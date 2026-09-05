@@ -181,4 +181,29 @@ class HotelAccessTest extends TestCase
             ->assertStatus(404)
             ->assertJson(['success' => false]);
     }
+
+    /**
+     * Regression test for Phase 2D bug #2: implicit route model binding
+     * on a genuinely missing id used to leak Eloquent's raw exception
+     * message instead of the standard localized not-found message. This
+     * is the non-Inventory resource confirming the bootstrap/app.php fix
+     * is general — not specific to Room/RoomType.
+     */
+    public function test_implicit_route_model_binding_404_returns_the_standard_message_without_leaking_internals(): void
+    {
+        $owner = User::factory()->groupOwner()->create();
+
+        $response = $this->actingAs($owner, 'sanctum')
+            ->getJson('/api/v1/hotels/999999')
+            ->assertStatus(404)
+            ->assertExactJson([
+                'success' => false,
+                'message' => 'The requested resource was not found.',
+            ]);
+
+        $body = $response->getContent();
+        $this->assertStringNotContainsString('Hotel', $body, 'Response leaked the model class name.');
+        $this->assertStringNotContainsString('App\\Domain', $body);
+        $this->assertStringNotContainsString('No query results', $body);
+    }
 }

@@ -1,925 +1,4145 @@
 {
-	"info": {
-		"_postman_id": "51ad8dfc-71b5-43b5-ae25-1a80387b705b",
-		"name": "Hotel Management API — Phase 1",
-		"description": "Phase 1 (Foundation / RBAC) endpoints for the Hotel Group Management Platform API, generated directly from the current Laravel routes, Form Requests, and API Resources under /api/v1. Only endpoints that exist in the codebase today are included. Collection-level auth is Bearer {{access_token}}, populated automatically by the Login request.",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "0"
-	},
-	"item": [
-		{
-			"name": "Authentication",
-			"item": [
-				{
-					"name": "Login",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"var jsonData = pm.response.json();",
-									"",
-									"pm.test(\"Response follows the standard success envelope\", function () {",
-									"    pm.expect(jsonData).to.have.property(\"success\", true);",
-									"    pm.expect(jsonData).to.have.property(\"message\");",
-									"    pm.expect(jsonData.data).to.have.property(\"user\");",
-									"    pm.expect(jsonData.data).to.have.property(\"token\");",
-									"});",
-									"",
-									"pm.test(\"Access token is present and saved to {{access_token}}\", function () {",
-									"    pm.expect(jsonData.data.token).to.be.a(\"string\").and.to.have.lengthOf.above(0);",
-									"    pm.environment.set(\"access_token\", jsonData.data.token);",
-									"});",
-									"",
-									"pm.test(\"Logged-in user profile includes role\", function () {",
-									"    pm.expect(jsonData.data.user).to.have.property(\"role\");",
-									"    pm.expect(jsonData.data.user.role).to.have.property(\"slug\");",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"owner@example.com\",\n    \"password\": \"password\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/auth/login",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"auth",
-								"login"
-							]
-						},
-						"description": "Authenticates a staff user (Group Owner / Hotel Manager / Reception) via App\\Http\\Controllers\\Api\\V1\\AuthController::login. Body validated by LoginRequest: email (required, string, email:filter), password (required, string). On success, issues a Sanctum bearer token and saves it to {{access_token}}.\n\nThe seeded local Group Owner (php artisan db:seed, local environment only) is owner@example.com / password — adjust to a real account for other environments."
-					},
-					"response": []
-				},
-				{
-					"name": "Get Authenticated User (Me)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"var jsonData = pm.response.json();",
-									"",
-									"pm.test(\"Returns the authenticated user's own profile\", function () {",
-									"    pm.expect(jsonData.success).to.eql(true);",
-									"    pm.expect(jsonData.data).to.have.property(\"id\");",
-									"    pm.expect(jsonData.data).to.have.property(\"email\");",
-									"    pm.expect(jsonData.data).to.have.property(\"role\");",
-									"    pm.expect(jsonData.data.role).to.have.property(\"permissions\");",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/auth/me",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"auth",
-								"me"
-							]
-						},
-						"description": "Returns the authenticated user's own profile (App\\Http\\Controllers\\Api\\V1\\AuthController::me), including role, the role's permissions, and hotel access. Requires auth:sanctum."
-					},
-					"response": []
-				},
-				{
-					"name": "Logout",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"var jsonData = pm.response.json();",
-									"",
-									"pm.test(\"Logout success envelope\", function () {",
-									"    pm.expect(jsonData.success).to.eql(true);",
-									"    pm.expect(jsonData.data).to.eql(null);",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/auth/logout",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"auth",
-								"logout"
-							]
-						},
-						"description": "Revokes the current Sanctum access token (App\\Http\\Controllers\\Api\\V1\\AuthController::logout). Requires auth:sanctum. After this call, {{access_token}} is no longer valid — run Login again before further requests."
-					},
-					"response": []
-				}
-			],
-			"description": "AuthController: login, logout, and the authenticated user's own profile."
-		},
-		{
-			"name": "Hotel Groups",
-			"item": [
-				{
-					"name": "List Hotel Groups",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"var jsonData = pm.response.json();",
-									"",
-									"pm.test(\"Paginated list envelope\", function () {",
-									"    pm.expect(jsonData.success).to.eql(true);",
-									"    pm.expect(jsonData.data).to.be.an(\"array\");",
-									"    pm.expect(jsonData.meta).to.have.property(\"current_page\");",
-									"    pm.expect(jsonData.meta).to.have.property(\"total\");",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/hotel-groups",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"hotel-groups"
-							]
-						},
-						"description": "App\\Http\\Controllers\\Api\\V1\\HotelGroupController::index. Requires the hotel-groups.manage permission (Group Owner). Returns a paginated list of Hotel Groups."
-					},
-					"response": []
-				},
-				{
-					"name": "Create Hotel Group",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 201\", function () {",
-									"    pm.response.to.have.status(201);",
-									"});",
-									"",
-									"var jsonData = pm.response.json();",
-									"",
-									"pm.test(\"Created hotel group returned with expected fields\", function () {",
-									"    pm.expect(jsonData.success).to.eql(true);",
-									"    pm.expect(jsonData.message).to.eql(\"Created successfully.\");",
-									"    pm.expect(jsonData.data).to.have.property(\"id\");",
-									"    pm.expect(jsonData.data.slug).to.eql(\"acme-hotels\");",
-									"});",
-									"",
-									"pm.test(\"hotel_group_id saved for later requests\", function () {",
-									"    pm.environment.set(\"hotel_group_id\", jsonData.data.id);",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Acme Hotels\",\n    \"slug\": \"acme-hotels\",\n    \"is_active\": true\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/hotel-groups",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"hotel-groups"
-							]
-						},
-						"description": "App\\Http\\Controllers\\Api\\V1\\HotelGroupController::store. Validated by StoreHotelGroupRequest: name (required, string, max:255), slug (required, string, max:255, alpha_dash, unique:hotel_groups,slug), is_active (optional, boolean). Requires hotel-groups.manage. Saves the created id to {{hotel_group_id}}."
-					},
-					"response": []
-				},
-				{
-					"name": "Get Hotel Group",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"var jsonData = pm.response.json();",
-									"",
-									"pm.test(\"Returned hotel group matches {{hotel_group_id}}\", function () {",
-									"    pm.expect(jsonData.success).to.eql(true);",
-									"    pm.expect(String(jsonData.data.id)).to.eql(pm.environment.get(\"hotel_group_id\"));",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/hotel-groups/{{hotel_group_id}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"hotel-groups",
-								"{{hotel_group_id}}"
-							]
-						},
-						"description": "App\\Http\\Controllers\\Api\\V1\\HotelGroupController::show. Requires hotel-groups.manage."
-					},
-					"response": []
-				},
-				{
-					"name": "Update Hotel Group",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"var jsonData = pm.response.json();",
-									"",
-									"pm.test(\"Hotel group updated\", function () {",
-									"    pm.expect(jsonData.success).to.eql(true);",
-									"    pm.expect(jsonData.message).to.eql(\"Updated successfully.\");",
-									"    pm.expect(jsonData.data.name).to.eql(\"Acme Hotels Group\");",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Acme Hotels Group\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/hotel-groups/{{hotel_group_id}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"hotel-groups",
-								"{{hotel_group_id}}"
-							]
-						},
-						"description": "App\\Http\\Controllers\\Api\\V1\\HotelGroupController::update. Validated by UpdateHotelGroupRequest: name (sometimes, string, max:255), slug (sometimes, string, max:255, alpha_dash, unique ignoring current record), is_active (sometimes, boolean). Requires hotel-groups.manage."
-					},
-					"response": []
-				}
-			],
-			"description": "HotelGroupController: R1 \"one owning entity, one control plane\" — Group-Owner-only management of Hotel Groups."
-		},
-		{
-			"name": "Hotels",
-			"item": [
-				{
-					"name": "List Hotels",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"var jsonData = pm.response.json();",
-									"",
-									"pm.test(\"Paginated list envelope, scoped to the caller's hotel access\", function () {",
-									"    pm.expect(jsonData.success).to.eql(true);",
-									"    pm.expect(jsonData.data).to.be.an(\"array\");",
-									"    pm.expect(jsonData.meta).to.have.property(\"current_page\");",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/hotels",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"hotels"
-							]
-						},
-						"description": "App\\Http\\Controllers\\Api\\V1\\HotelController::index. Requires hotels.view. Results are always resolved from the authenticated user's own hotel access (Group Owner sees all; Hotel Manager/Reception see only their assigned hotels) — never from a client-supplied parameter."
-					},
-					"response": []
-				},
-				{
-					"name": "Create Hotel",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 201\", function () {",
-									"    pm.response.to.have.status(201);",
-									"});",
-									"",
-									"var jsonData = pm.response.json();",
-									"",
-									"pm.test(\"Created hotel returned with expected fields\", function () {",
-									"    pm.expect(jsonData.success).to.eql(true);",
-									"    pm.expect(jsonData.message).to.eql(\"Created successfully.\");",
-									"    pm.expect(jsonData.data).to.have.property(\"id\");",
-									"    pm.expect(jsonData.data).to.have.property(\"hotel_group_id\");",
-									"});",
-									"",
-									"pm.test(\"hotel_id saved for later requests\", function () {",
-									"    pm.environment.set(\"hotel_id\", jsonData.data.id);",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"hotel_group_id\": {{hotel_group_id}},\n    \"name\": \"Hotel A\",\n    \"slug\": \"hotel-a\",\n    \"country\": \"US\",\n    \"city\": \"New York\",\n    \"timezone\": \"UTC\",\n    \"is_active\": true\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/hotels",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"hotels"
-							]
-						},
-						"description": "App\\Http\\Controllers\\Api\\V1\\HotelController::store. Validated by StoreHotelRequest: hotel_group_id (required, integer, exists:hotel_groups,id), name (required, string, max:255), slug (required, string, max:255, alpha_dash, unique:hotels,slug), country (nullable, string), city (nullable, string), timezone (optional, string, max:64), is_active (optional, boolean). Requires hotels.manage (Group Owner only). Saves the created id to {{hotel_id}}. Run \"Create Hotel Group\" first so {{hotel_group_id}} is set."
-					},
-					"response": []
-				},
-				{
-					"name": "Get Hotel",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"var jsonData = pm.response.json();",
-									"",
-									"pm.test(\"Returned hotel matches {{hotel_id}}\", function () {",
-									"    pm.expect(jsonData.success).to.eql(true);",
-									"    pm.expect(String(jsonData.data.id)).to.eql(pm.environment.get(\"hotel_id\"));",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/hotels/{{hotel_id}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"hotels",
-								"{{hotel_id}}"
-							]
-						},
-						"description": "App\\Http\\Controllers\\Api\\V1\\HotelController::show. Requires hotels.view AND that the authenticated user's own stored hotel access includes this hotel (or Group Owner). Returns 403 for an unassigned hotel, 404 if it does not exist."
-					},
-					"response": []
-				},
-				{
-					"name": "Update Hotel",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"var jsonData = pm.response.json();",
-									"",
-									"pm.test(\"Hotel updated\", function () {",
-									"    pm.expect(jsonData.success).to.eql(true);",
-									"    pm.expect(jsonData.message).to.eql(\"Updated successfully.\");",
-									"    pm.expect(jsonData.data.city).to.eql(\"Brooklyn\");",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"city\": \"Brooklyn\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/hotels/{{hotel_id}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"hotels",
-								"{{hotel_id}}"
-							]
-						},
-						"description": "App\\Http\\Controllers\\Api\\V1\\HotelController::update. Validated by UpdateHotelRequest (all fields \"sometimes\", same rules as create, slug uniqueness ignores the current record). Requires hotels.manage (Group Owner only)."
-					},
-					"response": []
-				}
-			],
-			"description": "HotelController: hotel-scope isolation enforced server-side via the authenticated user's own stored hotel access — a client-supplied hotel_id can select which hotel to view, never widen what is authorized."
-		},
-		{
-			"name": "Users",
-			"item": [
-				{
-					"name": "List Users",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"var jsonData = pm.response.json();",
-									"",
-									"pm.test(\"Paginated list envelope\", function () {",
-									"    pm.expect(jsonData.success).to.eql(true);",
-									"    pm.expect(jsonData.data).to.be.an(\"array\");",
-									"    pm.expect(jsonData.meta).to.have.property(\"current_page\");",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/users",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"users"
-							]
-						},
-						"description": "App\\Http\\Controllers\\Api\\V1\\UserController::index. Requires users.view or users.manage (Group Owner). Each entry includes its role but not its hotels relation (not eager-loaded on the list endpoint)."
-					},
-					"response": []
-				},
-				{
-					"name": "Create User",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"// Ensures {{role_id}} is populated even if the \"List Roles\" request",
-									"// (under Roles & Permissions) has not been run yet in this session,",
-									"// by calling the existing GET /roles endpoint directly.",
-									"if (!pm.environment.get(\"role_id\")) {",
-									"    pm.sendRequest({",
-									"        url: pm.environment.get(\"base_url\") + \"/roles\",",
-									"        method: \"GET\",",
-									"        header: {",
-									"            Accept: \"application/json\",",
-									"            Authorization: \"Bearer \" + pm.environment.get(\"access_token\")",
-									"        }",
-									"    }, function (err, res) {",
-									"        if (!err && res.code === 200) {",
-									"            var body = res.json();",
-									"            var roles = body.data || [];",
-									"            var hotelManager = roles.find(function (r) { return r.slug === \"hotel_manager\"; });",
-									"            var role = hotelManager || roles[0];",
-									"            if (role) {",
-									"                pm.environment.set(\"role_id\", role.id);",
-									"            }",
-									"        }",
-									"    });",
-									"}"
-								]
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 201\", function () {",
-									"    pm.response.to.have.status(201);",
-									"});",
-									"",
-									"var jsonData = pm.response.json();",
-									"",
-									"pm.test(\"Created user returned with role and hotel access\", function () {",
-									"    pm.expect(jsonData.success).to.eql(true);",
-									"    pm.expect(jsonData.message).to.eql(\"Created successfully.\");",
-									"    pm.expect(jsonData.data).to.have.property(\"id\");",
-									"    pm.expect(jsonData.data).to.have.property(\"role\");",
-									"    pm.expect(jsonData.data).to.have.property(\"hotels\");",
-									"});",
-									"",
-									"pm.test(\"user_id saved for later requests\", function () {",
-									"    pm.environment.set(\"user_id\", jsonData.data.id);",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Manager A\",\n    \"email\": \"manager-a@example.com\",\n    \"password\": \"password123\",\n    \"role_id\": {{role_id}},\n    \"hotel_ids\": [{{hotel_id}}]\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/users",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"users"
-							]
-						},
-						"description": "App\\Http\\Controllers\\Api\\V1\\UserController::store. Validated by StoreUserRequest: name (required), email (required, unique:users,email), password (required, min:8), role_id (required, exists:roles,id), is_active (optional, boolean), hotel_ids (optional array of ids existing in hotels). Requires users.manage (Group Owner only). Saves the created id to {{user_id}}. Run \"Create Hotel\" first so {{hotel_id}} is set; {{role_id}} is auto-resolved by the pre-request script if not already set."
-					},
-					"response": []
-				},
-				{
-					"name": "Get User",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"var jsonData = pm.response.json();",
-									"",
-									"pm.test(\"Returned user matches {{user_id}}\", function () {",
-									"    pm.expect(jsonData.success).to.eql(true);",
-									"    pm.expect(String(jsonData.data.id)).to.eql(pm.environment.get(\"user_id\"));",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/users/{{user_id}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"users",
-								"{{user_id}}"
-							]
-						},
-						"description": "App\\Http\\Controllers\\Api\\V1\\UserController::show. Any authenticated user may view their own profile this way; viewing another user's profile additionally requires users.view or users.manage."
-					},
-					"response": []
-				},
-				{
-					"name": "Update User",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"var jsonData = pm.response.json();",
-									"",
-									"pm.test(\"User updated\", function () {",
-									"    pm.expect(jsonData.success).to.eql(true);",
-									"    pm.expect(jsonData.message).to.eql(\"Updated successfully.\");",
-									"    pm.expect(jsonData.data.name).to.eql(\"Manager A Renamed\");",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Manager A Renamed\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/users/{{user_id}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"users",
-								"{{user_id}}"
-							]
-						},
-						"description": "App\\Http\\Controllers\\Api\\V1\\UserController::update. Validated by UpdateUserRequest (all fields \"sometimes\"; password nullable — omit or leave blank to keep the current password; hotel_ids, when supplied, replaces the user's hotel access). Requires users.manage (Group Owner only)."
-					},
-					"response": []
-				},
-				{
-					"name": "Delete User",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"var jsonData = pm.response.json();",
-									"",
-									"pm.test(\"Delete success envelope\", function () {",
-									"    pm.expect(jsonData.success).to.eql(true);",
-									"    pm.expect(jsonData.message).to.eql(\"Deleted successfully.\");",
-									"    pm.expect(jsonData.data).to.eql(null);",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/users/{{user_id}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"users",
-								"{{user_id}}"
-							]
-						},
-						"description": "App\\Http\\Controllers\\Api\\V1\\UserController::destroy. Requires users.manage (Group Owner only) and the target must not be the caller themselves (self-deletion is rejected)."
-					},
-					"response": []
-				}
-			],
-			"description": "UserController: staff account management, RBAC role assignment, and user_hotel_access — Group-Owner-only for create/update/delete; any user may view their own profile."
-		},
-		{
-			"name": "Roles & Permissions",
-			"item": [
-				{
-					"name": "List Roles",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"var jsonData = pm.response.json();",
-									"",
-									"pm.test(\"Roles list returned\", function () {",
-									"    pm.expect(jsonData.success).to.eql(true);",
-									"    pm.expect(jsonData.data).to.be.an(\"array\");",
-									"});",
-									"",
-									"if (jsonData.data && jsonData.data.length > 0) {",
-									"    var hotelManager = jsonData.data.find(function (r) { return r.slug === \"hotel_manager\"; });",
-									"    var role = hotelManager || jsonData.data[0];",
-									"    pm.test(\"role_id saved for later requests\", function () {",
-									"        pm.environment.set(\"role_id\", role.id);",
-									"    });",
-									"}"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/roles",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"roles"
-							]
-						},
-						"description": "App\\Http\\Controllers\\Api\\V1\\RoleController::index. Requires the roles.view permission (Group Owner). Returns the four fixed Phase 1 roles (group_owner, hotel_manager, reception, guest) with their permissions. Saves the Hotel Manager role's id (falling back to the first role) to {{role_id}} for use by \"Create User\"."
-					},
-					"response": []
-				},
-				{
-					"name": "List Permissions",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"var jsonData = pm.response.json();",
-									"",
-									"pm.test(\"Permissions list returned\", function () {",
-									"    pm.expect(jsonData.success).to.eql(true);",
-									"    pm.expect(jsonData.data).to.be.an(\"array\");",
-									"});",
-									"",
-									"if (jsonData.data && jsonData.data.length > 0) {",
-									"    pm.test(\"permission_id saved for future use\", function () {",
-									"        pm.environment.set(\"permission_id\", jsonData.data[0].id);",
-									"    });",
-									"}"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/permissions",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"permissions"
-							]
-						},
-						"description": "App\\Http\\Controllers\\Api\\V1\\PermissionController::index. Requires the permissions.view permission (Group Owner). Returns the fixed Phase 1 permission set seeded by RolePermissionSeeder. Saves the first permission's id to {{permission_id}} — no Phase 1 endpoint currently consumes a single permission id, this is kept for later phases."
-					},
-					"response": []
-				}
-			],
-			"description": "RoleController + PermissionController: read-only lookups over the seeded RBAC foundation."
-		}
-	],
-	"auth": {
-		"type": "bearer",
-		"bearer": [
-			{
-				"key": "token",
-				"value": "{{access_token}}",
-				"type": "string"
-			}
-		]
-	},
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		}
-	],
-	"variable": [
-		{
-			"key": "base_url",
-			"value": "http://127.0.0.1:8000/api/v1",
-			"type": "string"
-		}
-	]
+  "info": {
+    "_postman_id": "51ad8dfc-71b5-43b5-ae25-1a80387b705b",
+    "name": "Hotel Management API \u2014 Phase 1",
+    "description": "Phase 1 (Foundation / RBAC) endpoints for the Hotel Group Management Platform API, generated directly from the current Laravel routes, Form Requests, and API Resources under /api/v1. Only endpoints that exist in the codebase today are included. Collection-level auth is Bearer {{access_token}}, populated automatically by the Login request.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "0"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Response follows the standard success envelope\", function () {",
+                  "    pm.expect(jsonData).to.have.property(\"success\", true);",
+                  "    pm.expect(jsonData).to.have.property(\"message\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"user\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"token\");",
+                  "});",
+                  "",
+                  "pm.test(\"Access token is present and saved to {{access_token}}\", function () {",
+                  "    pm.expect(jsonData.data.token).to.be.a(\"string\").and.to.have.lengthOf.above(0);",
+                  "    pm.environment.set(\"access_token\", jsonData.data.token);",
+                  "});",
+                  "",
+                  "pm.test(\"Logged-in user profile includes role\", function () {",
+                  "    pm.expect(jsonData.data.user).to.have.property(\"role\");",
+                  "    pm.expect(jsonData.data.user.role).to.have.property(\"slug\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"owner@example.com\",\n    \"password\": \"password\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Authenticates a staff user (Group Owner / Hotel Manager / Reception) via App\\Http\\Controllers\\Api\\V1\\AuthController::login. Body validated by LoginRequest: email (required, string, email:filter), password (required, string). On success, issues a Sanctum bearer token and saves it to {{access_token}}.\n\nThe seeded local Group Owner (php artisan db:seed, local environment only) is owner@example.com / password \u2014 adjust to a real account for other environments."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Authenticated User (Me)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Returns the authenticated user's own profile\", function () {",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"email\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"role\");",
+                  "    pm.expect(jsonData.data.role).to.have.property(\"permissions\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Returns the authenticated user's own profile (App\\Http\\Controllers\\Api\\V1\\AuthController::me), including role, the role's permissions, and hotel access. Requires auth:sanctum."
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Logout success envelope\", function () {",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "    pm.expect(jsonData.data).to.eql(null);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Revokes the current Sanctum access token (App\\Http\\Controllers\\Api\\V1\\AuthController::logout). Requires auth:sanctum. After this call, {{access_token}} is no longer valid \u2014 run Login again before further requests."
+          },
+          "response": []
+        }
+      ],
+      "description": "AuthController: login, logout, and the authenticated user's own profile."
+    },
+    {
+      "name": "Hotel Groups",
+      "item": [
+        {
+          "name": "List Hotel Groups",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Paginated list envelope\", function () {",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "    pm.expect(jsonData.data).to.be.an(\"array\");",
+                  "    pm.expect(jsonData.meta).to.have.property(\"current_page\");",
+                  "    pm.expect(jsonData.meta).to.have.property(\"total\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/hotel-groups",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotel-groups"
+              ]
+            },
+            "description": "App\\Http\\Controllers\\Api\\V1\\HotelGroupController::index. Requires the hotel-groups.manage permission (Group Owner). Returns a paginated list of Hotel Groups."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Hotel Group",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Created hotel group returned with expected fields\", function () {",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "    pm.expect(jsonData.message).to.eql(\"Created successfully.\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "    pm.expect(jsonData.data.slug).to.eql(\"acme-hotels\");",
+                  "});",
+                  "",
+                  "pm.test(\"hotel_group_id saved for later requests\", function () {",
+                  "    pm.environment.set(\"hotel_group_id\", jsonData.data.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Acme Hotels\",\n    \"slug\": \"acme-hotels\",\n    \"is_active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/hotel-groups",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotel-groups"
+              ]
+            },
+            "description": "App\\Http\\Controllers\\Api\\V1\\HotelGroupController::store. Validated by StoreHotelGroupRequest: name (required, string, max:255), slug (required, string, max:255, alpha_dash, unique:hotel_groups,slug), is_active (optional, boolean). Requires hotel-groups.manage. Saves the created id to {{hotel_group_id}}."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Hotel Group",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Returned hotel group matches {{hotel_group_id}}\", function () {",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "    pm.expect(String(jsonData.data.id)).to.eql(pm.environment.get(\"hotel_group_id\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/hotel-groups/{{hotel_group_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotel-groups",
+                "{{hotel_group_id}}"
+              ]
+            },
+            "description": "App\\Http\\Controllers\\Api\\V1\\HotelGroupController::show. Requires hotel-groups.manage."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Hotel Group",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Hotel group updated\", function () {",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "    pm.expect(jsonData.message).to.eql(\"Updated successfully.\");",
+                  "    pm.expect(jsonData.data.name).to.eql(\"Acme Hotels Group\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Acme Hotels Group\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/hotel-groups/{{hotel_group_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotel-groups",
+                "{{hotel_group_id}}"
+              ]
+            },
+            "description": "App\\Http\\Controllers\\Api\\V1\\HotelGroupController::update. Validated by UpdateHotelGroupRequest: name (sometimes, string, max:255), slug (sometimes, string, max:255, alpha_dash, unique ignoring current record), is_active (sometimes, boolean). Requires hotel-groups.manage."
+          },
+          "response": []
+        }
+      ],
+      "description": "HotelGroupController: R1 \"one owning entity, one control plane\" \u2014 Group-Owner-only management of Hotel Groups."
+    },
+    {
+      "name": "Hotels",
+      "item": [
+        {
+          "name": "List Hotels",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Paginated list envelope, scoped to the caller's hotel access\", function () {",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "    pm.expect(jsonData.data).to.be.an(\"array\");",
+                  "    pm.expect(jsonData.meta).to.have.property(\"current_page\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/hotels",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels"
+              ]
+            },
+            "description": "App\\Http\\Controllers\\Api\\V1\\HotelController::index. Requires hotels.view. Results are always resolved from the authenticated user's own hotel access (Group Owner sees all; Hotel Manager/Reception see only their assigned hotels) \u2014 never from a client-supplied parameter."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Hotel",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Created hotel returned with expected fields\", function () {",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "    pm.expect(jsonData.message).to.eql(\"Created successfully.\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"hotel_group_id\");",
+                  "});",
+                  "",
+                  "pm.test(\"hotel_id saved for later requests\", function () {",
+                  "    pm.environment.set(\"hotel_id\", jsonData.data.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"hotel_group_id\": {{hotel_group_id}},\n    \"name\": \"Hotel A\",\n    \"slug\": \"hotel-a\",\n    \"country\": \"US\",\n    \"city\": \"New York\",\n    \"timezone\": \"UTC\",\n    \"is_active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/hotels",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels"
+              ]
+            },
+            "description": "App\\Http\\Controllers\\Api\\V1\\HotelController::store. Validated by StoreHotelRequest: hotel_group_id (required, integer, exists:hotel_groups,id), name (required, string, max:255), slug (required, string, max:255, alpha_dash, unique:hotels,slug), country (nullable, string), city (nullable, string), timezone (optional, string, max:64), is_active (optional, boolean). Requires hotels.manage (Group Owner only). Saves the created id to {{hotel_id}}. Run \"Create Hotel Group\" first so {{hotel_group_id}} is set."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Hotel",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Returned hotel matches {{hotel_id}}\", function () {",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "    pm.expect(String(jsonData.data.id)).to.eql(pm.environment.get(\"hotel_id\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}"
+              ]
+            },
+            "description": "App\\Http\\Controllers\\Api\\V1\\HotelController::show. Requires hotels.view AND that the authenticated user's own stored hotel access includes this hotel (or Group Owner). Returns 403 for an unassigned hotel, 404 if it does not exist."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Hotel",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Hotel updated\", function () {",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "    pm.expect(jsonData.message).to.eql(\"Updated successfully.\");",
+                  "    pm.expect(jsonData.data.city).to.eql(\"Brooklyn\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"city\": \"Brooklyn\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}"
+              ]
+            },
+            "description": "App\\Http\\Controllers\\Api\\V1\\HotelController::update. Validated by UpdateHotelRequest (all fields \"sometimes\", same rules as create, slug uniqueness ignores the current record). Requires hotels.manage (Group Owner only)."
+          },
+          "response": []
+        }
+      ],
+      "description": "HotelController: hotel-scope isolation enforced server-side via the authenticated user's own stored hotel access \u2014 a client-supplied hotel_id can select which hotel to view, never widen what is authorized."
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "List Users",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Paginated list envelope\", function () {",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "    pm.expect(jsonData.data).to.be.an(\"array\");",
+                  "    pm.expect(jsonData.meta).to.have.property(\"current_page\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users"
+              ]
+            },
+            "description": "App\\Http\\Controllers\\Api\\V1\\UserController::index. Requires users.view or users.manage (Group Owner). Each entry includes its role but not its hotels relation (not eager-loaded on the list endpoint)."
+          },
+          "response": []
+        },
+        {
+          "name": "Create User",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Ensures {{role_id}} is populated even if the \"List Roles\" request",
+                  "// (under Roles & Permissions) has not been run yet in this session,",
+                  "// by calling the existing GET /roles endpoint directly.",
+                  "if (!pm.environment.get(\"role_id\")) {",
+                  "    pm.sendRequest({",
+                  "        url: pm.environment.get(\"base_url\") + \"/roles\",",
+                  "        method: \"GET\",",
+                  "        header: {",
+                  "            Accept: \"application/json\",",
+                  "            Authorization: \"Bearer \" + pm.environment.get(\"access_token\")",
+                  "        }",
+                  "    }, function (err, res) {",
+                  "        if (!err && res.code === 200) {",
+                  "            var body = res.json();",
+                  "            var roles = body.data || [];",
+                  "            var hotelManager = roles.find(function (r) { return r.slug === \"hotel_manager\"; });",
+                  "            var role = hotelManager || roles[0];",
+                  "            if (role) {",
+                  "                pm.environment.set(\"role_id\", role.id);",
+                  "            }",
+                  "        }",
+                  "    });",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Created user returned with role and hotel access\", function () {",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "    pm.expect(jsonData.message).to.eql(\"Created successfully.\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"role\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"hotels\");",
+                  "});",
+                  "",
+                  "pm.test(\"user_id saved for later requests\", function () {",
+                  "    pm.environment.set(\"user_id\", jsonData.data.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Manager A\",\n    \"email\": \"manager-a@example.com\",\n    \"password\": \"password123\",\n    \"role_id\": {{role_id}},\n    \"hotel_ids\": [{{hotel_id}}]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users"
+              ]
+            },
+            "description": "App\\Http\\Controllers\\Api\\V1\\UserController::store. Validated by StoreUserRequest: name (required), email (required, unique:users,email), password (required, min:8), role_id (required, exists:roles,id), is_active (optional, boolean), hotel_ids (optional array of ids existing in hotels). Requires users.manage (Group Owner only). Saves the created id to {{user_id}}. Run \"Create Hotel\" first so {{hotel_id}} is set; {{role_id}} is auto-resolved by the pre-request script if not already set."
+          },
+          "response": []
+        },
+        {
+          "name": "Get User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Returned user matches {{user_id}}\", function () {",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "    pm.expect(String(jsonData.data.id)).to.eql(pm.environment.get(\"user_id\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "{{user_id}}"
+              ]
+            },
+            "description": "App\\Http\\Controllers\\Api\\V1\\UserController::show. Any authenticated user may view their own profile this way; viewing another user's profile additionally requires users.view or users.manage."
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"User updated\", function () {",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "    pm.expect(jsonData.message).to.eql(\"Updated successfully.\");",
+                  "    pm.expect(jsonData.data.name).to.eql(\"Manager A Renamed\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Manager A Renamed\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "{{user_id}}"
+              ]
+            },
+            "description": "App\\Http\\Controllers\\Api\\V1\\UserController::update. Validated by UpdateUserRequest (all fields \"sometimes\"; password nullable \u2014 omit or leave blank to keep the current password; hotel_ids, when supplied, replaces the user's hotel access). Requires users.manage (Group Owner only)."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Delete success envelope\", function () {",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "    pm.expect(jsonData.message).to.eql(\"Deleted successfully.\");",
+                  "    pm.expect(jsonData.data).to.eql(null);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "{{user_id}}"
+              ]
+            },
+            "description": "App\\Http\\Controllers\\Api\\V1\\UserController::destroy. Requires users.manage (Group Owner only) and the target must not be the caller themselves (self-deletion is rejected)."
+          },
+          "response": []
+        }
+      ],
+      "description": "UserController: staff account management, RBAC role assignment, and user_hotel_access \u2014 Group-Owner-only for create/update/delete; any user may view their own profile."
+    },
+    {
+      "name": "Roles & Permissions",
+      "item": [
+        {
+          "name": "List Roles",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Roles list returned\", function () {",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "    pm.expect(jsonData.data).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "if (jsonData.data && jsonData.data.length > 0) {",
+                  "    var hotelManager = jsonData.data.find(function (r) { return r.slug === \"hotel_manager\"; });",
+                  "    var role = hotelManager || jsonData.data[0];",
+                  "    pm.test(\"role_id saved for later requests\", function () {",
+                  "        pm.environment.set(\"role_id\", role.id);",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/roles",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "roles"
+              ]
+            },
+            "description": "App\\Http\\Controllers\\Api\\V1\\RoleController::index. Requires the roles.view permission (Group Owner). Returns the four fixed Phase 1 roles (group_owner, hotel_manager, reception, guest) with their permissions. Saves the Hotel Manager role's id (falling back to the first role) to {{role_id}} for use by \"Create User\"."
+          },
+          "response": []
+        },
+        {
+          "name": "List Permissions",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Permissions list returned\", function () {",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "    pm.expect(jsonData.data).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "if (jsonData.data && jsonData.data.length > 0) {",
+                  "    pm.test(\"permission_id saved for future use\", function () {",
+                  "        pm.environment.set(\"permission_id\", jsonData.data[0].id);",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/permissions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "permissions"
+              ]
+            },
+            "description": "App\\Http\\Controllers\\Api\\V1\\PermissionController::index. Requires the permissions.view permission (Group Owner). Returns the fixed Phase 1 permission set seeded by RolePermissionSeeder. Saves the first permission's id to {{permission_id}} \u2014 no Phase 1 endpoint currently consumes a single permission id, this is kept for later phases."
+          },
+          "response": []
+        }
+      ],
+      "description": "RoleController + PermissionController: read-only lookups over the seeded RBAC foundation."
+    },
+    {
+      "name": "01 Authentication",
+      "item": [
+        {
+          "name": "Login as Owner",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Demo Group Owner credentials from Phase1DemoSeeder (backend/database/seeders/Phase1DemoSeeder.php). Saves {{owner_token}}.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"owner@hotel.test\",\n    \"password\": \"Password123!\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Role is group_owner', () => pm.expect(json.data.user.role.slug).to.eql('group_owner'));",
+                  "pm.environment.set('owner_token', json.data.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login as Hotel Manager",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Demo Hotel Manager, assigned to Cairo Hotel + Hurghada Hotel only (not Luxor). Saves {{manager_token}}.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"manager@hotel.test\",\n    \"password\": \"Password123!\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Role is hotel_manager', () => pm.expect(json.data.user.role.slug).to.eql('hotel_manager'));",
+                  "pm.environment.set('manager_token', json.data.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login as Reception (Cairo)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Demo Reception user, assigned to Cairo Hotel only. Saves {{reception_token}}.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"reception.cairo@hotel.test\",\n    \"password\": \"Password123!\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Role is reception', () => pm.expect(json.data.user.role.slug).to.eql('reception'));",
+                  "pm.environment.set('reception_token', json.data.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login as Guest",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Demo Guest \u2014 carries no inventory permissions in Phase 1/2. Saves {{guest_token}}.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"guest@hotel.test\",\n    \"password\": \"Password123!\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Role is guest', () => pm.expect(json.data.user.role.slug).to.eql('guest'));",
+                  "pm.environment.set('guest_token', json.data.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Resolve Demo Hotel IDs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels"
+              ]
+            },
+            "description": "Resolves {{hotel_id}} (Cairo \u2014 assigned to Manager/Reception) and {{other_hotel_id}} (Hurghada \u2014 assigned to Manager only, NOT Reception) from the demo dataset, for every scenario below.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "var cairo = json.data.find(h => h.slug === 'demo-cairo-hotel');",
+                  "var hurghada = json.data.find(h => h.slug === 'demo-hurghada-hotel');",
+                  "pm.test('Demo hotels found', () => { pm.expect(cairo).to.not.be.undefined; pm.expect(hurghada).to.not.be.undefined; });",
+                  "if (cairo) pm.environment.set('hotel_id', cairo.id);",
+                  "if (hurghada) pm.environment.set('other_hotel_id', hurghada.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Unauthenticated Inventory Request",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/room-types",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "room-types"
+              ]
+            },
+            "description": "No Authorization header at all. Verifies the standard 401 envelope, same as every other authenticated endpoint.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Standard unauthenticated envelope', () => {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json.message).to.eql('Unauthenticated.');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Logs in as each of the four demo roles and resolves the demo hotel ids \u2014 every later folder depends on running this one first."
+    },
+    {
+      "name": "02 Room Types",
+      "item": [
+        {
+          "name": "List Room Types",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/room-types",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "room-types"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Standard paginated envelope', () => {",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data).to.be.an('array');",
+                  "    pm.expect(json.meta).to.have.property('current_page');",
+                  "    pm.expect(json.meta).to.have.property('total');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Room Type",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/room-types",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "room-types"
+              ]
+            },
+            "description": "Saves {{room_type_id}} for the rest of the collection.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"2D Verification Suite\",\n    \"base_price\": 175.0,\n    \"capacity\": 3,\n    \"amenities\": [\n        \"wifi\",\n        \"balcony\"\n    ],\n    \"description\": \"Phase 2D verification room type.\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "var json = pm.response.json();",
+                  "pm.test('Created with hotel_id from the route, inventory counts start at 0', () => {",
+                  "    pm.expect(json.data.hotel_id.toString()).to.eql(pm.environment.get('hotel_id'));",
+                  "    pm.expect(json.data.rooms_count).to.eql(0);",
+                  "    pm.expect(json.data.available_rooms_count).to.eql(0);",
+                  "    pm.expect(json.data.maintenance_rooms_count).to.eql(0);",
+                  "});",
+                  "pm.environment.set('room_type_id', json.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Show Room Type",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/room-types/{{room_type_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "room-types",
+                "{{room_type_id}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Returns the requested room type', () => pm.expect(json.data.id.toString()).to.eql(pm.environment.get('room_type_id')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Room Type",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/room-types/{{room_type_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "room-types",
+                "{{room_type_id}}"
+              ]
+            },
+            "description": "Fixed in Phase 2D.1: RoomTypeService::update() now returns the repository's refreshed, count-loaded instance instead of the stale pre-update one.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"capacity\": 4\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Capacity updated', () => pm.expect(json.data.capacity).to.eql(4));",
+                  "pm.test('Inventory counts remain numeric after update (Phase 2D.1 fix)', () => {",
+                  "    pm.expect(typeof json.data.rooms_count).to.eql('number');",
+                  "    pm.expect(typeof json.data.available_rooms_count).to.eql('number');",
+                  "    pm.expect(typeof json.data.maintenance_rooms_count).to.eql('number');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Activate Room Type",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/room-types/{{room_type_id}}/activate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "room-types",
+                "{{room_type_id}}",
+                "activate"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('is_active is true', () => pm.expect(json.data.is_active).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Deactivate Room Type",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/room-types/{{room_type_id}}/deactivate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "room-types",
+                "{{room_type_id}}",
+                "deactivate"
+              ]
+            },
+            "description": "Re-activate afterwards (see next request) so later scenarios in this collection are unaffected.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('is_active is false', () => pm.expect(json.data.is_active).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Re-activate Room Type (cleanup)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/room-types/{{room_type_id}}/activate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "room-types",
+                "{{room_type_id}}",
+                "activate"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verify Inventory Counts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/room-types/{{room_type_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "room-types",
+                "{{room_type_id}}"
+              ]
+            },
+            "description": "Run the '03 Rooms > Create Room' request first for a non-trivial count. Inventory counts are now confirmed correct on every path (list, show, create, update, activate, deactivate) after the Phase 2D.1 fix.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Inventory snapshot fields are present and numeric', () => {",
+                  "    pm.expect(typeof json.data.rooms_count).to.eql('number');",
+                  "    pm.expect(typeof json.data.available_rooms_count).to.eql('number');",
+                  "    pm.expect(typeof json.data.maintenance_rooms_count).to.eql('number');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Pagination",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/room-types",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "room-types"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Pagination meta structure', () => {",
+                  "    pm.expect(json.meta).to.have.property('current_page');",
+                  "    pm.expect(json.meta).to.have.property('per_page');",
+                  "    pm.expect(json.meta).to.have.property('total');",
+                  "    pm.expect(json.meta).to.have.property('last_page');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Duplicate Room Type Name (Rejected)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/room-types",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "room-types"
+              ]
+            },
+            "description": "Same name as 'Create Room Type' above, same hotel \u2014 UNIQUE(hotel_id, name) violation surfaced as a clean 422.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"2D Verification Suite\",\n    \"base_price\": 100,\n    \"capacity\": 1\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 422', () => pm.response.to.have.status(422));",
+                  "var json = pm.response.json();",
+                  "pm.test('Validation error on name', () => {",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json.errors).to.have.property('name');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Room Type CRUD, activation, inventory counts, pagination, duplicate-name handling."
+    },
+    {
+      "name": "03 Rooms",
+      "item": [
+        {
+          "name": "List Rooms",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/rooms",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "rooms"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Standard paginated envelope', () => {",
+                  "    pm.expect(json.data).to.be.an('array');",
+                  "    pm.expect(json.meta).to.have.property('total');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Room",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/rooms",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "rooms"
+              ]
+            },
+            "description": "Saves {{room_id}} for the rest of the collection.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"room_type_id\": \"{{room_type_id}}\",\n    \"room_number\": \"2D-101\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "var json = pm.response.json();",
+                  "pm.test('Created available, hotel_id from route', () => {",
+                  "    pm.expect(json.data.status).to.eql('available');",
+                  "    pm.expect(json.data.hotel_id.toString()).to.eql(pm.environment.get('hotel_id'));",
+                  "});",
+                  "pm.environment.set('room_id', json.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Show Room",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/rooms/{{room_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "rooms",
+                "{{room_id}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Returns the requested room', () => pm.expect(json.data.id.toString()).to.eql(pm.environment.get('room_id')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Room",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/rooms/{{room_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "rooms",
+                "{{room_id}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"room_number\": \"2D-101B\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('room_number updated', () => pm.expect(json.data.room_number).to.eql('2D-101B'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Filter Rooms by room_type_id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/rooms?room_type_id={{room_type_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "rooms?room_type_id={{room_type_id}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Every returned room matches the filter', () => {",
+                  "    json.data.forEach(r => pm.expect(r.room_type_id.toString()).to.eql(pm.environment.get('room_type_id')));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Room with Client-Supplied hotel_id (Ignored)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/rooms",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "rooms"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"hotel_id\": \"{{other_hotel_id}}\",\n    \"room_type_id\": \"{{room_type_id}}\",\n    \"room_number\": \"2D-102\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "var json = pm.response.json();",
+                  "pm.test('hotel_id is the route hotel, NOT the smuggled value', () => {",
+                  "    pm.expect(json.data.hotel_id.toString()).to.eql(pm.environment.get('hotel_id'));",
+                  "    pm.expect(json.data.hotel_id.toString()).to.not.eql(pm.environment.get('other_hotel_id'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Room with Client-Supplied status=booked (Ignored)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/rooms",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "rooms"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"room_type_id\": \"{{room_type_id}}\",\n    \"room_number\": \"2D-103\",\n    \"status\": \"booked\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "var json = pm.response.json();",
+                  "pm.test('Status is available, not booked', () => pm.expect(json.data.status).to.eql('available'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Room Type in Other Hotel (setup)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{other_hotel_id}}/room-types",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{other_hotel_id}}",
+                "room-types"
+              ]
+            },
+            "description": "Setup only \u2014 creates a Room Type that belongs to {{other_hotel_id}} (Hurghada), saved as {{other_room_type_id}}, so the next request can prove cross-hotel room_type_id is rejected.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"2D Cross-Hotel Setup Type\",\n    \"base_price\": 90,\n    \"capacity\": 2\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "var json = pm.response.json();",
+                  "pm.environment.set('other_room_type_id', json.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cross-Hotel room_type_id on Create (Rejected)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/rooms",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "rooms"
+              ]
+            },
+            "description": "{{other_room_type_id}} belongs to {{other_hotel_id}}, but this request targets {{hotel_id}} \u2014 RoomTypeHotelMismatchException, mapped to 422.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"room_type_id\": \"{{other_room_type_id}}\",\n    \"room_number\": \"2D-CROSS\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 422', () => pm.response.to.have.status(422));",
+                  "var json = pm.response.json();",
+                  "pm.test('Business exception message, no errors bag', () => {",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json.message).to.eql('The selected room type does not belong to this hotel.');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Room CRUD, filtering, hotel_id/status smuggling, cross-hotel room_type_id rejection."
+    },
+    {
+      "name": "04 Status Transitions",
+      "item": [
+        {
+          "name": "Available -> Under Maintenance",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/rooms/{{room_id}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "rooms",
+                "{{room_id}}",
+                "status"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"under_maintenance\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Now under_maintenance', () => pm.expect(json.data.status).to.eql('under_maintenance'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Under Maintenance -> Booked (Rejected)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/rooms/{{room_id}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "rooms",
+                "{{room_id}}",
+                "status"
+              ]
+            },
+            "description": "`booked` is rejected by Rule::in() validation before RoomService ever runs.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"booked\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 422', () => pm.response.to.have.status(422));",
+                  "var json = pm.response.json();",
+                  "pm.test('Rejected at validation layer', () => {",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json.errors.status[0]).to.include('invalid');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Under Maintenance -> Available",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/rooms/{{room_id}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "rooms",
+                "{{room_id}}",
+                "status"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"available\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Now available', () => pm.expect(json.data.status).to.eql('available'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Available -> Booked (Rejected)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/rooms/{{room_id}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "rooms",
+                "{{room_id}}",
+                "status"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"booked\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 422', () => pm.response.to.have.status(422));",
+                  "pm.test('Rejected', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Same-State: Available -> Available (Rejected)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/rooms/{{room_id}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "rooms",
+                "{{room_id}}",
+                "status"
+              ]
+            },
+            "description": "Matches Phase 2B behavior: a same-state request is not in RoomService::ALLOWED_TRANSITIONS, so it is rejected rather than treated as a no-op.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"available\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 422', () => pm.response.to.have.status(422));",
+                  "var json = pm.response.json();",
+                  "pm.test('Business exception: no self-transition', () => {",
+                  "    pm.expect(json.message).to.include(\"from 'available' to 'available'\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Booked -> Available (Rejected)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/rooms/{{room_id}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "rooms",
+                "{{room_id}}",
+                "status"
+              ]
+            },
+            "description": "PREREQUISITE: {{room_id}} must already be in `booked` status. Phase 2's API has no way to reach `booked` (by design), so set it directly for this check only: `UPDATE rooms SET status='booked' WHERE id = {{room_id}}`. Not a normal applicati\u00adon flow \u2014 verification-only.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"available\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 422', () => pm.response.to.have.status(422));",
+                  "var json = pm.response.json();",
+                  "pm.test('Business exception from booked', () => pm.expect(json.message).to.include(\"from 'booked'\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Booked -> Under Maintenance (Rejected)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/rooms/{{room_id}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "rooms",
+                "{{room_id}}",
+                "status"
+              ]
+            },
+            "description": "Same prerequisite as the previous request \u2014 {{room_id}} must be manually set to `booked` in the database first.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"under_maintenance\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 422', () => pm.response.to.have.status(422));",
+                  "var json = pm.response.json();",
+                  "pm.test('Business exception from booked', () => pm.expect(json.message).to.include(\"from 'booked'\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "available <-> under_maintenance, and every rejected transition involving booked."
+    },
+    {
+      "name": "05 Authorization",
+      "item": [
+        {
+          "name": "Owner: Access Hotel A (Cairo)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/room-types",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "room-types"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Owner: Access Hotel B (Hurghada)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{other_hotel_id}}/room-types",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{other_hotel_id}}",
+                "room-types"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 \u2014 Group Owner bypass applies to every hotel', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Manager: Access Assigned Hotel (Cairo)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{manager_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/rooms",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "rooms"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Manager: Access Unassigned Hotel (Rejected)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{manager_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{other_hotel_id}}/rooms",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{other_hotel_id}}",
+                "rooms"
+              ]
+            },
+            "description": "NOTE: despite the folder name using 'Hurghada' as other_hotel_id, the demo Manager IS actually assigned to Hurghada too. For a true 'unassigned' check, point this request at the Luxor hotel id instead (no demo staff assigned there) if this unexpectedly returns 200.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Standard forbidden envelope', () => pm.expect(pm.response.json().message).to.eql('This action is unauthorized.'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reception: Read Assigned Hotel (Cairo)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{reception_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/room-types",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "room-types"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 \u2014 view-only access granted', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reception: Attempt Create (Rejected)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{reception_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/room-types",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "room-types"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Reception Attempt\",\n    \"base_price\": 10,\n    \"capacity\": 1\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Reception has view-only inventory access', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Guest: Attempt Access (Rejected)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{guest_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/room-types",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "room-types"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Guest has no inventory access at all', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Group Owner / Hotel Manager / Reception / Guest access boundaries."
+    },
+    {
+      "name": "06 Hotel Isolation",
+      "item": [
+        {
+          "name": "Cross-Hotel Room Access (404)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{other_hotel_id}}/rooms/{{room_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{other_hotel_id}}",
+                "rooms",
+                "{{room_id}}"
+              ]
+            },
+            "description": "{{room_id}} belongs to {{hotel_id}} (Cairo), addressed through {{other_hotel_id}} (Hurghada)'s URL. Route/tenancy consistency check \u2014 independent of the requester's own permissions.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 404 \u2014 even for Group Owner', () => pm.response.to.have.status(404));",
+                  "pm.test('Standard not-found envelope', () => {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json.message).to.eql('The requested resource was not found.');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cross-Hotel Room Type Access (404)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{other_hotel_id}}/room-types/{{room_type_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{other_hotel_id}}",
+                "room-types",
+                "{{room_type_id}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 404 \u2014 even for Group Owner', () => pm.response.to.have.status(404));",
+                  "pm.test('Standard not-found envelope', () => {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json.message).to.eql('The requested resource was not found.');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Room Type Create with Fake hotel_id",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/room-types",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "room-types"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"hotel_id\": \"{{other_hotel_id}}\",\n    \"name\": \"2D Fake Hotel Test\",\n    \"base_price\": 50,\n    \"capacity\": 1\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "var json = pm.response.json();",
+                  "pm.test('hotel_id is the route hotel', () => pm.expect(json.data.hotel_id.toString()).to.eql(pm.environment.get('hotel_id')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Room Create with Fake hotel_id",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/rooms",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "rooms"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"hotel_id\": \"{{other_hotel_id}}\",\n    \"room_type_id\": \"{{room_type_id}}\",\n    \"room_number\": \"2D-FAKE\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "var json = pm.response.json();",
+                  "pm.test('hotel_id is the route hotel', () => pm.expect(json.data.hotel_id.toString()).to.eql(pm.environment.get('hotel_id')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Room Update with Fake hotel_id",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/rooms/{{room_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "rooms",
+                "{{room_id}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"hotel_id\": \"{{other_hotel_id}}\",\n    \"room_number\": \"2D-STILL-CAIRO\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('hotel_id unchanged', () => pm.expect(json.data.hotel_id.toString()).to.eql(pm.environment.get('hotel_id')));"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Cross-hotel access denial and hotel_id-smuggling resistance."
+    },
+    {
+      "name": "07 Validation & Errors",
+      "item": [
+        {
+          "name": "Validation Error",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/room-types",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "room-types"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 422', () => pm.response.to.have.status(422));",
+                  "var json = pm.response.json();",
+                  "pm.test('Standard validation envelope', () => {",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json).to.have.property('errors');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "403 Authorization Error",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{guest_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/room-types",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "room-types"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"X\",\n    \"base_price\": 1,\n    \"capacity\": 1\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Standard forbidden envelope, no errors key', () => {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json.message).to.eql('This action is unauthorized.');",
+                  "    pm.expect(json).to.not.have.property('errors');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "404 Not Found (genuinely missing id)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{hotel_id}}/room-types/999999",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{hotel_id}}",
+                "room-types",
+                "999999"
+              ]
+            },
+            "description": "Fixed in Phase 2D.1: bootstrap/app.php's HttpExceptionInterface renderable now detects a wrapped ModelNotFoundException (via getPrevious()) and returns the standard localized message instead of leaking the raw Eloquent exception text.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));",
+                  "var json = pm.response.json();",
+                  "pm.test('Standard localized not-found message, no internal details leaked (Phase 2D.1 fix)', () => {",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json.message).to.eql('The requested resource was not found.');",
+                  "});",
+                  "pm.test('Response body contains no model/class internals', () => {",
+                  "    var body = pm.response.text();",
+                  "    pm.expect(body).to.not.include('RoomType');",
+                  "    pm.expect(body).to.not.include('App\\\\Domain');",
+                  "    pm.expect(body).to.not.include('No query results');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cross-Hotel Not Found (nested resource)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{other_hotel_id}}/room-types/{{room_type_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{other_hotel_id}}",
+                "room-types",
+                "{{room_type_id}}"
+              ]
+            },
+            "description": "Contrast with the previous request: this 404 comes from the explicit ensureBelongsToHotel()/abort(404) tenancy check rather than implicit route model binding. Both now return the identical clean standard message after the Phase 2D.1 fix.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));",
+                  "var json = pm.response.json();",
+                  "pm.test('Clean standard message (this path is NOT affected by the known issue above)', () => {",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json.message).to.eql('The requested resource was not found.');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Business Exception (cross-hotel room_type_id)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{other_hotel_id}}/rooms",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{other_hotel_id}}",
+                "rooms"
+              ]
+            },
+            "description": "{{room_type_id}} belongs to {{hotel_id}} (Cairo), this request targets {{other_hotel_id}} (Hurghada) \u2014 RoomTypeHotelMismatchException.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"room_type_id\": \"{{room_type_id}}\",\n    \"room_number\": \"2D-BIZ-EXC\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 422', () => pm.response.to.have.status(422));",
+                  "var json = pm.response.json();",
+                  "pm.test('Business exception mapped to the standard error envelope', () => {",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json.message).to.eql('The selected room type does not belong to this hotel.');",
+                  "    pm.expect(json).to.not.have.property('errors');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Standard error envelope shape for validation, authorization, not-found, and business-exception responses."
+    },
+    {
+      "name": "08 Reservations",
+      "item": [
+        {
+          "name": "List Reservations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations"
+              ]
+            },
+            "description": "Owner sees reservations across every hotel.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Standard paginated envelope', () => {",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data).to.be.an('array');",
+                  "    pm.expect(json.meta).to.have.property('current_page');",
+                  "    pm.expect(json.meta).to.have.property('total');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Reservation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations"
+              ]
+            },
+            "description": "Saves {{reservation_id}} for the rest of the folder. REQUIRES {{guest_id}} to already be set to an existing `guests` table row id \u2014 there is no Guest API yet (Phase 3-Pre created only the model/migration/factory), so this must be created manually before running this request, e.g. via `php artisan tinker` -> App\\Domain\\Reservation\\Models\\Guest::factory()->create()->id.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"room_type_id\": \"{{room_type_id}}\",\n    \"guest_id\": \"{{guest_id}}\",\n    \"check_in\": \"2026-12-01\",\n    \"check_out\": \"2026-12-05\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "var json = pm.response.json();",
+                  "pm.test('Created in PENDING with hotel_id derived from room_type_id', () => {",
+                  "    pm.expect(json.data.hotel_id.toString()).to.eql(pm.environment.get('hotel_id'));",
+                  "    pm.expect(json.data.status).to.eql('pending');",
+                  "    pm.expect(json.data.room_id).to.eql(null);",
+                  "});",
+                  "pm.environment.set('reservation_id', json.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Show Reservation",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations/{{reservation_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations",
+                "{{reservation_id}}"
+              ]
+            },
+            "description": "Retrieves the reservation created above.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Matches the created reservation', () => {",
+                  "    pm.expect(json.data.id.toString()).to.eql(pm.environment.get('reservation_id'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Show Reservation - Not Found (404)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations/999999",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations",
+                "999999"
+              ]
+            },
+            "description": "A genuinely nonexistent id returns the standard clean 404, never a leaked Eloquent message.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Standard error envelope', () => {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json.message).to.eql('The requested resource was not found.');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Reservation - Manager Assigned Hotel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{manager_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations"
+              ]
+            },
+            "description": "Manager is assigned to the Cairo hotel {{hotel_id}} belongs to \u2014 create succeeds.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"room_type_id\": \"{{room_type_id}}\",\n    \"guest_id\": \"{{guest_id}}\",\n    \"check_in\": \"2026-12-01\",\n    \"check_out\": \"2026-12-05\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Resolve Luxor Hotel ID (setup)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels"
+              ]
+            },
+            "description": "Manager (demo dataset) is assigned to Cairo + Hurghada but NOT Luxor \u2014 resolves {{luxor_hotel_id}} for the 'unassigned hotel' scenario below, since {{other_hotel_id}} (Hurghada) is also assigned to the Manager and cannot be used for that case.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "var luxor = json.data.find(h => h.slug === 'demo-luxor-hotel');",
+                  "pm.test('Luxor hotel found', () => pm.expect(luxor).to.not.be.undefined);",
+                  "if (luxor) pm.environment.set('luxor_hotel_id', luxor.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Room Type in Luxor (setup)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{luxor_hotel_id}}/room-types",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{luxor_hotel_id}}",
+                "room-types"
+              ]
+            },
+            "description": "Saves {{luxor_room_type_id}} for the 'unassigned hotel' create scenario.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"3C Verification Suite\",\n    \"base_price\": 120.0,\n    \"capacity\": 2\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('luxor_room_type_id', pm.response.json().data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Reservation - Manager Unassigned Hotel (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{manager_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations"
+              ]
+            },
+            "description": "Manager has no access to Luxor \u2014 denied even though hotel_id is only derived, never sent.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"room_type_id\": \"{{luxor_room_type_id}}\",\n    \"guest_id\": \"{{guest_id}}\",\n    \"check_in\": \"2026-12-01\",\n    \"check_out\": \"2026-12-05\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Reservation - Reception (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{reception_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations"
+              ]
+            },
+            "description": "Reception has reservations.view but never reservations.manage (approved D4) \u2014 denied.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"room_type_id\": \"{{room_type_id}}\",\n    \"guest_id\": \"{{guest_id}}\",\n    \"check_in\": \"2026-12-01\",\n    \"check_out\": \"2026-12-05\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Reservation - Guest (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{guest_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations"
+              ]
+            },
+            "description": "The Guest RBAC role (staff-side, no relation to the Guest domain model) has no reservation permissions at all.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"room_type_id\": \"{{room_type_id}}\",\n    \"guest_id\": \"{{guest_id}}\",\n    \"check_in\": \"2026-12-01\",\n    \"check_out\": \"2026-12-05\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Reservation with Client-Supplied hotel_id (Ignored)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations"
+              ]
+            },
+            "description": "hotel_id is silently stripped by the Form Request and re-derived from room_type_id \u2014 it can never widen or redirect access.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"hotel_id\": \"{{luxor_hotel_id}}\",\n    \"room_type_id\": \"{{room_type_id}}\",\n    \"guest_id\": \"{{guest_id}}\",\n    \"check_in\": \"2026-12-01\",\n    \"check_out\": \"2026-12-05\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "var json = pm.response.json();",
+                  "pm.test('hotel_id is derived, not the client-supplied Luxor id', () => {",
+                  "    pm.expect(json.data.hotel_id.toString()).to.eql(pm.environment.get('hotel_id'));",
+                  "    pm.expect(json.data.hotel_id.toString()).to.not.eql(pm.environment.get('luxor_hotel_id'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Reservation with Client-Supplied status and price_snapshot (Ignored)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations"
+              ]
+            },
+            "description": "status/price_snapshot/created_by_staff_id/cancelled_at/cancellation_reason are all server-controlled (Phase 3B) \u2014 none are accepted by the Form Request.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"room_type_id\": \"{{room_type_id}}\",\n    \"guest_id\": \"{{guest_id}}\",\n    \"check_in\": \"2026-12-01\",\n    \"check_out\": \"2026-12-05\",\n    \"status\": \"checked_in\",\n    \"price_snapshot\": 1.0,\n    \"created_by_staff_id\": 999999,\n    \"cancelled_at\": \"2026-01-01 00:00:00\",\n    \"cancellation_reason\": \"not allowed\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "var json = pm.response.json();",
+                  "pm.test('Server-controlled fields win over client input', () => {",
+                  "    pm.expect(json.data.status).to.eql('pending');",
+                  "    pm.expect(json.data.price_snapshot).to.not.eql('1.00');",
+                  "    pm.expect(json.data.cancelled_at).to.eql(null);",
+                  "    pm.expect(json.data.cancellation_reason).to.eql(null);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Room in Other Hotel (setup)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotels/{{other_hotel_id}}/rooms",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "hotels",
+                "{{other_hotel_id}}",
+                "rooms"
+              ]
+            },
+            "description": "Saves {{other_room_id}} (a Room belonging to Hurghada) for the cross-hotel room_id rejection case below.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"room_type_id\": \"{{other_room_type_id}}\",\n    \"room_number\": \"3C-1\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('other_room_id', pm.response.json().data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Reservation - Cross-Hotel room_id (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations"
+              ]
+            },
+            "description": "room_type_id resolves to Cairo but room_id belongs to Hurghada \u2014 RoomHotelMismatchException, 422.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"room_type_id\": \"{{room_type_id}}\",\n    \"room_id\": \"{{other_room_id}}\",\n    \"guest_id\": \"{{guest_id}}\",\n    \"check_in\": \"2026-12-01\",\n    \"check_out\": \"2026-12-05\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 422', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Reservation - check_out Before check_in (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations"
+              ]
+            },
+            "description": "Structural validation only (approved D2) \u2014 not an availability check.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"room_type_id\": \"{{room_type_id}}\",\n    \"guest_id\": \"{{guest_id}}\",\n    \"check_in\": \"2026-12-05\",\n    \"check_out\": \"2026-12-01\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 422', () => pm.response.to.have.status(422));",
+                  "pm.test('check_out is the reported field', () => pm.expect(pm.response.json().errors).to.have.property('check_out'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Reservation - check_out Equal check_in (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations"
+              ]
+            },
+            "description": "check_out must be strictly after check_in (approved D2), not merely on-or-after.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"room_type_id\": \"{{room_type_id}}\",\n    \"guest_id\": \"{{guest_id}}\",\n    \"check_in\": \"2026-12-01\",\n    \"check_out\": \"2026-12-01\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 422', () => pm.response.to.have.status(422));",
+                  "pm.test('check_out is the reported field', () => pm.expect(pm.response.json().errors).to.have.property('check_out'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Reservation - Missing room_type_id (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations"
+              ]
+            },
+            "description": "Standard validation envelope.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"guest_id\": \"{{guest_id}}\",\n    \"check_in\": \"2026-12-01\",\n    \"check_out\": \"2026-12-05\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 422', () => pm.response.to.have.status(422));",
+                  "var json = pm.response.json();",
+                  "pm.test('Standard error envelope', () => {",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json.errors).to.have.property('room_type_id');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Reservation in Luxor (setup)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations"
+              ]
+            },
+            "description": "Saves {{luxor_reservation_id}} \u2014 Owner can create anywhere, used to prove cross-hotel show() below.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"room_type_id\": \"{{luxor_room_type_id}}\",\n    \"guest_id\": \"{{guest_id}}\",\n    \"check_in\": \"2026-12-01\",\n    \"check_out\": \"2026-12-05\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('luxor_reservation_id', pm.response.json().data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Show Reservation - Cross-Hotel Access (404)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{manager_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations/{{luxor_reservation_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations",
+                "{{luxor_reservation_id}}"
+              ]
+            },
+            "description": "Manager has no access to Luxor. Approved D1: this returns 404, the same as a genuinely nonexistent id \u2014 never a 403 that would leak the reservation's existence.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 404 (not 403 - existence is not leaked)', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000/api/v1",
+      "type": "string"
+    }
+  ]
 }

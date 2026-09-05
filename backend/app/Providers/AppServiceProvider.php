@@ -18,6 +18,20 @@ use App\Domain\IdentityAccess\Repositories\Contracts\UserRepositoryInterface;
 use App\Domain\IdentityAccess\Repositories\EloquentPermissionRepository;
 use App\Domain\IdentityAccess\Repositories\EloquentRoleRepository;
 use App\Domain\IdentityAccess\Repositories\EloquentUserRepository;
+use App\Domain\Inventory\Models\Room;
+use App\Domain\Inventory\Models\RoomType;
+use App\Domain\Inventory\Policies\RoomPolicy;
+use App\Domain\Inventory\Policies\RoomTypePolicy;
+use App\Domain\Inventory\Repositories\Contracts\RoomRepositoryInterface;
+use App\Domain\Inventory\Repositories\Contracts\RoomTypeRepositoryInterface;
+use App\Domain\Inventory\Repositories\EloquentRoomRepository;
+use App\Domain\Inventory\Repositories\EloquentRoomTypeRepository;
+use App\Domain\Reservation\Models\Reservation;
+use App\Domain\Reservation\Policies\ReservationPolicy;
+use App\Domain\Reservation\Repositories\Contracts\GuestRepositoryInterface;
+use App\Domain\Reservation\Repositories\Contracts\ReservationRepositoryInterface;
+use App\Domain\Reservation\Repositories\EloquentGuestRepository;
+use App\Domain\Reservation\Repositories\EloquentReservationRepository;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -32,6 +46,10 @@ class AppServiceProvider extends ServiceProvider
         PermissionRepositoryInterface::class => EloquentPermissionRepository::class,
         HotelGroupRepositoryInterface::class => EloquentHotelGroupRepository::class,
         HotelRepositoryInterface::class => EloquentHotelRepository::class,
+        RoomTypeRepositoryInterface::class => EloquentRoomTypeRepository::class,
+        RoomRepositoryInterface::class => EloquentRoomRepository::class,
+        ReservationRepositoryInterface::class => EloquentReservationRepository::class,
+        GuestRepositoryInterface::class => EloquentGuestRepository::class,
     ];
 
     /**
@@ -41,6 +59,9 @@ class AppServiceProvider extends ServiceProvider
         HotelGroup::class => HotelGroupPolicy::class,
         Hotel::class => HotelPolicy::class,
         User::class => UserPolicy::class,
+        RoomType::class => RoomTypePolicy::class,
+        Room::class => RoomPolicy::class,
+        Reservation::class => ReservationPolicy::class,
     ];
 
     public function register(): void

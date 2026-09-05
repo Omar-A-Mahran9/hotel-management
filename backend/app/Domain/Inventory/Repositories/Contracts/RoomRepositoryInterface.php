@@ -1,0 +1,42 @@
+<?php
+
+namespace App\Domain\Inventory\Repositories\Contracts;
+
+use App\Domain\HotelGroup\Models\Hotel;
+use App\Domain\IdentityAccess\Models\User;
+use App\Domain\Inventory\Models\Room;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+
+interface RoomRepositoryInterface
+{
+    /**
+     * Rooms belonging to $hotel, filtered through $user's own hotel
+     * access, with an optional room_type_id filter.
+     */
+    public function paginateAccessibleBy(User $user, Hotel $hotel, ?int $roomTypeId = null, int $perPage = 15): LengthAwarePaginator;
+
+    /**
+     * Plain lookup by id — no authorization decision is made here, that
+     * is the Policy's responsibility.
+     */
+    public function find(int $id): ?Room;
+
+    /**
+     * Locks the row for the duration of the caller's transaction. Must
+     * only be called from within an active DB::transaction() — this is
+     * the groundwork the future Reservations domain's concurrency model
+     * will build on (see approved plan §6/§9); it is not itself a
+     * date-range or reservation lock.
+     */
+    public function findForUpdate(int $id): ?Room;
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function create(array $data): Room;
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function update(Room $room, array $data): Room;
+}

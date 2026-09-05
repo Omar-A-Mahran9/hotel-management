@@ -2,6 +2,10 @@
 
 use App\Domain\IdentityAccess\Exceptions\AccountInactiveException;
 use App\Domain\IdentityAccess\Exceptions\InvalidCredentialsException;
+use App\Domain\Inventory\Exceptions\InvalidRoomStatusTransitionException;
+use App\Domain\Inventory\Exceptions\RoomTypeHotelMismatchException;
+use App\Domain\Reservation\Exceptions\RoomHotelMismatchException;
+use App\Domain\Reservation\Exceptions\RoomTypeMismatchException;
 use App\Http\Middleware\ForceJsonResponse;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -75,10 +79,48 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        $exceptions->renderable(function (HttpExceptionInterface $e, Request $request) use ($envelope) {
+        $exceptions->renderable(function (RoomTypeHotelMismatchException $e, Request $request) use ($envelope) {
             if ($request->is('api/*')) {
-                return $envelope($e->getMessage() ?: __('api.not_found'), $e->getStatusCode());
+                return $envelope($e->getMessage(), 422);
             }
+        });
+
+        $exceptions->renderable(function (InvalidRoomStatusTransitionException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (RoomHotelMismatchException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (RoomTypeMismatchException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (HttpExceptionInterface $e, Request $request) use ($envelope) {
+            if (! $request->is('api/*')) {
+                return null;
+            }
+
+            // Laravel's Handler::prepareException() converts a
+            // ModelNotFoundException (thrown by implicit route model
+            // binding) into a NotFoundHttpException before any
+            // renderable ever sees it, carrying the original raw
+            // Eloquent message along as getMessage(). Detecting that via
+            // getPrevious() here — rather than trusting getMessage() —
+            // keeps that internal detail (model class, id) out of the
+            // response, regardless of which resource it came from.
+            if ($e->getPrevious() instanceof ModelNotFoundException) {
+                return $envelope(__('api.not_found'), 404);
+            }
+
+            return $envelope($e->getMessage() ?: __('api.not_found'), $e->getStatusCode());
         });
 
         $exceptions->renderable(function (Throwable $e, Request $request) use ($envelope) {

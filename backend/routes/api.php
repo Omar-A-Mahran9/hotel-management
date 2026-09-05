@@ -4,7 +4,10 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\HotelController;
 use App\Http\Controllers\Api\V1\HotelGroupController;
 use App\Http\Controllers\Api\V1\PermissionController;
+use App\Http\Controllers\Api\V1\ReservationController;
 use App\Http\Controllers\Api\V1\RoleController;
+use App\Http\Controllers\Api\V1\RoomController;
+use App\Http\Controllers\Api\V1\RoomTypeController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,5 +36,24 @@ Route::prefix('v1')->group(function () {
         Route::get('/users/{user}', [UserController::class, 'show']);
         Route::put('/users/{user}', [UserController::class, 'update']);
         Route::delete('/users/{user}', [UserController::class, 'destroy']);
+
+        Route::get('/reservations', [ReservationController::class, 'index']);
+        Route::post('/reservations', [ReservationController::class, 'store']);
+        Route::get('/reservations/{reservation}', [ReservationController::class, 'show']);
+
+        Route::prefix('/hotels/{hotel}')->group(function () {
+            Route::get('/room-types', [RoomTypeController::class, 'index']);
+            Route::post('/room-types', [RoomTypeController::class, 'store']);
+            Route::get('/room-types/{roomType}', [RoomTypeController::class, 'show']);
+            Route::match(['put', 'patch'], '/room-types/{roomType}', [RoomTypeController::class, 'update']);
+            Route::patch('/room-types/{roomType}/activate', [RoomTypeController::class, 'activate']);
+            Route::patch('/room-types/{roomType}/deactivate', [RoomTypeController::class, 'deactivate']);
+
+            Route::get('/rooms', [RoomController::class, 'index']);
+            Route::post('/rooms', [RoomController::class, 'store']);
+            Route::get('/rooms/{room}', [RoomController::class, 'show']);
+            Route::match(['put', 'patch'], '/rooms/{room}', [RoomController::class, 'update']);
+            Route::patch('/rooms/{room}/status', [RoomController::class, 'updateStatus']);
+        });
     });
 });
