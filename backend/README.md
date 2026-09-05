@@ -40,9 +40,52 @@ then:
 php artisan migrate --seed
 ```
 
-In `local` environment, seeding also creates a Group Owner account from
-`GROUP_OWNER_EMAIL` / `GROUP_OWNER_PASSWORD` (defaults to
-`owner@example.com` / `password`) so you have a way in.
+Seeding always runs `RolePermissionSeeder` (the four RBAC roles and their
+permissions). Outside of `production`, it also runs `Phase1DemoSeeder` —
+see below.
+
+## Phase 1 demo data
+
+`Phase1DemoSeeder` (called from `DatabaseSeeder` whenever `APP_ENV` is not
+`production`) creates a realistic, deterministic dataset so you can
+exercise every Phase 1 endpoint manually — e.g. with the Postman
+collection under `postman/` — without hand-crafting records first.
+
+Run it on its own at any time with:
+
+```bash
+php artisan db:seed --class=Phase1DemoSeeder
+```
+
+It is **idempotent**: every record is matched by a stable key (slug for
+the Hotel Group/Hotels, email for Users) via `firstOrCreate`/
+`updateOrCreate`, and hotel access is granted with `syncWithoutDetaching`.
+Re-running it any number of times never creates duplicates and never
+deletes or detaches existing data — safe to run again after manual
+testing has changed things.
+
+**⚠️ Development only.** All accounts below use the reserved `.test`
+email TLD and a single shared password — never use these credentials
+outside local/dev/staging, and the seeder itself refuses to run at all
+when `APP_ENV=production`.
+
+Demo password for every account: **`Password123!`**
+
+| Email | Role | Hotel access |
+|---|---|---|
+| `owner@hotel.test` | Group Owner | All hotels (explicit role-based bypass, no pivot rows needed) |
+| `manager@hotel.test` | Hotel Manager | Cairo Hotel, Hurghada Hotel |
+| `reception.cairo@hotel.test` | Reception | Cairo Hotel only |
+| `reception.hurghada@hotel.test` | Reception | Hurghada Hotel only |
+| `guest@hotel.test` | Guest | None — Guest carries no staff permissions in Phase 1 |
+
+Demo Hotel Group ("Demo Hotel Group", slug `demo-hotel-group`) owns three
+hotels: Cairo Hotel, Hurghada Hotel, and Luxor Hotel (`demo-*-hotel`
+slugs — Luxor has no staff assigned, useful for testing cross-hotel
+denial). Use this to confirm scope isolation manually: the Manager and
+Cairo Reception should see Cairo; Hurghada Reception should see Hurghada;
+neither should ever see Luxor or each other's unassigned hotel; the
+Guest should get `403` from every staff endpoint.
 
 ## Testing
 

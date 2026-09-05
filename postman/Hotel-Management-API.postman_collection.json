@@ -1,0 +1,925 @@
+{
+	"info": {
+		"_postman_id": "51ad8dfc-71b5-43b5-ae25-1a80387b705b",
+		"name": "Hotel Management API — Phase 1",
+		"description": "Phase 1 (Foundation / RBAC) endpoints for the Hotel Group Management Platform API, generated directly from the current Laravel routes, Form Requests, and API Resources under /api/v1. Only endpoints that exist in the codebase today are included. Collection-level auth is Bearer {{access_token}}, populated automatically by the Login request.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "0"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Response follows the standard success envelope\", function () {",
+									"    pm.expect(jsonData).to.have.property(\"success\", true);",
+									"    pm.expect(jsonData).to.have.property(\"message\");",
+									"    pm.expect(jsonData.data).to.have.property(\"user\");",
+									"    pm.expect(jsonData.data).to.have.property(\"token\");",
+									"});",
+									"",
+									"pm.test(\"Access token is present and saved to {{access_token}}\", function () {",
+									"    pm.expect(jsonData.data.token).to.be.a(\"string\").and.to.have.lengthOf.above(0);",
+									"    pm.environment.set(\"access_token\", jsonData.data.token);",
+									"});",
+									"",
+									"pm.test(\"Logged-in user profile includes role\", function () {",
+									"    pm.expect(jsonData.data.user).to.have.property(\"role\");",
+									"    pm.expect(jsonData.data.user.role).to.have.property(\"slug\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"owner@example.com\",\n    \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Authenticates a staff user (Group Owner / Hotel Manager / Reception) via App\\Http\\Controllers\\Api\\V1\\AuthController::login. Body validated by LoginRequest: email (required, string, email:filter), password (required, string). On success, issues a Sanctum bearer token and saves it to {{access_token}}.\n\nThe seeded local Group Owner (php artisan db:seed, local environment only) is owner@example.com / password — adjust to a real account for other environments."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Authenticated User (Me)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Returns the authenticated user's own profile\", function () {",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.data).to.have.property(\"id\");",
+									"    pm.expect(jsonData.data).to.have.property(\"email\");",
+									"    pm.expect(jsonData.data).to.have.property(\"role\");",
+									"    pm.expect(jsonData.data.role).to.have.property(\"permissions\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						},
+						"description": "Returns the authenticated user's own profile (App\\Http\\Controllers\\Api\\V1\\AuthController::me), including role, the role's permissions, and hotel access. Requires auth:sanctum."
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Logout success envelope\", function () {",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.data).to.eql(null);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						},
+						"description": "Revokes the current Sanctum access token (App\\Http\\Controllers\\Api\\V1\\AuthController::logout). Requires auth:sanctum. After this call, {{access_token}} is no longer valid — run Login again before further requests."
+					},
+					"response": []
+				}
+			],
+			"description": "AuthController: login, logout, and the authenticated user's own profile."
+		},
+		{
+			"name": "Hotel Groups",
+			"item": [
+				{
+					"name": "List Hotel Groups",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Paginated list envelope\", function () {",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.data).to.be.an(\"array\");",
+									"    pm.expect(jsonData.meta).to.have.property(\"current_page\");",
+									"    pm.expect(jsonData.meta).to.have.property(\"total\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/hotel-groups",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hotel-groups"
+							]
+						},
+						"description": "App\\Http\\Controllers\\Api\\V1\\HotelGroupController::index. Requires the hotel-groups.manage permission (Group Owner). Returns a paginated list of Hotel Groups."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Hotel Group",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Created hotel group returned with expected fields\", function () {",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.message).to.eql(\"Created successfully.\");",
+									"    pm.expect(jsonData.data).to.have.property(\"id\");",
+									"    pm.expect(jsonData.data.slug).to.eql(\"acme-hotels\");",
+									"});",
+									"",
+									"pm.test(\"hotel_group_id saved for later requests\", function () {",
+									"    pm.environment.set(\"hotel_group_id\", jsonData.data.id);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Acme Hotels\",\n    \"slug\": \"acme-hotels\",\n    \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/hotel-groups",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hotel-groups"
+							]
+						},
+						"description": "App\\Http\\Controllers\\Api\\V1\\HotelGroupController::store. Validated by StoreHotelGroupRequest: name (required, string, max:255), slug (required, string, max:255, alpha_dash, unique:hotel_groups,slug), is_active (optional, boolean). Requires hotel-groups.manage. Saves the created id to {{hotel_group_id}}."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Hotel Group",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Returned hotel group matches {{hotel_group_id}}\", function () {",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(String(jsonData.data.id)).to.eql(pm.environment.get(\"hotel_group_id\"));",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/hotel-groups/{{hotel_group_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hotel-groups",
+								"{{hotel_group_id}}"
+							]
+						},
+						"description": "App\\Http\\Controllers\\Api\\V1\\HotelGroupController::show. Requires hotel-groups.manage."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Hotel Group",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Hotel group updated\", function () {",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.message).to.eql(\"Updated successfully.\");",
+									"    pm.expect(jsonData.data.name).to.eql(\"Acme Hotels Group\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Acme Hotels Group\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/hotel-groups/{{hotel_group_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hotel-groups",
+								"{{hotel_group_id}}"
+							]
+						},
+						"description": "App\\Http\\Controllers\\Api\\V1\\HotelGroupController::update. Validated by UpdateHotelGroupRequest: name (sometimes, string, max:255), slug (sometimes, string, max:255, alpha_dash, unique ignoring current record), is_active (sometimes, boolean). Requires hotel-groups.manage."
+					},
+					"response": []
+				}
+			],
+			"description": "HotelGroupController: R1 \"one owning entity, one control plane\" — Group-Owner-only management of Hotel Groups."
+		},
+		{
+			"name": "Hotels",
+			"item": [
+				{
+					"name": "List Hotels",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Paginated list envelope, scoped to the caller's hotel access\", function () {",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.data).to.be.an(\"array\");",
+									"    pm.expect(jsonData.meta).to.have.property(\"current_page\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/hotels",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hotels"
+							]
+						},
+						"description": "App\\Http\\Controllers\\Api\\V1\\HotelController::index. Requires hotels.view. Results are always resolved from the authenticated user's own hotel access (Group Owner sees all; Hotel Manager/Reception see only their assigned hotels) — never from a client-supplied parameter."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Hotel",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Created hotel returned with expected fields\", function () {",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.message).to.eql(\"Created successfully.\");",
+									"    pm.expect(jsonData.data).to.have.property(\"id\");",
+									"    pm.expect(jsonData.data).to.have.property(\"hotel_group_id\");",
+									"});",
+									"",
+									"pm.test(\"hotel_id saved for later requests\", function () {",
+									"    pm.environment.set(\"hotel_id\", jsonData.data.id);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"hotel_group_id\": {{hotel_group_id}},\n    \"name\": \"Hotel A\",\n    \"slug\": \"hotel-a\",\n    \"country\": \"US\",\n    \"city\": \"New York\",\n    \"timezone\": \"UTC\",\n    \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/hotels",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hotels"
+							]
+						},
+						"description": "App\\Http\\Controllers\\Api\\V1\\HotelController::store. Validated by StoreHotelRequest: hotel_group_id (required, integer, exists:hotel_groups,id), name (required, string, max:255), slug (required, string, max:255, alpha_dash, unique:hotels,slug), country (nullable, string), city (nullable, string), timezone (optional, string, max:64), is_active (optional, boolean). Requires hotels.manage (Group Owner only). Saves the created id to {{hotel_id}}. Run \"Create Hotel Group\" first so {{hotel_group_id}} is set."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Hotel",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Returned hotel matches {{hotel_id}}\", function () {",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(String(jsonData.data.id)).to.eql(pm.environment.get(\"hotel_id\"));",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/hotels/{{hotel_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hotels",
+								"{{hotel_id}}"
+							]
+						},
+						"description": "App\\Http\\Controllers\\Api\\V1\\HotelController::show. Requires hotels.view AND that the authenticated user's own stored hotel access includes this hotel (or Group Owner). Returns 403 for an unassigned hotel, 404 if it does not exist."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Hotel",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Hotel updated\", function () {",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.message).to.eql(\"Updated successfully.\");",
+									"    pm.expect(jsonData.data.city).to.eql(\"Brooklyn\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"city\": \"Brooklyn\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/hotels/{{hotel_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hotels",
+								"{{hotel_id}}"
+							]
+						},
+						"description": "App\\Http\\Controllers\\Api\\V1\\HotelController::update. Validated by UpdateHotelRequest (all fields \"sometimes\", same rules as create, slug uniqueness ignores the current record). Requires hotels.manage (Group Owner only)."
+					},
+					"response": []
+				}
+			],
+			"description": "HotelController: hotel-scope isolation enforced server-side via the authenticated user's own stored hotel access — a client-supplied hotel_id can select which hotel to view, never widen what is authorized."
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "List Users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Paginated list envelope\", function () {",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.data).to.be.an(\"array\");",
+									"    pm.expect(jsonData.meta).to.have.property(\"current_page\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						},
+						"description": "App\\Http\\Controllers\\Api\\V1\\UserController::index. Requires users.view or users.manage (Group Owner). Each entry includes its role but not its hotels relation (not eager-loaded on the list endpoint)."
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Ensures {{role_id}} is populated even if the \"List Roles\" request",
+									"// (under Roles & Permissions) has not been run yet in this session,",
+									"// by calling the existing GET /roles endpoint directly.",
+									"if (!pm.environment.get(\"role_id\")) {",
+									"    pm.sendRequest({",
+									"        url: pm.environment.get(\"base_url\") + \"/roles\",",
+									"        method: \"GET\",",
+									"        header: {",
+									"            Accept: \"application/json\",",
+									"            Authorization: \"Bearer \" + pm.environment.get(\"access_token\")",
+									"        }",
+									"    }, function (err, res) {",
+									"        if (!err && res.code === 200) {",
+									"            var body = res.json();",
+									"            var roles = body.data || [];",
+									"            var hotelManager = roles.find(function (r) { return r.slug === \"hotel_manager\"; });",
+									"            var role = hotelManager || roles[0];",
+									"            if (role) {",
+									"                pm.environment.set(\"role_id\", role.id);",
+									"            }",
+									"        }",
+									"    });",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Created user returned with role and hotel access\", function () {",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.message).to.eql(\"Created successfully.\");",
+									"    pm.expect(jsonData.data).to.have.property(\"id\");",
+									"    pm.expect(jsonData.data).to.have.property(\"role\");",
+									"    pm.expect(jsonData.data).to.have.property(\"hotels\");",
+									"});",
+									"",
+									"pm.test(\"user_id saved for later requests\", function () {",
+									"    pm.environment.set(\"user_id\", jsonData.data.id);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Manager A\",\n    \"email\": \"manager-a@example.com\",\n    \"password\": \"password123\",\n    \"role_id\": {{role_id}},\n    \"hotel_ids\": [{{hotel_id}}]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						},
+						"description": "App\\Http\\Controllers\\Api\\V1\\UserController::store. Validated by StoreUserRequest: name (required), email (required, unique:users,email), password (required, min:8), role_id (required, exists:roles,id), is_active (optional, boolean), hotel_ids (optional array of ids existing in hotels). Requires users.manage (Group Owner only). Saves the created id to {{user_id}}. Run \"Create Hotel\" first so {{hotel_id}} is set; {{role_id}} is auto-resolved by the pre-request script if not already set."
+					},
+					"response": []
+				},
+				{
+					"name": "Get User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Returned user matches {{user_id}}\", function () {",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(String(jsonData.data.id)).to.eql(pm.environment.get(\"user_id\"));",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}"
+							]
+						},
+						"description": "App\\Http\\Controllers\\Api\\V1\\UserController::show. Any authenticated user may view their own profile this way; viewing another user's profile additionally requires users.view or users.manage."
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"User updated\", function () {",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.message).to.eql(\"Updated successfully.\");",
+									"    pm.expect(jsonData.data.name).to.eql(\"Manager A Renamed\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Manager A Renamed\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}"
+							]
+						},
+						"description": "App\\Http\\Controllers\\Api\\V1\\UserController::update. Validated by UpdateUserRequest (all fields \"sometimes\"; password nullable — omit or leave blank to keep the current password; hotel_ids, when supplied, replaces the user's hotel access). Requires users.manage (Group Owner only)."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Delete success envelope\", function () {",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.message).to.eql(\"Deleted successfully.\");",
+									"    pm.expect(jsonData.data).to.eql(null);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}"
+							]
+						},
+						"description": "App\\Http\\Controllers\\Api\\V1\\UserController::destroy. Requires users.manage (Group Owner only) and the target must not be the caller themselves (self-deletion is rejected)."
+					},
+					"response": []
+				}
+			],
+			"description": "UserController: staff account management, RBAC role assignment, and user_hotel_access — Group-Owner-only for create/update/delete; any user may view their own profile."
+		},
+		{
+			"name": "Roles & Permissions",
+			"item": [
+				{
+					"name": "List Roles",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Roles list returned\", function () {",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.data).to.be.an(\"array\");",
+									"});",
+									"",
+									"if (jsonData.data && jsonData.data.length > 0) {",
+									"    var hotelManager = jsonData.data.find(function (r) { return r.slug === \"hotel_manager\"; });",
+									"    var role = hotelManager || jsonData.data[0];",
+									"    pm.test(\"role_id saved for later requests\", function () {",
+									"        pm.environment.set(\"role_id\", role.id);",
+									"    });",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/roles",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles"
+							]
+						},
+						"description": "App\\Http\\Controllers\\Api\\V1\\RoleController::index. Requires the roles.view permission (Group Owner). Returns the four fixed Phase 1 roles (group_owner, hotel_manager, reception, guest) with their permissions. Saves the Hotel Manager role's id (falling back to the first role) to {{role_id}} for use by \"Create User\"."
+					},
+					"response": []
+				},
+				{
+					"name": "List Permissions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Permissions list returned\", function () {",
+									"    pm.expect(jsonData.success).to.eql(true);",
+									"    pm.expect(jsonData.data).to.be.an(\"array\");",
+									"});",
+									"",
+									"if (jsonData.data && jsonData.data.length > 0) {",
+									"    pm.test(\"permission_id saved for future use\", function () {",
+									"        pm.environment.set(\"permission_id\", jsonData.data[0].id);",
+									"    });",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/permissions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"permissions"
+							]
+						},
+						"description": "App\\Http\\Controllers\\Api\\V1\\PermissionController::index. Requires the permissions.view permission (Group Owner). Returns the fixed Phase 1 permission set seeded by RolePermissionSeeder. Saves the first permission's id to {{permission_id}} — no Phase 1 endpoint currently consumes a single permission id, this is kept for later phases."
+					},
+					"response": []
+				}
+			],
+			"description": "RoleController + PermissionController: read-only lookups over the seeded RBAC foundation."
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:8000/api/v1",
+			"type": "string"
+		}
+	]
+}

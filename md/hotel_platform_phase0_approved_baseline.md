@@ -4,6 +4,8 @@
 
 **No Laravel, Nuxt, Flutter, or database code has been created. No migrations. No packages installed. Implementation has not started.** This document stops at documentation, per your explicit instruction, and waits for Phase 1 authorization.
 
+**Addendum (2026-09-05) — Room Booking Model decided:** §6.2 / §20 item 1 (Room-vs-Room-Type booking model) is now **RESOLVED — Hybrid**. See §6.2 for the full decision and rules. This addendum is documentation-only — no migrations or models are introduced by it. **This decision unblocks Phase 2.** (Phase 1 — Foundation/RBAC — has since been implemented separately from this document.)
+
 ---
 
 ## 1. Requirements Matrix
@@ -44,7 +46,7 @@ Classification: **[A]** Approved (in source PDF) · **[O]** Project-Owner Additi
 | R57 | Verification confidence thresholds configurable, not hardcoded; retry count configurable | O |
 | R58 | Identity data retention period configurable, not hardcoded | O |
 | R59 | Loyalty redemption limited to eligible bookings only in MVP; no folio/service redemption | O |
-| R60 | **Room-vs-Room-Type booking model** | **[OPEN]** — see §6 |
+| R60 | **Room-vs-Room-Type booking model** | **RESOLVED — Hybrid** — see §6.2 |
 
 ---
 
@@ -127,15 +129,33 @@ Unchanged (13 bounded contexts): Identity & Access · Inventory · Reservations 
 | **Booking / Reservation** | A Guest's confirmed or in-progress intent to occupy inventory for a date range. Always references `hotel_id` and `room_type_id`. May or may not reference a specific `room_id` at creation time, depending on §6.2. | belongs to Guest, Hotel, Room Type; optionally Physical Room; has one Payment record, one Verification session, one Access grant, one Folio, at most one Review |
 | **Guest / Customer** | The person-account making bookings — distinct from staff `Users` (Group Owner/Hotel Manager/Reception, who are internal accounts with role/permission assignments). A Guest has many Reservations, one Loyalty Account, many Reviews. | separate table/auth guard from staff `users` |
 
-### 6.2 Room-vs-Room-Type booking model — **[OPEN]**
+### 6.2 Room-vs-Room-Type booking model — **RESOLVED: Hybrid (approved 2026-09-05)**
 
-Per your guardrail #3, here are the three options, re-checked against the document text (unchanged conclusion from the prior round — the document still does not resolve this):
+Per your guardrail #3, three options were considered:
 
 - **(A) Specific-Physical-Room booking:** the guest books an exact room; availability is a per-room calendar.
 - **(B) Room-Type/category booking with later physical-room allocation:** the guest books a class of room; a specific Physical Room is assigned by staff (or by a system rule) at or before check-in; availability is a count against Room-Type capacity.
-- **(C) Hybrid/allocation model:** Room Type is always required at booking; Physical Room assignment is optional at booking time and can happen later — the same schema supports either (A) or (B) as an *operating mode* per hotel, without a schema change.
+- **(C) Hybrid/allocation model — SELECTED:** Room Type is always required at booking; Physical Room assignment is optional at booking time and can happen later — the same schema supports either (A) or (B) as an *operating mode* per hotel, without a schema change.
 
-**This remains genuinely unresolved and is not being decided here.** The recommended default schema (Option C shape) keeps the door open in both directions:
+**Decision: Option (C), the Hybrid model, is adopted.**
+
+**Room Type vs Room — the distinction this decision rests on (see §6.1 for the full entity definitions):**
+- **Room Type = the bookable inventory / category.** This is what a reservation reserves against — it carries base price, capacity, amenities. A reservation always books a Room Type.
+- **Room = the physical accommodation.** This is the individually addressable, numbered unit later allocated to fulfil a reservation. A Room always belongs to exactly one Room Type (and transitively one Hotel).
+
+**Approved rules governing the Hybrid model (binding on Phase 2 and later):**
+1. Room Type is the booking inventory.
+2. A reservation MUST have `room_type_id`.
+3. A reservation MAY have `room_id`.
+4. `room_id` represents the physical Room allocated to the reservation.
+5. A guest may book a Room Type without immediately being assigned a physical Room.
+6. Physical Room allocation may happen later.
+7. If a specific physical Room is assigned, it MUST belong to the same Hotel and the selected Room Type as the reservation.
+8. Availability and allocation MUST be protected against double booking using a database transaction, appropriate row locking/concurrency protection, and availability revalidation inside the same transaction (see §6.3, unchanged by this decision).
+9. No additional business rules are invented by this decision — overbooking behavior, walk-in behavior, automatic room-allocation strategy, and pricing rules stay unspecified/deferred unless and until an approved requirement introduces them.
+10. The design stays flexible for future specific-room booking and room reassignment — no schema change is required to shift operating mode per hotel.
+
+The schema shape anticipated in the prior draft does not change:
 
 ```
 room_types   (id, hotel_id, name, base_price, capacity, amenities, description)
@@ -145,12 +165,12 @@ reservations (id, hotel_id, room_type_id NOT NULL, room_id NULLABLE,
               check_in, check_out, status, ...)
 ```
 
-This is a **[OPEN]** item — flagged again in §19 — and must be explicitly decided by you before the `reservations`/`rooms` migrations are finalized (i.e., before Phase 2, not before Phase 1).
+**This decision unblocks Phase 2** (see §19, §20 item 1) — the `rooms`/`reservations` migrations may now be finalized against this model. This documentation update introduces no migrations, models, or Phase 2 code; that remains Phase 2 implementation work.
 
 ### 6.3 Concurrency / double-booking protection (per guardrail #4)
 
-Regardless of which mode (A) or (B) is eventually chosen, the architecture requires:
-- A database-level exclusion/uniqueness constraint preventing two overlapping date ranges from being confirmed against the same inventory unit (a specific `room_id` in mode A, or a capacity-counted constraint against `room_type_id` in mode B).
+Under the approved Hybrid model, the architecture requires (applying to a specific `room_id` when one has been assigned, and to `room_type_id` capacity when one has not):
+- A database-level exclusion/uniqueness constraint preventing two overlapping date ranges from being confirmed against the same inventory unit (a specific `room_id` when assigned, or a capacity-counted constraint against `room_type_id` when not).
 - Application-level locking (DB transaction + row lock, or an equivalent atomic check-and-reserve operation) at the moment a reservation moves into `PENDING`, so two simultaneous booking attempts cannot both succeed — this directly satisfies the document's edge case R36 ("lock the slot on first attempt").
 - Availability must be **re-validated inside the same transaction that creates/confirms the reservation** — never trusted from an earlier read (e.g., a stale "available" response shown in the app 30 seconds ago).
 
@@ -375,9 +395,9 @@ Every dummy adapter scenario is deterministic/test-selectable — never randomiz
 ## 19. Implementation Roadmap
 
 Unchanged phase sequence:
-`Phase 1 Foundation/RBAC/HotelGroup/Hotels/Users/Roles/Permissions → 2 Rooms/Availability (blocked on §6.2 decision) → 3 Discovery APIs → 4 Reservations → 5 Payments (dummy) → 6 Identity Verification (dummy) → 7 Digital Access (dummy) → 8 Services/Folio → 9 Checkout/Invoices → 10 Loyalty → 11 Ratings/Reviews → 12 Notifications (dummy) → 13 Central Dashboard (Metronic) → 14 Hotel Dashboard → 15 Nuxt Public Site → 16 Flutter App → 17 Reports/Audit/Hardening → 18 QA/Security/Perf/Deploy/Docs`
+`Phase 1 Foundation/RBAC/HotelGroup/Hotels/Users/Roles/Permissions → 2 Rooms/Availability (Hybrid model, §6.2 — resolved) → 3 Discovery APIs → 4 Reservations → 5 Payments (dummy) → 6 Identity Verification (dummy) → 7 Digital Access (dummy) → 8 Services/Folio → 9 Checkout/Invoices → 10 Loyalty → 11 Ratings/Reviews → 12 Notifications (dummy) → 13 Central Dashboard (Metronic) → 14 Hotel Dashboard → 15 Nuxt Public Site → 16 Flutter App → 17 Reports/Audit/Hardening → 18 QA/Security/Perf/Deploy/Docs`
 
-**Phase 1 can begin immediately upon your authorization** — it does not touch reservations/rooms and is unaffected by the §6.2 open item. Phase 2 must not start until §6.2 is resolved.
+**Phase 1 can begin immediately upon your authorization** — it does not touch reservations/rooms and is unaffected by the §6.2 open item. **§6.2 is now resolved (Hybrid, approved 2026-09-05) — Phase 2 is unblocked.**
 
 ---
 
@@ -385,7 +405,7 @@ Unchanged phase sequence:
 
 | # | Item | Status |
 |---|---|---|
-| 1 | **Room-vs-Room-Type booking model** (§6.2) — the document does not conclusively answer this, and this round's instructions did not resolve it either | **[OPEN]** — blocks Phase 2, not Phase 1 |
+| 1 | **Room-vs-Room-Type booking model** (§6.2) | **RESOLVED (2026-09-05)** — Hybrid model approved; see §6.2 |
 | 2 | Verification confidence threshold **numeric values** (only the fact that they must be configurable is confirmed — actual default numbers are not) | **[OPEN]** — blocks Phase 6 config, not Phase 1 |
 | 3 | Verification retry-count **numeric limit** (confirmed configurable; number not specified) | **[OPEN]** — blocks Phase 6 config, not Phase 1 |
 | 4 | Cancellation policy **field values** per hotel (field shape is defined in §12; actual notice periods/penalty values are not) | **[OPEN]** — blocks real cancellation behavior in Phase 4, not the schema itself |
@@ -404,7 +424,7 @@ No answer has been invented for any of the above, per your instruction.
 
 - Phase 0 is approved.
 - All 12 confirmed-decision areas from your latest instructions are reflected above.
-- Exactly **one item blocks Phase 2** (§6.2/§20 item 1); **nothing blocks Phase 1**.
-- No code, migrations, packages, or scaffolding of any kind have been created.
+- §6.2/§20 item 1 (Room-vs-Room-Type booking model) is now **RESOLVED — Hybrid** (approved 2026-09-05, see §6.2). **No items block Phase 2.**
+- No code, migrations, packages, or scaffolding of any kind had been created as of this document's original approval.
 
-Waiting for your explicit authorization to begin **Phase 1: Laravel Foundation — Database, Authentication, RBAC, Hotel Group, Hotels, Users, Roles, Permissions.**
+**Update:** Phase 1 (Laravel Foundation — Database, Authentication, RBAC, Hotel Group, Hotels, Users, Roles, Permissions) has since been authorized and implemented. With the Room Booking Model now resolved, Phase 2 is unblocked — waiting for your explicit authorization to begin it.
