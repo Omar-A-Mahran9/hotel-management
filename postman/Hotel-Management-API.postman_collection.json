@@ -4103,6 +4103,133 @@
           ]
         }
       ]
+    },
+    {
+      "name": "09 Payments",
+      "item": [
+        {
+          "name": "Payment Hold",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "reservation-hold-{{reservation_id}}-001"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations/{{reservation_id}}/payment/hold",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations",
+                "{{reservation_id}}",
+                "payment",
+                "hold"
+              ]
+            },
+            "description": "Initiates the deposit hold for a PENDING reservation via App\\Http\\Controllers\\Api\\V1\\PaymentController::hold. Requires the payments.manage permission (Group Owner / assigned Hotel Manager) and access to the reservation's hotel. Body validated by StorePaymentHoldRequest: amount (required decimal string, positive, fits DECIMAL(12,2)); currency (optional 3-letter ISO code, never defaulted). Idempotency is HTTP-header based: repeating the same Idempotency-Key for the same reservation replays the existing result without a second provider call. 201 = hold active + reservation DEPOSIT_HELD; 200 = provider still processing (payment HOLD_REQUESTED); 422 = declined / cancelled / expired hold or a validation/business error. No simulation directive is accepted in production.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"amount\": \"150.00\",\n    \"currency\": \"EUR\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Hold placed (201) or pending (200)', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));",
+                  "var json = pm.response.json();",
+                  "pm.test('Standard success envelope', () => {",
+                  "    pm.expect(json).to.have.property('success', true);",
+                  "    pm.expect(json.data).to.have.property('status');",
+                  "    pm.expect(json.data).to.have.property('reservation_id');",
+                  "});",
+                  "pm.test('No provider internals exposed', () => {",
+                  "    pm.expect(json.data).to.not.have.property('metadata');",
+                  "    pm.expect(json.data).to.not.have.property('provider_reference');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Payment Webhook (dummy)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const secret = pm.environment.get('payment_webhook_secret') || '';",
+                  "const body = pm.request.body.raw;",
+                  "const sig = CryptoJS.HmacSHA256(body, secret).toString(CryptoJS.enc.Hex);",
+                  "pm.request.headers.upsert({ key: 'X-Signature', value: sig });"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Standard envelope + processing_status', () => {",
+                  "    pm.expect(json).to.have.property('success', true);",
+                  "    pm.expect(json.data).to.have.property('processing_status');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/payments/webhooks/dummy",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "payments",
+                "webhooks",
+                "dummy"
+              ]
+            },
+            "description": "Provider async callback (PaymentWebhookController::handle). UNAUTHENTICATED machine-to-machine: the HMAC-SHA256 signature over the EXACT raw body (X-Signature header, computed by the pre-request script from {{payment_webhook_secret}} - set it to match PAYMENT_DUMMY_WEBHOOK_SECRET) is the credential. Reuses the Phase 5C result-application logic. HTTP: 400 invalid/missing signature (nothing persisted); 422 malformed / wrong shape / missing type / sensitive-key payload; 200 for every valid delivery (processed | duplicate_ignored | unmatched). Deduped by provider event_id, or by payload hash when event_id is absent; duplicate and post-resolution deliveries never re-apply a transition. Rate limited (throttle:payments.webhook). To exercise: run '09 Payments > Payment Hold' first with X-Payment-Simulate: pending (local/testing only), then send this with that transaction's provider_reference.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"event_id\": \"dummy_evt_0001\",\n    \"type\": \"hold.succeeded\",\n    \"provider_reference\": \"REPLACE_WITH_PENDING_TRANSACTION_provider_reference\",\n    \"status\": \"succeeded\"\n}"
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "auth": {

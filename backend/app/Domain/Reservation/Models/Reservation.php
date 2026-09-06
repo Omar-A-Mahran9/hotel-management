@@ -5,11 +5,13 @@ namespace App\Domain\Reservation\Models;
 use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\Inventory\Models\Room;
 use App\Domain\Inventory\Models\RoomType;
+use App\Domain\Payment\Models\Payment;
 use Database\Factories\ReservationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * A Guest's confirmed or in-progress intent to occupy inventory for a date
@@ -111,6 +113,17 @@ class Reservation extends Model
     public function reservationGuests(): HasMany
     {
         return $this->hasMany(ReservationGuest::class);
+    }
+
+    /**
+     * The approved 1:1 Payment record (Phase 0 §6.1, Phase 5A). This is a
+     * plain schema relationship only — no payment business logic lives on
+     * the Reservation, and ReservationService does not depend on the
+     * Payment domain.
+     */
+    public function payment(): HasOne
+    {
+        return $this->hasOne(Payment::class);
     }
 
     protected static function newFactory(): ReservationFactory

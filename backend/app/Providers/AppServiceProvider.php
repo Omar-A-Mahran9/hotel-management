@@ -26,13 +26,28 @@ use App\Domain\Inventory\Repositories\Contracts\RoomRepositoryInterface;
 use App\Domain\Inventory\Repositories\Contracts\RoomTypeRepositoryInterface;
 use App\Domain\Inventory\Repositories\EloquentRoomRepository;
 use App\Domain\Inventory\Repositories\EloquentRoomTypeRepository;
+use App\Domain\Payment\Gateway\Contracts\PaymentGatewayInterface;
+use App\Domain\Payment\Gateway\DummyPaymentGateway;
+use App\Domain\Payment\Gateway\Exceptions\UnsupportedPaymentProviderException;
+use App\Domain\Payment\Gateway\SimulationDirective;
+use App\Domain\Payment\Models\Payment;
+use App\Domain\Payment\Policies\PaymentPolicy;
+use App\Domain\Payment\Repositories\Contracts\PaymentRepositoryInterface;
+use App\Domain\Payment\Repositories\Contracts\PaymentTransactionRepositoryInterface;
+use App\Domain\Payment\Repositories\Contracts\PaymentWebhookEventRepositoryInterface;
+use App\Domain\Payment\Repositories\EloquentPaymentRepository;
+use App\Domain\Payment\Repositories\EloquentPaymentTransactionRepository;
+use App\Domain\Payment\Repositories\EloquentPaymentWebhookEventRepository;
 use App\Domain\Reservation\Models\Reservation;
 use App\Domain\Reservation\Policies\ReservationPolicy;
 use App\Domain\Reservation\Repositories\Contracts\GuestRepositoryInterface;
 use App\Domain\Reservation\Repositories\Contracts\ReservationRepositoryInterface;
 use App\Domain\Reservation\Repositories\EloquentGuestRepository;
 use App\Domain\Reservation\Repositories\EloquentReservationRepository;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -50,6 +65,9 @@ class AppServiceProvider extends ServiceProvider
         RoomRepositoryInterface::class => EloquentRoomRepository::class,
         ReservationRepositoryInterface::class => EloquentReservationRepository::class,
         GuestRepositoryInterface::class => EloquentGuestRepository::class,
+        PaymentRepositoryInterface::class => EloquentPaymentRepository::class,
+        PaymentTransactionRepositoryInterface::class => EloquentPaymentTransactionRepository::class,
+        PaymentWebhookEventRepositoryInterface::class => EloquentPaymentWebhookEventRepository::class,
     ];
 
     /**
@@ -62,11 +80,29 @@ class AppServiceProvider extends ServiceProvider
         RoomType::class => RoomTypePolicy::class,
         Room::class => RoomPolicy::class,
         Reservation::class => ReservationPolicy::class,
+        Payment::class => PaymentPolicy::class,
     ];
 
     public function register(): void
     {
-        //
+        // The payment provider boundary (Phase 5B). The rest of the app
+        // depends only on PaymentGatewayInterface; the concrete provider is
+        // chosen from config('payment.provider'). "dummy" is the only
+        // implementation registered this phase — an explicitly configured
+        // but unsupported provider fails loudly, never silently falls back.
+        $this->app->singleton(PaymentGatewayInterface::class, function (): PaymentGatewayInterface {
+            $provider = (string) config('payment.provider');
+
+            return match ($provider) {
+                'dummy' => new DummyPaymentGateway(
+                    webhookSecret: (string) config('payment.providers.dummy.webhook_secret', ''),
+                    defaultDirective: SimulationDirective::fromConfig(
+                        config('payment.providers.dummy.default_directive'),
+                    ),
+                ),
+                default => throw new UnsupportedPaymentProviderException($provider),
+            };
+        });
     }
 
     public function boot(): void
@@ -77,5 +113,22 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::define('roles.view', fn (User $user) => $user->hasPermission('roles.view'));
         Gate::define('permissions.view', fn (User $user) => $user->hasPermission('permissions.view'));
+
+        $this->registerPaymentRateLimiters();
+    }
+
+    /**
+     * Phase 0 §17 — rate limiting on the payment endpoints (Phase 5F).
+     * Config-driven (config/payment.php), native RateLimiter, no package.
+     */
+    private function registerPaymentRateLimiters(): void
+    {
+        RateLimiter::for('payments.hold', fn (Request $request) => Limit::perMinute(
+            (int) config('payment.rate_limits.hold.per_minute'),
+        )->by((string) ($request->user()?->id ?? $request->ip())));
+
+        RateLimiter::for('payments.webhook', fn (Request $request) => Limit::perMinute(
+            (int) config('payment.rate_limits.webhook.per_minute'),
+        )->by((string) $request->ip()));
     }
 }

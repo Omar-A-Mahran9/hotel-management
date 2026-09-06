@@ -28,6 +28,7 @@ class RolePermissionSeeder extends Seeder
             'inventory.manage' => 'Create, update, activate/deactivate room types and rooms',
             'reservations.view' => 'View reservations within authorized scope',
             'reservations.manage' => 'Create reservations within authorized scope',
+            'payments.manage' => 'Initiate and manage reservation payments within authorized scope',
         ];
 
         foreach ($permissions as $slug => $name) {
@@ -46,7 +47,7 @@ class RolePermissionSeeder extends Seeder
             Role::HOTEL_MANAGER => [
                 'name' => 'Hotel Manager',
                 'description' => 'Manages one or more assigned hotels.',
-                'permissions' => ['hotels.view', 'inventory.view', 'inventory.manage', 'reservations.view', 'reservations.manage'],
+                'permissions' => ['hotels.view', 'inventory.view', 'inventory.manage', 'reservations.view', 'reservations.manage', 'payments.manage'],
             ],
             Role::RECEPTION => [
                 'name' => 'Reception',

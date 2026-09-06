@@ -3,6 +3,8 @@
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\HotelController;
 use App\Http\Controllers\Api\V1\HotelGroupController;
+use App\Http\Controllers\Api\V1\PaymentController;
+use App\Http\Controllers\Api\V1\PaymentWebhookController;
 use App\Http\Controllers\Api\V1\PermissionController;
 use App\Http\Controllers\Api\V1\ReservationController;
 use App\Http\Controllers\Api\V1\RoleController;
@@ -13,6 +15,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     Route::post('/auth/login', [AuthController::class, 'login']);
+
+    // Provider webhook — machine-to-machine, unauthenticated: the HMAC
+    // signature is the credential (Phase 5E). Rate limited per Phase 0 §17,
+    // keyed by IP and set high for legitimate provider retries (Phase 5F).
+    Route::post('/payments/webhooks/{provider}', [PaymentWebhookController::class, 'handle'])
+        ->middleware('throttle:payments.webhook');
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -41,6 +49,8 @@ Route::prefix('v1')->group(function () {
         Route::post('/reservations', [ReservationController::class, 'store']);
         Route::get('/reservations/{reservation}', [ReservationController::class, 'show']);
         Route::post('/reservations/{reservation}/transition', [ReservationController::class, 'transition']);
+        Route::post('/reservations/{reservation}/payment/hold', [PaymentController::class, 'hold'])
+            ->middleware('throttle:payments.hold');
 
         Route::prefix('/hotels/{hotel}')->group(function () {
             Route::get('/room-types', [RoomTypeController::class, 'index']);

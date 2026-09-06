@@ -4,6 +4,12 @@ use App\Domain\IdentityAccess\Exceptions\AccountInactiveException;
 use App\Domain\IdentityAccess\Exceptions\InvalidCredentialsException;
 use App\Domain\Inventory\Exceptions\InvalidRoomStatusTransitionException;
 use App\Domain\Inventory\Exceptions\RoomTypeHotelMismatchException;
+use App\Domain\Payment\Exceptions\IdempotencyKeyConflictException;
+use App\Domain\Payment\Exceptions\InvalidPaymentAmountException;
+use App\Domain\Payment\Exceptions\InvalidPaymentCurrencyException;
+use App\Domain\Payment\Exceptions\InvalidPaymentStatusTransitionException;
+use App\Domain\Payment\Exceptions\PaymentAlreadyInitiatedException;
+use App\Domain\Payment\Exceptions\PaymentHoldNotAllowedException;
 use App\Domain\Reservation\Exceptions\InvalidReservationStatusTransitionException;
 use App\Domain\Reservation\Exceptions\ReservationNotAvailableException;
 use App\Domain\Reservation\Exceptions\RoomHotelMismatchException;
@@ -112,6 +118,47 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->renderable(function (InvalidReservationStatusTransitionException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        // Phase 5D — payment workflow business errors. Every message below
+        // is a fixed, safe business string (no secret, provider payload,
+        // SQLSTATE, or stack trace). All map to 422: the project's API has
+        // no 409/conflict convention, and these are business-rule failures
+        // like every other domain exception above.
+        $exceptions->renderable(function (PaymentHoldNotAllowedException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (PaymentAlreadyInitiatedException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (IdempotencyKeyConflictException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (InvalidPaymentAmountException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (InvalidPaymentCurrencyException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (InvalidPaymentStatusTransitionException $e, Request $request) use ($envelope) {
             if ($request->is('api/*')) {
                 return $envelope($e->getMessage(), 422);
             }
