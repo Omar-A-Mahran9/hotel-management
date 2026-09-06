@@ -4,6 +4,7 @@ use App\Domain\IdentityAccess\Exceptions\AccountInactiveException;
 use App\Domain\IdentityAccess\Exceptions\InvalidCredentialsException;
 use App\Domain\Inventory\Exceptions\InvalidRoomStatusTransitionException;
 use App\Domain\Inventory\Exceptions\RoomTypeHotelMismatchException;
+use App\Domain\Reservation\Exceptions\ReservationNotAvailableException;
 use App\Domain\Reservation\Exceptions\RoomHotelMismatchException;
 use App\Domain\Reservation\Exceptions\RoomTypeMismatchException;
 use App\Http\Middleware\ForceJsonResponse;
@@ -98,6 +99,12 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->renderable(function (RoomTypeMismatchException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (ReservationNotAvailableException $e, Request $request) use ($envelope) {
             if ($request->is('api/*')) {
                 return $envelope($e->getMessage(), 422);
             }

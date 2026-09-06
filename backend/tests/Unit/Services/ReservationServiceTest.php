@@ -12,6 +12,7 @@ use App\Domain\Inventory\Repositories\Contracts\RoomRepositoryInterface;
 use App\Domain\Inventory\Repositories\Contracts\RoomTypeRepositoryInterface;
 use App\Domain\Inventory\Repositories\EloquentRoomRepository;
 use App\Domain\Inventory\Repositories\EloquentRoomTypeRepository;
+use App\Domain\Reservation\Exceptions\ReservationNotAvailableException;
 use App\Domain\Reservation\Exceptions\RoomHotelMismatchException;
 use App\Domain\Reservation\Exceptions\RoomTypeMismatchException;
 use App\Domain\Reservation\Models\Guest;
@@ -45,6 +46,7 @@ class ReservationServiceTest extends TestCase
     public function test_create_starts_the_reservation_in_pending_regardless_of_input(): void
     {
         $roomType = RoomType::factory()->create();
+        Room::factory()->create(['hotel_id' => $roomType->hotel_id, 'room_type_id' => $roomType->id]);
         $guest = Guest::factory()->create();
         $owner = User::factory()->groupOwner()->create();
 
@@ -62,6 +64,7 @@ class ReservationServiceTest extends TestCase
     public function test_create_derives_price_snapshot_from_room_types_base_price(): void
     {
         $roomType = RoomType::factory()->create(['base_price' => 275.50]);
+        Room::factory()->create(['hotel_id' => $roomType->hotel_id, 'room_type_id' => $roomType->id]);
         $guest = Guest::factory()->create();
         $owner = User::factory()->groupOwner()->create();
 
@@ -81,6 +84,7 @@ class ReservationServiceTest extends TestCase
         $hotel = Hotel::factory()->create();
         $otherHotel = Hotel::factory()->create();
         $roomType = RoomType::factory()->create(['hotel_id' => $hotel->id]);
+        Room::factory()->create(['hotel_id' => $hotel->id, 'room_type_id' => $roomType->id]);
         $guest = Guest::factory()->create();
         $owner = User::factory()->groupOwner()->create();
 
@@ -113,6 +117,7 @@ class ReservationServiceTest extends TestCase
     public function test_create_accepts_a_reservation_without_room_id(): void
     {
         $roomType = RoomType::factory()->create();
+        Room::factory()->create(['hotel_id' => $roomType->hotel_id, 'room_type_id' => $roomType->id]);
         $guest = Guest::factory()->create();
         $owner = User::factory()->groupOwner()->create();
 
@@ -203,6 +208,7 @@ class ReservationServiceTest extends TestCase
     public function test_create_records_the_acting_staff_member(): void
     {
         $roomType = RoomType::factory()->create();
+        Room::factory()->create(['hotel_id' => $roomType->hotel_id, 'room_type_id' => $roomType->id]);
         $guest = Guest::factory()->create();
         $manager = User::factory()->hotelManager()->create();
 
@@ -219,6 +225,7 @@ class ReservationServiceTest extends TestCase
     public function test_create_leaves_created_by_staff_id_null_when_no_actor_is_given(): void
     {
         $roomType = RoomType::factory()->create();
+        Room::factory()->create(['hotel_id' => $roomType->hotel_id, 'room_type_id' => $roomType->id]);
         $guest = Guest::factory()->create();
 
         $reservation = $this->service->create([
@@ -250,12 +257,17 @@ class ReservationServiceTest extends TestCase
         $this->assertSame('available', $room->fresh()->status);
     }
 
-    public function test_create_persists_overlapping_dates_without_any_availability_check(): void
+    /**
+     * Phase 3D behavior change: this used to prove Phase 3B performed no
+     * overlap check at all (both reservations succeeded). Availability
+     * protection is now implemented — a second overlapping request for
+     * the same room must be rejected. See ReservationAvailabilityTest for
+     * the full Phase 3D coverage; this test is kept (inverted) as a
+     * direct regression guard at the exact spot the old "no check"
+     * behavior used to be documented.
+     */
+    public function test_create_rejects_a_second_overlapping_reservation_for_the_same_room(): void
     {
-        // Deliberate proof that Phase 3B performs no overlap/capacity
-        // validation — two reservations for the identical room and dates
-        // both succeed. This is intentional and must remain true until the
-        // dedicated concurrency/date-range phase implements the check.
         $hotel = Hotel::factory()->create();
         $roomType = RoomType::factory()->create(['hotel_id' => $hotel->id]);
         $room = Room::factory()->create(['hotel_id' => $hotel->id, 'room_type_id' => $roomType->id]);
@@ -263,7 +275,7 @@ class ReservationServiceTest extends TestCase
         $guestB = Guest::factory()->create();
         $owner = User::factory()->groupOwner()->create();
 
-        $first = $this->service->create([
+        $this->service->create([
             'room_type_id' => $roomType->id,
             'room_id' => $room->id,
             'guest_id' => $guestA->id,
@@ -271,22 +283,22 @@ class ReservationServiceTest extends TestCase
             'check_out' => '2026-12-05',
         ], $owner);
 
-        $second = $this->service->create([
+        $this->expectException(ReservationNotAvailableException::class);
+
+        $this->service->create([
             'room_type_id' => $roomType->id,
             'room_id' => $room->id,
             'guest_id' => $guestB->id,
             'check_in' => '2026-12-01',
             'check_out' => '2026-12-05',
         ], $owner);
-
-        $this->assertNotSame($first->id, $second->id);
-        $this->assertSame(2, Reservation::where('room_id', $room->id)->count());
     }
 
     public function test_create_writes_an_audit_log_entry(): void
     {
         $hotel = Hotel::factory()->create();
         $roomType = RoomType::factory()->create(['hotel_id' => $hotel->id]);
+        Room::factory()->create(['hotel_id' => $hotel->id, 'room_type_id' => $roomType->id]);
         $guest = Guest::factory()->create();
         $owner = User::factory()->groupOwner()->create();
 
@@ -339,6 +351,7 @@ class ReservationServiceTest extends TestCase
     public function test_create_resolves_the_guest_through_the_repository_not_a_direct_query(): void
     {
         $roomType = RoomType::factory()->create();
+        Room::factory()->create(['hotel_id' => $roomType->hotel_id, 'room_type_id' => $roomType->id]);
         $owner = User::factory()->groupOwner()->create();
         $realGuest = Guest::factory()->create();
 
@@ -385,6 +398,7 @@ class ReservationServiceTest extends TestCase
         $guest = Guest::factory()->create();
         $owner = User::factory()->groupOwner()->create();
         $realRoomType = RoomType::factory()->create(['base_price' => 123.45]);
+        Room::factory()->create(['hotel_id' => $realRoomType->hotel_id, 'room_type_id' => $realRoomType->id]);
 
         $spy = new class($realRoomType) implements RoomTypeRepositoryInterface
         {
@@ -398,6 +412,11 @@ class ReservationServiceTest extends TestCase
             }
 
             public function find(int $id): ?RoomType
+            {
+                throw new LogicException('not used by this test');
+            }
+
+            public function findForUpdate(int $id): ?RoomType
             {
                 $this->wasCalled = true;
 
@@ -459,14 +478,14 @@ class ReservationServiceTest extends TestCase
 
             public function find(int $id): ?Room
             {
-                $this->wasCalled = true;
-
-                return $this->room;
+                throw new LogicException('not used by this test');
             }
 
             public function findForUpdate(int $id): ?Room
             {
-                throw new LogicException('not used by this test');
+                $this->wasCalled = true;
+
+                return $this->room;
             }
 
             public function create(array $data): Room
@@ -477,6 +496,15 @@ class ReservationServiceTest extends TestCase
             public function update(Room $room, array $data): Room
             {
                 throw new LogicException('not used by this test');
+            }
+
+            public function countByRoomType(int $roomTypeId): int
+            {
+                // Not the method under test here, but the Service's Option
+                // A capacity check still calls it unconditionally — must
+                // return a real count (1, matching $realRoom) rather than
+                // throw, or create() would fail for an unrelated reason.
+                return 1;
             }
         };
 

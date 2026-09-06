@@ -41,6 +41,29 @@ class Reservation extends Model
 
     public const STATUS_CANCELLED = 'cancelled';
 
+    /**
+     * Approved Phase 3D decision: every status except CANCELLED holds a
+     * claim on inventory for its stored date range (PENDING through
+     * CHECKOUT_IN_PROGRESS hold a live, forward-progressing claim;
+     * CHECKOUT_BLOCKED/CHECKED_OUT/INVOICED still block their own,
+     * already-elapsed range against retroactive double-booking). Deliberately
+     * an explicit positive list, not `!== self::STATUS_CANCELLED`, so a
+     * future status added to the enum never silently becomes blocking.
+     *
+     * @var array<int, string>
+     */
+    public const BLOCKING_STATUSES = [
+        self::STATUS_PENDING,
+        self::STATUS_DEPOSIT_HELD,
+        self::STATUS_VERIFIED,
+        self::STATUS_CHECKED_IN,
+        self::STATUS_IN_STAY,
+        self::STATUS_CHECKOUT_IN_PROGRESS,
+        self::STATUS_CHECKOUT_BLOCKED,
+        self::STATUS_CHECKED_OUT,
+        self::STATUS_INVOICED,
+    ];
+
     protected $fillable = [
         'hotel_id',
         'room_type_id',

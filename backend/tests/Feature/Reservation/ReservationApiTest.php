@@ -29,6 +29,7 @@ class ReservationApiTest extends TestCase
     {
         $hotel = Hotel::factory()->create();
         $roomType = RoomType::factory()->create(['hotel_id' => $hotel->id]);
+        Room::factory()->create(['hotel_id' => $hotel->id, 'room_type_id' => $roomType->id]);
         $guest = Guest::factory()->create();
         $owner = User::factory()->groupOwner()->create();
 
@@ -41,6 +42,7 @@ class ReservationApiTest extends TestCase
     {
         $hotel = Hotel::factory()->create();
         $roomType = RoomType::factory()->create(['hotel_id' => $hotel->id]);
+        Room::factory()->create(['hotel_id' => $hotel->id, 'room_type_id' => $roomType->id]);
         $guest = Guest::factory()->create();
         $manager = User::factory()->hotelManager()->create();
         $manager->hotels()->attach($hotel);
@@ -304,6 +306,7 @@ class ReservationApiTest extends TestCase
         $hotel = Hotel::factory()->create();
         $otherHotel = Hotel::factory()->create();
         $roomType = RoomType::factory()->create(['hotel_id' => $hotel->id]);
+        Room::factory()->create(['hotel_id' => $hotel->id, 'room_type_id' => $roomType->id]);
         $guest = Guest::factory()->create();
         $owner = User::factory()->groupOwner()->create();
 
@@ -317,6 +320,7 @@ class ReservationApiTest extends TestCase
     public function test_client_status_and_price_snapshot_cannot_override_server_controlled_values(): void
     {
         $roomType = RoomType::factory()->create(['base_price' => 199.00]);
+        Room::factory()->create(['hotel_id' => $roomType->hotel_id, 'room_type_id' => $roomType->id]);
         $guest = Guest::factory()->create();
         $owner = User::factory()->groupOwner()->create();
 
@@ -342,6 +346,7 @@ class ReservationApiTest extends TestCase
     public function test_reservation_created_audit_entry_is_created(): void
     {
         $roomType = RoomType::factory()->create();
+        Room::factory()->create(['hotel_id' => $roomType->hotel_id, 'room_type_id' => $roomType->id]);
         $guest = Guest::factory()->create();
         $owner = User::factory()->groupOwner()->create();
 
@@ -370,12 +375,13 @@ class ReservationApiTest extends TestCase
     }
 
     /**
-     * Deliberate proof that no availability/concurrency behavior was
-     * introduced: two reservations for the identical room and dates both
-     * succeed through the API, exactly as the Phase 3B unit test proved
-     * at the Service layer.
+     * Phase 3D behavior change: this used to prove no availability check
+     * existed (both succeeded). Availability protection is now
+     * implemented end-to-end through the API — a second overlapping
+     * request for the same room must be rejected with 422. See
+     * ReservationAvailabilityTest for full Phase 3D coverage.
      */
-    public function test_no_availability_or_concurrency_behavior_is_introduced(): void
+    public function test_second_overlapping_reservation_for_the_same_room_is_rejected(): void
     {
         $hotel = Hotel::factory()->create();
         $roomType = RoomType::factory()->create(['hotel_id' => $hotel->id]);
@@ -390,9 +396,9 @@ class ReservationApiTest extends TestCase
 
         $this->actingAs($owner, 'sanctum')
             ->postJson('/api/v1/reservations', $this->payload($roomType, $guestB, ['room_id' => $room->id]))
-            ->assertCreated();
+            ->assertStatus(422);
 
-        $this->assertSame(2, Reservation::where('room_id', $room->id)->count());
+        $this->assertSame(1, Reservation::where('room_id', $room->id)->count());
     }
 
     // ── List/response contract ─────────────────────────────────────

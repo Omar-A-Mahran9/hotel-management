@@ -30,4 +30,26 @@ interface ReservationRepositoryInterface
      * @param  array<string, mixed>  $data
      */
     public function create(array $data): Reservation;
+
+    /**
+     * Count of blocking reservations (Reservation::BLOCKING_STATUSES) for
+     * the exact physical Room $roomId whose date range overlaps
+     * [$checkIn, $checkOut) under the canonical, checkout-exclusive
+     * overlap predicate: existing.check_in < $checkOut AND $checkIn <
+     * existing.check_out. Must be called only after the caller holds the
+     * appropriate lock (approved Phase 3D concurrency design) — this
+     * method performs a plain, non-locking read.
+     */
+    public function countOverlappingForRoom(int $roomId, string $checkIn, string $checkOut): int;
+
+    /**
+     * Count of blocking reservations (Reservation::BLOCKING_STATUSES) for
+     * Room Type $roomTypeId whose date range overlaps [$checkIn,
+     * $checkOut), regardless of whether each reservation has a room_id
+     * assigned or not (approved Option A: assigned and unassigned
+     * reservations both consume the Room Type's shared physical
+     * capacity). Same overlap predicate and locking precondition as
+     * countOverlappingForRoom().
+     */
+    public function countOverlappingForRoomType(int $roomTypeId, string $checkIn, string $checkOut): int;
 }

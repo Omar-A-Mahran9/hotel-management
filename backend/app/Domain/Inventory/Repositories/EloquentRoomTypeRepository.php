@@ -38,6 +38,11 @@ class EloquentRoomTypeRepository implements RoomTypeRepositoryInterface
         return $this->query()->find($id);
     }
 
+    public function findForUpdate(int $id): ?RoomType
+    {
+        return RoomType::query()->lockForUpdate()->find($id);
+    }
+
     public function create(array $data): RoomType
     {
         $roomType = RoomType::create($data);

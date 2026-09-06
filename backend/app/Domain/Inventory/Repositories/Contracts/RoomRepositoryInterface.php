@@ -39,4 +39,12 @@ interface RoomRepositoryInterface
      * @param  array<string, mixed>  $data
      */
     public function update(Room $room, array $data): Room;
+
+    /**
+     * Total physical Rooms belonging to $roomTypeId — the capacity figure
+     * the Reservation domain's Phase 3D availability check (approved
+     * Option A) compares against, regardless of each Room's operational
+     * status.
+     */
+    public function countByRoomType(int $roomTypeId): int;
 }

@@ -24,6 +24,17 @@ interface RoomTypeRepositoryInterface
     public function find(int $id): ?RoomType;
 
     /**
+     * Locks the row for the duration of the caller's transaction. Must
+     * only be called from within an active DB::transaction() — this is
+     * the Room Type's serialization point for the Reservation domain's
+     * Phase 3D availability/concurrency protection (approved Option A:
+     * aggregate capacity is checked against this Room Type's total
+     * physical rooms while this lock is held). No snapshot counts are
+     * loaded — callers needing those should use find() instead.
+     */
+    public function findForUpdate(int $id): ?RoomType;
+
+    /**
      * @param  array<string, mixed>  $data
      */
     public function create(array $data): RoomType;

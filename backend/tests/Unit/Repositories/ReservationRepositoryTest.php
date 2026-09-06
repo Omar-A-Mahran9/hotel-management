@@ -4,6 +4,7 @@ namespace Tests\Unit\Repositories;
 
 use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\IdentityAccess\Models\User;
+use App\Domain\Inventory\Models\Room;
 use App\Domain\Inventory\Models\RoomType;
 use App\Domain\Reservation\Models\Guest;
 use App\Domain\Reservation\Models\Reservation;
@@ -108,5 +109,70 @@ class ReservationRepositoryTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('reservations', ['id' => $reservation->id, 'hotel_id' => $hotel->id]);
+    }
+
+    public function test_count_overlapping_for_room_counts_a_blocking_overlapping_reservation(): void
+    {
+        $hotel = Hotel::factory()->create();
+        $roomType = RoomType::factory()->create(['hotel_id' => $hotel->id]);
+        $room = Room::factory()->create(['hotel_id' => $hotel->id, 'room_type_id' => $roomType->id]);
+        Reservation::factory()->create([
+            'hotel_id' => $hotel->id, 'room_type_id' => $roomType->id, 'room_id' => $room->id,
+            'check_in' => '2026-10-10', 'check_out' => '2026-10-15',
+        ]);
+
+        $count = $this->repository->countOverlappingForRoom($room->id, '2026-10-12', '2026-10-18');
+
+        $this->assertSame(1, $count);
+    }
+
+    public function test_count_overlapping_for_room_excludes_non_overlapping_ranges(): void
+    {
+        $hotel = Hotel::factory()->create();
+        $roomType = RoomType::factory()->create(['hotel_id' => $hotel->id]);
+        $room = Room::factory()->create(['hotel_id' => $hotel->id, 'room_type_id' => $roomType->id]);
+        Reservation::factory()->create([
+            'hotel_id' => $hotel->id, 'room_type_id' => $roomType->id, 'room_id' => $room->id,
+            'check_in' => '2026-10-10', 'check_out' => '2026-10-12',
+        ]);
+
+        // Adjacent, not overlapping.
+        $count = $this->repository->countOverlappingForRoom($room->id, '2026-10-12', '2026-10-15');
+
+        $this->assertSame(0, $count);
+    }
+
+    public function test_count_overlapping_for_room_excludes_cancelled_reservations(): void
+    {
+        $hotel = Hotel::factory()->create();
+        $roomType = RoomType::factory()->create(['hotel_id' => $hotel->id]);
+        $room = Room::factory()->create(['hotel_id' => $hotel->id, 'room_type_id' => $roomType->id]);
+        Reservation::factory()->cancelled()->create([
+            'hotel_id' => $hotel->id, 'room_type_id' => $roomType->id, 'room_id' => $room->id,
+            'check_in' => '2026-10-10', 'check_out' => '2026-10-15',
+        ]);
+
+        $count = $this->repository->countOverlappingForRoom($room->id, '2026-10-12', '2026-10-18');
+
+        $this->assertSame(0, $count);
+    }
+
+    public function test_count_overlapping_for_room_type_counts_assigned_and_unassigned_together(): void
+    {
+        $hotel = Hotel::factory()->create();
+        $roomType = RoomType::factory()->create(['hotel_id' => $hotel->id]);
+        $room = Room::factory()->create(['hotel_id' => $hotel->id, 'room_type_id' => $roomType->id]);
+        Reservation::factory()->create([
+            'hotel_id' => $hotel->id, 'room_type_id' => $roomType->id, 'room_id' => $room->id,
+            'check_in' => '2026-10-10', 'check_out' => '2026-10-15',
+        ]);
+        Reservation::factory()->create([
+            'hotel_id' => $hotel->id, 'room_type_id' => $roomType->id, 'room_id' => null,
+            'check_in' => '2026-10-11', 'check_out' => '2026-10-13',
+        ]);
+
+        $count = $this->repository->countOverlappingForRoomType($roomType->id, '2026-10-10', '2026-10-15');
+
+        $this->assertSame(2, $count);
     }
 }
