@@ -32,6 +32,21 @@ interface ReservationRepositoryInterface
     public function create(array $data): Reservation;
 
     /**
+     * Locks the Reservation row for the duration of the caller's
+     * transaction (`SELECT ... FOR UPDATE`). Must only be called from
+     * within an active DB::transaction(). This is the row lock the
+     * status-transition workflow (Phase 4B) relies on so two concurrent
+     * transitions cannot both act on stale state — the same
+     * findForUpdate convention RoomRepository already exposes.
+     */
+    public function findForUpdate(int $id): ?Reservation;
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function update(Reservation $reservation, array $data): Reservation;
+
+    /**
      * Count of blocking reservations (Reservation::BLOCKING_STATUSES) for
      * the exact physical Room $roomId whose date range overlaps
      * [$checkIn, $checkOut) under the canonical, checkout-exclusive

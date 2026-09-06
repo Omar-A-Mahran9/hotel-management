@@ -40,6 +40,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/reservations', [ReservationController::class, 'index']);
         Route::post('/reservations', [ReservationController::class, 'store']);
         Route::get('/reservations/{reservation}', [ReservationController::class, 'show']);
+        Route::post('/reservations/{reservation}/transition', [ReservationController::class, 'transition']);
 
         Route::prefix('/hotels/{hotel}')->group(function () {
             Route::get('/room-types', [RoomTypeController::class, 'index']);

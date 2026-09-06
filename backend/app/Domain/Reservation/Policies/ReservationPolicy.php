@@ -54,4 +54,20 @@ class ReservationPolicy
         return $user->hasPermission('reservations.manage')
             && $this->hotelAccess->canAccessHotel($user, $hotel->id);
     }
+
+    /**
+     * A status transition is a Reservation mutation, so it takes the same
+     * `reservations.manage` permission as creation (Reception, holding only
+     * `reservations.view`, is denied) plus the hotel-scope check resolved
+     * from the user's own access records against the reservation's own
+     * hotel_id — never a client-supplied value. Phase 4C keeps the
+     * authorization boundary minimal: which *transitions* a role may
+     * perform (e.g. only Reception checks guests in) is deferred until
+     * those workflows exist, not encoded as a new RBAC matrix now.
+     */
+    public function transition(User $user, Reservation $reservation): bool
+    {
+        return $user->hasPermission('reservations.manage')
+            && $this->hotelAccess->canAccessHotel($user, $reservation->hotel_id);
+    }
 }

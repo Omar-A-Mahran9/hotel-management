@@ -15,15 +15,18 @@ use App\Domain\Reservation\Models\Guest;
 use App\Domain\Reservation\Models\Reservation;
 use App\Domain\Reservation\Repositories\Contracts\GuestRepositoryInterface;
 use App\Domain\Reservation\Repositories\Contracts\ReservationRepositoryInterface;
+use App\Domain\Reservation\StateMachine\ReservationStateMachine;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Phase 3B foundation plus Phase 3D availability/concurrency protection.
- * Still deliberately does NOT implement: room allocation strategy, the
- * status-transition engine, cancellation, or payment — all explicitly
- * deferred.
+ * Phase 3B foundation, Phase 3D availability/concurrency protection, and
+ * Phase 4B status-transition execution (transitionTo). Structural
+ * transition rules live only in ReservationStateMachine (Phase 4A).
+ * Still deliberately does NOT implement: room allocation strategy, payment
+ * or identity-verification preconditions, cancellation penalties — all
+ * explicitly deferred to later phases.
  */
 class ReservationService
 {
@@ -172,6 +175,61 @@ class ReservationService
             );
 
             return $reservation;
+        });
+    }
+
+    /**
+     * Executes a Reservation status transition. Structural validity is
+     * decided exclusively by ReservationStateMachine (Phase 4A) — this
+     * method owns only the transaction, the row lock, persistence, and the
+     * audit entry, never the transition map.
+     *
+     * The passed $reservation is used only for its id. The authoritative
+     * current status is re-read under a row lock inside the transaction
+     * (`findForUpdate`), so a stale status on the passed model can never
+     * drive the decision and two concurrent transitions cannot both act on
+     * the same starting state — the same transaction + lock + revalidate
+     * shape RoomService::transitionStatus already uses.
+     *
+     * Phase 4B deliberately does NOT check payment or identity-verification
+     * preconditions (e.g. the §8 rule that CHECKED_IN needs confirmed
+     * payment + verified identity): those domains are Phase 5 / Phase 6 and
+     * their guards are layered on later. Availability is likewise untouched
+     * — every status except CANCELLED already blocks inventory (Phase 3D),
+     * so a forward transition never changes a reservation's blocking effect
+     * and needs no re-check.
+     *
+     * @throws ModelNotFoundException if the Reservation no longer exists.
+     * @throws InvalidReservationStatusTransitionException if $currentStatus
+     *                                                     → $targetStatus is not an approved transition.
+     */
+    public function transitionTo(Reservation $reservation, string $targetStatus, ?User $actor = null): Reservation
+    {
+        return DB::transaction(function () use ($reservation, $targetStatus, $actor) {
+            $current = $this->reservations->findForUpdate($reservation->id);
+
+            if (! $current) {
+                throw (new ModelNotFoundException)->setModel(Reservation::class, [$reservation->id]);
+            }
+
+            $fromStatus = $current->status;
+
+            ReservationStateMachine::assertCanTransition($fromStatus, $targetStatus);
+
+            $before = $current->toArray();
+
+            $current = $this->reservations->update($current, ['status' => $targetStatus]);
+
+            $this->auditLogger->record(
+                $actor,
+                'reservation.status_changed',
+                $current,
+                before: $before,
+                after: $current->toArray(),
+                hotelId: $current->hotel_id,
+            );
+
+            return $current;
         });
     }
 }

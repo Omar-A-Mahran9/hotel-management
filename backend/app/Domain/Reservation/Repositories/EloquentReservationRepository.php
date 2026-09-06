@@ -25,6 +25,18 @@ class EloquentReservationRepository implements ReservationRepositoryInterface
         return Reservation::create($data);
     }
 
+    public function findForUpdate(int $id): ?Reservation
+    {
+        return Reservation::query()->lockForUpdate()->find($id);
+    }
+
+    public function update(Reservation $reservation, array $data): Reservation
+    {
+        $reservation->update($data);
+
+        return $reservation->refresh();
+    }
+
     public function countOverlappingForRoom(int $roomId, string $checkIn, string $checkOut): int
     {
         return $this->overlapQuery($checkIn, $checkOut)

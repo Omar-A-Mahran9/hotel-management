@@ -7,6 +7,7 @@ use App\Domain\Reservation\Models\Reservation;
 use App\Domain\Reservation\Services\ReservationService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Reservation\StoreReservationRequest;
+use App\Http\Requests\Api\V1\Reservation\TransitionReservationRequest;
 use App\Http\Resources\V1\ReservationResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -74,5 +75,34 @@ class ReservationController extends Controller
         $this->authorize('view', $found);
 
         return $this->success(new ReservationResource($found));
+    }
+
+    /**
+     * The single endpoint for advancing a Reservation through the approved
+     * state machine (Phase 4A/4B). Resolution and scoping mirror show():
+     * the reservation is fetched through ReservationService::findAccessibleBy()
+     * — not implicit route-model binding — so a cross-hotel or non-existent
+     * id is an identical plain 404. The client supplies only target_status;
+     * the acting user is taken from the token, never the request body.
+     * Structural transition validity stays in ReservationStateMachine (via
+     * the service) and an illegal transition surfaces as the standard 422.
+     */
+    public function transition(TransitionReservationRequest $request, int $reservation): JsonResponse
+    {
+        $found = $this->reservations->findAccessibleBy($request->user(), $reservation);
+
+        if (! $found) {
+            abort(404);
+        }
+
+        $this->authorize('transition', $found);
+
+        $updated = $this->reservations->transitionTo(
+            $found,
+            $request->validated('target_status'),
+            $request->user(),
+        );
+
+        return $this->success(new ReservationResource($updated), __('api.updated'));
     }
 }
