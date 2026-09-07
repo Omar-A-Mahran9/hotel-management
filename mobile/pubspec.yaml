@@ -1,0 +1,42 @@
+name: hotel_guest_app
+description: "Hotel Management System — Guest mobile application (Flutter client of the Laravel REST API)."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.13.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State management + compile-safe dependency injection. Lets the UI depend on
+  # repository/data-source abstractions while tests swap in the dummy data source
+  # via ProviderContainer overrides without any UI coupling.
+  flutter_riverpod: ^2.6.1
+
+  # Declarative routing / navigation foundation. Flutter-team package, deep-link
+  # ready for the journeys described in md/mobile/architecture.md §10.
+  go_router: ^14.6.2
+
+  # HTTP client foundation for the API layer (interceptors, timeouts, centralized
+  # error parsing per md/mobile/architecture.md §5). Pure Dart — no native pods,
+  # so it builds on every target while Android SDK / Xcode / CocoaPods are absent.
+  dio: ^5.7.0
+
+  # Message formatting + locale utilities used by the generated localizations.
+  intl: any
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  generate: true

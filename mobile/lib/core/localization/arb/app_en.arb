@@ -1,0 +1,63 @@
+{
+  "@@locale": "en",
+
+  "appName": "Hotel System",
+  "@appName": { "description": "Product name shown in the app bar and app metadata." },
+
+  "appTagline": "Book, verify and enter — from your phone.",
+  "@appTagline": { "description": "One-line promise shown on the foundation screen." },
+
+  "foundationScreenTitle": "Foundation & Design System",
+  "@foundationScreenTitle": { "description": "Title of the Phase 0 placeholder screen." },
+
+  "foundationScreenSubtitle": "Mobile Phase 0 — architecture, theme, localization and data-layer scaffolding only. Feature screens arrive in later phases.",
+
+  "sectionLanguage": "Language",
+  "sectionTheme": "Appearance",
+  "sectionBackendStatus": "Backend connectivity",
+  "sectionComponents": "Design system components",
+
+  "languageEnglish": "English",
+  "languageArabic": "العربية",
+
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+
+  "environmentLabel": "Environment: {name}",
+  "@environmentLabel": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+
+  "apiBaseUrlLabel": "API base URL: {url}",
+  "@apiBaseUrlLabel": {
+    "placeholders": { "url": { "type": "String" } }
+  },
+
+  "backendStatusOk": "Reachable",
+  "backendStatusDegraded": "Degraded",
+  "backendStatusDown": "Unreachable",
+  "backendStatusCheckedAt": "Checked at {time}",
+  "@backendStatusCheckedAt": {
+    "placeholders": { "time": { "type": "String" } }
+  },
+
+  "actionRetry": "Retry",
+  "actionCheckAgain": "Check again",
+  "actionPrimaryExample": "Primary action",
+  "actionSecondaryExample": "Secondary action",
+
+  "stateLoadingTitle": "Loading…",
+  "stateEmptyTitle": "Nothing here yet",
+  "stateEmptySubtitle": "When there is something to show, it will appear here.",
+  "stateErrorTitle": "Something went wrong",
+  "errorGeneric": "We could not complete that request. Please try again.",
+  "errorNetwork": "You appear to be offline. Check your connection and try again.",
+  "errorTimeout": "The request took too long. Please try again.",
+  "errorUnauthorized": "Your session has expired. Please sign in again.",
+  "errorServer": "The service is temporarily unavailable. Please try again later.",
+  "errorNotImplemented": "This is not available in Phase 0.",
+
+  "textFieldExampleLabel": "Full name",
+  "textFieldExampleHint": "Enter your name"
+}

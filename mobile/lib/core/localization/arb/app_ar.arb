@@ -1,0 +1,47 @@
+{
+  "@@locale": "ar",
+
+  "appName": "فندق سيستم",
+  "appTagline": "احجز، تحقّق، وادخل غرفتك من هاتفك.",
+  "foundationScreenTitle": "الأساس ونظام التصميم",
+  "foundationScreenSubtitle": "المرحلة صفر من التطبيق — بنية المشروع، السمة، الترجمة، وطبقة البيانات فقط. شاشات الميزات تأتي في المراحل التالية.",
+
+  "sectionLanguage": "اللغة",
+  "sectionTheme": "المظهر",
+  "sectionBackendStatus": "الاتصال بالخادم",
+  "sectionComponents": "مكوّنات نظام التصميم",
+
+  "languageEnglish": "English",
+  "languageArabic": "العربية",
+
+  "themeSystem": "النظام",
+  "themeLight": "فاتح",
+  "themeDark": "داكن",
+
+  "environmentLabel": "البيئة: {name}",
+  "apiBaseUrlLabel": "عنوان الـ API: {url}",
+
+  "backendStatusOk": "متصل",
+  "backendStatusDegraded": "متذبذب",
+  "backendStatusDown": "غير متصل",
+  "backendStatusCheckedAt": "آخر فحص: {time}",
+
+  "actionRetry": "إعادة المحاولة",
+  "actionCheckAgain": "افحص مجددًا",
+  "actionPrimaryExample": "إجراء رئيسي",
+  "actionSecondaryExample": "إجراء ثانوي",
+
+  "stateLoadingTitle": "جارٍ التحميل…",
+  "stateEmptyTitle": "لا يوجد شيء بعد",
+  "stateEmptySubtitle": "عند توفّر بيانات لعرضها ستظهر هنا.",
+  "stateErrorTitle": "حدث خطأ ما",
+  "errorGeneric": "تعذّر إكمال الطلب. يرجى المحاولة مرة أخرى.",
+  "errorNetwork": "يبدو أنك غير متصل بالإنترنت. تحقّق من الاتصال وحاول مجددًا.",
+  "errorTimeout": "استغرق الطلب وقتًا طويلًا. يرجى المحاولة مرة أخرى.",
+  "errorUnauthorized": "انتهت جلستك. يرجى تسجيل الدخول مرة أخرى.",
+  "errorServer": "الخدمة غير متاحة مؤقتًا. يرجى المحاولة لاحقًا.",
+  "errorNotImplemented": "هذا غير متاح في المرحلة صفر.",
+
+  "textFieldExampleLabel": "الاسم الكامل",
+  "textFieldExampleHint": "أدخل اسمك"
+}
