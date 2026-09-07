@@ -20,7 +20,7 @@ void main() {
     expect(find.text(en.entryStartAction), findsOneWidget);
   });
 
-  testWidgets('an authenticated cold start lands on the home screen',
+  testWidgets('an authenticated cold start lands on the discover screen',
       (WidgetTester tester) async {
     await tester.pumpWidget(
       ProviderScope(
@@ -32,8 +32,8 @@ void main() {
 
     final AppLocalizations en =
         await AppLocalizations.delegate.load(const Locale('en'));
-    expect(find.text(en.foundationScreenTitle), findsOneWidget);
-    // The foundation home still resolves its backend-health slice.
-    expect(find.text(en.backendStatusOk), findsOneWidget);
+    // Phase 2: discover is the authenticated landing (was the Phase 0 preview).
+    expect(find.text(en.discoverSubtitle), findsOneWidget);
+    expect(find.text(en.discoverFeaturedSection), findsOneWidget);
   });
 }

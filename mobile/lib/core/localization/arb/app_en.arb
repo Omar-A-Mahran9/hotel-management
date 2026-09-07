@@ -121,5 +121,176 @@
   "authDemoHint": "Development build: the verification code is {code}.",
   "@authDemoHint": {
     "placeholders": { "code": { "type": "String" } }
-  }
+  },
+
+  "commonApply": "Apply",
+  "commonCancel": "Cancel",
+  "commonReset": "Reset",
+  "commonClear": "Clear",
+  "commonSeeAll": "See all",
+  "commonBack": "Back",
+
+  "discoverGreeting": "Welcome",
+  "discoverGreetingNamed": "Welcome, {name}",
+  "@discoverGreetingNamed": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "discoverSubtitle": "Discover the group's hotels",
+  "discoverSearchHint": "Search for a hotel or city",
+  "discoverNotificationsTooltip": "Notifications",
+  "discoverFeaturedSection": "Group hotels",
+  "discoverEmptyTitle": "No hotels to show yet",
+  "discoverEmptyBody": "The group's hotels will appear here once they are published.",
+
+  "searchTitle": "Search",
+  "searchClearTooltip": "Clear search",
+  "searchResultsCount": "{count, plural, =0{No hotels available} =1{1 hotel available} other{{count} hotels available}}",
+  "@searchResultsCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "searchNoResultsTitle": "No hotels match your search",
+  "searchNoResultsBody": "Try a different city or clear your filters.",
+  "searchClearFilters": "Clear filters",
+
+  "sortRecommended": "Recommended",
+  "sortTopRated": "Top rated",
+  "sortLowestPrice": "Best value",
+  "sortTitle": "Sort results",
+  "sortHint": "The order stays until you change it or search again.",
+  "sortApply": "Apply sort",
+  "sortActiveTag": "on",
+
+  "filterTitle": "Filter results",
+  "filterMatchCount": "{count, plural, =0{No matching hotels} =1{1 matching hotel} other{{count} matching hotels}}",
+  "@filterMatchCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "filterHint": "Adjust the criteria to narrow the results.",
+  "filterCityLabel": "City",
+  "filterValueAll": "All",
+  "filterSelectedCount": "{count} selected",
+  "@filterSelectedCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "filterPriceLabel": "Price range",
+  "filterApply": "Apply filter",
+  "filterClearAll": "Clear all",
+  "filterCityPickerTitle": "City",
+  "filterCityPickerHint": "You can choose more than one city. Results update when you apply.",
+
+  "cityHotelCount": "{count, plural, =1{1 hotel} other{{count} hotels}}",
+  "@cityHotelCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "priceRangeValue": "SAR {min} – SAR {max}",
+  "@priceRangeValue": {
+    "placeholders": {
+      "min": { "type": "int" },
+      "max": { "type": "int" }
+    }
+  },
+  "priceFrom": "from SAR {amount}",
+  "@priceFrom": {
+    "placeholders": { "amount": { "type": "int" } }
+  },
+  "pricePerNight": "SAR {amount} / night",
+  "@pricePerNight": {
+    "placeholders": { "amount": { "type": "int" } }
+  },
+  "priceStayTotal": "SAR {amount} total",
+  "@priceStayTotal": {
+    "placeholders": { "amount": { "type": "int" } }
+  },
+
+  "hotelRatingValue": "{rating}",
+  "@hotelRatingValue": {
+    "placeholders": {
+      "rating": { "type": "double", "format": "decimalPattern" }
+    }
+  },
+  "hotelReviewCount": "{count, plural, =1{1 review} other{{count} reviews}}",
+  "@hotelReviewCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "hotelAvailable": "Available",
+  "hotelUnavailable": "Not available right now",
+  "hotelDetailReviews": "Ratings & reviews",
+  "hotelReviewCleanliness": "Cleanliness",
+  "hotelReviewCommunication": "Communication",
+  "hotelDetailAmenities": "What this hotel offers",
+  "hotelRoomTypeCount": "{count, plural, =1{1 room type} other{{count} room types}}",
+  "@hotelRoomTypeCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "hotelPhotoCount": "{count, plural, other{+{count}}}",
+  "@hotelPhotoCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "hotelSelectDates": "Select dates",
+
+  "amenityFreeWifi": "Free Wi-Fi",
+  "amenityBreakfast": "Breakfast",
+  "amenityParking": "Parking",
+  "amenityPool": "Pool",
+  "amenityGym": "Gym",
+  "amenityFamilyRooms": "Family rooms",
+  "amenityAirportShuttle": "Airport shuttle",
+  "amenityRoomService": "Room service",
+  "amenityAirConditioning": "Air conditioning",
+  "amenityCityView": "City view",
+  "amenityBalcony": "Balcony",
+  "amenityKitchenette": "Kitchenette",
+
+  "stayDatesTitle": "Choose your stay dates",
+  "stayDatesCheckIn": "Check-in",
+  "stayDatesCheckOut": "Check-out",
+  "stayDatesPick": "Choose date",
+  "stayDatesClear": "Clear dates",
+  "stayDatesShowRooms": "Show available rooms",
+  "stayNights": "{count, plural, =1{1 night} other{{count} nights}}",
+  "@stayNights": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "stayDatesErrorCheckoutBeforeCheckin": "Check-out must be after check-in",
+  "stayDatesErrorPast": "Choose a date from today onwards",
+  "stayDatesEditDates": "Edit dates",
+
+  "guestsTitle": "Number of guests",
+  "guestsAdults": "Adults",
+  "guestsChildren": "Children",
+  "guestsConfirm": "Confirm guests",
+  "stepperDecrease": "Decrease",
+  "stepperIncrease": "Increase",
+  "guestsAdultsCount": "{count, plural, =1{1 adult} other{{count} adults}}",
+  "@guestsAdultsCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "guestsChildrenCount": "{count, plural, =1{1 child} other{{count} children}}",
+  "@guestsChildrenCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "roomsTitle": "Available rooms",
+  "roomsAvailableCount": "{count, plural, =0{None available} =1{1 available} other{{count} available}}",
+  "@roomsAvailableCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "roomsSortLabel": "Sort",
+  "roomsSortLowest": "Lowest price",
+  "roomsSortHighest": "Highest price",
+  "roomOccupancy": "{count, plural, =1{1 guest} other{{count} guests}}",
+  "@roomOccupancy": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "roomBreakfastIncluded": "Breakfast included",
+  "roomFreeCancellation": "Free cancellation",
+  "roomNonRefundable": "Non-refundable",
+  "roomSoldOut": "Not available for these dates",
+  "roomsAllSoldOutTitle": "All rooms are sold out for these dates",
+  "roomsAllSoldOutBody": "Try different dates and we will show the rooms that open up.",
+  "roomsNoResultsTitle": "No rooms for these dates",
+  "roomsNoResultsBody": "Try different dates or adjust the number of guests.",
+  "roomsChangeDates": "Change dates",
+  "roomsChangeGuests": "Change guests"
 }

@@ -270,4 +270,418 @@ class AppLocalizationsEn extends AppLocalizations {
   String authDemoHint(String code) {
     return 'Development build: the verification code is $code.';
   }
+
+  @override
+  String get commonApply => 'Apply';
+
+  @override
+  String get commonCancel => 'Cancel';
+
+  @override
+  String get commonReset => 'Reset';
+
+  @override
+  String get commonClear => 'Clear';
+
+  @override
+  String get commonSeeAll => 'See all';
+
+  @override
+  String get commonBack => 'Back';
+
+  @override
+  String get discoverGreeting => 'Welcome';
+
+  @override
+  String discoverGreetingNamed(String name) {
+    return 'Welcome, $name';
+  }
+
+  @override
+  String get discoverSubtitle => 'Discover the group\'s hotels';
+
+  @override
+  String get discoverSearchHint => 'Search for a hotel or city';
+
+  @override
+  String get discoverNotificationsTooltip => 'Notifications';
+
+  @override
+  String get discoverFeaturedSection => 'Group hotels';
+
+  @override
+  String get discoverEmptyTitle => 'No hotels to show yet';
+
+  @override
+  String get discoverEmptyBody =>
+      'The group\'s hotels will appear here once they are published.';
+
+  @override
+  String get searchTitle => 'Search';
+
+  @override
+  String get searchClearTooltip => 'Clear search';
+
+  @override
+  String searchResultsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hotels available',
+      one: '1 hotel available',
+      zero: 'No hotels available',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get searchNoResultsTitle => 'No hotels match your search';
+
+  @override
+  String get searchNoResultsBody =>
+      'Try a different city or clear your filters.';
+
+  @override
+  String get searchClearFilters => 'Clear filters';
+
+  @override
+  String get sortRecommended => 'Recommended';
+
+  @override
+  String get sortTopRated => 'Top rated';
+
+  @override
+  String get sortLowestPrice => 'Best value';
+
+  @override
+  String get sortTitle => 'Sort results';
+
+  @override
+  String get sortHint => 'The order stays until you change it or search again.';
+
+  @override
+  String get sortApply => 'Apply sort';
+
+  @override
+  String get sortActiveTag => 'on';
+
+  @override
+  String get filterTitle => 'Filter results';
+
+  @override
+  String filterMatchCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count matching hotels',
+      one: '1 matching hotel',
+      zero: 'No matching hotels',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get filterHint => 'Adjust the criteria to narrow the results.';
+
+  @override
+  String get filterCityLabel => 'City';
+
+  @override
+  String get filterValueAll => 'All';
+
+  @override
+  String filterSelectedCount(int count) {
+    return '$count selected';
+  }
+
+  @override
+  String get filterPriceLabel => 'Price range';
+
+  @override
+  String get filterApply => 'Apply filter';
+
+  @override
+  String get filterClearAll => 'Clear all';
+
+  @override
+  String get filterCityPickerTitle => 'City';
+
+  @override
+  String get filterCityPickerHint =>
+      'You can choose more than one city. Results update when you apply.';
+
+  @override
+  String cityHotelCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hotels',
+      one: '1 hotel',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String priceRangeValue(int min, int max) {
+    return 'SAR $min – SAR $max';
+  }
+
+  @override
+  String priceFrom(int amount) {
+    return 'from SAR $amount';
+  }
+
+  @override
+  String pricePerNight(int amount) {
+    return 'SAR $amount / night';
+  }
+
+  @override
+  String priceStayTotal(int amount) {
+    return 'SAR $amount total';
+  }
+
+  @override
+  String hotelRatingValue(double rating) {
+    final intl.NumberFormat ratingNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String ratingString = ratingNumberFormat.format(rating);
+
+    return '$ratingString';
+  }
+
+  @override
+  String hotelReviewCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count reviews',
+      one: '1 review',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get hotelAvailable => 'Available';
+
+  @override
+  String get hotelUnavailable => 'Not available right now';
+
+  @override
+  String get hotelDetailReviews => 'Ratings & reviews';
+
+  @override
+  String get hotelReviewCleanliness => 'Cleanliness';
+
+  @override
+  String get hotelReviewCommunication => 'Communication';
+
+  @override
+  String get hotelDetailAmenities => 'What this hotel offers';
+
+  @override
+  String hotelRoomTypeCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count room types',
+      one: '1 room type',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String hotelPhotoCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '+$count',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get hotelSelectDates => 'Select dates';
+
+  @override
+  String get amenityFreeWifi => 'Free Wi-Fi';
+
+  @override
+  String get amenityBreakfast => 'Breakfast';
+
+  @override
+  String get amenityParking => 'Parking';
+
+  @override
+  String get amenityPool => 'Pool';
+
+  @override
+  String get amenityGym => 'Gym';
+
+  @override
+  String get amenityFamilyRooms => 'Family rooms';
+
+  @override
+  String get amenityAirportShuttle => 'Airport shuttle';
+
+  @override
+  String get amenityRoomService => 'Room service';
+
+  @override
+  String get amenityAirConditioning => 'Air conditioning';
+
+  @override
+  String get amenityCityView => 'City view';
+
+  @override
+  String get amenityBalcony => 'Balcony';
+
+  @override
+  String get amenityKitchenette => 'Kitchenette';
+
+  @override
+  String get stayDatesTitle => 'Choose your stay dates';
+
+  @override
+  String get stayDatesCheckIn => 'Check-in';
+
+  @override
+  String get stayDatesCheckOut => 'Check-out';
+
+  @override
+  String get stayDatesPick => 'Choose date';
+
+  @override
+  String get stayDatesClear => 'Clear dates';
+
+  @override
+  String get stayDatesShowRooms => 'Show available rooms';
+
+  @override
+  String stayNights(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count nights',
+      one: '1 night',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get stayDatesErrorCheckoutBeforeCheckin =>
+      'Check-out must be after check-in';
+
+  @override
+  String get stayDatesErrorPast => 'Choose a date from today onwards';
+
+  @override
+  String get stayDatesEditDates => 'Edit dates';
+
+  @override
+  String get guestsTitle => 'Number of guests';
+
+  @override
+  String get guestsAdults => 'Adults';
+
+  @override
+  String get guestsChildren => 'Children';
+
+  @override
+  String get guestsConfirm => 'Confirm guests';
+
+  @override
+  String get stepperDecrease => 'Decrease';
+
+  @override
+  String get stepperIncrease => 'Increase';
+
+  @override
+  String guestsAdultsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count adults',
+      one: '1 adult',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String guestsChildrenCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count children',
+      one: '1 child',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get roomsTitle => 'Available rooms';
+
+  @override
+  String roomsAvailableCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count available',
+      one: '1 available',
+      zero: 'None available',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get roomsSortLabel => 'Sort';
+
+  @override
+  String get roomsSortLowest => 'Lowest price';
+
+  @override
+  String get roomsSortHighest => 'Highest price';
+
+  @override
+  String roomOccupancy(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count guests',
+      one: '1 guest',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get roomBreakfastIncluded => 'Breakfast included';
+
+  @override
+  String get roomFreeCancellation => 'Free cancellation';
+
+  @override
+  String get roomNonRefundable => 'Non-refundable';
+
+  @override
+  String get roomSoldOut => 'Not available for these dates';
+
+  @override
+  String get roomsAllSoldOutTitle => 'All rooms are sold out for these dates';
+
+  @override
+  String get roomsAllSoldOutBody =>
+      'Try different dates and we will show the rooms that open up.';
+
+  @override
+  String get roomsNoResultsTitle => 'No rooms for these dates';
+
+  @override
+  String get roomsNoResultsBody =>
+      'Try different dates or adjust the number of guests.';
+
+  @override
+  String get roomsChangeDates => 'Change dates';
+
+  @override
+  String get roomsChangeGuests => 'Change guests';
 }

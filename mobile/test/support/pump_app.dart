@@ -16,12 +16,16 @@ Future<ProviderContainer> pumpApp(
   AuthSession? bootSession,
   Locale? locale,
   Duration resendCooldown = Duration.zero,
+  List<Override> extraOverrides = const <Override>[],
 }) async {
   final ProviderContainer container = ProviderContainer(
-    overrides: authOverrides(
-      bootSession: bootSession,
-      resendCooldown: resendCooldown,
-    ),
+    overrides: <Override>[
+      ...authOverrides(
+        bootSession: bootSession,
+        resendCooldown: resendCooldown,
+      ),
+      ...extraOverrides,
+    ],
   );
   addTearDown(container.dispose);
 

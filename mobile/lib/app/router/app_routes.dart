@@ -28,14 +28,39 @@ abstract final class AppRoutes {
   static const String sessionExpired = '/auth/session-expired';
   static const String sessionExpiredName = 'sessionExpired';
 
-  /// Authenticated landing. Phase 1 shows the Phase 0 foundation preview here;
-  /// the real home screen arrives in a later phase.
+  /// Phase 0/1 foundation preview — architecture, theme and backend-health
+  /// diagnostics. Still registered (so the Phase 0 route test and manual
+  /// diagnostics keep working) but no longer the authenticated landing: from
+  /// Phase 2 that is [discover].
   static const String home = '/home';
   static const String homeName = 'home';
 
   /// Retained for the Phase 0 error-route test / deep diagnostics.
   static const String foundation = home;
   static const String foundationName = homeName;
+
+  /// `02 · Discover & Book` — the authenticated landing from Phase 2 on.
+  static const String discover = '/discover';
+  static const String discoverName = 'discover';
+
+  /// `15 · Search, filters & sort` — hotel search + filters + sort.
+  static const String hotelSearch = '/discover/search';
+  static const String hotelSearchName = 'hotelSearch';
+
+  /// `02 · Discover & Book` (screen 3) — hotel detail. `:hotelId` path param.
+  static const String hotelDetail = '/discover/hotel/:hotelId';
+  static const String hotelDetailName = 'hotelDetail';
+
+  /// `16 · Stay dates & available rooms` — stay-date selection.
+  static const String stayDates = '/discover/hotel/:hotelId/dates';
+  static const String stayDatesName = 'stayDates';
+
+  /// `16 · Stay dates & available rooms` — the available-rooms list.
+  static const String availableRooms = '/discover/hotel/:hotelId/rooms';
+  static const String availableRoomsName = 'availableRooms';
+
+  /// The authenticated landing route.
+  static const String authenticatedHome = discover;
 
   /// Routes that make up the unauthenticated entry + auth surface.
   static const Set<String> authSurface = <String>{

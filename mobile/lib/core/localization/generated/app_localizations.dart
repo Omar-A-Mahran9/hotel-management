@@ -565,6 +565,606 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Development build: the verification code is {code}.'**
   String authDemoHint(String code);
+
+  /// No description provided for @commonApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get commonApply;
+
+  /// No description provided for @commonCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get commonCancel;
+
+  /// No description provided for @commonReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get commonReset;
+
+  /// No description provided for @commonClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get commonClear;
+
+  /// No description provided for @commonSeeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See all'**
+  String get commonSeeAll;
+
+  /// No description provided for @commonBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get commonBack;
+
+  /// No description provided for @discoverGreeting.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome'**
+  String get discoverGreeting;
+
+  /// No description provided for @discoverGreetingNamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome, {name}'**
+  String discoverGreetingNamed(String name);
+
+  /// No description provided for @discoverSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover the group\'s hotels'**
+  String get discoverSubtitle;
+
+  /// No description provided for @discoverSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for a hotel or city'**
+  String get discoverSearchHint;
+
+  /// No description provided for @discoverNotificationsTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get discoverNotificationsTooltip;
+
+  /// No description provided for @discoverFeaturedSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Group hotels'**
+  String get discoverFeaturedSection;
+
+  /// No description provided for @discoverEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No hotels to show yet'**
+  String get discoverEmptyTitle;
+
+  /// No description provided for @discoverEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The group\'s hotels will appear here once they are published.'**
+  String get discoverEmptyBody;
+
+  /// No description provided for @searchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get searchTitle;
+
+  /// No description provided for @searchClearTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get searchClearTooltip;
+
+  /// No description provided for @searchResultsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No hotels available} =1{1 hotel available} other{{count} hotels available}}'**
+  String searchResultsCount(int count);
+
+  /// No description provided for @searchNoResultsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No hotels match your search'**
+  String get searchNoResultsTitle;
+
+  /// No description provided for @searchNoResultsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Try a different city or clear your filters.'**
+  String get searchNoResultsBody;
+
+  /// No description provided for @searchClearFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear filters'**
+  String get searchClearFilters;
+
+  /// No description provided for @sortRecommended.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended'**
+  String get sortRecommended;
+
+  /// No description provided for @sortTopRated.
+  ///
+  /// In en, this message translates to:
+  /// **'Top rated'**
+  String get sortTopRated;
+
+  /// No description provided for @sortLowestPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Best value'**
+  String get sortLowestPrice;
+
+  /// No description provided for @sortTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort results'**
+  String get sortTitle;
+
+  /// No description provided for @sortHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The order stays until you change it or search again.'**
+  String get sortHint;
+
+  /// No description provided for @sortApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply sort'**
+  String get sortApply;
+
+  /// No description provided for @sortActiveTag.
+  ///
+  /// In en, this message translates to:
+  /// **'on'**
+  String get sortActiveTag;
+
+  /// No description provided for @filterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter results'**
+  String get filterTitle;
+
+  /// No description provided for @filterMatchCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No matching hotels} =1{1 matching hotel} other{{count} matching hotels}}'**
+  String filterMatchCount(int count);
+
+  /// No description provided for @filterHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust the criteria to narrow the results.'**
+  String get filterHint;
+
+  /// No description provided for @filterCityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'City'**
+  String get filterCityLabel;
+
+  /// No description provided for @filterValueAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterValueAll;
+
+  /// No description provided for @filterSelectedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected'**
+  String filterSelectedCount(int count);
+
+  /// No description provided for @filterPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Price range'**
+  String get filterPriceLabel;
+
+  /// No description provided for @filterApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply filter'**
+  String get filterApply;
+
+  /// No description provided for @filterClearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all'**
+  String get filterClearAll;
+
+  /// No description provided for @filterCityPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'City'**
+  String get filterCityPickerTitle;
+
+  /// No description provided for @filterCityPickerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You can choose more than one city. Results update when you apply.'**
+  String get filterCityPickerHint;
+
+  /// No description provided for @cityHotelCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 hotel} other{{count} hotels}}'**
+  String cityHotelCount(int count);
+
+  /// No description provided for @priceRangeValue.
+  ///
+  /// In en, this message translates to:
+  /// **'SAR {min} – SAR {max}'**
+  String priceRangeValue(int min, int max);
+
+  /// No description provided for @priceFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'from SAR {amount}'**
+  String priceFrom(int amount);
+
+  /// No description provided for @pricePerNight.
+  ///
+  /// In en, this message translates to:
+  /// **'SAR {amount} / night'**
+  String pricePerNight(int amount);
+
+  /// No description provided for @priceStayTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'SAR {amount} total'**
+  String priceStayTotal(int amount);
+
+  /// No description provided for @hotelRatingValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{rating}'**
+  String hotelRatingValue(double rating);
+
+  /// No description provided for @hotelReviewCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 review} other{{count} reviews}}'**
+  String hotelReviewCount(int count);
+
+  /// No description provided for @hotelAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get hotelAvailable;
+
+  /// No description provided for @hotelUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available right now'**
+  String get hotelUnavailable;
+
+  /// No description provided for @hotelDetailReviews.
+  ///
+  /// In en, this message translates to:
+  /// **'Ratings & reviews'**
+  String get hotelDetailReviews;
+
+  /// No description provided for @hotelReviewCleanliness.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleanliness'**
+  String get hotelReviewCleanliness;
+
+  /// No description provided for @hotelReviewCommunication.
+  ///
+  /// In en, this message translates to:
+  /// **'Communication'**
+  String get hotelReviewCommunication;
+
+  /// No description provided for @hotelDetailAmenities.
+  ///
+  /// In en, this message translates to:
+  /// **'What this hotel offers'**
+  String get hotelDetailAmenities;
+
+  /// No description provided for @hotelRoomTypeCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 room type} other{{count} room types}}'**
+  String hotelRoomTypeCount(int count);
+
+  /// No description provided for @hotelPhotoCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, other{+{count}}}'**
+  String hotelPhotoCount(int count);
+
+  /// No description provided for @hotelSelectDates.
+  ///
+  /// In en, this message translates to:
+  /// **'Select dates'**
+  String get hotelSelectDates;
+
+  /// No description provided for @amenityFreeWifi.
+  ///
+  /// In en, this message translates to:
+  /// **'Free Wi-Fi'**
+  String get amenityFreeWifi;
+
+  /// No description provided for @amenityBreakfast.
+  ///
+  /// In en, this message translates to:
+  /// **'Breakfast'**
+  String get amenityBreakfast;
+
+  /// No description provided for @amenityParking.
+  ///
+  /// In en, this message translates to:
+  /// **'Parking'**
+  String get amenityParking;
+
+  /// No description provided for @amenityPool.
+  ///
+  /// In en, this message translates to:
+  /// **'Pool'**
+  String get amenityPool;
+
+  /// No description provided for @amenityGym.
+  ///
+  /// In en, this message translates to:
+  /// **'Gym'**
+  String get amenityGym;
+
+  /// No description provided for @amenityFamilyRooms.
+  ///
+  /// In en, this message translates to:
+  /// **'Family rooms'**
+  String get amenityFamilyRooms;
+
+  /// No description provided for @amenityAirportShuttle.
+  ///
+  /// In en, this message translates to:
+  /// **'Airport shuttle'**
+  String get amenityAirportShuttle;
+
+  /// No description provided for @amenityRoomService.
+  ///
+  /// In en, this message translates to:
+  /// **'Room service'**
+  String get amenityRoomService;
+
+  /// No description provided for @amenityAirConditioning.
+  ///
+  /// In en, this message translates to:
+  /// **'Air conditioning'**
+  String get amenityAirConditioning;
+
+  /// No description provided for @amenityCityView.
+  ///
+  /// In en, this message translates to:
+  /// **'City view'**
+  String get amenityCityView;
+
+  /// No description provided for @amenityBalcony.
+  ///
+  /// In en, this message translates to:
+  /// **'Balcony'**
+  String get amenityBalcony;
+
+  /// No description provided for @amenityKitchenette.
+  ///
+  /// In en, this message translates to:
+  /// **'Kitchenette'**
+  String get amenityKitchenette;
+
+  /// No description provided for @stayDatesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your stay dates'**
+  String get stayDatesTitle;
+
+  /// No description provided for @stayDatesCheckIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in'**
+  String get stayDatesCheckIn;
+
+  /// No description provided for @stayDatesCheckOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-out'**
+  String get stayDatesCheckOut;
+
+  /// No description provided for @stayDatesPick.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose date'**
+  String get stayDatesPick;
+
+  /// No description provided for @stayDatesClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear dates'**
+  String get stayDatesClear;
+
+  /// No description provided for @stayDatesShowRooms.
+  ///
+  /// In en, this message translates to:
+  /// **'Show available rooms'**
+  String get stayDatesShowRooms;
+
+  /// No description provided for @stayNights.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 night} other{{count} nights}}'**
+  String stayNights(int count);
+
+  /// No description provided for @stayDatesErrorCheckoutBeforeCheckin.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-out must be after check-in'**
+  String get stayDatesErrorCheckoutBeforeCheckin;
+
+  /// No description provided for @stayDatesErrorPast.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a date from today onwards'**
+  String get stayDatesErrorPast;
+
+  /// No description provided for @stayDatesEditDates.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit dates'**
+  String get stayDatesEditDates;
+
+  /// No description provided for @guestsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of guests'**
+  String get guestsTitle;
+
+  /// No description provided for @guestsAdults.
+  ///
+  /// In en, this message translates to:
+  /// **'Adults'**
+  String get guestsAdults;
+
+  /// No description provided for @guestsChildren.
+  ///
+  /// In en, this message translates to:
+  /// **'Children'**
+  String get guestsChildren;
+
+  /// No description provided for @guestsConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm guests'**
+  String get guestsConfirm;
+
+  /// No description provided for @stepperDecrease.
+  ///
+  /// In en, this message translates to:
+  /// **'Decrease'**
+  String get stepperDecrease;
+
+  /// No description provided for @stepperIncrease.
+  ///
+  /// In en, this message translates to:
+  /// **'Increase'**
+  String get stepperIncrease;
+
+  /// No description provided for @guestsAdultsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 adult} other{{count} adults}}'**
+  String guestsAdultsCount(int count);
+
+  /// No description provided for @guestsChildrenCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 child} other{{count} children}}'**
+  String guestsChildrenCount(int count);
+
+  /// No description provided for @roomsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Available rooms'**
+  String get roomsTitle;
+
+  /// No description provided for @roomsAvailableCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{None available} =1{1 available} other{{count} available}}'**
+  String roomsAvailableCount(int count);
+
+  /// No description provided for @roomsSortLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort'**
+  String get roomsSortLabel;
+
+  /// No description provided for @roomsSortLowest.
+  ///
+  /// In en, this message translates to:
+  /// **'Lowest price'**
+  String get roomsSortLowest;
+
+  /// No description provided for @roomsSortHighest.
+  ///
+  /// In en, this message translates to:
+  /// **'Highest price'**
+  String get roomsSortHighest;
+
+  /// No description provided for @roomOccupancy.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 guest} other{{count} guests}}'**
+  String roomOccupancy(int count);
+
+  /// No description provided for @roomBreakfastIncluded.
+  ///
+  /// In en, this message translates to:
+  /// **'Breakfast included'**
+  String get roomBreakfastIncluded;
+
+  /// No description provided for @roomFreeCancellation.
+  ///
+  /// In en, this message translates to:
+  /// **'Free cancellation'**
+  String get roomFreeCancellation;
+
+  /// No description provided for @roomNonRefundable.
+  ///
+  /// In en, this message translates to:
+  /// **'Non-refundable'**
+  String get roomNonRefundable;
+
+  /// No description provided for @roomSoldOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available for these dates'**
+  String get roomSoldOut;
+
+  /// No description provided for @roomsAllSoldOutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'All rooms are sold out for these dates'**
+  String get roomsAllSoldOutTitle;
+
+  /// No description provided for @roomsAllSoldOutBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Try different dates and we will show the rooms that open up.'**
+  String get roomsAllSoldOutBody;
+
+  /// No description provided for @roomsNoResultsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No rooms for these dates'**
+  String get roomsNoResultsTitle;
+
+  /// No description provided for @roomsNoResultsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Try different dates or adjust the number of guests.'**
+  String get roomsNoResultsBody;
+
+  /// No description provided for @roomsChangeDates.
+  ///
+  /// In en, this message translates to:
+  /// **'Change dates'**
+  String get roomsChangeDates;
+
+  /// No description provided for @roomsChangeGuests.
+  ///
+  /// In en, this message translates to:
+  /// **'Change guests'**
+  String get roomsChangeGuests;
 }
 
 class _AppLocalizationsDelegate

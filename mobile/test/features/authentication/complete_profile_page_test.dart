@@ -33,7 +33,7 @@ void main() {
     expect(find.text(en.authProfileTitle), findsOneWidget);
   });
 
-  testWidgets('valid details complete the profile and open the home screen',
+  testWidgets('valid details complete the profile and open the discover screen',
       (WidgetTester tester) async {
     await pumpApp(tester, bootSession: _incompleteSession());
     final AppLocalizations en = await tester.l10n();
@@ -46,7 +46,7 @@ void main() {
     await tester.tap(find.text(en.authProfileSubmit));
     await tester.pumpAndSettle();
 
-    expect(find.text(en.foundationScreenTitle), findsOneWidget);
+    expect(find.text(en.discoverSubtitle), findsOneWidget);
   });
 
   testWidgets('an invalid email is rejected locally',

@@ -1,0 +1,64 @@
+import 'package:flutter/foundation.dart';
+
+import 'localized_text.dart';
+import 'money.dart';
+
+/// The compact view of a hotel shown in discover cards and search-result rows
+/// (`02 · Discover & Book`). The full [Hotel] adds the detail-screen fields.
+@immutable
+class HotelSummary {
+  const HotelSummary({
+    required this.id,
+    required this.name,
+    required this.cityId,
+    required this.cityName,
+    required this.tagline,
+    required this.rating,
+    required this.reviewCount,
+    required this.nightlyRateFrom,
+    required this.isAvailable,
+  });
+
+  final String id;
+  final LocalizedText name;
+  final String cityId;
+  final LocalizedText cityName;
+  final LocalizedText tagline;
+
+  /// Average guest rating out of 5 (`4.96` in the reference). `null` when the
+  /// hotel has no ratings yet — the card then hides the rating pill.
+  final double? rating;
+  final int? reviewCount;
+
+  /// Lowest nightly rate across the hotel's room types — the "from" price on the
+  /// card.
+  final Money nightlyRateFrom;
+
+  final bool isAvailable;
+
+  @override
+  bool operator ==(Object other) =>
+      other is HotelSummary &&
+      other.id == id &&
+      other.name == name &&
+      other.cityId == cityId &&
+      other.cityName == cityName &&
+      other.tagline == tagline &&
+      other.rating == rating &&
+      other.reviewCount == reviewCount &&
+      other.nightlyRateFrom == nightlyRateFrom &&
+      other.isAvailable == isAvailable;
+
+  @override
+  int get hashCode => Object.hash(
+        id,
+        name,
+        cityId,
+        cityName,
+        tagline,
+        rating,
+        reviewCount,
+        nightlyRateFrom,
+        isAvailable,
+      );
+}

@@ -46,11 +46,11 @@ void main() {
     expect(_location(container), AppRoutes.welcome);
   });
 
-  testWidgets('authenticated boot redirects to home',
+  testWidgets('authenticated boot redirects to discover',
       (WidgetTester tester) async {
     final ProviderContainer container =
         await pumpApp(tester, bootSession: completeSession());
-    expect(_location(container), AppRoutes.home);
+    expect(_location(container), AppRoutes.discover);
   });
 
   testWidgets('an awaiting-profile session is forced onto the profile route',

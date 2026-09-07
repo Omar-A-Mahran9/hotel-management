@@ -13,6 +13,11 @@ import '../../features/authentication/presentation/pages/phone_login_page.dart';
 import '../../features/authentication/presentation/pages/session_expired_page.dart';
 import '../../features/authentication/presentation/state/auth_controller.dart';
 import '../../features/authentication/presentation/state/auth_state.dart';
+import '../../features/discovery/presentation/pages/available_rooms_page.dart';
+import '../../features/discovery/presentation/pages/discover_page.dart';
+import '../../features/discovery/presentation/pages/hotel_detail_page.dart';
+import '../../features/discovery/presentation/pages/hotel_search_page.dart';
+import '../../features/discovery/presentation/pages/stay_dates_page.dart';
 import '../foundation_home_page.dart';
 import 'app_routes.dart';
 
@@ -64,8 +69,9 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
           return AppRoutes.welcome;
         },
         awaitingProfile: (_) => onProfile ? null : AppRoutes.completeProfile,
-        authenticated: (_) =>
-            (onSplash || onAuthSurface || onProfile) ? AppRoutes.home : null,
+        authenticated: (_) => (onSplash || onAuthSurface || onProfile)
+            ? AppRoutes.authenticatedHome
+            : null,
         sessionExpired: () =>
             loc == AppRoutes.sessionExpired ? null : AppRoutes.sessionExpired,
       );
@@ -105,6 +111,34 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
         path: AppRoutes.home,
         name: AppRoutes.homeName,
         builder: (_, _) => const FoundationHomePage(),
+      ),
+      GoRoute(
+        path: AppRoutes.discover,
+        name: AppRoutes.discoverName,
+        builder: (_, _) => const DiscoverPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.hotelSearch,
+        name: AppRoutes.hotelSearchName,
+        builder: (_, _) => const HotelSearchPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.hotelDetail,
+        name: AppRoutes.hotelDetailName,
+        builder: (BuildContext context, GoRouterState state) =>
+            HotelDetailPage(hotelId: state.pathParameters['hotelId']!),
+      ),
+      GoRoute(
+        path: AppRoutes.stayDates,
+        name: AppRoutes.stayDatesName,
+        builder: (BuildContext context, GoRouterState state) =>
+            StayDatesPage(hotelId: state.pathParameters['hotelId']!),
+      ),
+      GoRoute(
+        path: AppRoutes.availableRooms,
+        name: AppRoutes.availableRoomsName,
+        builder: (BuildContext context, GoRouterState state) =>
+            AvailableRoomsPage(hotelId: state.pathParameters['hotelId']!),
       ),
     ],
     errorBuilder: (BuildContext context, GoRouterState state) => Scaffold(
