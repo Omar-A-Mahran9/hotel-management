@@ -4466,6 +4466,173 @@
           ]
         }
       ]
+    },
+    {
+      "name": "11 Check-in & Digital Access",
+      "description": "Phase 7 - Check-in + Digital Access (dummy provider). Endpoints per Phase 0 §16: /api/v1/check-in/{reservation}, /api/v1/access/{reservation}, /api/v1/access/{reservation}/revoke. {reservation} is an int id resolved through ReservationService (not route-model binding), so a cross-hotel or missing id is an identical plain 404. Permissions: check-in.perform / digital-access.view / digital-access.revoke - held by Group Owner, assigned Hotel Manager, and assigned Reception (Phase 0 §7: Reception issues/revokes access as 'manual-assist, logged'). Guest-role users have none and are resolved out of scope (404). Check-in issues the digital access credential (staged: DB txn -> provider call OUTSIDE any txn -> DB txn) and, on an ACTIVE credential, drives the reservation VERIFIED -> CHECKED_IN via ReservationService (Phase 0 §8 '(access issued)'). Eligibility (§8/§11): reservation VERIFIED + Payment HOLD_ACTIVE + identity approved + the stay not over. Access expiry is derived from the reservation's check_out date (§11 'stay end reached') - no configurable duration. The X-Digital-Access-Simulate header (success | failure) is honoured ONLY in local/testing. The PIN is returned ONLY while the grant is ACTIVE and is encrypted at rest.",
+      "item": [
+        {
+          "name": "Check-in (issue digital access)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "checkin-{{reservation_id}}-001"
+              },
+              {
+                "key": "X-Digital-Access-Simulate",
+                "value": "success",
+                "description": "local/testing only: success | failure"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/check-in/{{reservation_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "check-in",
+                "{{reservation_id}}"
+              ]
+            },
+            "description": "CheckInController::store -> DigitalAccessService::checkIn. No body. Validates the §8/§11 eligibility rules, issues the credential through DigitalAccessProviderInterface OUTSIDE any DB transaction, and on an ACTIVE credential transitions VERIFIED -> CHECKED_IN via ReservationService. Idempotency is HTTP-header based: repeating the same Idempotency-Key replays the stored grant without a second provider call. 201 = credential active + reservation CHECKED_IN (data.credential is the PIN). 422 = reservation not VERIFIED / payment hold not active / identity not approved / stay window passed / provider failure (data.errors.status = failed - check-in can be retried). Rate limited (throttle:check-in). NEVER triggers a refund or cancellation on failure.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                  "var json = pm.response.json();",
+                  "pm.test('Active credential issued', () => {",
+                  "    pm.expect(json).to.have.property('success', true);",
+                  "    pm.expect(json.data).to.have.property('status', 'active');",
+                  "    pm.expect(json.data).to.have.property('credential');",
+                  "    pm.expect(json.data).to.have.property('expires_at');",
+                  "});",
+                  "pm.test('No provider internals leaked', () => {",
+                  "    var raw = pm.response.text();",
+                  "    pm.expect(raw).to.not.include('provider_reference');",
+                  "    pm.expect(raw).to.not.include('idempotency_key');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Digital Access Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/access/{{reservation_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "access",
+                "{{reservation_id}}"
+              ]
+            },
+            "description": "DigitalAccessController::show. Requires digital-access.view. Returns the grant's safe fields (status, access_mode, issued_at, activated_at, expires_at, revoked_at, revocation_reason, failure_reason). An ACTIVE grant past its check_out is lazily transitioned to EXPIRED on read (§11 'Access validity is re-checked server-side at every access attempt'). data.credential (the PIN) is present ONLY while status is active; a not_issued / failed / revoked / expired grant never carries it. When no grant exists yet the response is a transient 'not_issued' payload (HTTP 200), never a 404.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Safe representation', () => {",
+                  "    pm.expect(json.data).to.have.property('status');",
+                  "    pm.expect(json.data).to.not.have.property('provider_reference');",
+                  "    pm.expect(json.data).to.not.have.property('metadata');",
+                  "    if (json.data.status !== 'active') { pm.expect(json.data).to.not.have.property('credential'); }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Revoke Digital Access",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              },
+              {
+                "key": "X-Digital-Access-Simulate",
+                "value": "success",
+                "description": "local/testing only: success | failure. A provider failure still revokes locally."
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/access/{{reservation_id}}/revoke",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "access",
+                "{{reservation_id}}",
+                "revoke"
+              ]
+            },
+            "description": "DigitalAccessController::revoke -> DigitalAccessService::revoke. Requires digital-access.revoke. Staged: DB txn (ACTIVE -> REVOKE_REQUESTED) -> provider revoke OUTSIDE any txn -> DB txn (REVOKE_REQUESTED -> REVOKED, credential nulled). Local revocation is authoritative - a provider failure still results in REVOKED and is audited with requires_reconciliation. Repeated revoke is a safe no-op (already-revoked / expired grant returns 200 unchanged). The reservation is NOT rolled back - it stays CHECKED_IN. Body: optional short 'reason' (max 500). 422 = nothing to revoke (no credential was ever issued / grant is FAILED). Rate limited (throttle:digital-access.revoke).",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"reason\": \"Guest reported a lost device.\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Credential revoked and gone', () => {",
+                  "    pm.expect(json.data).to.have.property('status', 'revoked');",
+                  "    pm.expect(json.data).to.not.have.property('credential');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     }
   ],
   "auth": {

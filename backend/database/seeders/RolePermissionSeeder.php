@@ -32,6 +32,9 @@ class RolePermissionSeeder extends Seeder
             'identity-verification.view' => 'View identity verification status within authorized scope',
             'identity-verification.submit' => 'Submit identity document/selfie for a reservation within authorized scope',
             'identity-verification.review' => 'Decide a pending identity verification manual review within authorized scope',
+            'check-in.perform' => 'Perform reservation check-in within authorized scope',
+            'digital-access.view' => 'View digital access status within authorized scope',
+            'digital-access.revoke' => 'Revoke a reservation digital access credential within authorized scope',
         ];
 
         foreach ($permissions as $slug => $name) {
@@ -50,15 +53,16 @@ class RolePermissionSeeder extends Seeder
             Role::HOTEL_MANAGER => [
                 'name' => 'Hotel Manager',
                 'description' => 'Manages one or more assigned hotels.',
-                'permissions' => ['hotels.view', 'inventory.view', 'inventory.manage', 'reservations.view', 'reservations.manage', 'payments.manage', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review'],
+                'permissions' => ['hotels.view', 'inventory.view', 'inventory.manage', 'reservations.view', 'reservations.manage', 'payments.manage', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke'],
             ],
             Role::RECEPTION => [
                 'name' => 'Reception',
                 'description' => 'Front-desk support/fallback for a single assigned hotel.',
                 // Phase 0 §7: Reception may review/decide a pending verification
-                // (✅) and assists with check-in processing (R7, R33) — but holds
-                // no financial capability.
-                'permissions' => ['hotels.view', 'inventory.view', 'reservations.view', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review'],
+                // (✅), assists with check-in processing (R7, R33), and may
+                // issue/revoke digital access as "manual-assist, logged" — but
+                // holds no financial capability.
+                'permissions' => ['hotels.view', 'inventory.view', 'reservations.view', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke'],
             ],
             Role::GUEST => [
                 'name' => 'Guest',

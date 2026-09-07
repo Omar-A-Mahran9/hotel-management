@@ -42,4 +42,12 @@ return [
         'staff_approved' => 'Identity verification was approved by staff.',
         'staff_rejected' => 'Identity verification was rejected by staff.',
     ],
+
+    'digital_access' => [
+        'checked_in' => 'Check-in complete. A digital access credential has been issued.',
+        'issue_failed' => 'The access-control provider could not issue a credential. Check-in can be retried.',
+        'status' => 'The current digital access state is returned.',
+        'revoked' => 'The digital access credential has been revoked.',
+        'state' => 'The current digital access state is returned.',
+    ],
 ];

@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\CheckInController;
+use App\Http\Controllers\Api\V1\DigitalAccessController;
 use App\Http\Controllers\Api\V1\HotelController;
 use App\Http\Controllers\Api\V1\HotelGroupController;
 use App\Http\Controllers\Api\V1\IdentityVerificationController;
@@ -65,6 +67,18 @@ Route::prefix('v1')->group(function () {
             Route::get('/status', [IdentityVerificationController::class, 'status']);
             Route::post('/review', [IdentityVerificationController::class, 'review']);
         });
+
+        // Phase 7 — Check-in + Digital Access (Phase 0 §16). {reservation} is
+        // an int id resolved through ReservationService (not route-model
+        // binding), so a cross-hotel or missing id is an identical plain
+        // 404. Check-in issues the digital access credential and, on success,
+        // drives VERIFIED -> CHECKED_IN via ReservationService.
+        Route::post('/check-in/{reservation}', [CheckInController::class, 'store'])
+            ->middleware('throttle:check-in');
+
+        Route::get('/access/{reservation}', [DigitalAccessController::class, 'show']);
+        Route::post('/access/{reservation}/revoke', [DigitalAccessController::class, 'revoke'])
+            ->middleware('throttle:digital-access.revoke');
 
         Route::prefix('/hotels/{hotel}')->group(function () {
             Route::get('/room-types', [RoomTypeController::class, 'index']);

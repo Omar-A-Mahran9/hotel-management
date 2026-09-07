@@ -1,5 +1,10 @@
 <?php
 
+use App\Domain\DigitalAccess\Exceptions\CheckInEligibilityException;
+use App\Domain\DigitalAccess\Exceptions\CheckInNotAllowedException;
+use App\Domain\DigitalAccess\Exceptions\DigitalAccessActionNotAllowedException;
+use App\Domain\DigitalAccess\Exceptions\DigitalAccessIdempotencyKeyConflictException;
+use App\Domain\DigitalAccess\Exceptions\InvalidDigitalAccessStatusTransitionException;
 use App\Domain\IdentityAccess\Exceptions\AccountInactiveException;
 use App\Domain\IdentityAccess\Exceptions\InvalidCredentialsException;
 use App\Domain\IdentityVerification\Exceptions\IdentityVerificationActionNotAllowedException;
@@ -207,6 +212,41 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->renderable(function (InvalidIdentityVerificationStatusTransitionException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        // Phase 7 — check-in / digital access workflow business errors. Every
+        // message is a fixed, safe business string (no secret, no credential,
+        // no provider payload, no SQLSTATE, no stack trace). All map to 422:
+        // the project's API has no 409/conflict convention, and these are
+        // business-rule failures like every other domain exception above.
+        $exceptions->renderable(function (CheckInNotAllowedException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (CheckInEligibilityException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (DigitalAccessActionNotAllowedException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (DigitalAccessIdempotencyKeyConflictException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (InvalidDigitalAccessStatusTransitionException $e, Request $request) use ($envelope) {
             if ($request->is('api/*')) {
                 return $envelope($e->getMessage(), 422);
             }

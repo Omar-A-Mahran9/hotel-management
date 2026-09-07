@@ -2,6 +2,14 @@
 
 namespace App\Providers;
 
+use App\Domain\DigitalAccess\Models\AccessGrant;
+use App\Domain\DigitalAccess\Policies\AccessGrantPolicy;
+use App\Domain\DigitalAccess\Provider\Contracts\DigitalAccessProviderInterface;
+use App\Domain\DigitalAccess\Provider\DummyDigitalAccessProvider;
+use App\Domain\DigitalAccess\Provider\Exceptions\UnsupportedDigitalAccessProviderException;
+use App\Domain\DigitalAccess\Provider\SimulationDirective as DigitalAccessSimulationDirective;
+use App\Domain\DigitalAccess\Repositories\Contracts\AccessGrantRepositoryInterface;
+use App\Domain\DigitalAccess\Repositories\EloquentAccessGrantRepository;
 use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\HotelGroup\Models\HotelGroup;
 use App\Domain\HotelGroup\Policies\HotelGroupPolicy;
@@ -83,6 +91,7 @@ class AppServiceProvider extends ServiceProvider
         IdentityVerificationSessionRepositoryInterface::class => EloquentIdentityVerificationSessionRepository::class,
         IdentityVerificationAttemptRepositoryInterface::class => EloquentIdentityVerificationAttemptRepository::class,
         IdentityVerificationDecisionRepositoryInterface::class => EloquentIdentityVerificationDecisionRepository::class,
+        AccessGrantRepositoryInterface::class => EloquentAccessGrantRepository::class,
     ];
 
     /**
@@ -97,6 +106,7 @@ class AppServiceProvider extends ServiceProvider
         Reservation::class => ReservationPolicy::class,
         Payment::class => PaymentPolicy::class,
         IdentityVerificationSession::class => IdentityVerificationPolicy::class,
+        AccessGrant::class => AccessGrantPolicy::class,
     ];
 
     public function register(): void
@@ -138,6 +148,25 @@ class AppServiceProvider extends ServiceProvider
                 default => throw new UnsupportedIdentityVerificationProviderException($provider),
             };
         });
+
+        // The digital access provider boundary (Phase 7). The rest of the app
+        // depends only on DigitalAccessProviderInterface; the concrete
+        // provider is chosen from config('digital_access.provider'). "dummy"
+        // is the only implementation registered this phase — an explicitly
+        // configured but unsupported provider fails loudly, never silently
+        // falls back.
+        $this->app->singleton(DigitalAccessProviderInterface::class, function (): DigitalAccessProviderInterface {
+            $provider = (string) config('digital_access.provider');
+
+            return match ($provider) {
+                'dummy' => new DummyDigitalAccessProvider(
+                    defaultDirective: DigitalAccessSimulationDirective::fromConfig(
+                        config('digital_access.providers.dummy.default_directive'),
+                    ),
+                ),
+                default => throw new UnsupportedDigitalAccessProviderException($provider),
+            };
+        });
     }
 
     public function boot(): void
@@ -151,6 +180,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->registerPaymentRateLimiters();
         $this->registerIdentityVerificationRateLimiters();
+        $this->registerDigitalAccessRateLimiters();
     }
 
     /**
@@ -177,6 +207,22 @@ class AppServiceProvider extends ServiceProvider
     {
         RateLimiter::for('identity-verification.submit', fn (Request $request) => Limit::perMinute(
             (int) config('verification.rate_limits.submit.per_minute'),
+        )->by((string) ($request->user()?->id ?? $request->ip())));
+    }
+
+    /**
+     * Phase 0 §17 — rate limiting on the sensitive check-in / digital access
+     * endpoints (Phase 7). Config-driven (config/digital_access.php), native
+     * RateLimiter, no package. Keyed by authenticated user id (IP fallback).
+     */
+    private function registerDigitalAccessRateLimiters(): void
+    {
+        RateLimiter::for('check-in', fn (Request $request) => Limit::perMinute(
+            (int) config('digital_access.rate_limits.check_in.per_minute'),
+        )->by((string) ($request->user()?->id ?? $request->ip())));
+
+        RateLimiter::for('digital-access.revoke', fn (Request $request) => Limit::perMinute(
+            (int) config('digital_access.rate_limits.revoke.per_minute'),
         )->by((string) ($request->user()?->id ?? $request->ip())));
     }
 }

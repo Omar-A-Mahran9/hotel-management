@@ -27,7 +27,11 @@ trait ApiResponse
             $payload['meta'] = array_merge($wrapped['meta'] ?? [], $meta);
         } else {
             if ($data instanceof JsonResource) {
-                $data = $data->toArray(request());
+                // resolve() applies the resource's conditional-attribute
+                // filtering (when()/whenLoaded()/MissingValue), which a raw
+                // toArray() call skips — matching how the ResourceCollection
+                // branch above already resolves via ->response().
+                $data = $data->resolve(request());
             }
 
             $payload['data'] = $data;
