@@ -2,6 +2,12 @@
 
 use App\Domain\IdentityAccess\Exceptions\AccountInactiveException;
 use App\Domain\IdentityAccess\Exceptions\InvalidCredentialsException;
+use App\Domain\IdentityVerification\Exceptions\IdentityVerificationActionNotAllowedException;
+use App\Domain\IdentityVerification\Exceptions\IdentityVerificationConfigurationMissingException;
+use App\Domain\IdentityVerification\Exceptions\IdentityVerificationIdempotencyKeyConflictException;
+use App\Domain\IdentityVerification\Exceptions\IdentityVerificationNotAllowedException;
+use App\Domain\IdentityVerification\Exceptions\IdentityVerificationRetryNotAllowedException;
+use App\Domain\IdentityVerification\Exceptions\InvalidIdentityVerificationStatusTransitionException;
 use App\Domain\Inventory\Exceptions\InvalidRoomStatusTransitionException;
 use App\Domain\Inventory\Exceptions\RoomTypeHotelMismatchException;
 use App\Domain\Payment\Exceptions\IdempotencyKeyConflictException;
@@ -159,6 +165,48 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->renderable(function (InvalidPaymentStatusTransitionException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        // Phase 6 — identity verification workflow business errors. Every
+        // message is a fixed, safe business string (no secret, no provider
+        // payload, no document number, no SQLSTATE, no stack trace). All map
+        // to 422: the project's API has no 409/conflict convention, and
+        // these are business-rule failures like every other domain
+        // exception above.
+        $exceptions->renderable(function (IdentityVerificationNotAllowedException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (IdentityVerificationActionNotAllowedException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (IdentityVerificationRetryNotAllowedException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (IdentityVerificationConfigurationMissingException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (IdentityVerificationIdempotencyKeyConflictException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (InvalidIdentityVerificationStatusTransitionException $e, Request $request) use ($envelope) {
             if ($request->is('api/*')) {
                 return $envelope($e->getMessage(), 422);
             }

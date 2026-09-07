@@ -18,6 +18,18 @@ use App\Domain\IdentityAccess\Repositories\Contracts\UserRepositoryInterface;
 use App\Domain\IdentityAccess\Repositories\EloquentPermissionRepository;
 use App\Domain\IdentityAccess\Repositories\EloquentRoleRepository;
 use App\Domain\IdentityAccess\Repositories\EloquentUserRepository;
+use App\Domain\IdentityVerification\Models\IdentityVerificationSession;
+use App\Domain\IdentityVerification\Policies\IdentityVerificationPolicy;
+use App\Domain\IdentityVerification\Provider\Contracts\IdentityVerificationProviderInterface;
+use App\Domain\IdentityVerification\Provider\DummyIdentityVerificationProvider;
+use App\Domain\IdentityVerification\Provider\Exceptions\UnsupportedIdentityVerificationProviderException;
+use App\Domain\IdentityVerification\Provider\SimulationDirective as IdentityVerificationSimulationDirective;
+use App\Domain\IdentityVerification\Repositories\Contracts\IdentityVerificationAttemptRepositoryInterface;
+use App\Domain\IdentityVerification\Repositories\Contracts\IdentityVerificationDecisionRepositoryInterface;
+use App\Domain\IdentityVerification\Repositories\Contracts\IdentityVerificationSessionRepositoryInterface;
+use App\Domain\IdentityVerification\Repositories\EloquentIdentityVerificationAttemptRepository;
+use App\Domain\IdentityVerification\Repositories\EloquentIdentityVerificationDecisionRepository;
+use App\Domain\IdentityVerification\Repositories\EloquentIdentityVerificationSessionRepository;
 use App\Domain\Inventory\Models\Room;
 use App\Domain\Inventory\Models\RoomType;
 use App\Domain\Inventory\Policies\RoomPolicy;
@@ -68,6 +80,9 @@ class AppServiceProvider extends ServiceProvider
         PaymentRepositoryInterface::class => EloquentPaymentRepository::class,
         PaymentTransactionRepositoryInterface::class => EloquentPaymentTransactionRepository::class,
         PaymentWebhookEventRepositoryInterface::class => EloquentPaymentWebhookEventRepository::class,
+        IdentityVerificationSessionRepositoryInterface::class => EloquentIdentityVerificationSessionRepository::class,
+        IdentityVerificationAttemptRepositoryInterface::class => EloquentIdentityVerificationAttemptRepository::class,
+        IdentityVerificationDecisionRepositoryInterface::class => EloquentIdentityVerificationDecisionRepository::class,
     ];
 
     /**
@@ -81,6 +96,7 @@ class AppServiceProvider extends ServiceProvider
         Room::class => RoomPolicy::class,
         Reservation::class => ReservationPolicy::class,
         Payment::class => PaymentPolicy::class,
+        IdentityVerificationSession::class => IdentityVerificationPolicy::class,
     ];
 
     public function register(): void
@@ -103,6 +119,25 @@ class AppServiceProvider extends ServiceProvider
                 default => throw new UnsupportedPaymentProviderException($provider),
             };
         });
+
+        // The identity verification provider boundary (Phase 6). The rest of
+        // the app depends only on IdentityVerificationProviderInterface; the
+        // concrete provider is chosen from config('verification.provider').
+        // "dummy" is the only implementation registered this phase — an
+        // explicitly configured but unsupported provider fails loudly, never
+        // silently falls back.
+        $this->app->singleton(IdentityVerificationProviderInterface::class, function (): IdentityVerificationProviderInterface {
+            $provider = (string) config('verification.provider');
+
+            return match ($provider) {
+                'dummy' => new DummyIdentityVerificationProvider(
+                    defaultDirective: IdentityVerificationSimulationDirective::fromConfig(
+                        config('verification.providers.dummy.default_directive'),
+                    ),
+                ),
+                default => throw new UnsupportedIdentityVerificationProviderException($provider),
+            };
+        });
     }
 
     public function boot(): void
@@ -115,6 +150,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('permissions.view', fn (User $user) => $user->hasPermission('permissions.view'));
 
         $this->registerPaymentRateLimiters();
+        $this->registerIdentityVerificationRateLimiters();
     }
 
     /**
@@ -130,5 +166,17 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('payments.webhook', fn (Request $request) => Limit::perMinute(
             (int) config('payment.rate_limits.webhook.per_minute'),
         )->by((string) $request->ip()));
+    }
+
+    /**
+     * Phase 0 §17 — "rate limiting on ... verification-upload ... endpoints"
+     * (Phase 6). Config-driven (config/verification.php), native
+     * RateLimiter, no package. Keyed by authenticated user id (IP fallback).
+     */
+    private function registerIdentityVerificationRateLimiters(): void
+    {
+        RateLimiter::for('identity-verification.submit', fn (Request $request) => Limit::perMinute(
+            (int) config('verification.rate_limits.submit.per_minute'),
+        )->by((string) ($request->user()?->id ?? $request->ip())));
     }
 }

@@ -29,6 +29,9 @@ class RolePermissionSeeder extends Seeder
             'reservations.view' => 'View reservations within authorized scope',
             'reservations.manage' => 'Create reservations within authorized scope',
             'payments.manage' => 'Initiate and manage reservation payments within authorized scope',
+            'identity-verification.view' => 'View identity verification status within authorized scope',
+            'identity-verification.submit' => 'Submit identity document/selfie for a reservation within authorized scope',
+            'identity-verification.review' => 'Decide a pending identity verification manual review within authorized scope',
         ];
 
         foreach ($permissions as $slug => $name) {
@@ -47,12 +50,15 @@ class RolePermissionSeeder extends Seeder
             Role::HOTEL_MANAGER => [
                 'name' => 'Hotel Manager',
                 'description' => 'Manages one or more assigned hotels.',
-                'permissions' => ['hotels.view', 'inventory.view', 'inventory.manage', 'reservations.view', 'reservations.manage', 'payments.manage'],
+                'permissions' => ['hotels.view', 'inventory.view', 'inventory.manage', 'reservations.view', 'reservations.manage', 'payments.manage', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review'],
             ],
             Role::RECEPTION => [
                 'name' => 'Reception',
                 'description' => 'Front-desk support/fallback for a single assigned hotel.',
-                'permissions' => ['hotels.view', 'inventory.view', 'reservations.view'],
+                // Phase 0 §7: Reception may review/decide a pending verification
+                // (✅) and assists with check-in processing (R7, R33) — but holds
+                // no financial capability.
+                'permissions' => ['hotels.view', 'inventory.view', 'reservations.view', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review'],
             ],
             Role::GUEST => [
                 'name' => 'Guest',

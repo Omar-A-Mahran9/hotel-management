@@ -28,4 +28,18 @@ return [
         'webhook_invalid_signature' => 'The webhook signature is invalid.',
         'webhook_malformed' => 'The webhook payload could not be processed.',
     ],
+
+    'identity_verification' => [
+        'document_submitted' => 'The identity document was received.',
+        'status' => 'The current identity verification state is returned.',
+        'not_started' => 'Identity verification has not been started for this reservation.',
+        'document_uploaded' => 'The identity document was received.',
+        'selfie_captured' => 'The selfie was received and is being matched.',
+        'matching_in_progress' => 'The identity match is in progress.',
+        'auto_approved' => 'Identity verification passed automatically.',
+        'pending_manual_review' => 'Identity verification requires a manual review.',
+        'retry_allowed' => 'The identity match could not be completed; a new attempt is allowed.',
+        'staff_approved' => 'Identity verification was approved by staff.',
+        'staff_rejected' => 'Identity verification was rejected by staff.',
+    ],
 ];

@@ -4230,6 +4230,242 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "10 Identity Verification",
+      "description": "Phase 6 - Identity Verification (dummy provider). Endpoints per Phase 0 §16: /api/v1/identity-verification/{reservation}/{documents|selfie|status|review}. {reservation} is an int id resolved through ReservationService (not route-model binding), so a cross-hotel or missing id is an identical plain 404. Permissions: identity-verification.view / .submit / .review — held by Group Owner, assigned Hotel Manager, and assigned Reception (Phase 0 §7: Reception may review/decide a pending verification). Guest-role users have none and are resolved out of scope (404). Confidence thresholds and the retry limit are genuinely-unresolved business values (Phase 0 §20 items 2/3/5) - config('verification.*') is UNSET by default and the workflow then fails safe to PENDING_MANUAL_REVIEW (never auto-approve / never auto-reject). The X-Identity-Simulate header (high_match | medium_match | low_match | error) is honoured ONLY in local/testing.",
+      "item": [
+        {
+          "name": "Submit ID Document",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/identity-verification/{{reservation_id}}/documents",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "identity-verification",
+                "{{reservation_id}}",
+                "documents"
+              ]
+            },
+            "description": "IdentityVerificationController::documents. Multipart form-data: document (required file, mimes jpg/jpeg/png/pdf, max config('verification.storage.max_file_kb') KB); document_type (optional short label, never a document number). Creates the verification session on first use (the reservation must be DEPOSIT_HELD), starts a new attempt from NOT_STARTED / RETRY_ALLOWED / STAFF_REJECTED (subject to config('verification.max_retries')), or replaces the document on the current DOCUMENT_UPLOADED attempt. The file is stored on a PRIVATE disk and never served back. 201 = session status document_uploaded. 422 = reservation not DEPOSIT_HELD, retry limit reached, wrong session state, or validation error.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "document",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "document_type",
+                  "value": "passport",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                  "var json = pm.response.json();",
+                  "pm.test('Standard success envelope', () => {",
+                  "    pm.expect(json).to.have.property('success', true);",
+                  "    pm.expect(json.data).to.have.property('status', 'document_uploaded');",
+                  "});",
+                  "pm.test('No storage path or provider internals exposed', () => {",
+                  "    pm.expect(json.data).to.not.have.property('document_path');",
+                  "    pm.expect(json.data).to.not.have.property('selfie_path');",
+                  "    pm.expect(json.data).to.not.have.property('provider_reference');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Submit Live Selfie (runs the match)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "idv-{{reservation_id}}-001"
+              },
+              {
+                "key": "X-Identity-Simulate",
+                "value": "high_match",
+                "description": "local/testing only: high_match | medium_match | low_match | error"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/identity-verification/{{reservation_id}}/selfie",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "identity-verification",
+                "{{reservation_id}}",
+                "selfie"
+              ]
+            },
+            "description": "IdentityVerificationController::selfie. Multipart form-data: selfie (required file, mimes jpg/jpeg/png). Transitions DOCUMENT_UPLOADED -> SELFIE_CAPTURED -> MATCHING_IN_PROGRESS, then calls IdentityVerificationProviderInterface::verify OUTSIDE any DB transaction, then applies the normalized result against config('verification.thresholds'). Idempotency is HTTP-header based: repeating the same Idempotency-Key replays the stored result without a second provider call. 200 with data.status one of: auto_approved (reservation DEPOSIT_HELD -> VERIFIED via ReservationService), pending_manual_review (score below the auto-approve threshold, or that threshold unset), or retry_allowed (provider error, retry budget remaining). 422 = selfie submitted before a document / wrong session state / validation error.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "selfie",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Standard envelope + workflow status', () => {",
+                  "    pm.expect(json).to.have.property('success', true);",
+                  "    pm.expect(json.data.status).to.be.oneOf(['auto_approved', 'pending_manual_review', 'retry_allowed']);",
+                  "});",
+                  "pm.test('No storage path / provider reference leaked', () => {",
+                  "    var raw = pm.response.text();",
+                  "    pm.expect(raw).to.not.include('document_path');",
+                  "    pm.expect(raw).to.not.include('identity-verification/');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Verification Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/identity-verification/{{reservation_id}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "identity-verification",
+                "{{reservation_id}}",
+                "status"
+              ]
+            },
+            "description": "IdentityVerificationController::status. Requires identity-verification.view. Returns the session's safe fields only: status, provider, attempts, latest_outcome, latest_score, decided_at, and a compact latest_decision block (result, band, staff reason, decided_by_user_id, decided_at). When no session exists yet the response is a transient 'not_started' payload (HTTP 200), never a 404. Storage paths, provider references and attempt metadata are never included.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Safe fields only', () => {",
+                  "    pm.expect(json.data).to.have.property('status');",
+                  "    pm.expect(json.data).to.have.property('attempts');",
+                  "    pm.expect(json.data).to.not.have.property('document_path');",
+                  "    pm.expect(json.data).to.not.have.property('metadata');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Manual Review Decision",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/identity-verification/{{reservation_id}}/review",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "identity-verification",
+                "{{reservation_id}}",
+                "review"
+              ]
+            },
+            "description": "IdentityVerificationController::review. Requires identity-verification.review (Group Owner / assigned Hotel Manager / assigned Reception). Valid ONLY when the session is PENDING_MANUAL_REVIEW. Body: decision (required: approve | reject); reason (optional short staff note, max 500, not a place for PII). approve -> STAFF_APPROVED and, if the reservation is still DEPOSIT_HELD, DEPOSIT_HELD -> VERIFIED via ReservationService. reject -> STAFF_REJECTED (reservation left as-is; a retry is possible from STAFF_REJECTED only while under config('verification.max_retries')). 422 = session not pending_manual_review / no session / validation error. Every decision is appended to identity_verification_decisions and audited.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"decision\": \"approve\",\n    \"reason\": \"Identity confirmed against the presented document.\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "var json = pm.response.json();",
+                  "pm.test('Decision applied', () => {",
+                  "    pm.expect(json.data.status).to.be.oneOf(['staff_approved', 'staff_rejected']);",
+                  "    pm.expect(json.data.latest_decision).to.have.property('type', 'manual');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     }
   ],
   "auth": {

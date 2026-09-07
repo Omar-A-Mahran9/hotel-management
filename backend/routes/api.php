@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\HotelController;
 use App\Http\Controllers\Api\V1\HotelGroupController;
+use App\Http\Controllers\Api\V1\IdentityVerificationController;
 use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\PaymentWebhookController;
 use App\Http\Controllers\Api\V1\PermissionController;
@@ -51,6 +52,19 @@ Route::prefix('v1')->group(function () {
         Route::post('/reservations/{reservation}/transition', [ReservationController::class, 'transition']);
         Route::post('/reservations/{reservation}/payment/hold', [PaymentController::class, 'hold'])
             ->middleware('throttle:payments.hold');
+
+        // Phase 6 — Identity Verification (Phase 0 §16). {reservation} is an
+        // int id resolved through ReservationService (not route-model
+        // binding), so a cross-hotel or missing id is an identical plain
+        // 404. The upload endpoints are rate limited per Phase 0 §17.
+        Route::prefix('/identity-verification/{reservation}')->group(function () {
+            Route::post('/documents', [IdentityVerificationController::class, 'documents'])
+                ->middleware('throttle:identity-verification.submit');
+            Route::post('/selfie', [IdentityVerificationController::class, 'selfie'])
+                ->middleware('throttle:identity-verification.submit');
+            Route::get('/status', [IdentityVerificationController::class, 'status']);
+            Route::post('/review', [IdentityVerificationController::class, 'review']);
+        });
 
         Route::prefix('/hotels/{hotel}')->group(function () {
             Route::get('/room-types', [RoomTypeController::class, 'index']);
