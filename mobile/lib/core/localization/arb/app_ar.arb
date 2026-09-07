@@ -43,5 +43,54 @@
   "errorNotImplemented": "هذا غير متاح في المرحلة صفر.",
 
   "textFieldExampleLabel": "الاسم الكامل",
-  "textFieldExampleHint": "أدخل اسمك"
+  "textFieldExampleHint": "أدخل اسمك",
+
+  "entryTagline": "إقامة بلا أوراق",
+  "entryHeadline": "احجز، تحقّق، وادخل غرفتك من هاتفك",
+  "entrySubtext": "دون طوابير ودون استقبال",
+  "entryStartAction": "ابدأ الآن",
+  "entryLanguageSwitchLabel": "اللغة",
+
+  "authPhoneTitle": "تسجيل الدخول",
+  "authPhoneHeading": "أدخل رقم جوالك",
+  "authPhoneBody": "نحتاجه لتأكيد حجزك وإرسال رمز دخول غرفتك. لن نستخدمه لأي شيء آخر.",
+  "authPhoneFieldLabel": "رقم الجوال",
+  "authPhoneFieldHint": "51 234 5678",
+  "authPhoneHelper": "سنرسل رمز تحقق على هذا الرقم",
+  "authPhoneTerms": "بالمتابعة أنت توافق على الشروط وسياسة الخصوصية.",
+  "authPhoneSubmit": "إرسال رمز التحقق",
+  "authPhoneInvalid": "أدخل رقم جوال صحيح",
+
+  "authOtpTitle": "رمز التحقق",
+  "authOtpHeading": "أدخل الرمز المرسل",
+  "authOtpChange": "تغيير",
+  "authOtpResendCountdown": "إعادة الإرسال خلال {time}",
+  "authOtpResendAction": "إعادة إرسال الرمز",
+  "authOtpSubmit": "تأكيد",
+  "authOtpInvalidFormat": "أدخل الرمز المكوّن من {length} أرقام",
+  "authOtpErrorTitle": "الرمز غير صحيح",
+  "authOtpErrorBody": "المحاولات المتبقية: {count}. تأكد من الرمز الأخير المرسل — الرموز السابقة تنتهي صلاحيتها فور إرسال رمز جديد.",
+  "authOtpRetry": "إعادة المحاولة",
+  "authOtpChangeNumber": "تغيير رقم الجوال",
+  "authOtpLockedTitle": "محاولات كثيرة",
+  "authOtpLockedBody": "لحماية حسابك أوقفنا قبول الرموز. اطلب رمزًا جديدًا للمتابعة.",
+
+  "authProfileTitle": "إكمال البيانات",
+  "authProfileBannerTitle": "اكتب اسمك كما في الهوية",
+  "authProfileBannerBody": "يقارن النظام اسمك بصورة بطاقتك عند التحقق. أي اختلاف قد يؤخر تسجيل دخولك.",
+  "authProfileNameLabel": "الاسم الكامل",
+  "authProfileNameHint": "محمود نبيل",
+  "authProfileEmailLabel": "البريد الإلكتروني",
+  "authProfileEmailHint": "name@example.com",
+  "authProfileSubmit": "حفظ ومتابعة",
+  "authProfileNameInvalid": "أدخل اسمك الكامل",
+  "authProfileEmailInvalid": "أدخل بريدًا إلكترونيًا صحيحًا",
+
+  "authSessionExpiredTitle": "انتهت الجلسة",
+  "authSessionExpiredBannerTitle": "انتهت جلستك",
+  "authSessionExpiredBannerBody": "حجزك محفوظ ولم يُلغَ. سجّل دخولك مرة أخرى وسنعود إلى نفس الخطوة التي توقفت عندها.",
+  "authSessionExpiredSubmit": "تسجيل الدخول",
+
+  "authSignOut": "تسجيل الخروج",
+  "authDemoHint": "نسخة التطوير: رمز التحقق هو {code}."
 }

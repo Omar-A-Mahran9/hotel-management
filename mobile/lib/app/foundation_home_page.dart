@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/config/app_config.dart';
 import '../core/di/core_providers.dart';
+import '../features/authentication/presentation/state/auth_controller.dart';
 import '../core/health/domain/backend_health.dart';
 import '../core/health/presentation/backend_health_controller.dart';
 import '../core/localization/l10n.dart';
@@ -34,7 +35,17 @@ class FoundationHomePage extends ConsumerWidget {
     final AppConfig config = ref.watch(appConfigProvider);
 
     return Scaffold(
-      appBar: HotelAppBar(title: l10n.foundationScreenTitle),
+      appBar: HotelAppBar(
+        title: l10n.foundationScreenTitle,
+        actions: <Widget>[
+          IconButton(
+            onPressed: () =>
+                ref.read(authControllerProvider.notifier).signOut(),
+            icon: const Icon(Icons.logout),
+            tooltip: l10n.authSignOut,
+          ),
+        ],
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.pageGutter),

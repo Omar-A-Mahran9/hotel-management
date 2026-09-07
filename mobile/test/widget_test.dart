@@ -2,48 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hotel_guest_app/app/app.dart';
-import 'package:hotel_guest_app/core/di/core_providers.dart';
 import 'package:hotel_guest_app/core/localization/generated/app_localizations.dart';
-import 'package:hotel_guest_app/core/widgets/primary_button.dart';
 
-import 'support/test_config.dart';
+import 'support/auth_test_support.dart';
 
 void main() {
-  testWidgets('app root boots to the foundation screen', (WidgetTester tester) async {
+  testWidgets('an unauthenticated cold start lands on the entry screen',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
-      ProviderScope(
-        overrides: <Override>[appConfigProvider.overrideWithValue(testConfig)],
-        child: const HotelGuestApp(),
-      ),
+      ProviderScope(overrides: authOverrides(), child: const HotelGuestApp()),
     );
     await tester.pumpAndSettle();
 
-    expect(find.byType(MaterialApp), findsOneWidget);
-
-    // English is the fallback locale in the test environment.
-    final AppLocalizations en = await AppLocalizations.delegate.load(
-      const Locale('en'),
-    );
-    expect(find.text(en.foundationScreenTitle), findsOneWidget);
-
-    // The design-system primitives render (scroll the last card into view).
-    await tester.scrollUntilVisible(find.byType(PrimaryButton), 250);
-    expect(find.byType(PrimaryButton), findsWidgets);
+    final AppLocalizations en =
+        await AppLocalizations.delegate.load(const Locale('en'));
+    expect(find.text(en.entryHeadline), findsOneWidget);
+    expect(find.text(en.entryStartAction), findsOneWidget);
   });
 
-  testWidgets('backend health slice resolves through the dummy data source',
+  testWidgets('an authenticated cold start lands on the home screen',
       (WidgetTester tester) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: <Override>[appConfigProvider.overrideWithValue(testConfig)],
+        overrides: authOverrides(bootSession: completeSession()),
         child: const HotelGuestApp(),
       ),
     );
     await tester.pumpAndSettle();
 
-    final AppLocalizations en = await AppLocalizations.delegate.load(
-      const Locale('en'),
-    );
+    final AppLocalizations en =
+        await AppLocalizations.delegate.load(const Locale('en'));
+    expect(find.text(en.foundationScreenTitle), findsOneWidget);
+    // The foundation home still resolves its backend-health slice.
     expect(find.text(en.backendStatusOk), findsOneWidget);
   });
 }

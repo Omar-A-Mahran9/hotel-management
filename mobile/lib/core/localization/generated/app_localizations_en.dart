@@ -125,4 +125,149 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get textFieldExampleHint => 'Enter your name';
+
+  @override
+  String get entryTagline => 'A stay without paperwork';
+
+  @override
+  String get entryHeadline =>
+      'Book, verify and enter your room — from your phone';
+
+  @override
+  String get entrySubtext => 'No queues, no front desk';
+
+  @override
+  String get entryStartAction => 'Start now';
+
+  @override
+  String get entryLanguageSwitchLabel => 'Language';
+
+  @override
+  String get authPhoneTitle => 'Sign in';
+
+  @override
+  String get authPhoneHeading => 'Enter your mobile number';
+
+  @override
+  String get authPhoneBody =>
+      'We use it to confirm your booking and send your room entry code. We will not use it for anything else.';
+
+  @override
+  String get authPhoneFieldLabel => 'Mobile number';
+
+  @override
+  String get authPhoneFieldHint => '51 234 5678';
+
+  @override
+  String get authPhoneHelper =>
+      'We will send a verification code to this number';
+
+  @override
+  String get authPhoneTerms =>
+      'By continuing you agree to the Terms and the Privacy Policy.';
+
+  @override
+  String get authPhoneSubmit => 'Send verification code';
+
+  @override
+  String get authPhoneInvalid => 'Enter a valid mobile number';
+
+  @override
+  String get authOtpTitle => 'Verification code';
+
+  @override
+  String get authOtpHeading => 'Enter the code we sent';
+
+  @override
+  String get authOtpChange => 'Change';
+
+  @override
+  String authOtpResendCountdown(String time) {
+    return 'Resend in $time';
+  }
+
+  @override
+  String get authOtpResendAction => 'Resend the code';
+
+  @override
+  String get authOtpSubmit => 'Confirm';
+
+  @override
+  String authOtpInvalidFormat(int length) {
+    return 'Enter the $length-digit code';
+  }
+
+  @override
+  String get authOtpErrorTitle => 'Incorrect code';
+
+  @override
+  String authOtpErrorBody(int count) {
+    return 'Attempts remaining: $count. Use the most recent code — earlier codes stop working as soon as a new one is sent.';
+  }
+
+  @override
+  String get authOtpRetry => 'Try again';
+
+  @override
+  String get authOtpChangeNumber => 'Change mobile number';
+
+  @override
+  String get authOtpLockedTitle => 'Too many attempts';
+
+  @override
+  String get authOtpLockedBody =>
+      'For your security we stopped accepting codes. Request a new code to continue.';
+
+  @override
+  String get authProfileTitle => 'Complete your details';
+
+  @override
+  String get authProfileBannerTitle =>
+      'Write your name exactly as it appears on your ID';
+
+  @override
+  String get authProfileBannerBody =>
+      'The system matches your name against your ID during verification. Any difference may delay your check-in.';
+
+  @override
+  String get authProfileNameLabel => 'Full name';
+
+  @override
+  String get authProfileNameHint => 'Mahmoud Nabil';
+
+  @override
+  String get authProfileEmailLabel => 'Email';
+
+  @override
+  String get authProfileEmailHint => 'name@example.com';
+
+  @override
+  String get authProfileSubmit => 'Save and continue';
+
+  @override
+  String get authProfileNameInvalid => 'Enter your full name';
+
+  @override
+  String get authProfileEmailInvalid => 'Enter a valid email address';
+
+  @override
+  String get authSessionExpiredTitle => 'Session ended';
+
+  @override
+  String get authSessionExpiredBannerTitle => 'Your session has ended';
+
+  @override
+  String get authSessionExpiredBannerBody =>
+      'Your booking is saved and was not cancelled. Sign in again and we will take you back to where you left off.';
+
+  @override
+  String get authSessionExpiredSubmit => 'Sign in';
+
+  @override
+  String get authSignOut => 'Sign out';
+
+  @override
+  String authDemoHint(String code) {
+    return 'Development build: the verification code is $code.';
+  }
 }

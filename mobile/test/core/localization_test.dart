@@ -56,6 +56,6 @@ void main() {
 
     final AppLocalizations ar =
         await AppLocalizations.delegate.load(const Locale('ar'));
-    expect(find.text(ar.foundationScreenTitle), findsOneWidget);
+    expect(find.text(ar.entryHeadline), findsOneWidget);
   });
 }

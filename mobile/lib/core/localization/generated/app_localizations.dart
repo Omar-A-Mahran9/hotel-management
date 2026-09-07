@@ -307,6 +307,264 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter your name'**
   String get textFieldExampleHint;
+
+  /// Small eyebrow line above the entry headline (01 · Entry).
+  ///
+  /// In en, this message translates to:
+  /// **'A stay without paperwork'**
+  String get entryTagline;
+
+  /// No description provided for @entryHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Book, verify and enter your room — from your phone'**
+  String get entryHeadline;
+
+  /// No description provided for @entrySubtext.
+  ///
+  /// In en, this message translates to:
+  /// **'No queues, no front desk'**
+  String get entrySubtext;
+
+  /// No description provided for @entryStartAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Start now'**
+  String get entryStartAction;
+
+  /// No description provided for @entryLanguageSwitchLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get entryLanguageSwitchLabel;
+
+  /// No description provided for @authPhoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get authPhoneTitle;
+
+  /// No description provided for @authPhoneHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your mobile number'**
+  String get authPhoneHeading;
+
+  /// No description provided for @authPhoneBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We use it to confirm your booking and send your room entry code. We will not use it for anything else.'**
+  String get authPhoneBody;
+
+  /// No description provided for @authPhoneFieldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile number'**
+  String get authPhoneFieldLabel;
+
+  /// No description provided for @authPhoneFieldHint.
+  ///
+  /// In en, this message translates to:
+  /// **'51 234 5678'**
+  String get authPhoneFieldHint;
+
+  /// No description provided for @authPhoneHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'We will send a verification code to this number'**
+  String get authPhoneHelper;
+
+  /// No description provided for @authPhoneTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'By continuing you agree to the Terms and the Privacy Policy.'**
+  String get authPhoneTerms;
+
+  /// No description provided for @authPhoneSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Send verification code'**
+  String get authPhoneSubmit;
+
+  /// No description provided for @authPhoneInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid mobile number'**
+  String get authPhoneInvalid;
+
+  /// No description provided for @authOtpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code'**
+  String get authOtpTitle;
+
+  /// No description provided for @authOtpHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the code we sent'**
+  String get authOtpHeading;
+
+  /// No description provided for @authOtpChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get authOtpChange;
+
+  /// No description provided for @authOtpResendCountdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend in {time}'**
+  String authOtpResendCountdown(String time);
+
+  /// No description provided for @authOtpResendAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend the code'**
+  String get authOtpResendAction;
+
+  /// No description provided for @authOtpSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get authOtpSubmit;
+
+  /// No description provided for @authOtpInvalidFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the {length}-digit code'**
+  String authOtpInvalidFormat(int length);
+
+  /// No description provided for @authOtpErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect code'**
+  String get authOtpErrorTitle;
+
+  /// No description provided for @authOtpErrorBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Attempts remaining: {count}. Use the most recent code — earlier codes stop working as soon as a new one is sent.'**
+  String authOtpErrorBody(int count);
+
+  /// No description provided for @authOtpRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get authOtpRetry;
+
+  /// No description provided for @authOtpChangeNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Change mobile number'**
+  String get authOtpChangeNumber;
+
+  /// No description provided for @authOtpLockedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts'**
+  String get authOtpLockedTitle;
+
+  /// No description provided for @authOtpLockedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'For your security we stopped accepting codes. Request a new code to continue.'**
+  String get authOtpLockedBody;
+
+  /// No description provided for @authProfileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete your details'**
+  String get authProfileTitle;
+
+  /// No description provided for @authProfileBannerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Write your name exactly as it appears on your ID'**
+  String get authProfileBannerTitle;
+
+  /// No description provided for @authProfileBannerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The system matches your name against your ID during verification. Any difference may delay your check-in.'**
+  String get authProfileBannerBody;
+
+  /// No description provided for @authProfileNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get authProfileNameLabel;
+
+  /// No description provided for @authProfileNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Mahmoud Nabil'**
+  String get authProfileNameHint;
+
+  /// No description provided for @authProfileEmailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get authProfileEmailLabel;
+
+  /// No description provided for @authProfileEmailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'name@example.com'**
+  String get authProfileEmailHint;
+
+  /// No description provided for @authProfileSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Save and continue'**
+  String get authProfileSubmit;
+
+  /// No description provided for @authProfileNameInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your full name'**
+  String get authProfileNameInvalid;
+
+  /// No description provided for @authProfileEmailInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address'**
+  String get authProfileEmailInvalid;
+
+  /// No description provided for @authSessionExpiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Session ended'**
+  String get authSessionExpiredTitle;
+
+  /// No description provided for @authSessionExpiredBannerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your session has ended'**
+  String get authSessionExpiredBannerTitle;
+
+  /// No description provided for @authSessionExpiredBannerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your booking is saved and was not cancelled. Sign in again and we will take you back to where you left off.'**
+  String get authSessionExpiredBannerBody;
+
+  /// No description provided for @authSessionExpiredSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get authSessionExpiredSubmit;
+
+  /// No description provided for @authSignOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get authSignOut;
+
+  /// No description provided for @authDemoHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Development build: the verification code is {code}.'**
+  String authDemoHint(String code);
 }
 
 class _AppLocalizationsDelegate

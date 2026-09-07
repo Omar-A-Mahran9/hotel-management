@@ -1,0 +1,40 @@
+import '../entities/guest_phone.dart';
+import '../entities/guest_profile.dart';
+import '../entities/otp_challenge.dart';
+
+/// Contract the presentation layer depends on for guest entry + authentication
+/// (architecture.md §4). Implemented by `AuthRepositoryImpl` over either the
+/// dummy or the API data source — callers never know which.
+///
+/// Every method throws a `Failure` (via `ErrorMapper`) for infrastructure
+/// errors. Expected authentication branch points (wrong code, lock-out) are
+/// returned as [OtpVerification] values, not thrown.
+abstract interface class AuthRepository {
+  /// Returns the session persisted from a previous run, or `null` if the guest
+  /// is not signed in. Phase 1 storage is in-memory (`InMemoryTokenStore`), so
+  /// this is effectively `null` on a cold start.
+  Future<AuthSession?> restoreSession();
+
+  /// Asks the backend to send a verification code to [phone].
+  Future<OtpChallenge> requestOtp(GuestPhone phone);
+
+  /// Requests a fresh code for an existing challenge, resetting its attempts.
+  Future<OtpChallenge> resendOtp(OtpChallenge challenge);
+
+  /// Submits [code] for [challenge].
+  Future<OtpVerification> verifyOtp({
+    required OtpChallenge challenge,
+    required String code,
+  });
+
+  /// Saves the first-time guest's name and email, returning the completed
+  /// session.
+  Future<AuthSession> completeProfile({
+    required AuthSession session,
+    required String fullName,
+    required String email,
+  });
+
+  /// Clears the stored token and any in-memory session.
+  Future<void> signOut();
+}
