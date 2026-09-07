@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CheckInController;
 use App\Http\Controllers\Api\V1\DigitalAccessController;
+use App\Http\Controllers\Api\V1\FolioController;
 use App\Http\Controllers\Api\V1\HotelController;
 use App\Http\Controllers\Api\V1\HotelGroupController;
 use App\Http\Controllers\Api\V1\IdentityVerificationController;
@@ -13,6 +14,9 @@ use App\Http\Controllers\Api\V1\ReservationController;
 use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\RoomTypeController;
+use App\Http\Controllers\Api\V1\ServiceCategoryController;
+use App\Http\Controllers\Api\V1\ServiceController;
+use App\Http\Controllers\Api\V1\ServiceOrderController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -55,6 +59,19 @@ Route::prefix('v1')->group(function () {
         Route::post('/reservations/{reservation}/payment/hold', [PaymentController::class, 'hold'])
             ->middleware('throttle:payments.hold');
 
+        // Phase 8 — Stay Services + Folio (Phase 0 §16). {reservation} is an
+        // int id resolved through ReservationService (not route-model
+        // binding), so a cross-hotel or missing id is an identical plain
+        // 404. Service orders accrue folio charges; the folio is read-only.
+        Route::prefix('/reservations/{reservation}')->group(function () {
+            Route::get('/service-orders', [ServiceOrderController::class, 'index']);
+            Route::post('/service-orders', [ServiceOrderController::class, 'store']);
+            Route::get('/service-orders/{serviceOrder}', [ServiceOrderController::class, 'show']);
+            Route::post('/service-orders/{serviceOrder}/transition', [ServiceOrderController::class, 'transition']);
+
+            Route::get('/folio', [FolioController::class, 'show']);
+        });
+
         // Phase 6 — Identity Verification (Phase 0 §16). {reservation} is an
         // int id resolved through ReservationService (not route-model
         // binding), so a cross-hotel or missing id is an identical plain
@@ -93,6 +110,22 @@ Route::prefix('v1')->group(function () {
             Route::get('/rooms/{room}', [RoomController::class, 'show']);
             Route::match(['put', 'patch'], '/rooms/{room}', [RoomController::class, 'update']);
             Route::patch('/rooms/{room}/status', [RoomController::class, 'updateStatus']);
+
+            // Phase 8 — hotel service catalog (Phase 0 §16). Categories are
+            // an optional grouping; services carry the price. No delete —
+            // deactivation preserves historical references.
+            Route::get('/service-categories', [ServiceCategoryController::class, 'index']);
+            Route::post('/service-categories', [ServiceCategoryController::class, 'store']);
+            Route::match(['put', 'patch'], '/service-categories/{serviceCategory}', [ServiceCategoryController::class, 'update']);
+            Route::patch('/service-categories/{serviceCategory}/activate', [ServiceCategoryController::class, 'activate']);
+            Route::patch('/service-categories/{serviceCategory}/deactivate', [ServiceCategoryController::class, 'deactivate']);
+
+            Route::get('/services', [ServiceController::class, 'index']);
+            Route::post('/services', [ServiceController::class, 'store']);
+            Route::get('/services/{service}', [ServiceController::class, 'show']);
+            Route::match(['put', 'patch'], '/services/{service}', [ServiceController::class, 'update']);
+            Route::patch('/services/{service}/activate', [ServiceController::class, 'activate']);
+            Route::patch('/services/{service}/deactivate', [ServiceController::class, 'deactivate']);
         });
     });
 });

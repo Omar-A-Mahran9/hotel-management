@@ -64,6 +64,22 @@ use App\Domain\Reservation\Repositories\Contracts\GuestRepositoryInterface;
 use App\Domain\Reservation\Repositories\Contracts\ReservationRepositoryInterface;
 use App\Domain\Reservation\Repositories\EloquentGuestRepository;
 use App\Domain\Reservation\Repositories\EloquentReservationRepository;
+use App\Domain\StayServices\Models\HotelService;
+use App\Domain\StayServices\Models\ServiceCategory;
+use App\Domain\StayServices\Models\ServiceOrder;
+use App\Domain\StayServices\Policies\FolioPolicy;
+use App\Domain\StayServices\Policies\HotelServicePolicy;
+use App\Domain\StayServices\Policies\ServiceCategoryPolicy;
+use App\Domain\StayServices\Policies\ServiceOrderPolicy;
+use App\Domain\StayServices\Repositories\Contracts\FolioChargeRepositoryInterface;
+use App\Domain\StayServices\Repositories\Contracts\HotelServiceRepositoryInterface;
+use App\Domain\StayServices\Repositories\Contracts\ServiceCategoryRepositoryInterface;
+use App\Domain\StayServices\Repositories\Contracts\ServiceOrderRepositoryInterface;
+use App\Domain\StayServices\Repositories\EloquentFolioChargeRepository;
+use App\Domain\StayServices\Repositories\EloquentHotelServiceRepository;
+use App\Domain\StayServices\Repositories\EloquentServiceCategoryRepository;
+use App\Domain\StayServices\Repositories\EloquentServiceOrderRepository;
+use App\Domain\StayServices\Services\Folio;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -92,6 +108,10 @@ class AppServiceProvider extends ServiceProvider
         IdentityVerificationAttemptRepositoryInterface::class => EloquentIdentityVerificationAttemptRepository::class,
         IdentityVerificationDecisionRepositoryInterface::class => EloquentIdentityVerificationDecisionRepository::class,
         AccessGrantRepositoryInterface::class => EloquentAccessGrantRepository::class,
+        ServiceCategoryRepositoryInterface::class => EloquentServiceCategoryRepository::class,
+        HotelServiceRepositoryInterface::class => EloquentHotelServiceRepository::class,
+        ServiceOrderRepositoryInterface::class => EloquentServiceOrderRepository::class,
+        FolioChargeRepositoryInterface::class => EloquentFolioChargeRepository::class,
     ];
 
     /**
@@ -107,6 +127,10 @@ class AppServiceProvider extends ServiceProvider
         Payment::class => PaymentPolicy::class,
         IdentityVerificationSession::class => IdentityVerificationPolicy::class,
         AccessGrant::class => AccessGrantPolicy::class,
+        ServiceCategory::class => ServiceCategoryPolicy::class,
+        HotelService::class => HotelServicePolicy::class,
+        ServiceOrder::class => ServiceOrderPolicy::class,
+        Folio::class => FolioPolicy::class,
     ];
 
     public function register(): void

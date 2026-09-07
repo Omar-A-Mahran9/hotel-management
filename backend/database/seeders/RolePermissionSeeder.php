@@ -35,6 +35,11 @@ class RolePermissionSeeder extends Seeder
             'check-in.perform' => 'Perform reservation check-in within authorized scope',
             'digital-access.view' => 'View digital access status within authorized scope',
             'digital-access.revoke' => 'Revoke a reservation digital access credential within authorized scope',
+            'services.view' => 'View the hotel service catalog within authorized scope',
+            'services.manage' => 'Create, update, activate/deactivate hotel services and categories within authorized scope',
+            'service-orders.view' => 'View reservation service orders within authorized scope',
+            'service-orders.manage' => 'Record and transition reservation service orders within authorized scope',
+            'folio.view' => 'View a reservation folio within authorized scope',
         ];
 
         foreach ($permissions as $slug => $name) {
@@ -53,7 +58,7 @@ class RolePermissionSeeder extends Seeder
             Role::HOTEL_MANAGER => [
                 'name' => 'Hotel Manager',
                 'description' => 'Manages one or more assigned hotels.',
-                'permissions' => ['hotels.view', 'inventory.view', 'inventory.manage', 'reservations.view', 'reservations.manage', 'payments.manage', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke'],
+                'permissions' => ['hotels.view', 'inventory.view', 'inventory.manage', 'reservations.view', 'reservations.manage', 'payments.manage', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke', 'services.view', 'services.manage', 'service-orders.view', 'service-orders.manage', 'folio.view'],
             ],
             Role::RECEPTION => [
                 'name' => 'Reception',
@@ -61,8 +66,12 @@ class RolePermissionSeeder extends Seeder
                 // Phase 0 §7: Reception may review/decide a pending verification
                 // (✅), assists with check-in processing (R7, R33), and may
                 // issue/revoke digital access as "manual-assist, logged" — but
-                // holds no financial capability.
-                'permissions' => ['hotels.view', 'inventory.view', 'reservations.view', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke'],
+                // holds no financial capability. Phase 8: Reception may view
+                // the service catalog and record/transition in-stay service
+                // orders (operational, R7/R14-R19) and read a folio, but NOT
+                // configure the catalog (services.manage = pricing config,
+                // §32 "no financial edit").
+                'permissions' => ['hotels.view', 'inventory.view', 'reservations.view', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke', 'services.view', 'service-orders.view', 'service-orders.manage', 'folio.view'],
             ],
             Role::GUEST => [
                 'name' => 'Guest',

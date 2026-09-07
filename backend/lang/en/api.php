@@ -50,4 +50,8 @@ return [
         'revoked' => 'The digital access credential has been revoked.',
         'state' => 'The current digital access state is returned.',
     ],
+
+    'stay_services' => [
+        'folio' => 'The current reservation folio is returned.',
+    ],
 ];

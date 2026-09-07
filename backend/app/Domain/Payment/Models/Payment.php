@@ -80,6 +80,21 @@ class Payment extends Model
         self::STATUS_REFUND_FAILED,
     ];
 
+    /**
+     * Statuses in which the Payment represents money actually captured or
+     * settled — not a mere authorization hold, not pending, not failed
+     * (Phase 0 §9). The folio's payments total is derived from these and
+     * these only; a HOLD_ACTIVE deposit is an authorization, not money in.
+     * Kept here — beside the status vocabulary — so no consumer redefines
+     * payment state semantics of its own (Phase 8D).
+     *
+     * @var array<int, string>
+     */
+    public const CAPTURED_STATUSES = [
+        self::STATUS_CAPTURED,
+        self::STATUS_SETTLED,
+    ];
+
     protected $fillable = [
         'reservation_id',
         'hotel_id',

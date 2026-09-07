@@ -25,6 +25,9 @@ use App\Domain\Reservation\Exceptions\InvalidReservationStatusTransitionExceptio
 use App\Domain\Reservation\Exceptions\ReservationNotAvailableException;
 use App\Domain\Reservation\Exceptions\RoomHotelMismatchException;
 use App\Domain\Reservation\Exceptions\RoomTypeMismatchException;
+use App\Domain\StayServices\Exceptions\FolioChargeAmountException;
+use App\Domain\StayServices\Exceptions\InvalidServiceOrderStatusTransitionException;
+use App\Domain\StayServices\Exceptions\ServiceOrderNotAllowedException;
 use App\Http\Middleware\ForceJsonResponse;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -247,6 +250,28 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->renderable(function (InvalidDigitalAccessStatusTransitionException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        // Phase 8 — stay services / folio business errors. Every message is a
+        // fixed, safe business string (no secret, no payment data, no
+        // SQLSTATE, no stack trace). All map to 422, like every other domain
+        // exception above.
+        $exceptions->renderable(function (ServiceOrderNotAllowedException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (InvalidServiceOrderStatusTransitionException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (FolioChargeAmountException $e, Request $request) use ($envelope) {
             if ($request->is('api/*')) {
                 return $envelope($e->getMessage(), 422);
             }

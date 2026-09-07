@@ -1,0 +1,99 @@
+<?php
+
+namespace App\Domain\StayServices\Models;
+
+use App\Domain\HotelGroup\Models\Hotel;
+use App\Domain\IdentityAccess\Models\User;
+use App\Domain\Reservation\Models\Reservation;
+use Database\Factories\FolioChargeFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+/**
+ * Phase 8 — a financial amount attached to a reservation's folio
+ * (Phase 0 §6.4 `guest_charges`, R26-R31).
+ *
+ * FolioCharge = what the guest owes / was charged for. It is NOT a Payment
+ * (money movement). No card data / provider secret is ever stored.
+ *
+ * `status` is the CHARGE lifecycle and is independent of any payment
+ * status — a charge is never implicitly "paid" just because it exists.
+ */
+class FolioCharge extends Model
+{
+    use HasFactory;
+
+    public const SOURCE_SERVICE_ORDER = 'service_order';
+
+    public const STATUS_POSTED = 'posted';
+
+    public const STATUS_CANCELLED = 'cancelled';
+
+    /**
+     * @var array<int, string>
+     */
+    public const STATUSES = [
+        self::STATUS_POSTED,
+        self::STATUS_CANCELLED,
+    ];
+
+    /**
+     * Charge statuses that represent a live amount the guest owes — the
+     * only ones that count toward the folio's charges total.
+     *
+     * @var array<int, string>
+     */
+    public const OWED_STATUSES = [
+        self::STATUS_POSTED,
+    ];
+
+    protected $fillable = [
+        'reservation_id',
+        'hotel_id',
+        'source_type',
+        'source_id',
+        'description',
+        'quantity',
+        'unit_amount',
+        'total_amount',
+        'currency',
+        'status',
+        'charged_at',
+        'cancelled_at',
+        'created_by_user_id',
+        'metadata',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'quantity' => 'integer',
+            'unit_amount' => 'decimal:2',
+            'total_amount' => 'decimal:2',
+            'charged_at' => 'datetime',
+            'cancelled_at' => 'datetime',
+            'metadata' => 'array',
+        ];
+    }
+
+    public function reservation(): BelongsTo
+    {
+        return $this->belongsTo(Reservation::class);
+    }
+
+    public function hotel(): BelongsTo
+    {
+        return $this->belongsTo(Hotel::class);
+    }
+
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by_user_id');
+    }
+
+    protected static function newFactory(): FolioChargeFactory
+    {
+        return FolioChargeFactory::new();
+    }
+}
