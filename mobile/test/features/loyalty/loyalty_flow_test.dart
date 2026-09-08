@@ -1,0 +1,99 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hotel_guest_app/app/router/app_router.dart';
+import 'package:hotel_guest_app/core/localization/generated/app_localizations.dart';
+import 'package:hotel_guest_app/features/loyalty/data/datasources/dummy_loyalty_data_source.dart';
+import 'package:hotel_guest_app/features/loyalty/data/repositories/loyalty_repository_impl.dart';
+import 'package:hotel_guest_app/features/loyalty/presentation/state/loyalty_providers.dart';
+import 'package:hotel_guest_app/features/reservation/domain/entities/create_reservation_request.dart';
+import 'package:hotel_guest_app/features/reservation/domain/entities/reservation.dart';
+import 'package:hotel_guest_app/features/reservation/domain/entities/reservation_status.dart';
+import 'package:hotel_guest_app/features/reservation/domain/repositories/reservation_repository.dart';
+import 'package:hotel_guest_app/features/reservation/presentation/state/reservation_providers.dart';
+
+import '../../support/auth_test_support.dart';
+import '../../support/pump_app.dart';
+import 'loyalty_test_support.dart';
+
+final DateTime _now = DateTime(2026, 9, 8, 11);
+
+class _ReservationRepo implements ReservationRepository {
+  _ReservationRepo(this.status);
+  final ReservationStatus status;
+  @override
+  Future<Reservation> create(CreateReservationRequest request) async =>
+      fakeReservation(status: status);
+  @override
+  Future<Reservation> getById(String id) async =>
+      fakeReservation(id: id, status: status, amount: 900);
+}
+
+Future<AppLocalizations> _l10n(String code) =>
+    AppLocalizations.delegate.load(Locale(code));
+
+Future<void> _openLoyalty(
+  WidgetTester tester,
+  String id, {
+  ReservationStatus status = ReservationStatus.checkedOut,
+  Locale? locale,
+}) async {
+  final ds = DummyLoyaltyDataSource(clock: () => _now);
+  final c = await pumpApp(
+    tester,
+    bootSession: completeSession(),
+    locale: locale,
+    extraOverrides: <Override>[
+      loyaltyDataSourceProvider.overrideWithValue(ds),
+      loyaltyRepositoryProvider.overrideWithValue(LoyaltyRepositoryImpl(ds)),
+      reservationRepositoryProvider.overrideWithValue(_ReservationRepo(status)),
+    ],
+  );
+  c.read(appRouterProvider).go('/reservation/$id/loyalty');
+  await tester.pumpAndSettle();
+}
+
+void main() {
+  testWidgets('a completed stay can earn points and sees the updated summary',
+      (tester) async {
+    final en = await _l10n('en');
+    final id = earnFreshActiveId();
+    await _openLoyalty(tester, id);
+
+    expect(find.text(en.loyaltyBalanceLabel), findsOneWidget);
+    expect(find.text(en.loyaltyPointsValue(1240)), findsWidgets);
+
+    await tester.tap(find.widgetWithText(FilledButton, en.loyaltyEarnCta));
+    await tester.pumpAndSettle();
+
+    // 900 / 2 = 450 points (dummy sample rate).
+    expect(find.text(en.loyaltyEarnedBody(450)), findsOneWidget);
+    expect(find.text(en.loyaltyPointsValue(1690)), findsWidgets);
+  });
+
+  testWidgets('an inactive programme shows the "off" banner, no earn CTA',
+      (tester) async {
+    final en = await _l10n('en');
+    await _openLoyalty(tester, programInactiveId());
+
+    expect(find.text(en.loyaltyProgramOffTitle), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, en.loyaltyEarnCta), findsNothing);
+  });
+
+  testWidgets('the points history is listed newest-first', (tester) async {
+    final en = await _l10n('en');
+    await _openLoyalty(tester, earnFreshActiveId());
+    expect(find.text(en.loyaltyHistoryTitle), findsOneWidget);
+    // Seeded ledger has an earn and a redeem entry.
+    expect(find.text(en.loyaltyPointsAdded(450)), findsWidgets);
+  });
+
+  testWidgets('renders right-to-left in Arabic', (tester) async {
+    final ar = await _l10n('ar');
+    await _openLoyalty(tester, earnFreshActiveId(), locale: arabic);
+    expect(
+      Directionality.of(tester.element(find.text(ar.loyaltyBalanceLabel))),
+      TextDirection.rtl,
+    );
+  });
+}

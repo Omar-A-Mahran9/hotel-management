@@ -16,7 +16,10 @@ import '../../../../core/widgets/loading_view.dart';
 import '../../../../core/widgets/message_view.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/secondary_button.dart';
+import '../../../reviews/domain/entities/review.dart';
+import '../../../reviews/presentation/state/review_providers.dart';
 import '../../domain/entities/reservation.dart';
+import '../../domain/entities/reservation_status.dart';
 import '../state/reservation_detail_provider.dart';
 import '../widgets/reservation_status_pill.dart';
 import '../widgets/reservation_summary_card.dart';
@@ -213,7 +216,57 @@ class _Body extends StatelessWidget {
             pathParameters: <String, String>{'reservationId': reservation.id},
           ),
         ),
+        _CompletedStayActions(reservation: reservation),
         const SizedBox(height: AppSpacing.xl),
+      ],
+    );
+  }
+}
+
+/// Loyalty + review entry points. Shown only once the stay is completed
+/// (`CHECKED_OUT` / `INVOICED`) — the same "completed stay" definition the
+/// backend loyalty + review eligibility use. The backend stays authoritative;
+/// this is a UX gate. Renders nothing (no extra spacing) for any other status,
+/// so the Phase 5–9 CTAs above are untouched.
+class _CompletedStayActions extends ConsumerWidget {
+  const _CompletedStayActions({required this.reservation});
+
+  final Reservation reservation;
+
+  bool get _isCompletedStay =>
+      reservation.status == ReservationStatus.checkedOut ||
+      reservation.status == ReservationStatus.invoiced;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (!_isCompletedStay) return const SizedBox.shrink();
+    final AppLocalizations l10n = context.l10n;
+    final AsyncValue<Review?> review =
+        ref.watch(reservationReviewProvider(reservation.id));
+    final bool hasReview = review.valueOrNull != null;
+
+    return Column(
+      children: <Widget>[
+        const SizedBox(height: AppSpacing.xs),
+        SecondaryButton(
+          label: l10n.reservationLoyaltyCta,
+          icon: Icons.card_giftcard_outlined,
+          onPressed: () => context.pushNamed(
+            AppRoutes.loyaltyName,
+            pathParameters: <String, String>{'reservationId': reservation.id},
+          ),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        SecondaryButton(
+          label: hasReview
+              ? l10n.reservationViewReviewCta
+              : l10n.reservationReviewCta,
+          icon: Icons.rate_review_outlined,
+          onPressed: () => context.pushNamed(
+            AppRoutes.reviewFormName,
+            pathParameters: <String, String>{'reservationId': reservation.id},
+          ),
+        ),
       ],
     );
   }

@@ -2827,6 +2827,486 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invoice is unavailable'**
   String get invoiceUnavailableTitle;
+
+  /// No description provided for @reservationLoyaltyCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Loyalty & points'**
+  String get reservationLoyaltyCta;
+
+  /// No description provided for @reservationReviewCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave a review'**
+  String get reservationReviewCta;
+
+  /// No description provided for @reservationViewReviewCta.
+  ///
+  /// In en, this message translates to:
+  /// **'View your review'**
+  String get reservationViewReviewCta;
+
+  /// No description provided for @loyaltyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Loyalty'**
+  String get loyaltyTitle;
+
+  /// No description provided for @loyaltyUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Loyalty is unavailable'**
+  String get loyaltyUnavailableTitle;
+
+  /// No description provided for @loyaltyBalanceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Points balance'**
+  String get loyaltyBalanceLabel;
+
+  /// No description provided for @loyaltyPointsValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{points, plural, =1{1 pt} other{{points} pts}}'**
+  String loyaltyPointsValue(int points);
+
+  /// No description provided for @loyaltyGroupWideNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Your points work across every hotel in the group.'**
+  String get loyaltyGroupWideNote;
+
+  /// No description provided for @loyaltyProgramOffTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The loyalty programme isn\'t active'**
+  String get loyaltyProgramOffTitle;
+
+  /// No description provided for @loyaltyProgramOffBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This hotel group hasn\'t switched on points earning yet. There\'s nothing to do here for now.'**
+  String get loyaltyProgramOffBody;
+
+  /// No description provided for @loyaltyEarnCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Earn points for this stay'**
+  String get loyaltyEarnCta;
+
+  /// No description provided for @loyaltyEarningCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Adding your points…'**
+  String get loyaltyEarningCta;
+
+  /// No description provided for @loyaltyEarnedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Points added'**
+  String get loyaltyEarnedTitle;
+
+  /// No description provided for @loyaltyEarnedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{points, plural, =1{1 point was added to your balance.} other{{points} points were added to your balance.}}'**
+  String loyaltyEarnedBody(int points);
+
+  /// No description provided for @loyaltyAlreadyEarnedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Points already added'**
+  String get loyaltyAlreadyEarnedTitle;
+
+  /// No description provided for @loyaltyAlreadyEarnedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve already earned points for this stay.'**
+  String get loyaltyAlreadyEarnedBody;
+
+  /// No description provided for @loyaltyNotEligibleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not eligible yet'**
+  String get loyaltyNotEligibleTitle;
+
+  /// No description provided for @loyaltyNotEligibleBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Points are added once your stay is completed.'**
+  String get loyaltyNotEligibleBody;
+
+  /// No description provided for @loyaltyNothingToEarnTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No points to add'**
+  String get loyaltyNothingToEarnTitle;
+
+  /// No description provided for @loyaltyNothingToEarnBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This stay doesn\'t have an amount that earns points.'**
+  String get loyaltyNothingToEarnBody;
+
+  /// No description provided for @loyaltyHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Points history'**
+  String get loyaltyHistoryTitle;
+
+  /// No description provided for @loyaltyHistoryNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Your full points ledger is kept by the hotel group. This is a read-only copy.'**
+  String get loyaltyHistoryNote;
+
+  /// No description provided for @loyaltyHistoryEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No points activity yet'**
+  String get loyaltyHistoryEmptyTitle;
+
+  /// No description provided for @loyaltyHistoryEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Points you earn and redeem will show up here.'**
+  String get loyaltyHistoryEmptyBody;
+
+  /// No description provided for @loyaltyPointsAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'{points, plural, =1{+1 pt} other{+{points} pts}}'**
+  String loyaltyPointsAdded(int points);
+
+  /// No description provided for @loyaltyPointsRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'{points, plural, =1{-1 pt} other{-{points} pts}}'**
+  String loyaltyPointsRemoved(int points);
+
+  /// No description provided for @loyaltyTxThisStay.
+  ///
+  /// In en, this message translates to:
+  /// **'This stay'**
+  String get loyaltyTxThisStay;
+
+  /// No description provided for @loyaltyTxEarnLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Earned'**
+  String get loyaltyTxEarnLabel;
+
+  /// No description provided for @loyaltyTxRedeemLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Redeemed'**
+  String get loyaltyTxRedeemLabel;
+
+  /// No description provided for @loyaltyTxReverseLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reversed'**
+  String get loyaltyTxReverseLabel;
+
+  /// No description provided for @loyaltyTxAdjustLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjustment'**
+  String get loyaltyTxAdjustLabel;
+
+  /// No description provided for @loyaltyTxExpireLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get loyaltyTxExpireLabel;
+
+  /// No description provided for @loyaltyRedeemCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Redeem points'**
+  String get loyaltyRedeemCta;
+
+  /// No description provided for @loyaltyRedeemTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Redeem points'**
+  String get loyaltyRedeemTitle;
+
+  /// No description provided for @loyaltyRedeemSubmitCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Redeem'**
+  String get loyaltyRedeemSubmitCta;
+
+  /// No description provided for @loyaltyRedeemingCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Redeeming…'**
+  String get loyaltyRedeemingCta;
+
+  /// No description provided for @loyaltyRedeemAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Points to redeem'**
+  String get loyaltyRedeemAmountLabel;
+
+  /// No description provided for @loyaltyRedeemNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Points are redeemed against this booking. The hotel group confirms the final value.'**
+  String get loyaltyRedeemNote;
+
+  /// No description provided for @loyaltyRedeemMax.
+  ///
+  /// In en, this message translates to:
+  /// **'Use max ({points})'**
+  String loyaltyRedeemMax(int points);
+
+  /// No description provided for @loyaltyRedeemedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Points redeemed'**
+  String get loyaltyRedeemedTitle;
+
+  /// No description provided for @loyaltyRedeemedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{points, plural, =1{1 point was redeemed against this booking.} other{{points} points were redeemed against this booking.}}'**
+  String loyaltyRedeemedBody(int points);
+
+  /// No description provided for @loyaltyRedeemedValueNote.
+  ///
+  /// In en, this message translates to:
+  /// **'That\'s about {value} {currency} off this booking.'**
+  String loyaltyRedeemedValueNote(String value, String currency);
+
+  /// No description provided for @loyaltyRedeemNotEligibleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t redeem on this booking'**
+  String get loyaltyRedeemNotEligibleTitle;
+
+  /// No description provided for @loyaltyRedeemNotEligibleBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Points can only be redeemed against an active booking.'**
+  String get loyaltyRedeemNotEligibleBody;
+
+  /// No description provided for @loyaltyAlreadyRedeemedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Already redeemed'**
+  String get loyaltyAlreadyRedeemedTitle;
+
+  /// No description provided for @loyaltyAlreadyRedeemedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Points were already redeemed against this booking.'**
+  String get loyaltyAlreadyRedeemedBody;
+
+  /// No description provided for @loyaltyAlreadyRedeemedDifferentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A different number of points was already redeemed against this booking.'**
+  String get loyaltyAlreadyRedeemedDifferentBody;
+
+  /// No description provided for @loyaltyInsufficientTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough points'**
+  String get loyaltyInsufficientTitle;
+
+  /// No description provided for @loyaltyInsufficientBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have enough points for that amount.'**
+  String get loyaltyInsufficientBody;
+
+  /// No description provided for @loyaltyInvalidAmountBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how many points to redeem.'**
+  String get loyaltyInvalidAmountBody;
+
+  /// No description provided for @reviewFormTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave a review'**
+  String get reviewFormTitle;
+
+  /// No description provided for @reviewFormPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'How was your stay?'**
+  String get reviewFormPrompt;
+
+  /// No description provided for @reviewResultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your review'**
+  String get reviewResultTitle;
+
+  /// No description provided for @reviewProcessingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending your review'**
+  String get reviewProcessingTitle;
+
+  /// No description provided for @reviewProcessingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending your review…'**
+  String get reviewProcessingBody;
+
+  /// No description provided for @reviewDoNotClose.
+  ///
+  /// In en, this message translates to:
+  /// **'This only takes a moment. Please don\'t close the app.'**
+  String get reviewDoNotClose;
+
+  /// No description provided for @reviewRatingRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a rating from 1 to 5 stars.'**
+  String get reviewRatingRequired;
+
+  /// No description provided for @reviewStarsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 star} other{{count} stars}}'**
+  String reviewStarsLabel(int count);
+
+  /// No description provided for @reviewTextLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your review (optional)'**
+  String get reviewTextLabel;
+
+  /// No description provided for @reviewTextHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell other guests about your stay'**
+  String get reviewTextHint;
+
+  /// No description provided for @reviewSubmitCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit review'**
+  String get reviewSubmitCta;
+
+  /// No description provided for @reviewSubmittingCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitting…'**
+  String get reviewSubmittingCta;
+
+  /// No description provided for @reviewYourRatingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your rating'**
+  String get reviewYourRatingLabel;
+
+  /// No description provided for @reviewBackToReservation.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to reservation'**
+  String get reviewBackToReservation;
+
+  /// No description provided for @reviewUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews are unavailable'**
+  String get reviewUnavailableTitle;
+
+  /// No description provided for @reviewNotEligibleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You can\'t review this stay'**
+  String get reviewNotEligibleTitle;
+
+  /// No description provided for @reviewNotEligibleBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews open once your stay is completed.'**
+  String get reviewNotEligibleBody;
+
+  /// No description provided for @reviewSubmittedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks for your review'**
+  String get reviewSubmittedTitle;
+
+  /// No description provided for @reviewPublishedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your review has been posted.'**
+  String get reviewPublishedBody;
+
+  /// No description provided for @reviewPendingModerationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your review was received and is with our team for a quick check before it\'s published.'**
+  String get reviewPendingModerationBody;
+
+  /// No description provided for @reviewAlreadyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve already reviewed this stay'**
+  String get reviewAlreadyTitle;
+
+  /// No description provided for @reviewAlreadyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Only one review per stay. Your existing review is shown below.'**
+  String get reviewAlreadyBody;
+
+  /// No description provided for @reviewRejectedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This review wasn\'t published'**
+  String get reviewRejectedTitle;
+
+  /// No description provided for @reviewRejectedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your review didn\'t pass our check and wasn\'t published.'**
+  String get reviewRejectedBody;
+
+  /// No description provided for @reviewInvalidRatingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating out of range'**
+  String get reviewInvalidRatingTitle;
+
+  /// No description provided for @reviewInvalidRatingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A rating must be between 1 and 5 stars.'**
+  String get reviewInvalidRatingBody;
+
+  /// No description provided for @reviewFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t send your review'**
+  String get reviewFailedTitle;
+
+  /// No description provided for @reviewStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending review'**
+  String get reviewStatusPending;
+
+  /// No description provided for @reviewStatusPublished.
+  ///
+  /// In en, this message translates to:
+  /// **'Published'**
+  String get reviewStatusPublished;
+
+  /// No description provided for @reviewStatusRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Not published'**
+  String get reviewStatusRejected;
 }
 
 class _AppLocalizationsDelegate

@@ -28,6 +28,11 @@ import '../../features/digital_access/presentation/pages/check_in_page.dart';
 import '../../features/digital_access/presentation/pages/check_in_processing_page.dart';
 import '../../features/digital_access/presentation/pages/digital_access_page.dart';
 import '../../features/identity_verification/presentation/pages/identity_verification_page.dart';
+import '../../features/loyalty/presentation/pages/loyalty_page.dart';
+import '../../features/loyalty/presentation/pages/loyalty_redeem_page.dart';
+import '../../features/reviews/presentation/pages/review_form_page.dart';
+import '../../features/reviews/presentation/pages/review_processing_page.dart';
+import '../../features/reviews/presentation/pages/review_result_page.dart';
 import '../../features/identity_verification/presentation/pages/identity_verification_result_page.dart';
 import '../../features/payment/presentation/pages/payment_processing_page.dart';
 import '../../features/payment/presentation/pages/payment_result_page.dart';
@@ -301,6 +306,42 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
         path: AppRoutes.invoice,
         name: AppRoutes.invoiceName,
         builder: (BuildContext context, GoRouterState state) => InvoicePage(
+          reservationId: state.pathParameters['reservationId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.loyalty,
+        name: AppRoutes.loyaltyName,
+        builder: (BuildContext context, GoRouterState state) => LoyaltyPage(
+          reservationId: state.pathParameters['reservationId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.loyaltyRedeem,
+        name: AppRoutes.loyaltyRedeemName,
+        builder: (BuildContext context, GoRouterState state) => LoyaltyRedeemPage(
+          reservationId: state.pathParameters['reservationId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.reviewForm,
+        name: AppRoutes.reviewFormName,
+        builder: (BuildContext context, GoRouterState state) => ReviewFormPage(
+          reservationId: state.pathParameters['reservationId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.reviewProcessing,
+        name: AppRoutes.reviewProcessingName,
+        builder: (BuildContext context, GoRouterState state) =>
+            ReviewProcessingPage(
+          reservationId: state.pathParameters['reservationId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.reviewResult,
+        name: AppRoutes.reviewResultName,
+        builder: (BuildContext context, GoRouterState state) => ReviewResultPage(
           reservationId: state.pathParameters['reservationId']!,
         ),
       ),

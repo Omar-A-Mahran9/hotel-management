@@ -626,5 +626,112 @@
   "invoiceSettledTag": "Settled in full",
   "invoiceNotReadyTitle": "No invoice yet",
   "invoiceNotReadyBody": "Your invoice will be here once you check out.",
-  "invoiceUnavailableTitle": "Invoice is unavailable"
+  "invoiceUnavailableTitle": "Invoice is unavailable",
+
+  "reservationLoyaltyCta": "Loyalty & points",
+  "reservationReviewCta": "Leave a review",
+  "reservationViewReviewCta": "View your review",
+
+  "loyaltyTitle": "Loyalty",
+  "loyaltyUnavailableTitle": "Loyalty is unavailable",
+  "loyaltyBalanceLabel": "Points balance",
+  "loyaltyPointsValue": "{points, plural, =1{1 pt} other{{points} pts}}",
+  "@loyaltyPointsValue": {
+    "placeholders": { "points": { "type": "int" } }
+  },
+  "loyaltyGroupWideNote": "Your points work across every hotel in the group.",
+  "loyaltyProgramOffTitle": "The loyalty programme isn't active",
+  "loyaltyProgramOffBody": "This hotel group hasn't switched on points earning yet. There's nothing to do here for now.",
+  "loyaltyEarnCta": "Earn points for this stay",
+  "loyaltyEarningCta": "Adding your points…",
+  "loyaltyEarnedTitle": "Points added",
+  "loyaltyEarnedBody": "{points, plural, =1{1 point was added to your balance.} other{{points} points were added to your balance.}}",
+  "@loyaltyEarnedBody": {
+    "placeholders": { "points": { "type": "int" } }
+  },
+  "loyaltyAlreadyEarnedTitle": "Points already added",
+  "loyaltyAlreadyEarnedBody": "You've already earned points for this stay.",
+  "loyaltyNotEligibleTitle": "Not eligible yet",
+  "loyaltyNotEligibleBody": "Points are added once your stay is completed.",
+  "loyaltyNothingToEarnTitle": "No points to add",
+  "loyaltyNothingToEarnBody": "This stay doesn't have an amount that earns points.",
+  "loyaltyHistoryTitle": "Points history",
+  "loyaltyHistoryNote": "Your full points ledger is kept by the hotel group. This is a read-only copy.",
+  "loyaltyHistoryEmptyTitle": "No points activity yet",
+  "loyaltyHistoryEmptyBody": "Points you earn and redeem will show up here.",
+  "loyaltyPointsAdded": "{points, plural, =1{+1 pt} other{+{points} pts}}",
+  "@loyaltyPointsAdded": {
+    "placeholders": { "points": { "type": "int" } }
+  },
+  "loyaltyPointsRemoved": "{points, plural, =1{-1 pt} other{-{points} pts}}",
+  "@loyaltyPointsRemoved": {
+    "placeholders": { "points": { "type": "int" } }
+  },
+  "loyaltyTxThisStay": "This stay",
+  "loyaltyTxEarnLabel": "Earned",
+  "loyaltyTxRedeemLabel": "Redeemed",
+  "loyaltyTxReverseLabel": "Reversed",
+  "loyaltyTxAdjustLabel": "Adjustment",
+  "loyaltyTxExpireLabel": "Expired",
+  "loyaltyRedeemCta": "Redeem points",
+  "loyaltyRedeemTitle": "Redeem points",
+  "loyaltyRedeemSubmitCta": "Redeem",
+  "loyaltyRedeemingCta": "Redeeming…",
+  "loyaltyRedeemAmountLabel": "Points to redeem",
+  "loyaltyRedeemNote": "Points are redeemed against this booking. The hotel group confirms the final value.",
+  "loyaltyRedeemMax": "Use max ({points})",
+  "@loyaltyRedeemMax": {
+    "placeholders": { "points": { "type": "int" } }
+  },
+  "loyaltyRedeemedTitle": "Points redeemed",
+  "loyaltyRedeemedBody": "{points, plural, =1{1 point was redeemed against this booking.} other{{points} points were redeemed against this booking.}}",
+  "@loyaltyRedeemedBody": {
+    "placeholders": { "points": { "type": "int" } }
+  },
+  "loyaltyRedeemedValueNote": "That's about {value} {currency} off this booking.",
+  "@loyaltyRedeemedValueNote": {
+    "placeholders": { "value": { "type": "String" }, "currency": { "type": "String" } }
+  },
+  "loyaltyRedeemNotEligibleTitle": "Can't redeem on this booking",
+  "loyaltyRedeemNotEligibleBody": "Points can only be redeemed against an active booking.",
+  "loyaltyAlreadyRedeemedTitle": "Already redeemed",
+  "loyaltyAlreadyRedeemedBody": "Points were already redeemed against this booking.",
+  "loyaltyAlreadyRedeemedDifferentBody": "A different number of points was already redeemed against this booking.",
+  "loyaltyInsufficientTitle": "Not enough points",
+  "loyaltyInsufficientBody": "You don't have enough points for that amount.",
+  "loyaltyInvalidAmountBody": "Choose how many points to redeem.",
+
+  "reviewFormTitle": "Leave a review",
+  "reviewFormPrompt": "How was your stay?",
+  "reviewResultTitle": "Your review",
+  "reviewProcessingTitle": "Sending your review",
+  "reviewProcessingBody": "Sending your review…",
+  "reviewDoNotClose": "This only takes a moment. Please don't close the app.",
+  "reviewRatingRequired": "Choose a rating from 1 to 5 stars.",
+  "reviewStarsLabel": "{count, plural, =1{1 star} other{{count} stars}}",
+  "@reviewStarsLabel": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "reviewTextLabel": "Your review (optional)",
+  "reviewTextHint": "Tell other guests about your stay",
+  "reviewSubmitCta": "Submit review",
+  "reviewSubmittingCta": "Submitting…",
+  "reviewYourRatingLabel": "Your rating",
+  "reviewBackToReservation": "Back to reservation",
+  "reviewUnavailableTitle": "Reviews are unavailable",
+  "reviewNotEligibleTitle": "You can't review this stay",
+  "reviewNotEligibleBody": "Reviews open once your stay is completed.",
+  "reviewSubmittedTitle": "Thanks for your review",
+  "reviewPublishedBody": "Your review has been posted.",
+  "reviewPendingModerationBody": "Your review was received and is with our team for a quick check before it's published.",
+  "reviewAlreadyTitle": "You've already reviewed this stay",
+  "reviewAlreadyBody": "Only one review per stay. Your existing review is shown below.",
+  "reviewRejectedTitle": "This review wasn't published",
+  "reviewRejectedBody": "Your review didn't pass our check and wasn't published.",
+  "reviewInvalidRatingTitle": "Rating out of range",
+  "reviewInvalidRatingBody": "A rating must be between 1 and 5 stars.",
+  "reviewFailedTitle": "We couldn't send your review",
+  "reviewStatusPending": "Pending review",
+  "reviewStatusPublished": "Published",
+  "reviewStatusRejected": "Not published"
 }

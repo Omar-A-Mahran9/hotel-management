@@ -1571,4 +1571,307 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get invoiceUnavailableTitle => 'الفاتورة غير متاحة';
+
+  @override
+  String get reservationLoyaltyCta => 'الولاء والنقاط';
+
+  @override
+  String get reservationReviewCta => 'أضف تقييماً';
+
+  @override
+  String get reservationViewReviewCta => 'عرض تقييمك';
+
+  @override
+  String get loyaltyTitle => 'الولاء';
+
+  @override
+  String get loyaltyUnavailableTitle => 'الولاء غير متاح';
+
+  @override
+  String get loyaltyBalanceLabel => 'رصيد النقاط';
+
+  @override
+  String loyaltyPointsValue(int points) {
+    String _temp0 = intl.Intl.pluralLogic(
+      points,
+      locale: localeName,
+      other: '$points نقطة',
+      one: 'نقطة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get loyaltyGroupWideNote => 'نقاطك صالحة في جميع فنادق المجموعة.';
+
+  @override
+  String get loyaltyProgramOffTitle => 'برنامج الولاء غير مُفعّل';
+
+  @override
+  String get loyaltyProgramOffBody =>
+      'لم تُفعّل مجموعة الفنادق كسب النقاط بعد. لا يوجد إجراء مطلوب هنا حالياً.';
+
+  @override
+  String get loyaltyEarnCta => 'اكسب نقاطاً عن هذه الإقامة';
+
+  @override
+  String get loyaltyEarningCta => 'جارٍ إضافة نقاطك…';
+
+  @override
+  String get loyaltyEarnedTitle => 'تمت إضافة النقاط';
+
+  @override
+  String loyaltyEarnedBody(int points) {
+    String _temp0 = intl.Intl.pluralLogic(
+      points,
+      locale: localeName,
+      other: 'أُضيفت $points نقطة إلى رصيدك.',
+      one: 'أُضيفت نقطة واحدة إلى رصيدك.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get loyaltyAlreadyEarnedTitle => 'النقاط مُضافة بالفعل';
+
+  @override
+  String get loyaltyAlreadyEarnedBody =>
+      'لقد كسبت نقاطاً عن هذه الإقامة بالفعل.';
+
+  @override
+  String get loyaltyNotEligibleTitle => 'غير مؤهّل بعد';
+
+  @override
+  String get loyaltyNotEligibleBody => 'تُضاف النقاط بعد اكتمال إقامتك.';
+
+  @override
+  String get loyaltyNothingToEarnTitle => 'لا نقاط لإضافتها';
+
+  @override
+  String get loyaltyNothingToEarnBody =>
+      'لا يوجد لهذه الإقامة مبلغ يكسب نقاطاً.';
+
+  @override
+  String get loyaltyHistoryTitle => 'سجل النقاط';
+
+  @override
+  String get loyaltyHistoryNote =>
+      'سجل نقاطك الكامل محفوظ لدى مجموعة الفنادق. هذه نسخة للعرض فقط.';
+
+  @override
+  String get loyaltyHistoryEmptyTitle => 'لا نشاط نقاط بعد';
+
+  @override
+  String get loyaltyHistoryEmptyBody =>
+      'ستظهر هنا النقاط التي تكسبها وتستبدلها.';
+
+  @override
+  String loyaltyPointsAdded(int points) {
+    String _temp0 = intl.Intl.pluralLogic(
+      points,
+      locale: localeName,
+      other: '+$points نقطة',
+      one: '+نقطة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String loyaltyPointsRemoved(int points) {
+    String _temp0 = intl.Intl.pluralLogic(
+      points,
+      locale: localeName,
+      other: '-$points نقطة',
+      one: '-نقطة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get loyaltyTxThisStay => 'هذه الإقامة';
+
+  @override
+  String get loyaltyTxEarnLabel => 'مكتسبة';
+
+  @override
+  String get loyaltyTxRedeemLabel => 'مُستبدلة';
+
+  @override
+  String get loyaltyTxReverseLabel => 'معكوسة';
+
+  @override
+  String get loyaltyTxAdjustLabel => 'تسوية';
+
+  @override
+  String get loyaltyTxExpireLabel => 'منتهية';
+
+  @override
+  String get loyaltyRedeemCta => 'استبدل النقاط';
+
+  @override
+  String get loyaltyRedeemTitle => 'استبدال النقاط';
+
+  @override
+  String get loyaltyRedeemSubmitCta => 'استبدال';
+
+  @override
+  String get loyaltyRedeemingCta => 'جارٍ الاستبدال…';
+
+  @override
+  String get loyaltyRedeemAmountLabel => 'النقاط المراد استبدالها';
+
+  @override
+  String get loyaltyRedeemNote =>
+      'تُستبدل النقاط مقابل هذا الحجز. تؤكد مجموعة الفنادق القيمة النهائية.';
+
+  @override
+  String loyaltyRedeemMax(int points) {
+    return 'استخدم الحد الأقصى ($points)';
+  }
+
+  @override
+  String get loyaltyRedeemedTitle => 'تم استبدال النقاط';
+
+  @override
+  String loyaltyRedeemedBody(int points) {
+    String _temp0 = intl.Intl.pluralLogic(
+      points,
+      locale: localeName,
+      other: 'تم استبدال $points نقطة مقابل هذا الحجز.',
+      one: 'تم استبدال نقطة واحدة مقابل هذا الحجز.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String loyaltyRedeemedValueNote(String value, String currency) {
+    return 'هذا يعادل نحو $value $currency خصماً على هذا الحجز.';
+  }
+
+  @override
+  String get loyaltyRedeemNotEligibleTitle => 'لا يمكن الاستبدال على هذا الحجز';
+
+  @override
+  String get loyaltyRedeemNotEligibleBody =>
+      'لا يمكن استبدال النقاط إلا مقابل حجز نشط.';
+
+  @override
+  String get loyaltyAlreadyRedeemedTitle => 'مُستبدلة بالفعل';
+
+  @override
+  String get loyaltyAlreadyRedeemedBody => 'سبق استبدال نقاط مقابل هذا الحجز.';
+
+  @override
+  String get loyaltyAlreadyRedeemedDifferentBody =>
+      'سبق استبدال عدد مختلف من النقاط مقابل هذا الحجز.';
+
+  @override
+  String get loyaltyInsufficientTitle => 'النقاط غير كافية';
+
+  @override
+  String get loyaltyInsufficientBody => 'ليس لديك نقاط كافية لهذا المبلغ.';
+
+  @override
+  String get loyaltyInvalidAmountBody => 'اختر عدد النقاط المراد استبدالها.';
+
+  @override
+  String get reviewFormTitle => 'أضف تقييماً';
+
+  @override
+  String get reviewFormPrompt => 'كيف كانت إقامتك؟';
+
+  @override
+  String get reviewResultTitle => 'تقييمك';
+
+  @override
+  String get reviewProcessingTitle => 'جارٍ إرسال تقييمك';
+
+  @override
+  String get reviewProcessingBody => 'جارٍ إرسال تقييمك…';
+
+  @override
+  String get reviewDoNotClose =>
+      'لن يستغرق هذا سوى لحظة. من فضلك لا تغلق التطبيق.';
+
+  @override
+  String get reviewRatingRequired => 'اختر تقييماً من 1 إلى 5 نجوم.';
+
+  @override
+  String reviewStarsLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count نجوم',
+      one: 'نجمة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reviewTextLabel => 'تقييمك (اختياري)';
+
+  @override
+  String get reviewTextHint => 'أخبر النزلاء الآخرين عن إقامتك';
+
+  @override
+  String get reviewSubmitCta => 'إرسال التقييم';
+
+  @override
+  String get reviewSubmittingCta => 'جارٍ الإرسال…';
+
+  @override
+  String get reviewYourRatingLabel => 'تقييمك';
+
+  @override
+  String get reviewBackToReservation => 'العودة إلى الحجز';
+
+  @override
+  String get reviewUnavailableTitle => 'التقييمات غير متاحة';
+
+  @override
+  String get reviewNotEligibleTitle => 'لا يمكنك تقييم هذه الإقامة';
+
+  @override
+  String get reviewNotEligibleBody => 'تُفتح التقييمات بعد اكتمال إقامتك.';
+
+  @override
+  String get reviewSubmittedTitle => 'شكراً لتقييمك';
+
+  @override
+  String get reviewPublishedBody => 'تم نشر تقييمك.';
+
+  @override
+  String get reviewPendingModerationBody =>
+      'تم استلام تقييمك وهو قيد المراجعة السريعة من فريقنا قبل نشره.';
+
+  @override
+  String get reviewAlreadyTitle => 'لقد قيّمت هذه الإقامة بالفعل';
+
+  @override
+  String get reviewAlreadyBody =>
+      'تقييم واحد لكل إقامة. يظهر تقييمك الحالي أدناه.';
+
+  @override
+  String get reviewRejectedTitle => 'لم يُنشر هذا التقييم';
+
+  @override
+  String get reviewRejectedBody => 'لم يجتز تقييمك مراجعتنا ولم يُنشر.';
+
+  @override
+  String get reviewInvalidRatingTitle => 'التقييم خارج النطاق';
+
+  @override
+  String get reviewInvalidRatingBody => 'يجب أن يكون التقييم بين 1 و5 نجوم.';
+
+  @override
+  String get reviewFailedTitle => 'تعذّر إرسال تقييمك';
+
+  @override
+  String get reviewStatusPending => 'قيد المراجعة';
+
+  @override
+  String get reviewStatusPublished => 'منشور';
+
+  @override
+  String get reviewStatusRejected => 'غير منشور';
 }

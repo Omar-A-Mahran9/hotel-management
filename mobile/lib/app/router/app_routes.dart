@@ -148,6 +148,32 @@ abstract final class AppRoutes {
   static const String invoice = '/reservation/:reservationId/invoice';
   static const String invoiceName = 'invoice';
 
+  /// `14 · Entry, loyalty & completion` — the reservation's loyalty summary:
+  /// balance, transaction history, earn + redeem entry points (Mobile Phase 10).
+  static const String loyalty = '/reservation/:reservationId/loyalty';
+  static const String loyaltyName = 'loyalty';
+
+  /// `14 · Entry, loyalty & completion` — the redeem-points amount picker
+  /// (Mobile Phase 10).
+  static const String loyaltyRedeem =
+      '/reservation/:reservationId/loyalty/redeem';
+  static const String loyaltyRedeemName = 'loyaltyRedeem';
+
+  /// `05 · Depart & Invoice` — the guest review form / existing review (Mobile
+  /// Phase 10).
+  static const String reviewForm = '/reservation/:reservationId/review';
+  static const String reviewFormName = 'reviewForm';
+
+  /// `05 · Depart & Invoice` — the transient review-submission screen.
+  static const String reviewProcessing =
+      '/reservation/:reservationId/review/processing';
+  static const String reviewProcessingName = 'reviewProcessing';
+
+  /// `05 · Depart & Invoice` — the authoritative review-submission outcome.
+  static const String reviewResult =
+      '/reservation/:reservationId/review/result';
+  static const String reviewResultName = 'reviewResult';
+
   /// The authenticated landing route.
   static const String authenticatedHome = discover;
 

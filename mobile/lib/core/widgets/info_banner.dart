@@ -5,7 +5,7 @@ import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 
 /// Tone of an [InfoBanner], mapped to the design system's semantic containers.
-enum InfoBannerTone { info, warning, error }
+enum InfoBannerTone { info, success, warning, error }
 
 /// Tinted, rounded message block with a leading icon — the pattern used for the
 /// "write your name as on your ID", "incorrect code" and "session ended" notices
@@ -34,6 +34,11 @@ class InfoBanner extends StatelessWidget {
           semantic.info,
           semantic.infoContainer,
           Icons.info_outline,
+        ),
+      InfoBannerTone.success => (
+          semantic.success,
+          semantic.successContainer,
+          Icons.check_circle_outline,
         ),
       InfoBannerTone.warning => (
           semantic.warning,

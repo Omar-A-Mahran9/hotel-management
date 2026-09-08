@@ -1584,4 +1584,314 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invoiceUnavailableTitle => 'Invoice is unavailable';
+
+  @override
+  String get reservationLoyaltyCta => 'Loyalty & points';
+
+  @override
+  String get reservationReviewCta => 'Leave a review';
+
+  @override
+  String get reservationViewReviewCta => 'View your review';
+
+  @override
+  String get loyaltyTitle => 'Loyalty';
+
+  @override
+  String get loyaltyUnavailableTitle => 'Loyalty is unavailable';
+
+  @override
+  String get loyaltyBalanceLabel => 'Points balance';
+
+  @override
+  String loyaltyPointsValue(int points) {
+    String _temp0 = intl.Intl.pluralLogic(
+      points,
+      locale: localeName,
+      other: '$points pts',
+      one: '1 pt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get loyaltyGroupWideNote =>
+      'Your points work across every hotel in the group.';
+
+  @override
+  String get loyaltyProgramOffTitle => 'The loyalty programme isn\'t active';
+
+  @override
+  String get loyaltyProgramOffBody =>
+      'This hotel group hasn\'t switched on points earning yet. There\'s nothing to do here for now.';
+
+  @override
+  String get loyaltyEarnCta => 'Earn points for this stay';
+
+  @override
+  String get loyaltyEarningCta => 'Adding your points…';
+
+  @override
+  String get loyaltyEarnedTitle => 'Points added';
+
+  @override
+  String loyaltyEarnedBody(int points) {
+    String _temp0 = intl.Intl.pluralLogic(
+      points,
+      locale: localeName,
+      other: '$points points were added to your balance.',
+      one: '1 point was added to your balance.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get loyaltyAlreadyEarnedTitle => 'Points already added';
+
+  @override
+  String get loyaltyAlreadyEarnedBody =>
+      'You\'ve already earned points for this stay.';
+
+  @override
+  String get loyaltyNotEligibleTitle => 'Not eligible yet';
+
+  @override
+  String get loyaltyNotEligibleBody =>
+      'Points are added once your stay is completed.';
+
+  @override
+  String get loyaltyNothingToEarnTitle => 'No points to add';
+
+  @override
+  String get loyaltyNothingToEarnBody =>
+      'This stay doesn\'t have an amount that earns points.';
+
+  @override
+  String get loyaltyHistoryTitle => 'Points history';
+
+  @override
+  String get loyaltyHistoryNote =>
+      'Your full points ledger is kept by the hotel group. This is a read-only copy.';
+
+  @override
+  String get loyaltyHistoryEmptyTitle => 'No points activity yet';
+
+  @override
+  String get loyaltyHistoryEmptyBody =>
+      'Points you earn and redeem will show up here.';
+
+  @override
+  String loyaltyPointsAdded(int points) {
+    String _temp0 = intl.Intl.pluralLogic(
+      points,
+      locale: localeName,
+      other: '+$points pts',
+      one: '+1 pt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String loyaltyPointsRemoved(int points) {
+    String _temp0 = intl.Intl.pluralLogic(
+      points,
+      locale: localeName,
+      other: '-$points pts',
+      one: '-1 pt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get loyaltyTxThisStay => 'This stay';
+
+  @override
+  String get loyaltyTxEarnLabel => 'Earned';
+
+  @override
+  String get loyaltyTxRedeemLabel => 'Redeemed';
+
+  @override
+  String get loyaltyTxReverseLabel => 'Reversed';
+
+  @override
+  String get loyaltyTxAdjustLabel => 'Adjustment';
+
+  @override
+  String get loyaltyTxExpireLabel => 'Expired';
+
+  @override
+  String get loyaltyRedeemCta => 'Redeem points';
+
+  @override
+  String get loyaltyRedeemTitle => 'Redeem points';
+
+  @override
+  String get loyaltyRedeemSubmitCta => 'Redeem';
+
+  @override
+  String get loyaltyRedeemingCta => 'Redeeming…';
+
+  @override
+  String get loyaltyRedeemAmountLabel => 'Points to redeem';
+
+  @override
+  String get loyaltyRedeemNote =>
+      'Points are redeemed against this booking. The hotel group confirms the final value.';
+
+  @override
+  String loyaltyRedeemMax(int points) {
+    return 'Use max ($points)';
+  }
+
+  @override
+  String get loyaltyRedeemedTitle => 'Points redeemed';
+
+  @override
+  String loyaltyRedeemedBody(int points) {
+    String _temp0 = intl.Intl.pluralLogic(
+      points,
+      locale: localeName,
+      other: '$points points were redeemed against this booking.',
+      one: '1 point was redeemed against this booking.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String loyaltyRedeemedValueNote(String value, String currency) {
+    return 'That\'s about $value $currency off this booking.';
+  }
+
+  @override
+  String get loyaltyRedeemNotEligibleTitle => 'Can\'t redeem on this booking';
+
+  @override
+  String get loyaltyRedeemNotEligibleBody =>
+      'Points can only be redeemed against an active booking.';
+
+  @override
+  String get loyaltyAlreadyRedeemedTitle => 'Already redeemed';
+
+  @override
+  String get loyaltyAlreadyRedeemedBody =>
+      'Points were already redeemed against this booking.';
+
+  @override
+  String get loyaltyAlreadyRedeemedDifferentBody =>
+      'A different number of points was already redeemed against this booking.';
+
+  @override
+  String get loyaltyInsufficientTitle => 'Not enough points';
+
+  @override
+  String get loyaltyInsufficientBody =>
+      'You don\'t have enough points for that amount.';
+
+  @override
+  String get loyaltyInvalidAmountBody => 'Choose how many points to redeem.';
+
+  @override
+  String get reviewFormTitle => 'Leave a review';
+
+  @override
+  String get reviewFormPrompt => 'How was your stay?';
+
+  @override
+  String get reviewResultTitle => 'Your review';
+
+  @override
+  String get reviewProcessingTitle => 'Sending your review';
+
+  @override
+  String get reviewProcessingBody => 'Sending your review…';
+
+  @override
+  String get reviewDoNotClose =>
+      'This only takes a moment. Please don\'t close the app.';
+
+  @override
+  String get reviewRatingRequired => 'Choose a rating from 1 to 5 stars.';
+
+  @override
+  String reviewStarsLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stars',
+      one: '1 star',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reviewTextLabel => 'Your review (optional)';
+
+  @override
+  String get reviewTextHint => 'Tell other guests about your stay';
+
+  @override
+  String get reviewSubmitCta => 'Submit review';
+
+  @override
+  String get reviewSubmittingCta => 'Submitting…';
+
+  @override
+  String get reviewYourRatingLabel => 'Your rating';
+
+  @override
+  String get reviewBackToReservation => 'Back to reservation';
+
+  @override
+  String get reviewUnavailableTitle => 'Reviews are unavailable';
+
+  @override
+  String get reviewNotEligibleTitle => 'You can\'t review this stay';
+
+  @override
+  String get reviewNotEligibleBody =>
+      'Reviews open once your stay is completed.';
+
+  @override
+  String get reviewSubmittedTitle => 'Thanks for your review';
+
+  @override
+  String get reviewPublishedBody => 'Your review has been posted.';
+
+  @override
+  String get reviewPendingModerationBody =>
+      'Your review was received and is with our team for a quick check before it\'s published.';
+
+  @override
+  String get reviewAlreadyTitle => 'You\'ve already reviewed this stay';
+
+  @override
+  String get reviewAlreadyBody =>
+      'Only one review per stay. Your existing review is shown below.';
+
+  @override
+  String get reviewRejectedTitle => 'This review wasn\'t published';
+
+  @override
+  String get reviewRejectedBody =>
+      'Your review didn\'t pass our check and wasn\'t published.';
+
+  @override
+  String get reviewInvalidRatingTitle => 'Rating out of range';
+
+  @override
+  String get reviewInvalidRatingBody =>
+      'A rating must be between 1 and 5 stars.';
+
+  @override
+  String get reviewFailedTitle => 'We couldn\'t send your review';
+
+  @override
+  String get reviewStatusPending => 'Pending review';
+
+  @override
+  String get reviewStatusPublished => 'Published';
+
+  @override
+  String get reviewStatusRejected => 'Not published';
 }
