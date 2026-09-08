@@ -17,7 +17,10 @@ import '../../features/discovery/presentation/pages/available_rooms_page.dart';
 import '../../features/discovery/presentation/pages/discover_page.dart';
 import '../../features/discovery/presentation/pages/hotel_detail_page.dart';
 import '../../features/discovery/presentation/pages/hotel_search_page.dart';
+import '../../features/discovery/presentation/pages/room_detail_page.dart';
+import '../../features/discovery/presentation/pages/room_selection_review_page.dart';
 import '../../features/discovery/presentation/pages/stay_dates_page.dart';
+import '../../features/reservation/presentation/pages/reservation_detail_page.dart';
 import '../foundation_home_page.dart';
 import 'app_routes.dart';
 
@@ -139,6 +142,28 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
         name: AppRoutes.availableRoomsName,
         builder: (BuildContext context, GoRouterState state) =>
             AvailableRoomsPage(hotelId: state.pathParameters['hotelId']!),
+      ),
+      GoRoute(
+        path: AppRoutes.roomDetail,
+        name: AppRoutes.roomDetailName,
+        builder: (BuildContext context, GoRouterState state) => RoomDetailPage(
+          hotelId: state.pathParameters['hotelId']!,
+          roomTypeId: state.pathParameters['roomTypeId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.roomSelectionReview,
+        name: AppRoutes.roomSelectionReviewName,
+        builder: (BuildContext context, GoRouterState state) =>
+            RoomSelectionReviewPage(hotelId: state.pathParameters['hotelId']!),
+      ),
+      GoRoute(
+        path: AppRoutes.reservationDetail,
+        name: AppRoutes.reservationDetailName,
+        builder: (BuildContext context, GoRouterState state) =>
+            ReservationDetailPage(
+          reservationId: state.pathParameters['reservationId']!,
+        ),
       ),
     ],
     errorBuilder: (BuildContext context, GoRouterState state) => Scaffold(

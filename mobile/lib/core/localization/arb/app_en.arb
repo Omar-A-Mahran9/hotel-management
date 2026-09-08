@@ -292,5 +292,105 @@
   "roomsNoResultsTitle": "No rooms for these dates",
   "roomsNoResultsBody": "Try different dates or adjust the number of guests.",
   "roomsChangeDates": "Change dates",
-  "roomsChangeGuests": "Change guests"
+  "roomsChangeGuests": "Change guests",
+
+  "commonContinue": "Continue",
+  "commonClose": "Close",
+  "commonEdit": "Edit",
+
+  "calendarWeekdays": "Sun,Mon,Tue,Wed,Thu,Fri,Sat",
+  "@calendarWeekdays": {
+    "description": "Seven short weekday names, Sunday first, comma-separated."
+  },
+
+  "stayDatesSelectedRange": "{checkIn} – {checkOut}",
+  "@stayDatesSelectedRange": {
+    "description": "Selected check-in – check-out summary; dates are pre-formatted.",
+    "placeholders": {
+      "checkIn": { "type": "String" },
+      "checkOut": { "type": "String" }
+    }
+  },
+  "stayDatesHintPickCheckIn": "Choose your check-in date to start",
+  "stayDatesHintPickCheckOut": "{checkIn} · choose your check-out date",
+  "@stayDatesHintPickCheckOut": {
+    "placeholders": { "checkIn": { "type": "String" } }
+  },
+  "stayDatesFieldPlaceholder": "Choose date",
+
+  "roomSelect": "Select",
+  "roomSelected": "Selected",
+  "roomViewDetails": "View details",
+  "roomDetailsTitle": "Room details",
+  "roomBedType": "Bed",
+  "roomCapacityLabel": "Sleeps",
+  "roomPolicyLabel": "Cancellation",
+  "roomPolicyRefundable": "Free cancellation",
+  "roomPolicyNonRefundable": "Non-refundable",
+  "roomSelectThisRoom": "Select this room",
+  "roomRemoveSelection": "Remove selection",
+  "roomStayTotalLabel": "for {nights, plural, =1{1 night} other{{nights} nights}}",
+  "@roomStayTotalLabel": {
+    "placeholders": { "nights": { "type": "int" } }
+  },
+  "roomDetailAmenitiesHeading": "Amenities",
+  "roomDetailCancellationHeading": "Cancellation policy",
+  "roomDetailStayHeading": "Your stay",
+  "roomSortTitle": "Sort rooms",
+  "roomSortApply": "Apply sort",
+  "roomSortActiveTag": "on",
+  "roomsSortTrigger": "Sort: {label}",
+  "@roomsSortTrigger": {
+    "placeholders": { "label": { "type": "String" } }
+  },
+
+  "roomsContinue": "Continue",
+  "roomsSelectPrompt": "Select a room to continue",
+  "roomsSelectionClearedNotice": "Your room selection was cleared because the stay details changed. Choose a room again.",
+
+  "reviewTitle": "Review your selection",
+  "reviewNotBookedNotice": "Nothing is booked yet. You can still change your dates, guests or room before the reservation step.",
+  "reviewHotelLabel": "Hotel",
+  "reviewRoomLabel": "Room",
+  "reviewStayLabel": "Stay",
+  "reviewGuestsLabel": "Guests",
+  "reviewCheckInLabel": "Check-in",
+  "reviewCheckOutLabel": "Check-out",
+  "reviewPriceLabel": "Price",
+  "reviewTotalLabel": "Total for {nights, plural, =1{1 night} other{{nights} nights}}",
+  "@reviewTotalLabel": {
+    "placeholders": { "nights": { "type": "int" } }
+  },
+  "reviewChangeSelection": "Change selection",
+  "reviewNoSelectionTitle": "No room selected",
+  "reviewNoSelectionBody": "Go back and choose a room to see your selection here.",
+  "reviewBackToRooms": "Back to rooms",
+
+  "reservationConfirmCta": "Confirm reservation",
+  "reservationConfirming": "Confirming…",
+  "reservationConfirmHint": "By confirming, you request this room for the dates above. Nothing is charged yet.",
+  "reservationCreateFailedTitle": "We couldn't confirm your reservation",
+
+  "reservationDetailTitle": "Reservation",
+  "reservationSuccessTitle": "Your reservation is confirmed",
+  "reservationSuccessBody": "We've saved your reservation. Keep your confirmation code handy.",
+  "reservationReferenceLabel": "Confirmation code",
+  "reservationStatusFieldLabel": "Status",
+  "reservationBookedOnLabel": "Booked on",
+  "reservationPendingNote": "This reservation is pending and not yet secured.",
+  "reservationDone": "Done",
+  "reservationViewDetails": "View reservation",
+  "reservationNotFoundTitle": "Reservation not found",
+  "reservationNotFoundBody": "We couldn't find that reservation.",
+
+  "reservationStatusPending": "Pending",
+  "reservationStatusDepositHeld": "Deposit held",
+  "reservationStatusVerified": "Verified",
+  "reservationStatusCheckedIn": "Checked in",
+  "reservationStatusInStay": "In stay",
+  "reservationStatusCheckoutInProgress": "Checkout in progress",
+  "reservationStatusCheckoutBlocked": "Checkout on hold",
+  "reservationStatusCheckedOut": "Checked out",
+  "reservationStatusInvoiced": "Invoiced",
+  "reservationStatusCancelled": "Cancelled"
 }

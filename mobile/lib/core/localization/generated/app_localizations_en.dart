@@ -684,4 +684,240 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get roomsChangeGuests => 'Change guests';
+
+  @override
+  String get commonContinue => 'Continue';
+
+  @override
+  String get commonClose => 'Close';
+
+  @override
+  String get commonEdit => 'Edit';
+
+  @override
+  String get calendarWeekdays => 'Sun,Mon,Tue,Wed,Thu,Fri,Sat';
+
+  @override
+  String stayDatesSelectedRange(String checkIn, String checkOut) {
+    return '$checkIn – $checkOut';
+  }
+
+  @override
+  String get stayDatesHintPickCheckIn => 'Choose your check-in date to start';
+
+  @override
+  String stayDatesHintPickCheckOut(String checkIn) {
+    return '$checkIn · choose your check-out date';
+  }
+
+  @override
+  String get stayDatesFieldPlaceholder => 'Choose date';
+
+  @override
+  String get roomSelect => 'Select';
+
+  @override
+  String get roomSelected => 'Selected';
+
+  @override
+  String get roomViewDetails => 'View details';
+
+  @override
+  String get roomDetailsTitle => 'Room details';
+
+  @override
+  String get roomBedType => 'Bed';
+
+  @override
+  String get roomCapacityLabel => 'Sleeps';
+
+  @override
+  String get roomPolicyLabel => 'Cancellation';
+
+  @override
+  String get roomPolicyRefundable => 'Free cancellation';
+
+  @override
+  String get roomPolicyNonRefundable => 'Non-refundable';
+
+  @override
+  String get roomSelectThisRoom => 'Select this room';
+
+  @override
+  String get roomRemoveSelection => 'Remove selection';
+
+  @override
+  String roomStayTotalLabel(int nights) {
+    String _temp0 = intl.Intl.pluralLogic(
+      nights,
+      locale: localeName,
+      other: '$nights nights',
+      one: '1 night',
+    );
+    return 'for $_temp0';
+  }
+
+  @override
+  String get roomDetailAmenitiesHeading => 'Amenities';
+
+  @override
+  String get roomDetailCancellationHeading => 'Cancellation policy';
+
+  @override
+  String get roomDetailStayHeading => 'Your stay';
+
+  @override
+  String get roomSortTitle => 'Sort rooms';
+
+  @override
+  String get roomSortApply => 'Apply sort';
+
+  @override
+  String get roomSortActiveTag => 'on';
+
+  @override
+  String roomsSortTrigger(String label) {
+    return 'Sort: $label';
+  }
+
+  @override
+  String get roomsContinue => 'Continue';
+
+  @override
+  String get roomsSelectPrompt => 'Select a room to continue';
+
+  @override
+  String get roomsSelectionClearedNotice =>
+      'Your room selection was cleared because the stay details changed. Choose a room again.';
+
+  @override
+  String get reviewTitle => 'Review your selection';
+
+  @override
+  String get reviewNotBookedNotice =>
+      'Nothing is booked yet. You can still change your dates, guests or room before the reservation step.';
+
+  @override
+  String get reviewHotelLabel => 'Hotel';
+
+  @override
+  String get reviewRoomLabel => 'Room';
+
+  @override
+  String get reviewStayLabel => 'Stay';
+
+  @override
+  String get reviewGuestsLabel => 'Guests';
+
+  @override
+  String get reviewCheckInLabel => 'Check-in';
+
+  @override
+  String get reviewCheckOutLabel => 'Check-out';
+
+  @override
+  String get reviewPriceLabel => 'Price';
+
+  @override
+  String reviewTotalLabel(int nights) {
+    String _temp0 = intl.Intl.pluralLogic(
+      nights,
+      locale: localeName,
+      other: '$nights nights',
+      one: '1 night',
+    );
+    return 'Total for $_temp0';
+  }
+
+  @override
+  String get reviewChangeSelection => 'Change selection';
+
+  @override
+  String get reviewNoSelectionTitle => 'No room selected';
+
+  @override
+  String get reviewNoSelectionBody =>
+      'Go back and choose a room to see your selection here.';
+
+  @override
+  String get reviewBackToRooms => 'Back to rooms';
+
+  @override
+  String get reservationConfirmCta => 'Confirm reservation';
+
+  @override
+  String get reservationConfirming => 'Confirming…';
+
+  @override
+  String get reservationConfirmHint =>
+      'By confirming, you request this room for the dates above. Nothing is charged yet.';
+
+  @override
+  String get reservationCreateFailedTitle =>
+      'We couldn\'t confirm your reservation';
+
+  @override
+  String get reservationDetailTitle => 'Reservation';
+
+  @override
+  String get reservationSuccessTitle => 'Your reservation is confirmed';
+
+  @override
+  String get reservationSuccessBody =>
+      'We\'ve saved your reservation. Keep your confirmation code handy.';
+
+  @override
+  String get reservationReferenceLabel => 'Confirmation code';
+
+  @override
+  String get reservationStatusFieldLabel => 'Status';
+
+  @override
+  String get reservationBookedOnLabel => 'Booked on';
+
+  @override
+  String get reservationPendingNote =>
+      'This reservation is pending and not yet secured.';
+
+  @override
+  String get reservationDone => 'Done';
+
+  @override
+  String get reservationViewDetails => 'View reservation';
+
+  @override
+  String get reservationNotFoundTitle => 'Reservation not found';
+
+  @override
+  String get reservationNotFoundBody => 'We couldn\'t find that reservation.';
+
+  @override
+  String get reservationStatusPending => 'Pending';
+
+  @override
+  String get reservationStatusDepositHeld => 'Deposit held';
+
+  @override
+  String get reservationStatusVerified => 'Verified';
+
+  @override
+  String get reservationStatusCheckedIn => 'Checked in';
+
+  @override
+  String get reservationStatusInStay => 'In stay';
+
+  @override
+  String get reservationStatusCheckoutInProgress => 'Checkout in progress';
+
+  @override
+  String get reservationStatusCheckoutBlocked => 'Checkout on hold';
+
+  @override
+  String get reservationStatusCheckedOut => 'Checked out';
+
+  @override
+  String get reservationStatusInvoiced => 'Invoiced';
+
+  @override
+  String get reservationStatusCancelled => 'Cancelled';
 }

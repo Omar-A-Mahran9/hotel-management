@@ -680,4 +680,239 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get roomsChangeGuests => 'تعديل عدد الضيوف';
+
+  @override
+  String get commonContinue => 'متابعة';
+
+  @override
+  String get commonClose => 'إغلاق';
+
+  @override
+  String get commonEdit => 'تعديل';
+
+  @override
+  String get calendarWeekdays => 'أحد,إثنين,ثلاثاء,أربعاء,خميس,جمعة,سبت';
+
+  @override
+  String stayDatesSelectedRange(String checkIn, String checkOut) {
+    return '$checkIn – $checkOut';
+  }
+
+  @override
+  String get stayDatesHintPickCheckIn => 'اختر تاريخ الوصول للبدء';
+
+  @override
+  String stayDatesHintPickCheckOut(String checkIn) {
+    return '$checkIn · اختر تاريخ المغادرة';
+  }
+
+  @override
+  String get stayDatesFieldPlaceholder => 'اختر التاريخ';
+
+  @override
+  String get roomSelect => 'اختيار';
+
+  @override
+  String get roomSelected => 'محدَّدة';
+
+  @override
+  String get roomViewDetails => 'عرض التفاصيل';
+
+  @override
+  String get roomDetailsTitle => 'تفاصيل الغرفة';
+
+  @override
+  String get roomBedType => 'السرير';
+
+  @override
+  String get roomCapacityLabel => 'تتّسع لـ';
+
+  @override
+  String get roomPolicyLabel => 'الإلغاء';
+
+  @override
+  String get roomPolicyRefundable => 'إلغاء مجاني';
+
+  @override
+  String get roomPolicyNonRefundable => 'غير قابلة للاسترداد';
+
+  @override
+  String get roomSelectThisRoom => 'اختيار هذه الغرفة';
+
+  @override
+  String get roomRemoveSelection => 'إلغاء الاختيار';
+
+  @override
+  String roomStayTotalLabel(int nights) {
+    String _temp0 = intl.Intl.pluralLogic(
+      nights,
+      locale: localeName,
+      other: '$nights ليالٍ',
+      two: 'ليلتين',
+      one: 'ليلة واحدة',
+    );
+    return 'لـ $_temp0';
+  }
+
+  @override
+  String get roomDetailAmenitiesHeading => 'المرافق';
+
+  @override
+  String get roomDetailCancellationHeading => 'سياسة الإلغاء';
+
+  @override
+  String get roomDetailStayHeading => 'إقامتك';
+
+  @override
+  String get roomSortTitle => 'ترتيب الغرف';
+
+  @override
+  String get roomSortApply => 'تطبيق الترتيب';
+
+  @override
+  String get roomSortActiveTag => 'مفعّل';
+
+  @override
+  String roomsSortTrigger(String label) {
+    return 'الترتيب: $label';
+  }
+
+  @override
+  String get roomsContinue => 'متابعة';
+
+  @override
+  String get roomsSelectPrompt => 'اختر غرفة للمتابعة';
+
+  @override
+  String get roomsSelectionClearedNotice =>
+      'أُلغي اختيار الغرفة لتغيّر تفاصيل الإقامة. الرجاء اختيار غرفة من جديد.';
+
+  @override
+  String get reviewTitle => 'مراجعة اختيارك';
+
+  @override
+  String get reviewNotBookedNotice =>
+      'لم يتم الحجز بعد. لا يزال بإمكانك تغيير التواريخ أو الضيوف أو الغرفة قبل خطوة الحجز.';
+
+  @override
+  String get reviewHotelLabel => 'الفندق';
+
+  @override
+  String get reviewRoomLabel => 'الغرفة';
+
+  @override
+  String get reviewStayLabel => 'الإقامة';
+
+  @override
+  String get reviewGuestsLabel => 'الضيوف';
+
+  @override
+  String get reviewCheckInLabel => 'تاريخ الوصول';
+
+  @override
+  String get reviewCheckOutLabel => 'تاريخ المغادرة';
+
+  @override
+  String get reviewPriceLabel => 'السعر';
+
+  @override
+  String reviewTotalLabel(int nights) {
+    String _temp0 = intl.Intl.pluralLogic(
+      nights,
+      locale: localeName,
+      other: '$nights ليالٍ',
+      two: 'ليلتين',
+      one: 'ليلة واحدة',
+    );
+    return 'الإجمالي لـ $_temp0';
+  }
+
+  @override
+  String get reviewChangeSelection => 'تغيير الاختيار';
+
+  @override
+  String get reviewNoSelectionTitle => 'لم تُختر غرفة';
+
+  @override
+  String get reviewNoSelectionBody => 'ارجع واختر غرفة لتظهر هنا.';
+
+  @override
+  String get reviewBackToRooms => 'العودة إلى الغرف';
+
+  @override
+  String get reservationConfirmCta => 'تأكيد الحجز';
+
+  @override
+  String get reservationConfirming => 'جارٍ التأكيد…';
+
+  @override
+  String get reservationConfirmHint =>
+      'بالتأكيد، أنت تطلب هذه الغرفة للتواريخ أعلاه. لن يُخصم أي مبلغ الآن.';
+
+  @override
+  String get reservationCreateFailedTitle => 'تعذّر تأكيد حجزك';
+
+  @override
+  String get reservationDetailTitle => 'الحجز';
+
+  @override
+  String get reservationSuccessTitle => 'تم تأكيد حجزك';
+
+  @override
+  String get reservationSuccessBody => 'حفظنا حجزك. احتفظ برقم التأكيد.';
+
+  @override
+  String get reservationReferenceLabel => 'رقم التأكيد';
+
+  @override
+  String get reservationStatusFieldLabel => 'الحالة';
+
+  @override
+  String get reservationBookedOnLabel => 'تاريخ الحجز';
+
+  @override
+  String get reservationPendingNote =>
+      'هذا الحجز قيد الانتظار ولم يُؤمَّن بعد.';
+
+  @override
+  String get reservationDone => 'تم';
+
+  @override
+  String get reservationViewDetails => 'عرض الحجز';
+
+  @override
+  String get reservationNotFoundTitle => 'الحجز غير موجود';
+
+  @override
+  String get reservationNotFoundBody => 'تعذّر العثور على هذا الحجز.';
+
+  @override
+  String get reservationStatusPending => 'قيد الانتظار';
+
+  @override
+  String get reservationStatusDepositHeld => 'تم حجز التأمين';
+
+  @override
+  String get reservationStatusVerified => 'تم التحقق';
+
+  @override
+  String get reservationStatusCheckedIn => 'تم تسجيل الدخول';
+
+  @override
+  String get reservationStatusInStay => 'أثناء الإقامة';
+
+  @override
+  String get reservationStatusCheckoutInProgress => 'جارٍ تسجيل المغادرة';
+
+  @override
+  String get reservationStatusCheckoutBlocked => 'المغادرة معلّقة';
+
+  @override
+  String get reservationStatusCheckedOut => 'تمت المغادرة';
+
+  @override
+  String get reservationStatusInvoiced => 'تمت الفوترة';
+
+  @override
+  String get reservationStatusCancelled => 'ملغى';
 }

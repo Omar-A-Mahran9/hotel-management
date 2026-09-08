@@ -62,5 +62,55 @@ void main() {
     );
     // Arabic month label (September 2026 → "سبتمبر ٢٠٢٦").
     expect(find.textContaining('سبتمبر'), findsWidgets);
+    // Arabic weekday names and Arabic-Indic day digits.
+    expect(find.text('أحد'), findsWidgets);
+    expect(find.text('٦'), findsWidgets);
+  });
+
+  testWidgets('the available-rooms + review screens render in Arabic',
+      (WidgetTester tester) async {
+    await pumpApp(
+      tester,
+      bootSession: completeSession(),
+      locale: arabic,
+      extraOverrides: <Override>[
+        clockProvider.overrideWithValue(() => DateTime(2026, 9, 1)),
+      ],
+    );
+    final AppLocalizations ar =
+        await AppLocalizations.delegate.load(const Locale('ar'));
+
+    await tester.tap(find.text('فندق الواحة').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(ar.hotelSelectDates));
+    await tester.pumpAndSettle();
+    // Calendar day cells render Arabic-Indic digits for `ar`.
+    await tester.tap(find.text('٦').first);
+    await tester.pump();
+    await tester.tap(find.text('٨').first);
+    await tester.pump();
+    await tester.tap(find.widgetWithText(FilledButton, ar.stayDatesShowRooms));
+    await tester.pumpAndSettle();
+
+    expect(find.text(ar.roomsTitle), findsWidgets);
+    expect(
+      Directionality.of(tester.element(find.text(ar.roomsTitle).first)),
+      TextDirection.rtl,
+    );
+
+    await tester
+        .tap(find.widgetWithText(OutlinedButton, ar.roomViewDetails).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, ar.roomSelectThisRoom));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, ar.roomsContinue));
+    await tester.pumpAndSettle();
+
+    expect(find.text(ar.reviewTitle), findsOneWidget);
+    expect(
+      Directionality.of(tester.element(find.text(ar.reviewTitle))),
+      TextDirection.rtl,
+    );
+    expect(find.text('فندق الواحة'), findsWidgets);
   });
 }

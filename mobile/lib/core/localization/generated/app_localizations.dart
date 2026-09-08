@@ -1165,6 +1165,420 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Change guests'**
   String get roomsChangeGuests;
+
+  /// No description provided for @commonContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get commonContinue;
+
+  /// No description provided for @commonClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get commonClose;
+
+  /// No description provided for @commonEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get commonEdit;
+
+  /// Seven short weekday names, Sunday first, comma-separated.
+  ///
+  /// In en, this message translates to:
+  /// **'Sun,Mon,Tue,Wed,Thu,Fri,Sat'**
+  String get calendarWeekdays;
+
+  /// Selected check-in – check-out summary; dates are pre-formatted.
+  ///
+  /// In en, this message translates to:
+  /// **'{checkIn} – {checkOut}'**
+  String stayDatesSelectedRange(String checkIn, String checkOut);
+
+  /// No description provided for @stayDatesHintPickCheckIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your check-in date to start'**
+  String get stayDatesHintPickCheckIn;
+
+  /// No description provided for @stayDatesHintPickCheckOut.
+  ///
+  /// In en, this message translates to:
+  /// **'{checkIn} · choose your check-out date'**
+  String stayDatesHintPickCheckOut(String checkIn);
+
+  /// No description provided for @stayDatesFieldPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose date'**
+  String get stayDatesFieldPlaceholder;
+
+  /// No description provided for @roomSelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get roomSelect;
+
+  /// No description provided for @roomSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected'**
+  String get roomSelected;
+
+  /// No description provided for @roomViewDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'View details'**
+  String get roomViewDetails;
+
+  /// No description provided for @roomDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Room details'**
+  String get roomDetailsTitle;
+
+  /// No description provided for @roomBedType.
+  ///
+  /// In en, this message translates to:
+  /// **'Bed'**
+  String get roomBedType;
+
+  /// No description provided for @roomCapacityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleeps'**
+  String get roomCapacityLabel;
+
+  /// No description provided for @roomPolicyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation'**
+  String get roomPolicyLabel;
+
+  /// No description provided for @roomPolicyRefundable.
+  ///
+  /// In en, this message translates to:
+  /// **'Free cancellation'**
+  String get roomPolicyRefundable;
+
+  /// No description provided for @roomPolicyNonRefundable.
+  ///
+  /// In en, this message translates to:
+  /// **'Non-refundable'**
+  String get roomPolicyNonRefundable;
+
+  /// No description provided for @roomSelectThisRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Select this room'**
+  String get roomSelectThisRoom;
+
+  /// No description provided for @roomRemoveSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove selection'**
+  String get roomRemoveSelection;
+
+  /// No description provided for @roomStayTotalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'for {nights, plural, =1{1 night} other{{nights} nights}}'**
+  String roomStayTotalLabel(int nights);
+
+  /// No description provided for @roomDetailAmenitiesHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Amenities'**
+  String get roomDetailAmenitiesHeading;
+
+  /// No description provided for @roomDetailCancellationHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation policy'**
+  String get roomDetailCancellationHeading;
+
+  /// No description provided for @roomDetailStayHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Your stay'**
+  String get roomDetailStayHeading;
+
+  /// No description provided for @roomSortTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort rooms'**
+  String get roomSortTitle;
+
+  /// No description provided for @roomSortApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply sort'**
+  String get roomSortApply;
+
+  /// No description provided for @roomSortActiveTag.
+  ///
+  /// In en, this message translates to:
+  /// **'on'**
+  String get roomSortActiveTag;
+
+  /// No description provided for @roomsSortTrigger.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort: {label}'**
+  String roomsSortTrigger(String label);
+
+  /// No description provided for @roomsContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get roomsContinue;
+
+  /// No description provided for @roomsSelectPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a room to continue'**
+  String get roomsSelectPrompt;
+
+  /// No description provided for @roomsSelectionClearedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Your room selection was cleared because the stay details changed. Choose a room again.'**
+  String get roomsSelectionClearedNotice;
+
+  /// No description provided for @reviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review your selection'**
+  String get reviewTitle;
+
+  /// No description provided for @reviewNotBookedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing is booked yet. You can still change your dates, guests or room before the reservation step.'**
+  String get reviewNotBookedNotice;
+
+  /// No description provided for @reviewHotelLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Hotel'**
+  String get reviewHotelLabel;
+
+  /// No description provided for @reviewRoomLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Room'**
+  String get reviewRoomLabel;
+
+  /// No description provided for @reviewStayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay'**
+  String get reviewStayLabel;
+
+  /// No description provided for @reviewGuestsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Guests'**
+  String get reviewGuestsLabel;
+
+  /// No description provided for @reviewCheckInLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in'**
+  String get reviewCheckInLabel;
+
+  /// No description provided for @reviewCheckOutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-out'**
+  String get reviewCheckOutLabel;
+
+  /// No description provided for @reviewPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get reviewPriceLabel;
+
+  /// No description provided for @reviewTotalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total for {nights, plural, =1{1 night} other{{nights} nights}}'**
+  String reviewTotalLabel(int nights);
+
+  /// No description provided for @reviewChangeSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Change selection'**
+  String get reviewChangeSelection;
+
+  /// No description provided for @reviewNoSelectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No room selected'**
+  String get reviewNoSelectionTitle;
+
+  /// No description provided for @reviewNoSelectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Go back and choose a room to see your selection here.'**
+  String get reviewNoSelectionBody;
+
+  /// No description provided for @reviewBackToRooms.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to rooms'**
+  String get reviewBackToRooms;
+
+  /// No description provided for @reservationConfirmCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm reservation'**
+  String get reservationConfirmCta;
+
+  /// No description provided for @reservationConfirming.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirming…'**
+  String get reservationConfirming;
+
+  /// No description provided for @reservationConfirmHint.
+  ///
+  /// In en, this message translates to:
+  /// **'By confirming, you request this room for the dates above. Nothing is charged yet.'**
+  String get reservationConfirmHint;
+
+  /// No description provided for @reservationCreateFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t confirm your reservation'**
+  String get reservationCreateFailedTitle;
+
+  /// No description provided for @reservationDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation'**
+  String get reservationDetailTitle;
+
+  /// No description provided for @reservationSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your reservation is confirmed'**
+  String get reservationSuccessTitle;
+
+  /// No description provided for @reservationSuccessBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ve saved your reservation. Keep your confirmation code handy.'**
+  String get reservationSuccessBody;
+
+  /// No description provided for @reservationReferenceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmation code'**
+  String get reservationReferenceLabel;
+
+  /// No description provided for @reservationStatusFieldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get reservationStatusFieldLabel;
+
+  /// No description provided for @reservationBookedOnLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Booked on'**
+  String get reservationBookedOnLabel;
+
+  /// No description provided for @reservationPendingNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This reservation is pending and not yet secured.'**
+  String get reservationPendingNote;
+
+  /// No description provided for @reservationDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get reservationDone;
+
+  /// No description provided for @reservationViewDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'View reservation'**
+  String get reservationViewDetails;
+
+  /// No description provided for @reservationNotFoundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation not found'**
+  String get reservationNotFoundTitle;
+
+  /// No description provided for @reservationNotFoundBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t find that reservation.'**
+  String get reservationNotFoundBody;
+
+  /// No description provided for @reservationStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get reservationStatusPending;
+
+  /// No description provided for @reservationStatusDepositHeld.
+  ///
+  /// In en, this message translates to:
+  /// **'Deposit held'**
+  String get reservationStatusDepositHeld;
+
+  /// No description provided for @reservationStatusVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get reservationStatusVerified;
+
+  /// No description provided for @reservationStatusCheckedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Checked in'**
+  String get reservationStatusCheckedIn;
+
+  /// No description provided for @reservationStatusInStay.
+  ///
+  /// In en, this message translates to:
+  /// **'In stay'**
+  String get reservationStatusInStay;
+
+  /// No description provided for @reservationStatusCheckoutInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Checkout in progress'**
+  String get reservationStatusCheckoutInProgress;
+
+  /// No description provided for @reservationStatusCheckoutBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Checkout on hold'**
+  String get reservationStatusCheckoutBlocked;
+
+  /// No description provided for @reservationStatusCheckedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Checked out'**
+  String get reservationStatusCheckedOut;
+
+  /// No description provided for @reservationStatusInvoiced.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoiced'**
+  String get reservationStatusInvoiced;
+
+  /// No description provided for @reservationStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get reservationStatusCancelled;
 }
 
 class _AppLocalizationsDelegate

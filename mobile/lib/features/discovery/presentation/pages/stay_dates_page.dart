@@ -6,7 +6,6 @@ import '../../../../app/router/app_routes.dart';
 import '../../../../core/localization/l10n.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/time/clock.dart';
-import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/hotel_app_bar.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../domain/entities/guest_party.dart';
@@ -40,7 +39,29 @@ class StayDatesPage extends ConsumerWidget {
         ref.read(stayDatesControllerProvider.notifier);
 
     final StayRange? range = draft.rangeAgainst(today);
-    final String? errorText = l10n.stayDatesErrorLabel(draft.errorAgainst(today));
+    final String? errorText =
+        l10n.stayDatesErrorLabel(draft.errorAgainst(today));
+
+    // Which field the next tap fills — gets the highlighted border.
+    final bool checkInActive = draft.checkIn == null || draft.checkOut != null;
+
+    final String guidance;
+    final bool guidanceIsError;
+    if (errorText != null) {
+      guidance = errorText;
+      guidanceIsError = true;
+    } else if (range != null) {
+      guidance =
+          '${l10n.stayDatesSelectedRange(ml.formatMediumDate(range.checkIn), ml.formatMediumDate(range.checkOut))} · ${l10n.stayNights(range.nights)}';
+      guidanceIsError = false;
+    } else if (draft.checkIn != null) {
+      guidance =
+          l10n.stayDatesHintPickCheckOut(ml.formatMediumDate(draft.checkIn!));
+      guidanceIsError = false;
+    } else {
+      guidance = l10n.stayDatesHintPickCheckIn;
+      guidanceIsError = false;
+    }
 
     return Scaffold(
       appBar: HotelAppBar(
@@ -61,30 +82,50 @@ class StayDatesPage extends ConsumerWidget {
                 AppSpacing.pageGutter,
                 AppSpacing.sm,
                 AppSpacing.pageGutter,
-                AppSpacing.xs,
+                AppSpacing.sm,
               ),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: _DateField(
-                      label: l10n.stayDatesCheckIn,
-                      value: draft.checkIn == null
-                          ? l10n.stayDatesPick
-                          : ml.formatMediumDate(draft.checkIn!),
+              child: IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Expanded(
+                      child: _DateField(
+                        label: l10n.stayDatesCheckIn,
+                        value: draft.checkIn == null
+                            ? null
+                            : ml.formatMediumDate(draft.checkIn!),
+                        active: checkInActive,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  Expanded(
-                    child: _DateField(
-                      label: l10n.stayDatesCheckOut,
-                      value: draft.checkOut == null
-                          ? l10n.stayDatesPick
-                          : ml.formatMediumDate(draft.checkOut!),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: _DateField(
+                        label: l10n.stayDatesCheckOut,
+                        value: draft.checkOut == null
+                            ? null
+                            : ml.formatMediumDate(draft.checkOut!),
+                        active: !checkInActive,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.pageGutter,
+              ),
+              child: Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: Text(
+                  guidance,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: guidanceIsError ? theme.colorScheme.error : null,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
             InkWell(
               onTap: () => showGuestPartySheet(context),
               child: Padding(
@@ -102,35 +143,24 @@ class StayDatesPage extends ConsumerWidget {
                         style: theme.textTheme.bodyMedium,
                       ),
                     ),
-                    const Icon(Icons.edit_outlined, size: 16),
+                    Text(l10n.commonEdit, style: theme.textTheme.labelMedium),
                   ],
                 ),
               ),
             ),
-            if (errorText != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pageGutter),
-                child: Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Text(
-                    errorText,
-                    style: theme.textTheme.bodySmall
-                        ?.copyWith(color: theme.colorScheme.error),
-                  ),
-                ),
-              ),
             const Divider(height: AppSpacing.md),
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(
                   AppSpacing.pageGutter,
-                  AppSpacing.xs,
+                  AppSpacing.sm,
                   AppSpacing.pageGutter,
                   AppSpacing.xl,
                 ),
                 children: <Widget>[
                   StayRangeCalendar(
                     firstDay: today,
+                    today: today,
                     checkIn: draft.checkIn,
                     checkOut: draft.checkOut,
                     onSelectDay: dates.selectDay,
@@ -144,9 +174,7 @@ class StayDatesPage extends ConsumerWidget {
       bottomNavigationBar: SafeArea(
         minimum: const EdgeInsets.all(AppSpacing.pageGutter),
         child: PrimaryButton(
-          label: range == null
-              ? l10n.stayDatesShowRooms
-              : '${l10n.stayDatesShowRooms} · ${l10n.stayNights(range.nights)}',
+          label: l10n.stayDatesShowRooms,
           onPressed: range == null
               ? null
               : () => context.pushNamed(
@@ -160,26 +188,58 @@ class StayDatesPage extends ConsumerWidget {
 }
 
 class _DateField extends StatelessWidget {
-  const _DateField({required this.label, required this.value});
+  const _DateField({
+    required this.label,
+    required this.value,
+    required this.active,
+  });
 
   final String label;
-  final String value;
+  final String? value;
+  final bool active;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    return AppCard(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
+    final bool filled = value != null;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: active
+              ? theme.colorScheme.primary
+              : theme.colorScheme.outline,
+          width: active ? 1.5 : 1,
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(label, style: theme.textTheme.labelMedium),
-          const SizedBox(height: 2),
-          Text(value, style: theme.textTheme.titleSmall),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.sm,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              label,
+              style: theme.textTheme.bodySmall,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppSpacing.xxs),
+            Text(
+              value ?? context.l10n.stayDatesFieldPlaceholder,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: filled
+                    ? theme.colorScheme.onSurface
+                    : theme.colorScheme.primary,
+                fontWeight: filled ? FontWeight.w700 : FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_radius.dart';
+import '../../../../core/localization/l10n.dart';
+import '../../../../core/localization/localized_digits.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../domain/entities/stay_range.dart';
 
-/// An inline month-by-month range calendar (`16 · Stay dates & available
-/// rooms`). Deliberately small: [monthCount] months forward from [firstDay],
-/// range selection driven entirely by [onSelectDay] taps.
+/// Inline month-by-month range calendar (`16 · Stay dates & available rooms`).
 ///
-/// All day / month / weekday text comes from [MaterialLocalizations], so it
-/// renders in Arabic and lays out right-to-left with no extra work.
+/// Matches the reference: centered month/year headings, short weekday names, a
+/// continuous blush band across the selected range with filled circular
+/// endpoints, and a soft ring on "today". [monthCount] months forward from
+/// [firstDay]; selection is driven by [onSelectDay] taps.
 class StayRangeCalendar extends StatelessWidget {
   const StayRangeCalendar({
     super.key,
@@ -17,6 +18,7 @@ class StayRangeCalendar extends StatelessWidget {
     required this.checkIn,
     required this.checkOut,
     required this.onSelectDay,
+    this.today,
     this.monthCount = 4,
   });
 
@@ -24,25 +26,27 @@ class StayRangeCalendar extends StatelessWidget {
   final DateTime? checkIn;
   final DateTime? checkOut;
   final ValueChanged<DateTime> onSelectDay;
+  final DateTime? today;
   final int monthCount;
 
   @override
   Widget build(BuildContext context) {
     final DateTime start = DateTime(firstDay.year, firstDay.month);
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        _WeekdayHeader(),
-        const SizedBox(height: AppSpacing.xs),
+        const _WeekdayHeader(),
+        const SizedBox(height: AppSpacing.sm),
         for (int i = 0; i < monthCount; i++) ...<Widget>[
           _MonthGrid(
             month: DateTime(start.year, start.month + i),
             firstSelectableDay: dateOnly(firstDay),
             checkIn: checkIn,
             checkOut: checkOut,
+            today: today == null ? null : dateOnly(today!),
             onSelectDay: onSelectDay,
           ),
-          if (i != monthCount - 1) const SizedBox(height: AppSpacing.lg),
+          if (i != monthCount - 1) const SizedBox(height: AppSpacing.xl),
         ],
       ],
     );
@@ -55,18 +59,23 @@ List<int> _weekdayOrder(BuildContext context) {
 }
 
 class _WeekdayHeader extends StatelessWidget {
+  const _WeekdayHeader();
+
   @override
   Widget build(BuildContext context) {
-    final MaterialLocalizations ml = MaterialLocalizations.of(context);
     final ThemeData theme = Theme.of(context);
+    final List<String> names = context.l10n.calendarWeekdays.split(',');
     return Row(
       children: <Widget>[
         for (final int weekday in _weekdayOrder(context))
           Expanded(
             child: Center(
-              child: Text(
-                ml.narrowWeekdays[weekday],
-                style: theme.textTheme.labelMedium,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 1),
+                  child: Text(names[weekday], style: theme.textTheme.bodySmall),
+                ),
               ),
             ),
           ),
@@ -81,6 +90,7 @@ class _MonthGrid extends StatelessWidget {
     required this.firstSelectableDay,
     required this.checkIn,
     required this.checkOut,
+    required this.today,
     required this.onSelectDay,
   });
 
@@ -88,6 +98,7 @@ class _MonthGrid extends StatelessWidget {
   final DateTime firstSelectableDay;
   final DateTime? checkIn;
   final DateTime? checkOut;
+  final DateTime? today;
   final ValueChanged<DateTime> onSelectDay;
 
   @override
@@ -108,23 +119,27 @@ class _MonthGrid extends StatelessWidget {
           firstSelectableDay: firstSelectableDay,
           checkIn: checkIn,
           checkOut: checkOut,
+          today: today,
           onSelectDay: onSelectDay,
         ),
     ];
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Text(
-          ml.formatMonthYear(month),
-          style: theme.textTheme.titleSmall,
+        Center(
+          child: Text(
+            ml.formatMonthYear(month),
+            style: theme.textTheme.titleSmall,
+          ),
         ),
-        const SizedBox(height: AppSpacing.xs),
+        const SizedBox(height: AppSpacing.sm),
         GridView.count(
           crossAxisCount: 7,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          childAspectRatio: 1.1,
+          mainAxisSpacing: AppSpacing.xs,
+          childAspectRatio: 1.0,
           children: cells,
         ),
       ],
@@ -138,6 +153,7 @@ class _DayCell extends StatelessWidget {
     required this.firstSelectableDay,
     required this.checkIn,
     required this.checkOut,
+    required this.today,
     required this.onSelectDay,
   });
 
@@ -145,54 +161,89 @@ class _DayCell extends StatelessWidget {
   final DateTime firstSelectableDay;
   final DateTime? checkIn;
   final DateTime? checkOut;
+  final DateTime? today;
   final ValueChanged<DateTime> onSelectDay;
 
   bool get _isDisabled => date.isBefore(firstSelectableDay);
-  bool _isSame(DateTime? other) => other != null && DateUtils.isSameDay(date, other);
+  bool _isSame(DateTime? other) =>
+      other != null && DateUtils.isSameDay(date, other);
+  bool get _isCheckIn => _isSame(checkIn);
+  bool get _isCheckOut => _isSame(checkOut);
+  bool get _isEndpoint => _isCheckIn || _isCheckOut;
+  bool get _hasRange => checkIn != null && checkOut != null;
   bool get _inRange =>
-      checkIn != null &&
-      checkOut != null &&
-      date.isAfter(checkIn!) &&
-      date.isBefore(checkOut!);
+      _hasRange && date.isAfter(checkIn!) && date.isBefore(checkOut!);
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final MaterialLocalizations ml = MaterialLocalizations.of(context);
-    final bool isEndpoint = _isSame(checkIn) || _isSame(checkOut);
+    // A soft warm band connecting the two endpoints (the "range" fill).
+    final Color band = theme.colorScheme.primary.withValues(alpha: 0.16);
 
-    final Color? background = isEndpoint
-        ? theme.colorScheme.primary
-        : _inRange
-            ? theme.colorScheme.primary.withValues(alpha: 0.12)
-            : null;
-    final Color foreground = isEndpoint
+    // Band halves. Dates increase toward the row's `end` (GridView fills in
+    // reading order), so check-in bleeds toward `end` and check-out toward
+    // `start`.
+    final bool fillStartHalf = _inRange || (_isCheckOut && _hasRange);
+    final bool fillEndHalf = _inRange || (_isCheckIn && _hasRange);
+
+    final Color foreground = _isEndpoint
         ? theme.colorScheme.onPrimary
         : _isDisabled
             ? theme.disabledColor
             : theme.colorScheme.onSurface;
 
-    return Padding(
-      padding: const EdgeInsets.all(2),
-      child: Material(
-        color: background ?? Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: AppRadius.allSm),
-        child: InkWell(
-          borderRadius: AppRadius.allSm,
-          onTap: _isDisabled ? null : () => onSelectDay(date),
-          child: Semantics(
-            selected: isEndpoint,
-            label: ml.formatFullDate(date),
-            child: Center(
-              child: Text(
-                ml.formatDecimal(date.day),
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: foreground,
-                  fontWeight: isEndpoint ? FontWeight.w700 : FontWeight.w400,
-                ),
+    return InkWell(
+      onTap: _isDisabled ? null : () => onSelectDay(date),
+      child: Semantics(
+        selected: _isEndpoint,
+        label: ml.formatFullDate(date),
+        button: !_isDisabled,
+        child: Stack(
+          alignment: Alignment.center,
+          children: <Widget>[
+            Positioned.fill(
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: ColoredBox(
+                      color: fillStartHalf ? band : Colors.transparent,
+                    ),
+                  ),
+                  Expanded(
+                    child: ColoredBox(
+                      color: fillEndHalf ? band : Colors.transparent,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
+            if (_isEndpoint)
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary,
+                  shape: BoxShape.circle,
+                ),
+              )
+            else if (_isSame(today))
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: theme.colorScheme.outline),
+                ),
+              ),
+            Text(
+              context.digits(date.day),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: foreground,
+                fontWeight: _isEndpoint ? FontWeight.w700 : FontWeight.w400,
+              ),
+            ),
+          ],
         ),
       ),
     );

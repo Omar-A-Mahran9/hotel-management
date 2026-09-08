@@ -33,17 +33,17 @@ class RatingPill extends StatelessWidget {
         children: <Widget>[
           Icon(Icons.star_rounded, size: 15, color: accent),
           const SizedBox(width: AppSpacing.xxs),
-          Text(
-            l10n.hotelRatingValue(rating),
-            style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.onSurface),
-          ),
-          if (reviewCount != null) ...<Widget>[
-            const SizedBox(width: AppSpacing.xxs),
-            Text(
-              '· ${l10n.hotelReviewCount(reviewCount!)}',
-              style: theme.textTheme.bodySmall,
+          Flexible(
+            child: Text(
+              reviewCount == null
+                  ? l10n.hotelRatingValue(rating)
+                  : '${l10n.hotelRatingValue(rating)} · ${l10n.hotelReviewCount(reviewCount!)}',
+              style: theme.textTheme.labelMedium
+                  ?.copyWith(color: theme.colorScheme.onSurface),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-          ],
+          ),
         ],
       ),
     );

@@ -59,6 +59,20 @@ abstract final class AppRoutes {
   static const String availableRooms = '/discover/hotel/:hotelId/rooms';
   static const String availableRoomsName = 'availableRooms';
 
+  /// `08 · Room selection & stay actions` (screen 1) — one room type in full,
+  /// with the "select this room" action. `:roomTypeId` path param.
+  static const String roomDetail = '/discover/hotel/:hotelId/rooms/:roomTypeId';
+  static const String roomDetailName = 'roomDetail';
+
+  /// Review the chosen room + stay + party and confirm the reservation
+  /// (Mobile Phase 4). Creates a `PENDING` reservation; nothing is charged.
+  static const String roomSelectionReview = '/discover/hotel/:hotelId/review';
+  static const String roomSelectionReviewName = 'roomSelectionReview';
+
+  /// Reservation confirmation + details, by id (`03 · Pay & Verify`).
+  static const String reservationDetail = '/reservation/:reservationId';
+  static const String reservationDetailName = 'reservationDetail';
+
   /// The authenticated landing route.
   static const String authenticatedHome = discover;
 

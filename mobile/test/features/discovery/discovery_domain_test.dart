@@ -1,13 +1,27 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hotel_guest_app/features/discovery/domain/entities/availability_request.dart';
 import 'package:hotel_guest_app/features/discovery/domain/entities/available_room.dart';
 import 'package:hotel_guest_app/features/discovery/domain/entities/guest_party.dart';
 import 'package:hotel_guest_app/features/discovery/domain/entities/hotel_filters.dart';
 import 'package:hotel_guest_app/features/discovery/domain/entities/localized_text.dart';
 import 'package:hotel_guest_app/features/discovery/domain/entities/money.dart';
+import 'package:hotel_guest_app/features/discovery/domain/entities/room_selection.dart';
 import 'package:hotel_guest_app/features/discovery/domain/entities/room_type_summary.dart';
 import 'package:hotel_guest_app/features/discovery/domain/entities/stay_range.dart';
 import 'package:hotel_guest_app/features/discovery/domain/validators/stay_dates_validator.dart';
+
+RoomTypeSummary _roomType({int price = 320, int occupancy = 2}) => RoomTypeSummary(
+      id: 'standard',
+      name: const LocalizedText(ar: 'قياسية', en: 'Standard'),
+      description: const LocalizedText(ar: 'وصف', en: 'desc'),
+      bedType: const LocalizedText(ar: 'مزدوج', en: 'Double'),
+      maxOccupancy: occupancy,
+      amenities: const <RoomAmenity>[RoomAmenity.freeWifi],
+      nightlyRate: Money(amount: price),
+      breakfastIncluded: true,
+      refundable: true,
+    );
 
 void main() {
   group('LocalizedText', () {
@@ -79,13 +93,127 @@ void main() {
   });
 
   group('StayRange', () {
-    test('nights is the day difference', () {
+    test('nights is the day difference and time is stripped', () {
       final StayRange range = StayRange(
         checkIn: DateTime(2026, 9, 6, 15),
         checkOut: DateTime(2026, 9, 8, 11),
       );
       expect(range.nights, 2);
       expect(range.checkIn, DateTime(2026, 9, 6));
+    });
+
+    test('a same-day or reversed range fails the invariant assert', () {
+      expect(
+        () => StayRange(
+          checkIn: DateTime(2026, 9, 8),
+          checkOut: DateTime(2026, 9, 8),
+        ),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
+    test('tryCreate returns null for invalid input, a range for valid', () {
+      expect(StayRange.tryCreate(checkIn: DateTime(2026, 9, 8), checkOut: null),
+          isNull);
+      expect(
+        StayRange.tryCreate(
+          checkIn: DateTime(2026, 9, 8),
+          checkOut: DateTime(2026, 9, 8),
+        ),
+        isNull,
+      );
+      expect(
+        StayRange.tryCreate(
+          checkIn: DateTime(2026, 9, 6),
+          checkOut: DateTime(2026, 9, 8),
+        )?.nights,
+        2,
+      );
+    });
+  });
+
+  group('AvailabilityRequest', () {
+    AvailabilityRequest req({String hotel = 'oasis', GuestParty? party}) =>
+        AvailabilityRequest(
+          hotelId: hotel,
+          stay: StayRange(
+            checkIn: DateTime(2026, 9, 6),
+            checkOut: DateTime(2026, 9, 8),
+          ),
+          party: party ?? GuestParty.initial,
+        );
+
+    test('value equality over hotel, stay and party', () {
+      expect(req(), req());
+      expect(req(hotel: 'palm') == req(), isFalse);
+      expect(
+        req(party: const GuestParty(adults: 3, children: 0)) == req(),
+        isFalse,
+      );
+    });
+  });
+
+  group('RoomSelection', () {
+    final StayRange stay = StayRange(
+      checkIn: DateTime(2026, 9, 6),
+      checkOut: DateTime(2026, 9, 8),
+    );
+    const GuestParty party = GuestParty(adults: 2, children: 0);
+
+    RoomSelection selection() => RoomSelection.fromAvailableRoom(
+          room: AvailableRoom(roomType: _roomType(price: 450), isAvailable: true),
+          hotelId: 'oasis',
+          hotelName: const LocalizedText(ar: 'الواحة', en: 'Oasis'),
+          stay: stay,
+          party: party,
+        );
+
+    test('fromAvailableRoom snapshots the room type, price, stay and party', () {
+      final RoomSelection sel = selection();
+      expect(sel.hotelId, 'oasis');
+      expect(sel.roomTypeId, 'standard');
+      expect(sel.nightlyRate, const Money(amount: 450));
+      expect(sel.nights, 2);
+      expect(sel.roomId, isNull); // physical room not modelled yet
+    });
+
+    test('stayTotal is integer nightly rate times nights', () {
+      expect(selection().stayTotal, const Money(amount: 900));
+    });
+
+    test('matches only its own hotel, stay and party', () {
+      final RoomSelection sel = selection();
+      expect(
+        sel.matches(AvailabilityRequest(hotelId: 'oasis', stay: stay, party: party)),
+        isTrue,
+      );
+      expect(
+        sel.matches(AvailabilityRequest(hotelId: 'palm', stay: stay, party: party)),
+        isFalse,
+      );
+      expect(
+        sel.matches(AvailabilityRequest(
+          hotelId: 'oasis',
+          stay: StayRange(
+            checkIn: DateTime(2026, 9, 6),
+            checkOut: DateTime(2026, 9, 9),
+          ),
+          party: party,
+        )),
+        isFalse,
+      );
+      expect(
+        sel.matches(AvailabilityRequest(
+          hotelId: 'oasis',
+          stay: stay,
+          party: const GuestParty(adults: 3, children: 0),
+        )),
+        isFalse,
+      );
+    });
+
+    test('copyWith carries a physical room id', () {
+      expect(selection().copyWith(roomId: 'r-101').roomId, 'r-101');
     });
   });
 

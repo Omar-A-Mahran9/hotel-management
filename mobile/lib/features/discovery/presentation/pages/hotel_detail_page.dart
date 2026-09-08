@@ -11,11 +11,13 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/loading_view.dart';
 import '../../../../core/widgets/message_view.dart';
 import '../../../../core/widgets/primary_button.dart';
+import '../../../reservation/presentation/state/create_reservation_controller.dart';
 import '../../domain/entities/hotel.dart';
 import '../discovery_l10n.dart';
 import '../state/guest_party_controller.dart';
 import '../state/hotel_detail_provider.dart';
 import '../state/room_availability_controller.dart';
+import '../state/room_selection_controller.dart';
 import '../state/stay_dates_controller.dart';
 import '../widgets/hotel_thumbnail.dart';
 import '../widgets/rating_pill.dart';
@@ -30,6 +32,8 @@ class HotelDetailPage extends ConsumerWidget {
 
   void _startDateSelection(BuildContext context, WidgetRef ref) {
     // A fresh stay selection for this hotel.
+    ref.read(createReservationControllerProvider.notifier).reset();
+    ref.read(roomSelectionControllerProvider.notifier).clear();
     ref.read(stayDatesControllerProvider.notifier).clear();
     ref.read(guestPartyControllerProvider.notifier).reset();
     ref.read(roomAvailabilityControllerProvider.notifier).reset();
@@ -108,7 +112,12 @@ class _HotelDetailBody extends StatelessWidget {
               Row(
                 children: <Widget>[
                   if (s.rating != null)
-                    RatingPill(rating: s.rating!, reviewCount: s.reviewCount),
+                    Flexible(
+                      child: RatingPill(
+                        rating: s.rating!,
+                        reviewCount: s.reviewCount,
+                      ),
+                    ),
                   const Spacer(),
                   Text(
                     l10n.priceFrom(s.nightlyRateFrom.amount),

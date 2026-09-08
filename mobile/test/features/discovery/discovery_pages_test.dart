@@ -119,25 +119,47 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text(en.stayDatesTitle), findsOneWidget);
     expect(find.byType(StayRangeCalendar), findsOneWidget);
+    // Guidance line, empty state.
+    expect(find.text(en.stayDatesHintPickCheckIn), findsOneWidget);
 
     // CTA disabled until both dates chosen.
     final Finder cta = find.widgetWithText(FilledButton, en.stayDatesShowRooms);
     expect(tester.widget<FilledButton>(cta).onPressed, isNull);
 
-    await tester.tap(find.text('6').first);
-    await tester.pump();
-    await tester.tap(find.text('8').first);
-    await tester.pump();
+    await tester.tap(find.descendant(
+      of: find.byType(StayRangeCalendar),
+      matching: find.text('6'),
+    ).first);
+    await tester.pumpAndSettle();
+    // After the first tap the guidance moves past the initial hint.
+    expect(find.text(en.stayDatesHintPickCheckIn), findsNothing);
 
-    final Finder ctaWithNights =
-        find.widgetWithText(FilledButton, '${en.stayDatesShowRooms} · ${en.stayNights(2)}');
-    expect(tester.widget<FilledButton>(ctaWithNights).onPressed, isNotNull);
+    await tester.tap(find.descendant(
+      of: find.byType(StayRangeCalendar),
+      matching: find.text('8'),
+    ).first);
+    await tester.pumpAndSettle();
+    // Both chosen → range + nights guidance and an enabled CTA.
+    expect(find.textContaining(en.stayNights(2)), findsWidgets);
 
-    await tester.tap(ctaWithNights);
+    final Finder cta2 = find.widgetWithText(FilledButton, en.stayDatesShowRooms);
+    expect(tester.widget<FilledButton>(cta2).onPressed, isNotNull);
+
+    await tester.tap(cta2);
     await tester.pumpAndSettle();
 
-    expect(find.text(en.roomsTitle), findsOneWidget);
+    expect(find.text(en.roomsTitle), findsWidgets);
     expect(find.byType(RoomSummaryCard), findsWidgets);
+    // The stay summary card shows the hotel and labelled dates.
+    expect(find.text('The Oasis Hotel'), findsWidgets);
+    expect(find.text(en.stayDatesCheckIn), findsWidgets);
+
+    // Open a room's detail page.
+    await tester.tap(find.widgetWithText(OutlinedButton, en.roomViewDetails).first);
+    await tester.pumpAndSettle();
+    expect(find.text(en.roomSelectThisRoom), findsOneWidget);
+    expect(find.text(en.roomDetailAmenitiesHeading), findsOneWidget);
+    expect(find.text(en.roomDetailCancellationHeading), findsOneWidget);
   });
 
   testWidgets('too many guests shows the no-rooms state with recovery actions',
@@ -157,13 +179,12 @@ void main() {
     await tester.pump();
     await tester.tap(find.text('8').first);
     await tester.pump();
-    await tester.tap(
-      find.widgetWithText(FilledButton, '${en.stayDatesShowRooms} · ${en.stayNights(2)}'),
-    );
+    await tester.tap(find.widgetWithText(FilledButton, en.stayDatesShowRooms));
     await tester.pumpAndSettle();
 
-    // Bump the party past every room's occupancy via the guests sheet.
-    await tester.tap(find.text(en.roomsChangeGuests).first);
+    // Bump the party past every room's occupancy via the guests sheet
+    // ("Edit" link in the stay summary card).
+    await tester.tap(find.text(en.commonEdit).first);
     await tester.pumpAndSettle();
     for (int i = 0; i < 6; i++) {
       await tester.tap(find.widgetWithIcon(IconButton, Icons.add).first);
