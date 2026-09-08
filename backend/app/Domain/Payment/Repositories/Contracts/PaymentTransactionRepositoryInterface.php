@@ -27,6 +27,15 @@ interface PaymentTransactionRepositoryInterface
     public function findByProviderReference(string $provider, string $providerReference): ?PaymentTransaction;
 
     /**
+     * The decimal-string SUM of `amount` over the payment's succeeded
+     * money-collecting transactions (`capture` + `settlement`). This is the
+     * folio's `payments_total` — the payment history is the source of truth,
+     * never `payments.amount` (Phase 9 review fix). Returns a canonical
+     * "0.00" when there are none.
+     */
+    public function sumCollectedForPayment(int $paymentId): string;
+
+    /**
      * `find()` under a `SELECT ... FOR UPDATE` row lock — the lock the
      * Phase 5C payment workflow acquires in Step C (third in the approved
      * Reservation -> Payment -> PaymentTransaction order). Must be called

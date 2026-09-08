@@ -6,6 +6,7 @@ use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\IdentityAccess\Models\User;
 use App\Domain\Inventory\Models\RoomType;
 use App\Domain\Payment\Models\Payment;
+use App\Domain\Payment\Models\PaymentTransaction;
 use App\Domain\Reservation\Models\Reservation;
 use App\Domain\StayServices\Models\FolioCharge;
 use Tests\TestCase;
@@ -36,9 +37,15 @@ class FolioApiTest extends TestCase
         FolioCharge::factory()->amount('5.00', 1)->create([
             'reservation_id' => $reservation->id, 'hotel_id' => $reservation->hotel_id, 'source_id' => 2,
         ]);
-        Payment::factory()->create([
+        $payment = Payment::factory()->create([
             'reservation_id' => $reservation->id, 'hotel_id' => $reservation->hotel_id,
             'status' => Payment::STATUS_CAPTURED, 'amount' => '15.00', 'currency' => 'USD',
+        ]);
+        // payments_total is the succeeded capture/settlement transaction
+        // history (Phase 9 review fix), not payments.amount.
+        PaymentTransaction::factory()->create([
+            'payment_id' => $payment->id, 'type' => PaymentTransaction::TYPE_CAPTURE,
+            'status' => PaymentTransaction::STATUS_SUCCEEDED, 'amount' => '15.00',
         ]);
 
         $this->actingAs($this->owner(), 'sanctum')

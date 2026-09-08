@@ -26,6 +26,15 @@ class FolioCharge extends Model
 
     public const SOURCE_SERVICE_ORDER = 'service_order';
 
+    /**
+     * The reservation accommodation charge (Phase 9). Amount is
+     * `reservation.price_snapshot` used exactly — no nights maths, no tax,
+     * no second pricing calculation. `source_id` = the reservation id, so
+     * the `(source_type, source_id)` UNIQUE guarantees exactly one per
+     * reservation and a checkout retry never duplicates it.
+     */
+    public const SOURCE_ACCOMMODATION = 'accommodation';
+
     public const STATUS_POSTED = 'posted';
 
     public const STATUS_CANCELLED = 'cancelled';

@@ -43,4 +43,14 @@ class PaymentTransactionFactory extends Factory
             'status' => PaymentTransaction::STATUS_FAILED,
         ]);
     }
+
+    public function settlement(): static
+    {
+        return $this->state(fn () => ['type' => PaymentTransaction::TYPE_SETTLEMENT]);
+    }
+
+    public function pending(): static
+    {
+        return $this->state(fn () => ['status' => PaymentTransaction::STATUS_PENDING]);
+    }
 }

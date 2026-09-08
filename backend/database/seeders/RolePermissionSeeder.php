@@ -40,6 +40,11 @@ class RolePermissionSeeder extends Seeder
             'service-orders.view' => 'View reservation service orders within authorized scope',
             'service-orders.manage' => 'Record and transition reservation service orders within authorized scope',
             'folio.view' => 'View a reservation folio within authorized scope',
+            'checkout.perform' => 'Perform reservation checkout and final settlement within authorized scope',
+            'invoice.view' => 'View a reservation invoice within authorized scope',
+            'loyalty.view' => 'View a guest loyalty account and ledger within authorized scope',
+            'loyalty.manage' => 'Accrue and redeem loyalty points against a reservation within authorized scope',
+            'loyalty.rules.manage' => 'Configure a hotel group loyalty rule',
         ];
 
         foreach ($permissions as $slug => $name) {
@@ -58,7 +63,7 @@ class RolePermissionSeeder extends Seeder
             Role::HOTEL_MANAGER => [
                 'name' => 'Hotel Manager',
                 'description' => 'Manages one or more assigned hotels.',
-                'permissions' => ['hotels.view', 'inventory.view', 'inventory.manage', 'reservations.view', 'reservations.manage', 'payments.manage', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke', 'services.view', 'services.manage', 'service-orders.view', 'service-orders.manage', 'folio.view'],
+                'permissions' => ['hotels.view', 'inventory.view', 'inventory.manage', 'reservations.view', 'reservations.manage', 'payments.manage', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke', 'services.view', 'services.manage', 'service-orders.view', 'service-orders.manage', 'folio.view', 'checkout.perform', 'invoice.view', 'loyalty.view', 'loyalty.manage'],
             ],
             Role::RECEPTION => [
                 'name' => 'Reception',
@@ -70,8 +75,13 @@ class RolePermissionSeeder extends Seeder
                 // the service catalog and record/transition in-stay service
                 // orders (operational, R7/R14-R19) and read a folio, but NOT
                 // configure the catalog (services.manage = pricing config,
-                // §32 "no financial edit").
-                'permissions' => ['hotels.view', 'inventory.view', 'reservations.view', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke', 'services.view', 'service-orders.view', 'service-orders.manage', 'folio.view'],
+                // §32 "no financial edit"). Phase 9: Reception may perform the
+                // operational one-tap checkout (R7/R14-R19 — every checkout is
+                // audited) and read the resulting invoice. Phase 10: Reception
+                // may view a guest's loyalty balance/history (operational) but
+                // NOT accrue/redeem points (loyalty.manage has a monetary
+                // effect on a booking — §32 "no financial edit").
+                'permissions' => ['hotels.view', 'inventory.view', 'reservations.view', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke', 'services.view', 'service-orders.view', 'service-orders.manage', 'folio.view', 'checkout.perform', 'invoice.view', 'loyalty.view'],
             ],
             Role::GUEST => [
                 'name' => 'Guest',

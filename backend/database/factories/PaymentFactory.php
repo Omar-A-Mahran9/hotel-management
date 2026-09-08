@@ -44,4 +44,27 @@ class PaymentFactory extends Factory
             'hold_expires_at' => now()->addDay(),
         ]);
     }
+
+    /**
+     * A Payment whose deposit hold has been captured — the state a final
+     * settlement (Phase 9) transitions from.
+     */
+    public function captured(): static
+    {
+        return $this->state(fn () => ['status' => Payment::STATUS_CAPTURED]);
+    }
+
+    /**
+     * A fully settled Payment (Phase 9 terminal). `amount` then represents
+     * the total collected folio.
+     */
+    public function settled(): static
+    {
+        return $this->state(fn () => ['status' => Payment::STATUS_SETTLED]);
+    }
+
+    public function settlementFailed(): static
+    {
+        return $this->state(fn () => ['status' => Payment::STATUS_SETTLEMENT_FAILED]);
+    }
 }

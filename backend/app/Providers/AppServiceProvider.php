@@ -2,6 +2,14 @@
 
 namespace App\Providers;
 
+use App\Domain\Checkout\Models\Checkout;
+use App\Domain\Checkout\Models\Invoice;
+use App\Domain\Checkout\Policies\CheckoutPolicy;
+use App\Domain\Checkout\Policies\InvoicePolicy;
+use App\Domain\Checkout\Repositories\Contracts\CheckoutRepositoryInterface;
+use App\Domain\Checkout\Repositories\Contracts\InvoiceRepositoryInterface;
+use App\Domain\Checkout\Repositories\EloquentCheckoutRepository;
+use App\Domain\Checkout\Repositories\EloquentInvoiceRepository;
 use App\Domain\DigitalAccess\Models\AccessGrant;
 use App\Domain\DigitalAccess\Policies\AccessGrantPolicy;
 use App\Domain\DigitalAccess\Provider\Contracts\DigitalAccessProviderInterface;
@@ -46,6 +54,16 @@ use App\Domain\Inventory\Repositories\Contracts\RoomRepositoryInterface;
 use App\Domain\Inventory\Repositories\Contracts\RoomTypeRepositoryInterface;
 use App\Domain\Inventory\Repositories\EloquentRoomRepository;
 use App\Domain\Inventory\Repositories\EloquentRoomTypeRepository;
+use App\Domain\Loyalty\Models\LoyaltyAccount;
+use App\Domain\Loyalty\Models\LoyaltyRule;
+use App\Domain\Loyalty\Policies\LoyaltyPolicy;
+use App\Domain\Loyalty\Policies\LoyaltyRulePolicy;
+use App\Domain\Loyalty\Repositories\Contracts\LoyaltyAccountRepositoryInterface;
+use App\Domain\Loyalty\Repositories\Contracts\LoyaltyRuleRepositoryInterface;
+use App\Domain\Loyalty\Repositories\Contracts\LoyaltyTransactionRepositoryInterface;
+use App\Domain\Loyalty\Repositories\EloquentLoyaltyAccountRepository;
+use App\Domain\Loyalty\Repositories\EloquentLoyaltyRuleRepository;
+use App\Domain\Loyalty\Repositories\EloquentLoyaltyTransactionRepository;
 use App\Domain\Payment\Gateway\Contracts\PaymentGatewayInterface;
 use App\Domain\Payment\Gateway\DummyPaymentGateway;
 use App\Domain\Payment\Gateway\Exceptions\UnsupportedPaymentProviderException;
@@ -112,6 +130,11 @@ class AppServiceProvider extends ServiceProvider
         HotelServiceRepositoryInterface::class => EloquentHotelServiceRepository::class,
         ServiceOrderRepositoryInterface::class => EloquentServiceOrderRepository::class,
         FolioChargeRepositoryInterface::class => EloquentFolioChargeRepository::class,
+        CheckoutRepositoryInterface::class => EloquentCheckoutRepository::class,
+        InvoiceRepositoryInterface::class => EloquentInvoiceRepository::class,
+        LoyaltyAccountRepositoryInterface::class => EloquentLoyaltyAccountRepository::class,
+        LoyaltyTransactionRepositoryInterface::class => EloquentLoyaltyTransactionRepository::class,
+        LoyaltyRuleRepositoryInterface::class => EloquentLoyaltyRuleRepository::class,
     ];
 
     /**
@@ -131,6 +154,10 @@ class AppServiceProvider extends ServiceProvider
         HotelService::class => HotelServicePolicy::class,
         ServiceOrder::class => ServiceOrderPolicy::class,
         Folio::class => FolioPolicy::class,
+        Checkout::class => CheckoutPolicy::class,
+        Invoice::class => InvoicePolicy::class,
+        LoyaltyAccount::class => LoyaltyPolicy::class,
+        LoyaltyRule::class => LoyaltyRulePolicy::class,
     ];
 
     public function register(): void
@@ -205,6 +232,21 @@ class AppServiceProvider extends ServiceProvider
         $this->registerPaymentRateLimiters();
         $this->registerIdentityVerificationRateLimiters();
         $this->registerDigitalAccessRateLimiters();
+        $this->registerCheckoutRateLimiters();
+    }
+
+    /**
+     * Phase 0 §17 — rate limiting on the financially-sensitive checkout
+     * endpoint (Phase 9G). Config-driven (config/checkout.php), native
+     * RateLimiter, no package. Keyed by authenticated user id (IP fallback),
+     * conservative — a staff member never legitimately fires this many
+     * checkouts a minute.
+     */
+    private function registerCheckoutRateLimiters(): void
+    {
+        RateLimiter::for('checkout.perform', fn (Request $request) => Limit::perMinute(
+            (int) config('checkout.rate_limits.perform.per_minute'),
+        )->by((string) ($request->user()?->id ?? $request->ip())));
     }
 
     /**

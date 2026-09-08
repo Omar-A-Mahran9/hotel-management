@@ -82,13 +82,16 @@ class StayServicesArchitectureTest extends TestCase
         $this->assertStringContainsString('bcsub(', $folio);
     }
 
-    public function test_folio_service_reuses_payment_state_definitions(): void
+    public function test_folio_service_derives_payments_total_from_the_payment_domain(): void
     {
         $code = $this->source(FolioService::class);
-        $this->assertStringContainsString('Payment::CAPTURED_STATUSES', $code);
-        // It must not hardcode its own list of "paid" statuses.
+        // payments_total is the payment transaction history (Phase 9 review
+        // fix) — resolved through the Payment domain's repository, never a
+        // hardcoded status list or `payments.amount` read.
+        $this->assertStringContainsString('paymentTransactions->sumCollectedForPayment(', $code);
         $this->assertStringNotContainsString("'captured'", $code);
         $this->assertStringNotContainsString("'settled'", $code);
+        $this->assertStringNotContainsString('payment->amount', $code);
     }
 
     public function test_reservation_and_payment_domains_do_not_depend_on_stay_services(): void

@@ -4,6 +4,7 @@ namespace App\Domain\StayServices\Services;
 
 use App\Domain\Payment\Models\Payment;
 use App\Domain\Payment\Repositories\Contracts\PaymentRepositoryInterface;
+use App\Domain\Payment\Repositories\Contracts\PaymentTransactionRepositoryInterface;
 use App\Domain\Reservation\Models\Reservation;
 use App\Domain\StayServices\Models\FolioCharge;
 use App\Domain\StayServices\Repositories\Contracts\FolioChargeRepositoryInterface;
@@ -14,10 +15,15 @@ use Illuminate\Support\Collection;
  * DECIMAL-safe (bcmath, never float).
  *
  *   charges_total     = SUM(folio_charges.total_amount WHERE status = posted)
- *   payments_total    = the reservation Payment's amount, but ONLY when the
- *                       Payment is CAPTURED / SETTLED (Phase 0 §9). A hold
- *                       (HOLD_ACTIVE), a pending or a failed payment counts
- *                       as zero — a deposit authorization is not money in.
+ *                       — includes the Phase 9 accommodation charge and every
+ *                       posted service-order charge.
+ *   payments_total    = SUM(payment_transactions.amount) over the payment's
+ *                       SUCCEEDED capture + settlement transactions
+ *                       (Phase 9 review fix). The payment history is the
+ *                       source of truth; `payments.amount` (the deposit
+ *                       requested at booking) is never used here and never
+ *                       overwritten. A hold / pending / failed attempt
+ *                       collects nothing and counts as zero.
  *   outstanding_total = charges_total - payments_total
  *
  * This phase does NOT implement checkout, settlement, capture or invoicing;
@@ -28,6 +34,7 @@ class FolioService
     public function __construct(
         private readonly FolioChargeRepositoryInterface $charges,
         private readonly PaymentRepositoryInterface $payments,
+        private readonly PaymentTransactionRepositoryInterface $paymentTransactions,
     ) {}
 
     public function folioFor(Reservation $reservation): Folio
@@ -40,7 +47,9 @@ class FolioService
             FolioCharge::OWED_STATUSES,
         );
 
-        $paymentsTotal = $this->capturedPaymentAmount($payment);
+        $paymentsTotal = $payment === null
+            ? '0.00'
+            : $this->paymentTransactions->sumCollectedForPayment($payment->id);
         $outstanding = bcsub($chargesTotal, $paymentsTotal, 2);
 
         return new Folio(
@@ -52,23 +61,6 @@ class FolioService
             outstandingTotal: $outstanding,
             currency: $this->resolveCurrency($charges, $payment),
         );
-    }
-
-    /**
-     * The captured/settled amount for a reservation's payment, as a
-     * canonical decimal string. Anything that is not CAPTURED / SETTLED —
-     * including a live deposit hold, a pending capture, or a failed
-     * payment — contributes 0.00.
-     */
-    private function capturedPaymentAmount(?Payment $payment): string
-    {
-        if ($payment === null
-            || ! in_array($payment->status, Payment::CAPTURED_STATUSES, true)
-            || $payment->amount === null) {
-            return '0.00';
-        }
-
-        return bcadd((string) $payment->amount, '0', 2);
     }
 
     /**

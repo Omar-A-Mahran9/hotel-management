@@ -1,5 +1,9 @@
 <?php
 
+use App\Domain\Checkout\Exceptions\CheckoutCurrencyMissingException;
+use App\Domain\Checkout\Exceptions\CheckoutNotAllowedException;
+use App\Domain\Checkout\Exceptions\InvalidCheckoutStatusTransitionException;
+use App\Domain\Checkout\Exceptions\InvoiceGenerationException;
 use App\Domain\DigitalAccess\Exceptions\CheckInEligibilityException;
 use App\Domain\DigitalAccess\Exceptions\CheckInNotAllowedException;
 use App\Domain\DigitalAccess\Exceptions\DigitalAccessActionNotAllowedException;
@@ -15,12 +19,15 @@ use App\Domain\IdentityVerification\Exceptions\IdentityVerificationRetryNotAllow
 use App\Domain\IdentityVerification\Exceptions\InvalidIdentityVerificationStatusTransitionException;
 use App\Domain\Inventory\Exceptions\InvalidRoomStatusTransitionException;
 use App\Domain\Inventory\Exceptions\RoomTypeHotelMismatchException;
+use App\Domain\Loyalty\Exceptions\InvalidLoyaltyPointsException;
+use App\Domain\Loyalty\Exceptions\LoyaltyNotAllowedException;
 use App\Domain\Payment\Exceptions\IdempotencyKeyConflictException;
 use App\Domain\Payment\Exceptions\InvalidPaymentAmountException;
 use App\Domain\Payment\Exceptions\InvalidPaymentCurrencyException;
 use App\Domain\Payment\Exceptions\InvalidPaymentStatusTransitionException;
 use App\Domain\Payment\Exceptions\PaymentAlreadyInitiatedException;
 use App\Domain\Payment\Exceptions\PaymentHoldNotAllowedException;
+use App\Domain\Payment\Exceptions\PaymentSettlementNotAllowedException;
 use App\Domain\Reservation\Exceptions\InvalidReservationStatusTransitionException;
 use App\Domain\Reservation\Exceptions\ReservationNotAvailableException;
 use App\Domain\Reservation\Exceptions\RoomHotelMismatchException;
@@ -272,6 +279,55 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->renderable(function (FolioChargeAmountException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        // Phase 9 — checkout / final settlement / invoice business errors.
+        // Every message is a fixed, safe business string (no secret, no
+        // payment data, no SQLSTATE, no stack trace). All map to 422, like
+        // every other domain exception above.
+        $exceptions->renderable(function (CheckoutNotAllowedException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (CheckoutCurrencyMissingException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (InvalidCheckoutStatusTransitionException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (InvoiceGenerationException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (PaymentSettlementNotAllowedException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        // Phase 10 — loyalty business errors. Fixed, safe machine strings
+        // (no secret, no payment data, no SQLSTATE, no stack trace). All 422,
+        // consistent with every other domain exception above.
+        $exceptions->renderable(function (LoyaltyNotAllowedException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (InvalidLoyaltyPointsException $e, Request $request) use ($envelope) {
             if ($request->is('api/*')) {
                 return $envelope($e->getMessage(), 422);
             }

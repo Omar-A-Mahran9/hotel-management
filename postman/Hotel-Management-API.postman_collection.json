@@ -4633,6 +4633,304 @@
           ]
         }
       ]
+    },
+    {
+      "name": "12 Checkout & Invoice",
+      "description": "Phase 9 — Checkout + Final Settlement + Invoice. POST /api/v1/reservations/{reservation}/checkout, GET /api/v1/reservations/{reservation}/invoice (Phase 0 §12/§16). {reservation} is an int id resolved through ReservationService, so a cross-hotel or missing id is an identical plain 404. Permissions checkout.perform / invoice.view — Group Owner, assigned Hotel Manager, assigned Reception (Phase 0 §7: Reception performs the operational one-tap checkout, every checkout audited); Guest-role users resolve out of scope (404). The client sends NO amount — the settlement amount is always computed server-side from the folio. When outstanding_total > 0 the payment provider is called for a final settlement OUTSIDE any DB transaction; on failure/pending the reservation stays CHECKOUT_IN_PROGRESS and no invoice is issued (business rule: never CHECKED_OUT / INVOICED on a failed/pending settlement). Idempotency-Key is shared with the settlement PaymentTransaction. Rate limited (throttle:checkout.perform). X-Payment-Simulate is honoured ONLY in local/testing.",
+      "item": [
+        {
+          "name": "Checkout - No Outstanding (completes)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "checkout-{{reservation_id}}-001"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations/{{reservation_id}}/checkout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations",
+                "{{reservation_id}}",
+                "checkout"
+              ]
+            },
+            "description": "outstanding_total <= 0 => no provider call: reservation CHECKOUT_IN_PROGRESS -> CHECKED_OUT -> INVOICED via ReservationService, invoice ISSUED. 200 with the checkout resource.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Checkout - Successful Final Settlement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "checkout-{{reservation_id}}-002"
+              },
+              {
+                "key": "X-Payment-Simulate",
+                "value": "success",
+                "description": "local/testing only: success | failure | pending | cancelled | expired"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations/{{reservation_id}}/checkout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations",
+                "{{reservation_id}}",
+                "checkout"
+              ]
+            },
+            "description": "Outstanding > 0: PaymentSettlementService::settle advances the Payment to FINAL_SETTLEMENT_REQUESTED, calls PaymentGatewayInterface::settle OUTSIDE any DB transaction, then Payment -> SETTLED (amount = folio total), reservation -> CHECKED_OUT -> INVOICED, invoice ISSUED. 200.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Checkout - Failed Settlement (422, retryable)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "checkout-{{reservation_id}}-003"
+              },
+              {
+                "key": "X-Payment-Simulate",
+                "value": "failure",
+                "description": "local/testing only: success | failure | pending | cancelled | expired"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations/{{reservation_id}}/checkout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations",
+                "{{reservation_id}}",
+                "checkout"
+              ]
+            },
+            "description": "Provider FAILURE: settlement transaction -> failed, Payment -> SETTLEMENT_FAILED, reservation STAYS CHECKOUT_IN_PROGRESS, no invoice. 422 errors.checkout_status = settlement_failed. Retry with a fresh Idempotency-Key.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Checkout - Pending Settlement (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "checkout-{{reservation_id}}-004"
+              },
+              {
+                "key": "X-Payment-Simulate",
+                "value": "pending",
+                "description": "local/testing only: success | failure | pending | cancelled | expired"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations/{{reservation_id}}/checkout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations",
+                "{{reservation_id}}",
+                "checkout"
+              ]
+            },
+            "description": "Provider PENDING: settlement transaction stays pending, Payment stays FINAL_SETTLEMENT_REQUESTED, reservation stays CHECKOUT_IN_PROGRESS, no invoice. 422 errors.checkout_status = awaiting_settlement. A later retry re-checks the provider (verify) and can complete it.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Checkout - Repeated / Idempotent",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "checkout-{{reservation_id}}-002"
+              },
+              {
+                "key": "X-Payment-Simulate",
+                "value": "success",
+                "description": "local/testing only: success | failure | pending | cancelled | expired"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations/{{reservation_id}}/checkout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations",
+                "{{reservation_id}}",
+                "checkout"
+              ]
+            },
+            "description": "Re-sending checkout for an already-INVOICED reservation is an idempotent replay: no second settlement, no duplicate invoice, same invoice_number. 200.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Reservation Invoice",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations/{{reservation_id}}/invoice",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations",
+                "{{reservation_id}}",
+                "invoice"
+              ]
+            },
+            "description": "InvoiceController::show. invoice.view permission. Issued invoice with frozen line items snapshotted from the posted folio charges + totals. 404 before checkout. No payment secret / provider reference / card data.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Checkout - Unauthorized (Guest, 404)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{guest_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations/{{reservation_id}}/checkout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations",
+                "{{reservation_id}}",
+                "checkout"
+              ]
+            },
+            "description": "Guest-role token: no checkout.perform, no hotel assignment -> reservation does not resolve -> plain 404.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Checkout - Cross-Hotel (404)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{manager_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations/{{other_hotel_reservation_id}}/checkout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations",
+                "{{other_hotel_reservation_id}}",
+                "checkout"
+              ]
+            },
+            "description": "Manager acting on a reservation in an unassigned hotel -> identical plain 404. Hotel scope resolved server-side from the reservation, never a client hotel_id.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Checkout - Invalid Reservation State (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations/{{checked_in_reservation_id}}/checkout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations",
+                "{{checked_in_reservation_id}}",
+                "checkout"
+              ]
+            },
+            "description": "Checkout may only begin from IN_STAY (or resume from CHECKOUT_IN_PROGRESS / CHECKED_OUT). Any other status -> 422 CheckoutNotAllowedException, nothing persisted.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "auth": {

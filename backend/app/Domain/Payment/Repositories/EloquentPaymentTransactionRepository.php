@@ -30,6 +30,20 @@ class EloquentPaymentTransactionRepository implements PaymentTransactionReposito
             ->first();
     }
 
+    public function sumCollectedForPayment(int $paymentId): string
+    {
+        // The database computes the SUM over the DECIMAL column — no float
+        // arithmetic. bcadd normalizes the (possibly null) result to 2 places.
+        $sum = PaymentTransaction::query()
+            ->where('payment_id', $paymentId)
+            ->whereIn('type', PaymentTransaction::COLLECTED_TYPES)
+            ->where('status', PaymentTransaction::STATUS_SUCCEEDED)
+            ->selectRaw('COALESCE(SUM(amount), 0) as aggregate')
+            ->value('aggregate');
+
+        return bcadd((string) $sum, '0', 2);
+    }
+
     public function create(array $data): PaymentTransaction
     {
         return PaymentTransaction::create($data)->refresh();

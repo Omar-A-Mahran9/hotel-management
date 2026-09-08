@@ -54,4 +54,19 @@ return [
     'stay_services' => [
         'folio' => 'The current reservation folio is returned.',
     ],
+
+    'checkout' => [
+        'completed' => 'Checkout is complete and the invoice has been issued.',
+        'settlement_pending' => 'The final settlement is awaiting confirmation from the payment provider. Checkout is not complete.',
+        'settlement_failed' => 'The final settlement was not successful. Checkout is not complete and can be retried.',
+        'invoice' => 'The reservation invoice is returned.',
+    ],
+
+    'loyalty' => [
+        'account' => 'The guest loyalty account is returned.',
+        'transactions' => 'The guest loyalty ledger is returned.',
+        'earned' => 'Loyalty points were accrued for the completed stay.',
+        'redeemed' => 'Loyalty points were redeemed against the booking.',
+        'rule' => 'The hotel group loyalty rule is returned.',
+    ],
 ];

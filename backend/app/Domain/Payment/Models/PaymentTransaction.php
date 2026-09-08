@@ -70,10 +70,24 @@ class PaymentTransaction extends Model
         self::STATUS_EXPIRED,
     ];
 
+    /**
+     * Transaction types that move money the guest has actually paid — a
+     * succeeded row of one of these is what counts toward the folio's
+     * `payments_total` (Phase 9 review fix). A `hold` is only an
+     * authorization and never counts.
+     *
+     * @var array<int, string>
+     */
+    public const COLLECTED_TYPES = [
+        self::TYPE_CAPTURE,
+        self::TYPE_SETTLEMENT,
+    ];
+
     protected $fillable = [
         'payment_id',
         'type',
         'status',
+        'amount',
         'idempotency_key',
         'provider',
         'provider_reference',
@@ -84,6 +98,7 @@ class PaymentTransaction extends Model
     protected function casts(): array
     {
         return [
+            'amount' => 'decimal:2',
             'metadata' => 'array',
         ];
     }

@@ -2,11 +2,15 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CheckInController;
+use App\Http\Controllers\Api\V1\CheckoutController;
 use App\Http\Controllers\Api\V1\DigitalAccessController;
 use App\Http\Controllers\Api\V1\FolioController;
 use App\Http\Controllers\Api\V1\HotelController;
 use App\Http\Controllers\Api\V1\HotelGroupController;
 use App\Http\Controllers\Api\V1\IdentityVerificationController;
+use App\Http\Controllers\Api\V1\InvoiceController;
+use App\Http\Controllers\Api\V1\LoyaltyController;
+use App\Http\Controllers\Api\V1\LoyaltyRuleController;
 use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\PaymentWebhookController;
 use App\Http\Controllers\Api\V1\PermissionController;
@@ -41,6 +45,11 @@ Route::prefix('v1')->group(function () {
         Route::get('/hotel-groups/{hotel_group}', [HotelGroupController::class, 'show']);
         Route::put('/hotel-groups/{hotel_group}', [HotelGroupController::class, 'update']);
 
+        // Phase 10 — Loyalty rule configuration (Phase 0 §7/§13). Group
+        // Owner only; the rule is created inactive/unconfigured on first read.
+        Route::get('/hotel-groups/{hotel_group}/loyalty-rule', [LoyaltyRuleController::class, 'show']);
+        Route::match(['put', 'patch'], '/hotel-groups/{hotel_group}/loyalty-rule', [LoyaltyRuleController::class, 'update']);
+
         Route::get('/hotels', [HotelController::class, 'index']);
         Route::post('/hotels', [HotelController::class, 'store']);
         Route::get('/hotels/{hotel}', [HotelController::class, 'show']);
@@ -70,6 +79,25 @@ Route::prefix('v1')->group(function () {
             Route::post('/service-orders/{serviceOrder}/transition', [ServiceOrderController::class, 'transition']);
 
             Route::get('/folio', [FolioController::class, 'show']);
+
+            // Phase 9 — Checkout + Final Settlement + Invoice (Phase 0 §12/§16).
+            // {reservation} is an int id resolved through ReservationService,
+            // so a cross-hotel or missing id is an identical plain 404.
+            // Checkout is financially sensitive — rate limited like the
+            // payment endpoints (Phase 0 §17). `Idempotency-Key` header.
+            Route::post('/checkout', [CheckoutController::class, 'store'])
+                ->middleware('throttle:checkout.perform');
+
+            Route::get('/invoice', [InvoiceController::class, 'show']);
+
+            // Phase 10 — Loyalty (Phase 0 §13/§16). Reservation-scoped so
+            // hotel scope + guest identity are resolved server-side (no guest
+            // auth in the MVP). `earn` accrues for a completed booking;
+            // `redeem` spends against an eligible (non-terminal) booking.
+            Route::get('/loyalty', [LoyaltyController::class, 'show']);
+            Route::get('/loyalty/transactions', [LoyaltyController::class, 'transactions']);
+            Route::post('/loyalty/earn', [LoyaltyController::class, 'earn']);
+            Route::post('/loyalty/redeem', [LoyaltyController::class, 'redeem']);
         });
 
         // Phase 6 — Identity Verification (Phase 0 §16). {reservation} is an
