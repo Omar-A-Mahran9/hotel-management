@@ -20,7 +20,23 @@ import '../../features/discovery/presentation/pages/hotel_search_page.dart';
 import '../../features/discovery/presentation/pages/room_detail_page.dart';
 import '../../features/discovery/presentation/pages/room_selection_review_page.dart';
 import '../../features/discovery/presentation/pages/stay_dates_page.dart';
+import '../../features/checkout/presentation/pages/checkout_completion_page.dart';
+import '../../features/checkout/presentation/pages/checkout_page.dart';
+import '../../features/checkout/presentation/pages/checkout_processing_page.dart';
+import '../../features/checkout/presentation/pages/invoice_page.dart';
+import '../../features/digital_access/presentation/pages/check_in_page.dart';
+import '../../features/digital_access/presentation/pages/check_in_processing_page.dart';
+import '../../features/digital_access/presentation/pages/digital_access_page.dart';
+import '../../features/identity_verification/presentation/pages/identity_verification_page.dart';
+import '../../features/identity_verification/presentation/pages/identity_verification_result_page.dart';
+import '../../features/payment/presentation/pages/payment_processing_page.dart';
+import '../../features/payment/presentation/pages/payment_result_page.dart';
+import '../../features/payment/presentation/pages/payment_review_page.dart';
 import '../../features/reservation/presentation/pages/reservation_detail_page.dart';
+import '../../features/stay_services/presentation/pages/my_service_requests_page.dart';
+import '../../features/stay_services/presentation/pages/service_detail_page.dart';
+import '../../features/stay_services/presentation/pages/service_order_detail_page.dart';
+import '../../features/stay_services/presentation/pages/stay_services_page.dart';
 import '../foundation_home_page.dart';
 import 'app_routes.dart';
 
@@ -162,6 +178,129 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
         name: AppRoutes.reservationDetailName,
         builder: (BuildContext context, GoRouterState state) =>
             ReservationDetailPage(
+          reservationId: state.pathParameters['reservationId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.paymentReview,
+        name: AppRoutes.paymentReviewName,
+        builder: (BuildContext context, GoRouterState state) => PaymentReviewPage(
+          reservationId: state.pathParameters['reservationId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.paymentProcessing,
+        name: AppRoutes.paymentProcessingName,
+        builder: (BuildContext context, GoRouterState state) =>
+            PaymentProcessingPage(
+          reservationId: state.pathParameters['reservationId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.paymentResult,
+        name: AppRoutes.paymentResultName,
+        builder: (BuildContext context, GoRouterState state) => PaymentResultPage(
+          reservationId: state.pathParameters['reservationId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.identityVerification,
+        name: AppRoutes.identityVerificationName,
+        builder: (BuildContext context, GoRouterState state) =>
+            IdentityVerificationPage(
+          reservationId: state.pathParameters['reservationId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.identityVerificationResult,
+        name: AppRoutes.identityVerificationResultName,
+        builder: (BuildContext context, GoRouterState state) =>
+            IdentityVerificationResultPage(
+          reservationId: state.pathParameters['reservationId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.checkIn,
+        name: AppRoutes.checkInName,
+        builder: (BuildContext context, GoRouterState state) => CheckInPage(
+          reservationId: state.pathParameters['reservationId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.checkInProcessing,
+        name: AppRoutes.checkInProcessingName,
+        builder: (BuildContext context, GoRouterState state) =>
+            CheckInProcessingPage(
+          reservationId: state.pathParameters['reservationId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.digitalAccess,
+        name: AppRoutes.digitalAccessName,
+        builder: (BuildContext context, GoRouterState state) =>
+            DigitalAccessPage(
+          reservationId: state.pathParameters['reservationId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.stayServices,
+        name: AppRoutes.stayServicesName,
+        builder: (BuildContext context, GoRouterState state) => StayServicesPage(
+          reservationId: state.pathParameters['reservationId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.serviceDetail,
+        name: AppRoutes.serviceDetailName,
+        builder: (BuildContext context, GoRouterState state) => ServiceDetailPage(
+          reservationId: state.pathParameters['reservationId']!,
+          serviceId: state.pathParameters['serviceId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.serviceOrders,
+        name: AppRoutes.serviceOrdersName,
+        builder: (BuildContext context, GoRouterState state) =>
+            MyServiceRequestsPage(
+          reservationId: state.pathParameters['reservationId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.serviceOrderDetail,
+        name: AppRoutes.serviceOrderDetailName,
+        builder: (BuildContext context, GoRouterState state) =>
+            ServiceOrderDetailPage(
+          reservationId: state.pathParameters['reservationId']!,
+          orderId: state.pathParameters['orderId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.checkout,
+        name: AppRoutes.checkoutName,
+        builder: (BuildContext context, GoRouterState state) => CheckoutPage(
+          reservationId: state.pathParameters['reservationId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.checkoutProcessing,
+        name: AppRoutes.checkoutProcessingName,
+        builder: (BuildContext context, GoRouterState state) =>
+            CheckoutProcessingPage(
+          reservationId: state.pathParameters['reservationId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.checkoutComplete,
+        name: AppRoutes.checkoutCompleteName,
+        builder: (BuildContext context, GoRouterState state) =>
+            CheckoutCompletionPage(
+          reservationId: state.pathParameters['reservationId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.invoice,
+        name: AppRoutes.invoiceName,
+        builder: (BuildContext context, GoRouterState state) => InvoicePage(
           reservationId: state.pathParameters['reservationId']!,
         ),
       ),

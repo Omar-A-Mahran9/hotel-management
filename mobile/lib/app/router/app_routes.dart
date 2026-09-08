@@ -73,6 +73,81 @@ abstract final class AppRoutes {
   static const String reservationDetail = '/reservation/:reservationId';
   static const String reservationDetailName = 'reservationDetail';
 
+  /// `03 · Pay & Verify` — review the deposit hold (Mobile Phase 5).
+  static const String paymentReview = '/reservation/:reservationId/payment';
+  static const String paymentReviewName = 'paymentReview';
+
+  /// `03 · Pay & Verify` — the transient processing screen (Mobile Phase 5).
+  static const String paymentProcessing =
+      '/reservation/:reservationId/payment/processing';
+  static const String paymentProcessingName = 'paymentProcessing';
+
+  /// `03 · Pay & Verify` — the authoritative hold outcome (Mobile Phase 5).
+  static const String paymentResult =
+      '/reservation/:reservationId/payment/result';
+  static const String paymentResultName = 'paymentResult';
+
+  /// `10 · Identity verification` — the guest verification flow (Mobile Phase 6).
+  static const String identityVerification =
+      '/reservation/:reservationId/identity';
+  static const String identityVerificationName = 'identityVerification';
+
+  /// `10 · Identity verification` — the authoritative verification outcome
+  /// (Mobile Phase 6).
+  static const String identityVerificationResult =
+      '/reservation/:reservationId/identity/result';
+  static const String identityVerificationResultName = 'identityVerificationResult';
+
+  /// `04 · Check in & Stay` — check-in review / eligibility (Mobile Phase 7).
+  static const String checkIn = '/reservation/:reservationId/check-in';
+  static const String checkInName = 'checkIn';
+
+  /// `04 · Check in & Stay` — the transient check-in processing screen.
+  static const String checkInProcessing =
+      '/reservation/:reservationId/check-in/processing';
+  static const String checkInProcessingName = 'checkInProcessing';
+
+  /// `04 · Check in & Stay` — the digital room-key screen (Mobile Phase 7).
+  static const String digitalAccess = '/reservation/:reservationId/access';
+  static const String digitalAccessName = 'digitalAccess';
+
+  /// `11 · Services & requests` — the hotel service catalogue (Mobile Phase 8).
+  static const String stayServices = '/reservation/:reservationId/services';
+  static const String stayServicesName = 'stayServices';
+
+  /// `11 · Services & requests` — one service + request action.
+  static const String serviceDetail =
+      '/reservation/:reservationId/services/:serviceId';
+  static const String serviceDetailName = 'serviceDetail';
+
+  /// `11 · Services & requests` — the guest's service requests.
+  static const String serviceOrders =
+      '/reservation/:reservationId/service-orders';
+  static const String serviceOrdersName = 'serviceOrders';
+
+  /// `11 · Services & requests` — one service request + status / cancel.
+  static const String serviceOrderDetail =
+      '/reservation/:reservationId/service-orders/:orderId';
+  static const String serviceOrderDetailName = 'serviceOrderDetail';
+
+  /// `05 · Depart & Invoice` — review the outstanding amount (Mobile Phase 9).
+  static const String checkout = '/reservation/:reservationId/checkout';
+  static const String checkoutName = 'checkout';
+
+  /// `05 · Depart & Invoice` — the transient settlement processing screen.
+  static const String checkoutProcessing =
+      '/reservation/:reservationId/checkout/processing';
+  static const String checkoutProcessingName = 'checkoutProcessing';
+
+  /// `05 · Depart & Invoice` — the authoritative checkout outcome.
+  static const String checkoutComplete =
+      '/reservation/:reservationId/checkout/complete';
+  static const String checkoutCompleteName = 'checkoutComplete';
+
+  /// `05 · Depart & Invoice` — the issued e-invoice (Mobile Phase 9).
+  static const String invoice = '/reservation/:reservationId/invoice';
+  static const String invoiceName = 'invoice';
+
   /// The authenticated landing route.
   static const String authenticatedHome = discover;
 

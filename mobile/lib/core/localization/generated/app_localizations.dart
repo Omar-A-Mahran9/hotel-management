@@ -293,7 +293,7 @@ abstract class AppLocalizations {
   /// No description provided for @errorNotImplemented.
   ///
   /// In en, this message translates to:
-  /// **'This is not available in Phase 0.'**
+  /// **'This isn\'t available yet. Please try again later.'**
   String get errorNotImplemented;
 
   /// No description provided for @textFieldExampleLabel.
@@ -1579,6 +1579,1254 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancelled'**
   String get reservationStatusCancelled;
+
+  /// No description provided for @reservationPayCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to payment'**
+  String get reservationPayCta;
+
+  /// No description provided for @reservationVerifyIdentityCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify your identity'**
+  String get reservationVerifyIdentityCta;
+
+  /// A currency amount, e.g. 'SAR 900'.
+  ///
+  /// In en, this message translates to:
+  /// **'{currency} {amount}'**
+  String moneyAmount(String currency, int amount);
+
+  /// No description provided for @paymentReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment'**
+  String get paymentReviewTitle;
+
+  /// No description provided for @paymentProcessingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing payment'**
+  String get paymentProcessingTitle;
+
+  /// No description provided for @paymentResultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment'**
+  String get paymentResultTitle;
+
+  /// No description provided for @paymentReservationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation'**
+  String get paymentReservationLabel;
+
+  /// No description provided for @paymentStatusFieldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment status'**
+  String get paymentStatusFieldLabel;
+
+  /// No description provided for @paymentAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get paymentAmountLabel;
+
+  /// No description provided for @paymentPayNowCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay now'**
+  String get paymentPayNowCta;
+
+  /// No description provided for @paymentHoldExplainer.
+  ///
+  /// In en, this message translates to:
+  /// **'A refundable deposit hold is placed for your stay. Nothing is charged now.'**
+  String get paymentHoldExplainer;
+
+  /// No description provided for @paymentProcessingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirming your payment…'**
+  String get paymentProcessingBody;
+
+  /// No description provided for @paymentDoNotClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Please keep this screen open.'**
+  String get paymentDoNotClose;
+
+  /// No description provided for @paymentAlreadyHeldTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Deposit already held'**
+  String get paymentAlreadyHeldTitle;
+
+  /// No description provided for @paymentAlreadyHeldBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The deposit hold for this reservation is already in place.'**
+  String get paymentAlreadyHeldBody;
+
+  /// No description provided for @paymentSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Deposit hold confirmed'**
+  String get paymentSuccessTitle;
+
+  /// No description provided for @paymentSuccessBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your deposit is secured. You can continue with identity verification.'**
+  String get paymentSuccessBody;
+
+  /// No description provided for @paymentPendingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment is processing'**
+  String get paymentPendingTitle;
+
+  /// No description provided for @paymentPendingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your bank hasn\'t confirmed the hold yet. You can check the status again shortly.'**
+  String get paymentPendingBody;
+
+  /// No description provided for @paymentFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment didn\'t go through'**
+  String get paymentFailedTitle;
+
+  /// No description provided for @paymentFailedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'No money was taken. You can try again.'**
+  String get paymentFailedBody;
+
+  /// No description provided for @paymentCancelledTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment cancelled'**
+  String get paymentCancelledTitle;
+
+  /// No description provided for @paymentExpiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment hold expired'**
+  String get paymentExpiredTitle;
+
+  /// No description provided for @paymentRetryCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get paymentRetryCta;
+
+  /// No description provided for @paymentBackToReservation.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to reservation'**
+  String get paymentBackToReservation;
+
+  /// No description provided for @paymentUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment is unavailable'**
+  String get paymentUnavailableTitle;
+
+  /// No description provided for @paymentStatusNotStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Not started'**
+  String get paymentStatusNotStarted;
+
+  /// No description provided for @paymentStatusHoldRequested.
+  ///
+  /// In en, this message translates to:
+  /// **'Authorizing'**
+  String get paymentStatusHoldRequested;
+
+  /// No description provided for @paymentStatusHoldActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Deposit held'**
+  String get paymentStatusHoldActive;
+
+  /// No description provided for @paymentStatusHoldFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get paymentStatusHoldFailed;
+
+  /// No description provided for @paymentStatusCaptureRequested.
+  ///
+  /// In en, this message translates to:
+  /// **'Charging'**
+  String get paymentStatusCaptureRequested;
+
+  /// No description provided for @paymentStatusCaptured.
+  ///
+  /// In en, this message translates to:
+  /// **'Charged'**
+  String get paymentStatusCaptured;
+
+  /// No description provided for @paymentStatusCaptureFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Charge failed'**
+  String get paymentStatusCaptureFailed;
+
+  /// No description provided for @paymentStatusFinalSettlementRequested.
+  ///
+  /// In en, this message translates to:
+  /// **'Settling'**
+  String get paymentStatusFinalSettlementRequested;
+
+  /// No description provided for @paymentStatusSettled.
+  ///
+  /// In en, this message translates to:
+  /// **'Settled'**
+  String get paymentStatusSettled;
+
+  /// No description provided for @paymentStatusSettlementFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Settlement failed'**
+  String get paymentStatusSettlementFailed;
+
+  /// No description provided for @paymentStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get paymentStatusCancelled;
+
+  /// No description provided for @paymentStatusExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get paymentStatusExpired;
+
+  /// No description provided for @paymentStatusRefundRequested.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund pending'**
+  String get paymentStatusRefundRequested;
+
+  /// No description provided for @paymentStatusRefunded.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunded'**
+  String get paymentStatusRefunded;
+
+  /// No description provided for @paymentStatusRefundFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund failed'**
+  String get paymentStatusRefundFailed;
+
+  /// No description provided for @identityVerificationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Identity verification'**
+  String get identityVerificationTitle;
+
+  /// No description provided for @identityVerificationResultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Identity verification'**
+  String get identityVerificationResultTitle;
+
+  /// No description provided for @identityVerifyCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify identity'**
+  String get identityVerifyCta;
+
+  /// No description provided for @identityStepDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Document'**
+  String get identityStepDocument;
+
+  /// No description provided for @identityStepSelfie.
+  ///
+  /// In en, this message translates to:
+  /// **'Selfie'**
+  String get identityStepSelfie;
+
+  /// No description provided for @identityStepResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Result'**
+  String get identityStepResult;
+
+  /// No description provided for @identityDocumentStepTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload your ID document'**
+  String get identityDocumentStepTitle;
+
+  /// No description provided for @identityDocumentStepBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Use your passport, national ID or residence permit. Make sure the whole document is visible and readable.'**
+  String get identityDocumentStepBody;
+
+  /// No description provided for @identityDocumentTypePassport.
+  ///
+  /// In en, this message translates to:
+  /// **'Passport'**
+  String get identityDocumentTypePassport;
+
+  /// No description provided for @identityDocumentTypeNationalId.
+  ///
+  /// In en, this message translates to:
+  /// **'National ID'**
+  String get identityDocumentTypeNationalId;
+
+  /// No description provided for @identityDocumentTypeResidencePermit.
+  ///
+  /// In en, this message translates to:
+  /// **'Residence permit'**
+  String get identityDocumentTypeResidencePermit;
+
+  /// No description provided for @identityDocumentTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Document type'**
+  String get identityDocumentTypeLabel;
+
+  /// No description provided for @identityDocumentCaptureCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Add document photo'**
+  String get identityDocumentCaptureCta;
+
+  /// No description provided for @identityDocumentCapturedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Document photo added'**
+  String get identityDocumentCapturedLabel;
+
+  /// No description provided for @identityDocumentSubmitCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to selfie'**
+  String get identityDocumentSubmitCta;
+
+  /// No description provided for @identitySelfieStepTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a selfie'**
+  String get identitySelfieStepTitle;
+
+  /// No description provided for @identitySelfieStepBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Look straight at the camera in good light. We match your selfie to your ID photo.'**
+  String get identitySelfieStepBody;
+
+  /// No description provided for @identitySelfieCaptureCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Add selfie'**
+  String get identitySelfieCaptureCta;
+
+  /// No description provided for @identitySelfieCapturedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Selfie added'**
+  String get identitySelfieCapturedLabel;
+
+  /// No description provided for @identitySelfieSubmitCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit for verification'**
+  String get identitySelfieSubmitCta;
+
+  /// No description provided for @identityProcessingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verifying your identity'**
+  String get identityProcessingTitle;
+
+  /// No description provided for @identityProcessingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Matching your selfie to your document…'**
+  String get identityProcessingBody;
+
+  /// No description provided for @identityApprovedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Identity verified'**
+  String get identityApprovedTitle;
+
+  /// No description provided for @identityApprovedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your identity is confirmed. You\'re ready for check-in.'**
+  String get identityApprovedBody;
+
+  /// No description provided for @identityManualReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual review in progress'**
+  String get identityManualReviewTitle;
+
+  /// No description provided for @identityManualReviewBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Our team is reviewing your documents. This usually takes a short while — we\'ll notify you when it\'s done.'**
+  String get identityManualReviewBody;
+
+  /// No description provided for @identityRetryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s try that again'**
+  String get identityRetryTitle;
+
+  /// No description provided for @identityRetryBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t verify your identity from those photos. Please retake them and submit again.'**
+  String get identityRetryBody;
+
+  /// No description provided for @identityRetryCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get identityRetryCta;
+
+  /// No description provided for @identityRejectedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification not approved'**
+  String get identityRejectedTitle;
+
+  /// No description provided for @identityRejectedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Our team could not approve your identity verification. Please contact the front desk for help.'**
+  String get identityRejectedBody;
+
+  /// No description provided for @identityRejectedRetryBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Our team could not approve your identity verification. You can submit new photos and try again.'**
+  String get identityRejectedRetryBody;
+
+  /// No description provided for @identityAttemptCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Attempt {count}'**
+  String identityAttemptCount(int count);
+
+  /// No description provided for @identityBackToReservation.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to reservation'**
+  String get identityBackToReservation;
+
+  /// No description provided for @identityViewResultCta.
+  ///
+  /// In en, this message translates to:
+  /// **'View result'**
+  String get identityViewResultCta;
+
+  /// No description provided for @identityUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification is unavailable'**
+  String get identityUnavailableTitle;
+
+  /// No description provided for @identityStatusNotStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Not started'**
+  String get identityStatusNotStarted;
+
+  /// No description provided for @identityStatusDocumentUploaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Document uploaded'**
+  String get identityStatusDocumentUploaded;
+
+  /// No description provided for @identityStatusSelfieCaptured.
+  ///
+  /// In en, this message translates to:
+  /// **'Selfie captured'**
+  String get identityStatusSelfieCaptured;
+
+  /// No description provided for @identityStatusMatchingInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Matching'**
+  String get identityStatusMatchingInProgress;
+
+  /// No description provided for @identityStatusAutoApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get identityStatusAutoApproved;
+
+  /// No description provided for @identityStatusPendingManualReview.
+  ///
+  /// In en, this message translates to:
+  /// **'In review'**
+  String get identityStatusPendingManualReview;
+
+  /// No description provided for @identityStatusStaffApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get identityStatusStaffApproved;
+
+  /// No description provided for @identityStatusStaffRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Not approved'**
+  String get identityStatusStaffRejected;
+
+  /// No description provided for @identityStatusRetryAllowed.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry needed'**
+  String get identityStatusRetryAllowed;
+
+  /// No description provided for @reservationCheckInCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Check in'**
+  String get reservationCheckInCta;
+
+  /// No description provided for @reservationServicesCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay services'**
+  String get reservationServicesCta;
+
+  /// No description provided for @reservationCheckoutCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Check out'**
+  String get reservationCheckoutCta;
+
+  /// No description provided for @checkInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check in'**
+  String get checkInTitle;
+
+  /// No description provided for @checkInProcessingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking you in'**
+  String get checkInProcessingTitle;
+
+  /// No description provided for @accessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Room access'**
+  String get accessTitle;
+
+  /// No description provided for @checkInReadyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to check in'**
+  String get checkInReadyTitle;
+
+  /// No description provided for @checkInReadyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your reservation is verified. Check in to get your room number and entry code.'**
+  String get checkInReadyBody;
+
+  /// No description provided for @checkInNotReadyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not ready to check in yet'**
+  String get checkInNotReadyTitle;
+
+  /// No description provided for @checkInNotReadyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete payment and identity verification first.'**
+  String get checkInNotReadyBody;
+
+  /// No description provided for @checkInUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in isn\'t available'**
+  String get checkInUnavailableTitle;
+
+  /// No description provided for @checkInAlreadyDoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re already checked in'**
+  String get checkInAlreadyDoneTitle;
+
+  /// No description provided for @checkInCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Check in now'**
+  String get checkInCta;
+
+  /// No description provided for @checkInProcessingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Issuing your digital room key…'**
+  String get checkInProcessingBody;
+
+  /// No description provided for @checkInDoNotClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Please keep this screen open.'**
+  String get checkInDoNotClose;
+
+  /// No description provided for @checkInFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in didn\'t complete'**
+  String get checkInFailedTitle;
+
+  /// No description provided for @checkInFailedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your room key couldn\'t be issued. You can try again.'**
+  String get checkInFailedBody;
+
+  /// No description provided for @checkInPendingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Almost there'**
+  String get checkInPendingTitle;
+
+  /// No description provided for @checkInPendingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The front desk is finishing your check-in. Check again shortly.'**
+  String get checkInPendingBody;
+
+  /// No description provided for @checkInRetryCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get checkInRetryCta;
+
+  /// No description provided for @accessCheckedInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re checked in'**
+  String get accessCheckedInTitle;
+
+  /// No description provided for @accessRoomNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Room number'**
+  String get accessRoomNumberLabel;
+
+  /// No description provided for @accessEntryCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Entry code'**
+  String get accessEntryCodeLabel;
+
+  /// No description provided for @accessExpiresLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid until your stay ends · {date}'**
+  String accessExpiresLabel(String date);
+
+  /// No description provided for @accessHelpBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Code not working? Contact reception.'**
+  String get accessHelpBanner;
+
+  /// No description provided for @accessNotIssuedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No room key yet'**
+  String get accessNotIssuedTitle;
+
+  /// No description provided for @accessNotIssuedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Check in to get your digital room key.'**
+  String get accessNotIssuedBody;
+
+  /// No description provided for @accessRevokedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Room key deactivated'**
+  String get accessRevokedTitle;
+
+  /// No description provided for @accessRevokedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This room key is no longer active. Contact reception if you need help.'**
+  String get accessRevokedBody;
+
+  /// No description provided for @accessExpiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Room key expired'**
+  String get accessExpiredTitle;
+
+  /// No description provided for @accessExpiredBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your stay has ended, so this room key no longer works.'**
+  String get accessExpiredBody;
+
+  /// No description provided for @accessFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Room key unavailable'**
+  String get accessFailedTitle;
+
+  /// No description provided for @accessUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Access is unavailable'**
+  String get accessUnavailableTitle;
+
+  /// No description provided for @accessBackToReservation.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to reservation'**
+  String get accessBackToReservation;
+
+  /// No description provided for @accessStatusNotIssued.
+  ///
+  /// In en, this message translates to:
+  /// **'Not issued'**
+  String get accessStatusNotIssued;
+
+  /// No description provided for @accessStatusIssueRequested.
+  ///
+  /// In en, this message translates to:
+  /// **'Issuing'**
+  String get accessStatusIssueRequested;
+
+  /// No description provided for @accessStatusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get accessStatusActive;
+
+  /// No description provided for @accessStatusFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get accessStatusFailed;
+
+  /// No description provided for @accessStatusRevokeRequested.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivating'**
+  String get accessStatusRevokeRequested;
+
+  /// No description provided for @accessStatusRevoked.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivated'**
+  String get accessStatusRevoked;
+
+  /// No description provided for @accessStatusExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get accessStatusExpired;
+
+  /// No description provided for @servicesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hotel services'**
+  String get servicesTitle;
+
+  /// No description provided for @servicesIntroBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Order what you need from your room. Requests go straight to reception.'**
+  String get servicesIntroBanner;
+
+  /// No description provided for @servicesEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No services available'**
+  String get servicesEmptyTitle;
+
+  /// No description provided for @servicesEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This hotel hasn\'t published any services yet.'**
+  String get servicesEmptyBody;
+
+  /// No description provided for @servicesUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Services are unavailable'**
+  String get servicesUnavailableTitle;
+
+  /// No description provided for @serviceUncategorised.
+  ///
+  /// In en, this message translates to:
+  /// **'Other services'**
+  String get serviceUncategorised;
+
+  /// No description provided for @serviceFreeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Included'**
+  String get serviceFreeLabel;
+
+  /// No description provided for @serviceEstimatedMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'~{count} min'**
+  String serviceEstimatedMinutes(int count);
+
+  /// No description provided for @serviceDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Service'**
+  String get serviceDetailTitle;
+
+  /// No description provided for @serviceQuantityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity'**
+  String get serviceQuantityLabel;
+
+  /// No description provided for @serviceNotesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes (optional)'**
+  String get serviceNotesLabel;
+
+  /// No description provided for @serviceNotesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Anything the team should know'**
+  String get serviceNotesHint;
+
+  /// No description provided for @serviceRequestCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Request this service'**
+  String get serviceRequestCta;
+
+  /// No description provided for @serviceRequestingCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending…'**
+  String get serviceRequestingCta;
+
+  /// No description provided for @serviceEstimatedTotalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated total'**
+  String get serviceEstimatedTotalLabel;
+
+  /// No description provided for @serviceChargeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Any charge is added to your room account and settled at checkout.'**
+  String get serviceChargeNote;
+
+  /// No description provided for @serviceRequestFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t send your request'**
+  String get serviceRequestFailedTitle;
+
+  /// No description provided for @myRequestsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My requests'**
+  String get myRequestsTitle;
+
+  /// No description provided for @myRequestsIntroBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Track each request. You can cancel one before the team starts it.'**
+  String get myRequestsIntroBanner;
+
+  /// No description provided for @myRequestsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No requests yet'**
+  String get myRequestsEmptyTitle;
+
+  /// No description provided for @myRequestsEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Request a service and it will show up here.'**
+  String get myRequestsEmptyBody;
+
+  /// No description provided for @newRequestCta.
+  ///
+  /// In en, this message translates to:
+  /// **'New request'**
+  String get newRequestCta;
+
+  /// No description provided for @serviceOrderDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Request details'**
+  String get serviceOrderDetailTitle;
+
+  /// No description provided for @serviceOrderRequestedAtLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Requested'**
+  String get serviceOrderRequestedAtLabel;
+
+  /// No description provided for @serviceOrderConfirmedAtLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepted'**
+  String get serviceOrderConfirmedAtLabel;
+
+  /// No description provided for @serviceCancelCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel request'**
+  String get serviceCancelCta;
+
+  /// No description provided for @serviceCancelConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel this request?'**
+  String get serviceCancelConfirmTitle;
+
+  /// No description provided for @serviceCancelConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The team hasn\'t started this yet, so it can still be cancelled.'**
+  String get serviceCancelConfirmBody;
+
+  /// No description provided for @serviceCancelConfirmCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, cancel'**
+  String get serviceCancelConfirmCta;
+
+  /// No description provided for @serviceCancelKeepCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep request'**
+  String get serviceCancelKeepCta;
+
+  /// No description provided for @serviceCancelNotAllowed.
+  ///
+  /// In en, this message translates to:
+  /// **'This request can no longer be cancelled.'**
+  String get serviceCancelNotAllowed;
+
+  /// No description provided for @serviceContactReception.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact reception'**
+  String get serviceContactReception;
+
+  /// No description provided for @serviceContactReceptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Call reception from your room phone or the front desk for help with this request.'**
+  String get serviceContactReceptionHint;
+
+  /// No description provided for @serviceStatusRequested.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get serviceStatusRequested;
+
+  /// No description provided for @serviceStatusConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepted'**
+  String get serviceStatusConfirmed;
+
+  /// No description provided for @serviceStatusFulfilled.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get serviceStatusFulfilled;
+
+  /// No description provided for @serviceStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get serviceStatusCancelled;
+
+  /// No description provided for @checkoutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Checkout'**
+  String get checkoutTitle;
+
+  /// No description provided for @checkoutProcessingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Completing checkout'**
+  String get checkoutProcessingTitle;
+
+  /// No description provided for @checkoutCompleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your stay summary'**
+  String get checkoutCompleteTitle;
+
+  /// No description provided for @invoiceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice'**
+  String get invoiceTitle;
+
+  /// No description provided for @checkoutReadyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to check out'**
+  String get checkoutReadyTitle;
+
+  /// No description provided for @checkoutReadyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'No pending tasks.'**
+  String get checkoutReadyBody;
+
+  /// No description provided for @checkoutNotReadyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Checkout isn\'t available yet'**
+  String get checkoutNotReadyTitle;
+
+  /// No description provided for @checkoutNotReadyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You can check out once your stay has started.'**
+  String get checkoutNotReadyBody;
+
+  /// No description provided for @checkoutUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Checkout is unavailable'**
+  String get checkoutUnavailableTitle;
+
+  /// No description provided for @folioSummaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Charge summary'**
+  String get folioSummaryTitle;
+
+  /// No description provided for @folioAccommodationLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Accommodation'**
+  String get folioAccommodationLine;
+
+  /// No description provided for @folioServiceLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Service charge'**
+  String get folioServiceLine;
+
+  /// No description provided for @folioTotalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get folioTotalLabel;
+
+  /// No description provided for @folioPaidLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Already paid'**
+  String get folioPaidLabel;
+
+  /// No description provided for @folioOutstandingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount due now'**
+  String get folioOutstandingLabel;
+
+  /// No description provided for @checkoutSettleNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The amount due is charged in one payment to your card on file. Your invoice is sent electronically.'**
+  String get checkoutSettleNote;
+
+  /// No description provided for @checkoutCompleteCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete checkout'**
+  String get checkoutCompleteCta;
+
+  /// No description provided for @checkoutProcessingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Settling your account…'**
+  String get checkoutProcessingBody;
+
+  /// No description provided for @checkoutDoNotClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Please keep this screen open.'**
+  String get checkoutDoNotClose;
+
+  /// No description provided for @checkoutDoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for your stay'**
+  String get checkoutDoneTitle;
+
+  /// No description provided for @checkoutDoneBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account is settled and your invoice is ready.'**
+  String get checkoutDoneBody;
+
+  /// No description provided for @checkoutPendingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settlement is processing'**
+  String get checkoutPendingTitle;
+
+  /// No description provided for @checkoutPendingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your bank hasn\'t confirmed the payment yet. Check the status again shortly.'**
+  String get checkoutPendingBody;
+
+  /// No description provided for @checkoutFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settlement didn\'t complete'**
+  String get checkoutFailedTitle;
+
+  /// No description provided for @checkoutFailedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'No money was taken. You can try again.'**
+  String get checkoutFailedBody;
+
+  /// No description provided for @checkoutRetryCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get checkoutRetryCta;
+
+  /// No description provided for @checkoutViewInvoiceCta.
+  ///
+  /// In en, this message translates to:
+  /// **'View invoice'**
+  String get checkoutViewInvoiceCta;
+
+  /// No description provided for @checkoutDoneCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get checkoutDoneCta;
+
+  /// No description provided for @checkoutStatusInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get checkoutStatusInProgress;
+
+  /// No description provided for @checkoutStatusAwaitingSettlement.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting settlement'**
+  String get checkoutStatusAwaitingSettlement;
+
+  /// No description provided for @checkoutStatusSettlementFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Settlement failed'**
+  String get checkoutStatusSettlementFailed;
+
+  /// No description provided for @checkoutStatusCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get checkoutStatusCompleted;
+
+  /// No description provided for @invoiceIssuedBannerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your e-invoice was issued'**
+  String get invoiceIssuedBannerTitle;
+
+  /// No description provided for @invoiceIssuedBannerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It was sent to your email and is always saved here — no paper invoice.'**
+  String get invoiceIssuedBannerBody;
+
+  /// No description provided for @invoiceNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice number'**
+  String get invoiceNumberLabel;
+
+  /// No description provided for @invoiceIssuedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Issued'**
+  String get invoiceIssuedLabel;
+
+  /// No description provided for @invoiceItemsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Items'**
+  String get invoiceItemsTitle;
+
+  /// No description provided for @invoiceSubtotalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Subtotal'**
+  String get invoiceSubtotalLabel;
+
+  /// No description provided for @invoicePaymentsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Payments'**
+  String get invoicePaymentsLabel;
+
+  /// No description provided for @invoiceOutstandingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Outstanding'**
+  String get invoiceOutstandingLabel;
+
+  /// No description provided for @invoiceSettledTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Settled in full'**
+  String get invoiceSettledTag;
+
+  /// No description provided for @invoiceNotReadyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No invoice yet'**
+  String get invoiceNotReadyTitle;
+
+  /// No description provided for @invoiceNotReadyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your invoice will be here once you check out.'**
+  String get invoiceNotReadyBody;
+
+  /// No description provided for @invoiceUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice is unavailable'**
+  String get invoiceUnavailableTitle;
 }
 
 class _AppLocalizationsDelegate

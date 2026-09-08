@@ -15,6 +15,7 @@ import '../../../../core/widgets/info_banner.dart';
 import '../../../../core/widgets/loading_view.dart';
 import '../../../../core/widgets/message_view.dart';
 import '../../../../core/widgets/primary_button.dart';
+import '../../../../core/widgets/secondary_button.dart';
 import '../../domain/entities/reservation.dart';
 import '../state/reservation_detail_provider.dart';
 import '../widgets/reservation_status_pill.dart';
@@ -167,6 +168,51 @@ class _Body extends StatelessWidget {
             title: l10n.reservationPendingNote,
           ),
         ],
+        const SizedBox(height: AppSpacing.md),
+        PrimaryButton(
+          label: l10n.reservationPayCta,
+          icon: Icons.payments_outlined,
+          onPressed: () => context.pushNamed(
+            AppRoutes.paymentReviewName,
+            pathParameters: <String, String>{'reservationId': reservation.id},
+          ),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        SecondaryButton(
+          label: l10n.reservationVerifyIdentityCta,
+          icon: Icons.badge_outlined,
+          onPressed: () => context.pushNamed(
+            AppRoutes.identityVerificationName,
+            pathParameters: <String, String>{'reservationId': reservation.id},
+          ),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        SecondaryButton(
+          label: l10n.reservationCheckInCta,
+          icon: Icons.meeting_room_outlined,
+          onPressed: () => context.pushNamed(
+            AppRoutes.checkInName,
+            pathParameters: <String, String>{'reservationId': reservation.id},
+          ),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        SecondaryButton(
+          label: l10n.reservationServicesCta,
+          icon: Icons.room_service_outlined,
+          onPressed: () => context.pushNamed(
+            AppRoutes.stayServicesName,
+            pathParameters: <String, String>{'reservationId': reservation.id},
+          ),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        SecondaryButton(
+          label: l10n.reservationCheckoutCta,
+          icon: Icons.logout_outlined,
+          onPressed: () => context.pushNamed(
+            AppRoutes.checkoutName,
+            pathParameters: <String, String>{'reservationId': reservation.id},
+          ),
+        ),
         const SizedBox(height: AppSpacing.xl),
       ],
     );

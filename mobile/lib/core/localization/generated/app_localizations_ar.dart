@@ -115,7 +115,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get errorServer => 'الخدمة غير متاحة مؤقتًا. يرجى المحاولة لاحقًا.';
 
   @override
-  String get errorNotImplemented => 'هذا غير متاح في المرحلة صفر.';
+  String get errorNotImplemented =>
+      'هذه الميزة غير متاحة بعد. يرجى المحاولة لاحقًا.';
 
   @override
   String get textFieldExampleLabel => 'الاسم الكامل';
@@ -915,4 +916,659 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get reservationStatusCancelled => 'ملغى';
+
+  @override
+  String get reservationPayCta => 'المتابعة إلى الدفع';
+
+  @override
+  String get reservationVerifyIdentityCta => 'التحقق من هويتك';
+
+  @override
+  String moneyAmount(String currency, int amount) {
+    return '$currency $amount';
+  }
+
+  @override
+  String get paymentReviewTitle => 'الدفع';
+
+  @override
+  String get paymentProcessingTitle => 'جارٍ معالجة الدفع';
+
+  @override
+  String get paymentResultTitle => 'الدفع';
+
+  @override
+  String get paymentReservationLabel => 'الحجز';
+
+  @override
+  String get paymentStatusFieldLabel => 'حالة الدفع';
+
+  @override
+  String get paymentAmountLabel => 'المبلغ';
+
+  @override
+  String get paymentPayNowCta => 'ادفع الآن';
+
+  @override
+  String get paymentHoldExplainer =>
+      'يُحجَز مبلغ تأمين قابل للاسترداد لإقامتك. لن يُخصَم أي مبلغ الآن.';
+
+  @override
+  String get paymentProcessingBody => 'جارٍ تأكيد عملية الدفع…';
+
+  @override
+  String get paymentDoNotClose => 'يرجى إبقاء هذه الشاشة مفتوحة.';
+
+  @override
+  String get paymentAlreadyHeldTitle => 'تم حجز التأمين مسبقًا';
+
+  @override
+  String get paymentAlreadyHeldBody => 'حجز التأمين لهذا الحجز قائم بالفعل.';
+
+  @override
+  String get paymentSuccessTitle => 'تم تأكيد حجز التأمين';
+
+  @override
+  String get paymentSuccessBody =>
+      'تم تأمين مبلغ التأمين. يمكنك المتابعة إلى التحقق من الهوية.';
+
+  @override
+  String get paymentPendingTitle => 'جارٍ معالجة الدفع';
+
+  @override
+  String get paymentPendingBody =>
+      'لم يؤكد البنك الحجز بعد. يمكنك التحقق من الحالة بعد قليل.';
+
+  @override
+  String get paymentFailedTitle => 'تعذّر إتمام الدفع';
+
+  @override
+  String get paymentFailedBody => 'لم يُخصَم أي مبلغ. يمكنك المحاولة مرة أخرى.';
+
+  @override
+  String get paymentCancelledTitle => 'تم إلغاء الدفع';
+
+  @override
+  String get paymentExpiredTitle => 'انتهت صلاحية حجز التأمين';
+
+  @override
+  String get paymentRetryCta => 'حاول مرة أخرى';
+
+  @override
+  String get paymentBackToReservation => 'العودة إلى الحجز';
+
+  @override
+  String get paymentUnavailableTitle => 'الدفع غير متاح';
+
+  @override
+  String get paymentStatusNotStarted => 'لم يبدأ';
+
+  @override
+  String get paymentStatusHoldRequested => 'جارٍ التفويض';
+
+  @override
+  String get paymentStatusHoldActive => 'تم حجز التأمين';
+
+  @override
+  String get paymentStatusHoldFailed => 'فشل';
+
+  @override
+  String get paymentStatusCaptureRequested => 'جارٍ الخصم';
+
+  @override
+  String get paymentStatusCaptured => 'تم الخصم';
+
+  @override
+  String get paymentStatusCaptureFailed => 'فشل الخصم';
+
+  @override
+  String get paymentStatusFinalSettlementRequested => 'جارٍ التسوية';
+
+  @override
+  String get paymentStatusSettled => 'تمت التسوية';
+
+  @override
+  String get paymentStatusSettlementFailed => 'فشلت التسوية';
+
+  @override
+  String get paymentStatusCancelled => 'ملغى';
+
+  @override
+  String get paymentStatusExpired => 'منتهٍ';
+
+  @override
+  String get paymentStatusRefundRequested => 'استرداد قيد المعالجة';
+
+  @override
+  String get paymentStatusRefunded => 'تم الاسترداد';
+
+  @override
+  String get paymentStatusRefundFailed => 'فشل الاسترداد';
+
+  @override
+  String get identityVerificationTitle => 'التحقق من الهوية';
+
+  @override
+  String get identityVerificationResultTitle => 'التحقق من الهوية';
+
+  @override
+  String get identityVerifyCta => 'تحقّق من الهوية';
+
+  @override
+  String get identityStepDocument => 'المستند';
+
+  @override
+  String get identityStepSelfie => 'صورة ذاتية';
+
+  @override
+  String get identityStepResult => 'النتيجة';
+
+  @override
+  String get identityDocumentStepTitle => 'ارفع مستند هويتك';
+
+  @override
+  String get identityDocumentStepBody =>
+      'استخدم جواز السفر أو الهوية الوطنية أو تصريح الإقامة. تأكد من ظهور المستند كاملًا وواضحًا.';
+
+  @override
+  String get identityDocumentTypePassport => 'جواز السفر';
+
+  @override
+  String get identityDocumentTypeNationalId => 'الهوية الوطنية';
+
+  @override
+  String get identityDocumentTypeResidencePermit => 'تصريح الإقامة';
+
+  @override
+  String get identityDocumentTypeLabel => 'نوع المستند';
+
+  @override
+  String get identityDocumentCaptureCta => 'أضف صورة المستند';
+
+  @override
+  String get identityDocumentCapturedLabel => 'تمت إضافة صورة المستند';
+
+  @override
+  String get identityDocumentSubmitCta => 'المتابعة إلى الصورة الذاتية';
+
+  @override
+  String get identitySelfieStepTitle => 'التقط صورة ذاتية';
+
+  @override
+  String get identitySelfieStepBody =>
+      'انظر مباشرة إلى الكاميرا في إضاءة جيدة. نطابق صورتك الذاتية مع صورة هويتك.';
+
+  @override
+  String get identitySelfieCaptureCta => 'أضف صورة ذاتية';
+
+  @override
+  String get identitySelfieCapturedLabel => 'تمت إضافة الصورة الذاتية';
+
+  @override
+  String get identitySelfieSubmitCta => 'إرسال للتحقق';
+
+  @override
+  String get identityProcessingTitle => 'جارٍ التحقق من هويتك';
+
+  @override
+  String get identityProcessingBody => 'جارٍ مطابقة صورتك الذاتية مع مستندك…';
+
+  @override
+  String get identityApprovedTitle => 'تم التحقق من الهوية';
+
+  @override
+  String get identityApprovedBody => 'تم تأكيد هويتك. أنت جاهز لتسجيل الدخول.';
+
+  @override
+  String get identityManualReviewTitle => 'المراجعة اليدوية قيد التنفيذ';
+
+  @override
+  String get identityManualReviewBody =>
+      'يقوم فريقنا بمراجعة مستنداتك. تستغرق هذه العملية وقتًا قصيرًا عادةً — سنُعلمك عند اكتمالها.';
+
+  @override
+  String get identityRetryTitle => 'لنجرب ذلك مرة أخرى';
+
+  @override
+  String get identityRetryBody =>
+      'لم نتمكن من التحقق من هويتك من تلك الصور. يرجى إعادة التقاطها وإرسالها مجددًا.';
+
+  @override
+  String get identityRetryCta => 'حاول مرة أخرى';
+
+  @override
+  String get identityRejectedTitle => 'لم تتم الموافقة على التحقق';
+
+  @override
+  String get identityRejectedBody =>
+      'لم يتمكن فريقنا من الموافقة على التحقق من هويتك. يرجى التواصل مع مكتب الاستقبال للمساعدة.';
+
+  @override
+  String get identityRejectedRetryBody =>
+      'لم يتمكن فريقنا من الموافقة على التحقق من هويتك. يمكنك إرسال صور جديدة والمحاولة مرة أخرى.';
+
+  @override
+  String identityAttemptCount(int count) {
+    return 'المحاولة $count';
+  }
+
+  @override
+  String get identityBackToReservation => 'العودة إلى الحجز';
+
+  @override
+  String get identityViewResultCta => 'عرض النتيجة';
+
+  @override
+  String get identityUnavailableTitle => 'التحقق غير متاح';
+
+  @override
+  String get identityStatusNotStarted => 'لم يبدأ';
+
+  @override
+  String get identityStatusDocumentUploaded => 'تم رفع المستند';
+
+  @override
+  String get identityStatusSelfieCaptured => 'تم التقاط الصورة الذاتية';
+
+  @override
+  String get identityStatusMatchingInProgress => 'جارٍ المطابقة';
+
+  @override
+  String get identityStatusAutoApproved => 'تم التحقق';
+
+  @override
+  String get identityStatusPendingManualReview => 'قيد المراجعة';
+
+  @override
+  String get identityStatusStaffApproved => 'تم التحقق';
+
+  @override
+  String get identityStatusStaffRejected => 'غير موافق عليه';
+
+  @override
+  String get identityStatusRetryAllowed => 'يلزم إعادة المحاولة';
+
+  @override
+  String get reservationCheckInCta => 'تسجيل الدخول';
+
+  @override
+  String get reservationServicesCta => 'خدمات الإقامة';
+
+  @override
+  String get reservationCheckoutCta => 'تسجيل المغادرة';
+
+  @override
+  String get checkInTitle => 'تسجيل الدخول';
+
+  @override
+  String get checkInProcessingTitle => 'جارٍ تسجيل دخولك';
+
+  @override
+  String get accessTitle => 'الدخول إلى الغرفة';
+
+  @override
+  String get checkInReadyTitle => 'جاهز لتسجيل الدخول';
+
+  @override
+  String get checkInReadyBody =>
+      'تم التحقق من حجزك. سجّل الدخول للحصول على رقم غرفتك ورمز الدخول.';
+
+  @override
+  String get checkInNotReadyTitle => 'لست جاهزًا لتسجيل الدخول بعد';
+
+  @override
+  String get checkInNotReadyBody => 'أكمل الدفع والتحقق من الهوية أولاً.';
+
+  @override
+  String get checkInUnavailableTitle => 'تسجيل الدخول غير متاح';
+
+  @override
+  String get checkInAlreadyDoneTitle => 'لقد سجّلت دخولك بالفعل';
+
+  @override
+  String get checkInCta => 'سجّل الدخول الآن';
+
+  @override
+  String get checkInProcessingBody => 'جارٍ إصدار مفتاح غرفتك الرقمي…';
+
+  @override
+  String get checkInDoNotClose => 'يرجى إبقاء هذه الشاشة مفتوحة.';
+
+  @override
+  String get checkInFailedTitle => 'لم يكتمل تسجيل الدخول';
+
+  @override
+  String get checkInFailedBody =>
+      'تعذّر إصدار مفتاح غرفتك. يمكنك المحاولة مرة أخرى.';
+
+  @override
+  String get checkInPendingTitle => 'أوشكت على الانتهاء';
+
+  @override
+  String get checkInPendingBody =>
+      'يقوم مكتب الاستقبال بإنهاء تسجيل دخولك. تحقق مرة أخرى بعد قليل.';
+
+  @override
+  String get checkInRetryCta => 'حاول مرة أخرى';
+
+  @override
+  String get accessCheckedInTitle => 'تم تسجيل دخولك';
+
+  @override
+  String get accessRoomNumberLabel => 'رقم الغرفة';
+
+  @override
+  String get accessEntryCodeLabel => 'رمز الدخول';
+
+  @override
+  String accessExpiresLabel(String date) {
+    return 'ساري حتى انتهاء إقامتك · $date';
+  }
+
+  @override
+  String get accessHelpBanner => 'لم يعمل الرمز؟ تواصل مع الاستقبال.';
+
+  @override
+  String get accessNotIssuedTitle => 'لا يوجد مفتاح غرفة بعد';
+
+  @override
+  String get accessNotIssuedBody =>
+      'سجّل الدخول للحصول على مفتاح غرفتك الرقمي.';
+
+  @override
+  String get accessRevokedTitle => 'تم إلغاء مفتاح الغرفة';
+
+  @override
+  String get accessRevokedBody =>
+      'لم يعد مفتاح الغرفة هذا نشطًا. تواصل مع الاستقبال إذا احتجت للمساعدة.';
+
+  @override
+  String get accessExpiredTitle => 'انتهت صلاحية مفتاح الغرفة';
+
+  @override
+  String get accessExpiredBody =>
+      'انتهت إقامتك، لذا لم يعد مفتاح الغرفة هذا يعمل.';
+
+  @override
+  String get accessFailedTitle => 'مفتاح الغرفة غير متاح';
+
+  @override
+  String get accessUnavailableTitle => 'الدخول غير متاح';
+
+  @override
+  String get accessBackToReservation => 'العودة إلى الحجز';
+
+  @override
+  String get accessStatusNotIssued => 'لم يُصدر';
+
+  @override
+  String get accessStatusIssueRequested => 'جارٍ الإصدار';
+
+  @override
+  String get accessStatusActive => 'نشط';
+
+  @override
+  String get accessStatusFailed => 'فشل';
+
+  @override
+  String get accessStatusRevokeRequested => 'جارٍ الإلغاء';
+
+  @override
+  String get accessStatusRevoked => 'ملغى';
+
+  @override
+  String get accessStatusExpired => 'منتهٍ';
+
+  @override
+  String get servicesTitle => 'خدمات الفندق';
+
+  @override
+  String get servicesIntroBanner =>
+      'اطلب ما تحتاجه من غرفتك. تصل الطلبات إلى الاستقبال مباشرة.';
+
+  @override
+  String get servicesEmptyTitle => 'لا توجد خدمات متاحة';
+
+  @override
+  String get servicesEmptyBody => 'لم ينشر هذا الفندق أي خدمات بعد.';
+
+  @override
+  String get servicesUnavailableTitle => 'الخدمات غير متاحة';
+
+  @override
+  String get serviceUncategorised => 'خدمات أخرى';
+
+  @override
+  String get serviceFreeLabel => 'مشمول';
+
+  @override
+  String serviceEstimatedMinutes(int count) {
+    return '~$count دقيقة';
+  }
+
+  @override
+  String get serviceDetailTitle => 'الخدمة';
+
+  @override
+  String get serviceQuantityLabel => 'الكمية';
+
+  @override
+  String get serviceNotesLabel => 'ملاحظات (اختياري)';
+
+  @override
+  String get serviceNotesHint => 'أي شيء يجب أن يعرفه الفريق';
+
+  @override
+  String get serviceRequestCta => 'اطلب هذه الخدمة';
+
+  @override
+  String get serviceRequestingCta => 'جارٍ الإرسال…';
+
+  @override
+  String get serviceEstimatedTotalLabel => 'الإجمالي المقدّر';
+
+  @override
+  String get serviceChargeNote =>
+      'تُضاف أي رسوم إلى حساب غرفتك وتُسوّى عند المغادرة.';
+
+  @override
+  String get serviceRequestFailedTitle => 'تعذّر إرسال طلبك';
+
+  @override
+  String get myRequestsTitle => 'طلباتي';
+
+  @override
+  String get myRequestsIntroBanner =>
+      'تابع حالة كل طلب. يمكنك إلغاء الطلب قبل أن يبدأ الفريق تنفيذه.';
+
+  @override
+  String get myRequestsEmptyTitle => 'لا توجد طلبات بعد';
+
+  @override
+  String get myRequestsEmptyBody => 'اطلب خدمة وستظهر هنا.';
+
+  @override
+  String get newRequestCta => 'طلب جديد';
+
+  @override
+  String get serviceOrderDetailTitle => 'تفاصيل الطلب';
+
+  @override
+  String get serviceOrderRequestedAtLabel => 'تاريخ الطلب';
+
+  @override
+  String get serviceOrderConfirmedAtLabel => 'تاريخ القبول';
+
+  @override
+  String get serviceCancelCta => 'إلغاء الطلب';
+
+  @override
+  String get serviceCancelConfirmTitle => 'إلغاء هذا الطلب؟';
+
+  @override
+  String get serviceCancelConfirmBody =>
+      'لم يبدأ الفريق تنفيذ هذا الطلب بعد، لذا لا يزال بالإمكان إلغاؤه.';
+
+  @override
+  String get serviceCancelConfirmCta => 'نعم، إلغاء';
+
+  @override
+  String get serviceCancelKeepCta => 'الإبقاء على الطلب';
+
+  @override
+  String get serviceCancelNotAllowed => 'لم يعد بالإمكان إلغاء هذا الطلب.';
+
+  @override
+  String get serviceContactReception => 'تواصل مع الاستقبال';
+
+  @override
+  String get serviceContactReceptionHint =>
+      'اتصل بالاستقبال من هاتف غرفتك أو من مكتب الاستقبال للمساعدة في هذا الطلب.';
+
+  @override
+  String get serviceStatusRequested => 'قيد الانتظار';
+
+  @override
+  String get serviceStatusConfirmed => 'مقبول';
+
+  @override
+  String get serviceStatusFulfilled => 'مكتمل';
+
+  @override
+  String get serviceStatusCancelled => 'ملغى';
+
+  @override
+  String get checkoutTitle => 'المغادرة';
+
+  @override
+  String get checkoutProcessingTitle => 'جارٍ إتمام المغادرة';
+
+  @override
+  String get checkoutCompleteTitle => 'ملخص إقامتك';
+
+  @override
+  String get invoiceTitle => 'الفاتورة';
+
+  @override
+  String get checkoutReadyTitle => 'جاهز للمغادرة';
+
+  @override
+  String get checkoutReadyBody => 'لا مهام معلّقة.';
+
+  @override
+  String get checkoutNotReadyTitle => 'المغادرة غير متاحة بعد';
+
+  @override
+  String get checkoutNotReadyBody => 'يمكنك تسجيل المغادرة بعد أن تبدأ إقامتك.';
+
+  @override
+  String get checkoutUnavailableTitle => 'المغادرة غير متاحة';
+
+  @override
+  String get folioSummaryTitle => 'ملخص الرسوم';
+
+  @override
+  String get folioAccommodationLine => 'قيمة الإقامة';
+
+  @override
+  String get folioServiceLine => 'رسوم الخدمة';
+
+  @override
+  String get folioTotalLabel => 'الإجمالي';
+
+  @override
+  String get folioPaidLabel => 'المدفوع مسبقًا';
+
+  @override
+  String get folioOutstandingLabel => 'المبلغ المستحق الآن';
+
+  @override
+  String get checkoutSettleNote =>
+      'يُخصم المبلغ المستحق دفعة واحدة من بطاقتك المسجّلة، وتُرسل فاتورتك إلكترونياً.';
+
+  @override
+  String get checkoutCompleteCta => 'إتمام المغادرة';
+
+  @override
+  String get checkoutProcessingBody => 'جارٍ تسوية حسابك…';
+
+  @override
+  String get checkoutDoNotClose => 'يرجى إبقاء هذه الشاشة مفتوحة.';
+
+  @override
+  String get checkoutDoneTitle => 'شكراً لإقامتك';
+
+  @override
+  String get checkoutDoneBody => 'تمت تسوية حسابك وفاتورتك جاهزة.';
+
+  @override
+  String get checkoutPendingTitle => 'جارٍ معالجة التسوية';
+
+  @override
+  String get checkoutPendingBody =>
+      'لم يؤكد البنك الدفع بعد. تحقق من الحالة مرة أخرى بعد قليل.';
+
+  @override
+  String get checkoutFailedTitle => 'لم تكتمل التسوية';
+
+  @override
+  String get checkoutFailedBody => 'لم يُخصم أي مبلغ. يمكنك المحاولة مرة أخرى.';
+
+  @override
+  String get checkoutRetryCta => 'حاول مرة أخرى';
+
+  @override
+  String get checkoutViewInvoiceCta => 'عرض الفاتورة';
+
+  @override
+  String get checkoutDoneCta => 'تم';
+
+  @override
+  String get checkoutStatusInProgress => 'قيد التنفيذ';
+
+  @override
+  String get checkoutStatusAwaitingSettlement => 'بانتظار التسوية';
+
+  @override
+  String get checkoutStatusSettlementFailed => 'فشلت التسوية';
+
+  @override
+  String get checkoutStatusCompleted => 'مكتمل';
+
+  @override
+  String get invoiceIssuedBannerTitle => 'صدرت فاتورتك الإلكترونية';
+
+  @override
+  String get invoiceIssuedBannerBody =>
+      'أُرسلت إلى بريدك الإلكتروني وهي محفوظة هنا دائماً — لا فاتورة ورقية.';
+
+  @override
+  String get invoiceNumberLabel => 'رقم الفاتورة';
+
+  @override
+  String get invoiceIssuedLabel => 'تاريخ الإصدار';
+
+  @override
+  String get invoiceItemsTitle => 'البنود';
+
+  @override
+  String get invoiceSubtotalLabel => 'المجموع الفرعي';
+
+  @override
+  String get invoicePaymentsLabel => 'المدفوعات';
+
+  @override
+  String get invoiceOutstandingLabel => 'المتبقي';
+
+  @override
+  String get invoiceSettledTag => 'مُسدّدة بالكامل';
+
+  @override
+  String get invoiceNotReadyTitle => 'لا توجد فاتورة بعد';
+
+  @override
+  String get invoiceNotReadyBody => 'ستظهر فاتورتك هنا بعد تسجيل مغادرتك.';
+
+  @override
+  String get invoiceUnavailableTitle => 'الفاتورة غير متاحة';
 }

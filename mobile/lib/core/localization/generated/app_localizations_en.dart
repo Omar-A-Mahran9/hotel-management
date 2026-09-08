@@ -118,7 +118,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'The service is temporarily unavailable. Please try again later.';
 
   @override
-  String get errorNotImplemented => 'This is not available in Phase 0.';
+  String get errorNotImplemented =>
+      'This isn\'t available yet. Please try again later.';
 
   @override
   String get textFieldExampleLabel => 'Full name';
@@ -920,4 +921,667 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reservationStatusCancelled => 'Cancelled';
+
+  @override
+  String get reservationPayCta => 'Continue to payment';
+
+  @override
+  String get reservationVerifyIdentityCta => 'Verify your identity';
+
+  @override
+  String moneyAmount(String currency, int amount) {
+    return '$currency $amount';
+  }
+
+  @override
+  String get paymentReviewTitle => 'Payment';
+
+  @override
+  String get paymentProcessingTitle => 'Processing payment';
+
+  @override
+  String get paymentResultTitle => 'Payment';
+
+  @override
+  String get paymentReservationLabel => 'Reservation';
+
+  @override
+  String get paymentStatusFieldLabel => 'Payment status';
+
+  @override
+  String get paymentAmountLabel => 'Amount';
+
+  @override
+  String get paymentPayNowCta => 'Pay now';
+
+  @override
+  String get paymentHoldExplainer =>
+      'A refundable deposit hold is placed for your stay. Nothing is charged now.';
+
+  @override
+  String get paymentProcessingBody => 'Confirming your payment…';
+
+  @override
+  String get paymentDoNotClose => 'Please keep this screen open.';
+
+  @override
+  String get paymentAlreadyHeldTitle => 'Deposit already held';
+
+  @override
+  String get paymentAlreadyHeldBody =>
+      'The deposit hold for this reservation is already in place.';
+
+  @override
+  String get paymentSuccessTitle => 'Deposit hold confirmed';
+
+  @override
+  String get paymentSuccessBody =>
+      'Your deposit is secured. You can continue with identity verification.';
+
+  @override
+  String get paymentPendingTitle => 'Payment is processing';
+
+  @override
+  String get paymentPendingBody =>
+      'Your bank hasn\'t confirmed the hold yet. You can check the status again shortly.';
+
+  @override
+  String get paymentFailedTitle => 'Payment didn\'t go through';
+
+  @override
+  String get paymentFailedBody => 'No money was taken. You can try again.';
+
+  @override
+  String get paymentCancelledTitle => 'Payment cancelled';
+
+  @override
+  String get paymentExpiredTitle => 'Payment hold expired';
+
+  @override
+  String get paymentRetryCta => 'Try again';
+
+  @override
+  String get paymentBackToReservation => 'Back to reservation';
+
+  @override
+  String get paymentUnavailableTitle => 'Payment is unavailable';
+
+  @override
+  String get paymentStatusNotStarted => 'Not started';
+
+  @override
+  String get paymentStatusHoldRequested => 'Authorizing';
+
+  @override
+  String get paymentStatusHoldActive => 'Deposit held';
+
+  @override
+  String get paymentStatusHoldFailed => 'Failed';
+
+  @override
+  String get paymentStatusCaptureRequested => 'Charging';
+
+  @override
+  String get paymentStatusCaptured => 'Charged';
+
+  @override
+  String get paymentStatusCaptureFailed => 'Charge failed';
+
+  @override
+  String get paymentStatusFinalSettlementRequested => 'Settling';
+
+  @override
+  String get paymentStatusSettled => 'Settled';
+
+  @override
+  String get paymentStatusSettlementFailed => 'Settlement failed';
+
+  @override
+  String get paymentStatusCancelled => 'Cancelled';
+
+  @override
+  String get paymentStatusExpired => 'Expired';
+
+  @override
+  String get paymentStatusRefundRequested => 'Refund pending';
+
+  @override
+  String get paymentStatusRefunded => 'Refunded';
+
+  @override
+  String get paymentStatusRefundFailed => 'Refund failed';
+
+  @override
+  String get identityVerificationTitle => 'Identity verification';
+
+  @override
+  String get identityVerificationResultTitle => 'Identity verification';
+
+  @override
+  String get identityVerifyCta => 'Verify identity';
+
+  @override
+  String get identityStepDocument => 'Document';
+
+  @override
+  String get identityStepSelfie => 'Selfie';
+
+  @override
+  String get identityStepResult => 'Result';
+
+  @override
+  String get identityDocumentStepTitle => 'Upload your ID document';
+
+  @override
+  String get identityDocumentStepBody =>
+      'Use your passport, national ID or residence permit. Make sure the whole document is visible and readable.';
+
+  @override
+  String get identityDocumentTypePassport => 'Passport';
+
+  @override
+  String get identityDocumentTypeNationalId => 'National ID';
+
+  @override
+  String get identityDocumentTypeResidencePermit => 'Residence permit';
+
+  @override
+  String get identityDocumentTypeLabel => 'Document type';
+
+  @override
+  String get identityDocumentCaptureCta => 'Add document photo';
+
+  @override
+  String get identityDocumentCapturedLabel => 'Document photo added';
+
+  @override
+  String get identityDocumentSubmitCta => 'Continue to selfie';
+
+  @override
+  String get identitySelfieStepTitle => 'Take a selfie';
+
+  @override
+  String get identitySelfieStepBody =>
+      'Look straight at the camera in good light. We match your selfie to your ID photo.';
+
+  @override
+  String get identitySelfieCaptureCta => 'Add selfie';
+
+  @override
+  String get identitySelfieCapturedLabel => 'Selfie added';
+
+  @override
+  String get identitySelfieSubmitCta => 'Submit for verification';
+
+  @override
+  String get identityProcessingTitle => 'Verifying your identity';
+
+  @override
+  String get identityProcessingBody => 'Matching your selfie to your document…';
+
+  @override
+  String get identityApprovedTitle => 'Identity verified';
+
+  @override
+  String get identityApprovedBody =>
+      'Your identity is confirmed. You\'re ready for check-in.';
+
+  @override
+  String get identityManualReviewTitle => 'Manual review in progress';
+
+  @override
+  String get identityManualReviewBody =>
+      'Our team is reviewing your documents. This usually takes a short while — we\'ll notify you when it\'s done.';
+
+  @override
+  String get identityRetryTitle => 'Let\'s try that again';
+
+  @override
+  String get identityRetryBody =>
+      'We couldn\'t verify your identity from those photos. Please retake them and submit again.';
+
+  @override
+  String get identityRetryCta => 'Try again';
+
+  @override
+  String get identityRejectedTitle => 'Verification not approved';
+
+  @override
+  String get identityRejectedBody =>
+      'Our team could not approve your identity verification. Please contact the front desk for help.';
+
+  @override
+  String get identityRejectedRetryBody =>
+      'Our team could not approve your identity verification. You can submit new photos and try again.';
+
+  @override
+  String identityAttemptCount(int count) {
+    return 'Attempt $count';
+  }
+
+  @override
+  String get identityBackToReservation => 'Back to reservation';
+
+  @override
+  String get identityViewResultCta => 'View result';
+
+  @override
+  String get identityUnavailableTitle => 'Verification is unavailable';
+
+  @override
+  String get identityStatusNotStarted => 'Not started';
+
+  @override
+  String get identityStatusDocumentUploaded => 'Document uploaded';
+
+  @override
+  String get identityStatusSelfieCaptured => 'Selfie captured';
+
+  @override
+  String get identityStatusMatchingInProgress => 'Matching';
+
+  @override
+  String get identityStatusAutoApproved => 'Verified';
+
+  @override
+  String get identityStatusPendingManualReview => 'In review';
+
+  @override
+  String get identityStatusStaffApproved => 'Verified';
+
+  @override
+  String get identityStatusStaffRejected => 'Not approved';
+
+  @override
+  String get identityStatusRetryAllowed => 'Retry needed';
+
+  @override
+  String get reservationCheckInCta => 'Check in';
+
+  @override
+  String get reservationServicesCta => 'Stay services';
+
+  @override
+  String get reservationCheckoutCta => 'Check out';
+
+  @override
+  String get checkInTitle => 'Check in';
+
+  @override
+  String get checkInProcessingTitle => 'Checking you in';
+
+  @override
+  String get accessTitle => 'Room access';
+
+  @override
+  String get checkInReadyTitle => 'Ready to check in';
+
+  @override
+  String get checkInReadyBody =>
+      'Your reservation is verified. Check in to get your room number and entry code.';
+
+  @override
+  String get checkInNotReadyTitle => 'Not ready to check in yet';
+
+  @override
+  String get checkInNotReadyBody =>
+      'Complete payment and identity verification first.';
+
+  @override
+  String get checkInUnavailableTitle => 'Check-in isn\'t available';
+
+  @override
+  String get checkInAlreadyDoneTitle => 'You\'re already checked in';
+
+  @override
+  String get checkInCta => 'Check in now';
+
+  @override
+  String get checkInProcessingBody => 'Issuing your digital room key…';
+
+  @override
+  String get checkInDoNotClose => 'Please keep this screen open.';
+
+  @override
+  String get checkInFailedTitle => 'Check-in didn\'t complete';
+
+  @override
+  String get checkInFailedBody =>
+      'Your room key couldn\'t be issued. You can try again.';
+
+  @override
+  String get checkInPendingTitle => 'Almost there';
+
+  @override
+  String get checkInPendingBody =>
+      'The front desk is finishing your check-in. Check again shortly.';
+
+  @override
+  String get checkInRetryCta => 'Try again';
+
+  @override
+  String get accessCheckedInTitle => 'You\'re checked in';
+
+  @override
+  String get accessRoomNumberLabel => 'Room number';
+
+  @override
+  String get accessEntryCodeLabel => 'Entry code';
+
+  @override
+  String accessExpiresLabel(String date) {
+    return 'Valid until your stay ends · $date';
+  }
+
+  @override
+  String get accessHelpBanner => 'Code not working? Contact reception.';
+
+  @override
+  String get accessNotIssuedTitle => 'No room key yet';
+
+  @override
+  String get accessNotIssuedBody => 'Check in to get your digital room key.';
+
+  @override
+  String get accessRevokedTitle => 'Room key deactivated';
+
+  @override
+  String get accessRevokedBody =>
+      'This room key is no longer active. Contact reception if you need help.';
+
+  @override
+  String get accessExpiredTitle => 'Room key expired';
+
+  @override
+  String get accessExpiredBody =>
+      'Your stay has ended, so this room key no longer works.';
+
+  @override
+  String get accessFailedTitle => 'Room key unavailable';
+
+  @override
+  String get accessUnavailableTitle => 'Access is unavailable';
+
+  @override
+  String get accessBackToReservation => 'Back to reservation';
+
+  @override
+  String get accessStatusNotIssued => 'Not issued';
+
+  @override
+  String get accessStatusIssueRequested => 'Issuing';
+
+  @override
+  String get accessStatusActive => 'Active';
+
+  @override
+  String get accessStatusFailed => 'Failed';
+
+  @override
+  String get accessStatusRevokeRequested => 'Deactivating';
+
+  @override
+  String get accessStatusRevoked => 'Deactivated';
+
+  @override
+  String get accessStatusExpired => 'Expired';
+
+  @override
+  String get servicesTitle => 'Hotel services';
+
+  @override
+  String get servicesIntroBanner =>
+      'Order what you need from your room. Requests go straight to reception.';
+
+  @override
+  String get servicesEmptyTitle => 'No services available';
+
+  @override
+  String get servicesEmptyBody =>
+      'This hotel hasn\'t published any services yet.';
+
+  @override
+  String get servicesUnavailableTitle => 'Services are unavailable';
+
+  @override
+  String get serviceUncategorised => 'Other services';
+
+  @override
+  String get serviceFreeLabel => 'Included';
+
+  @override
+  String serviceEstimatedMinutes(int count) {
+    return '~$count min';
+  }
+
+  @override
+  String get serviceDetailTitle => 'Service';
+
+  @override
+  String get serviceQuantityLabel => 'Quantity';
+
+  @override
+  String get serviceNotesLabel => 'Notes (optional)';
+
+  @override
+  String get serviceNotesHint => 'Anything the team should know';
+
+  @override
+  String get serviceRequestCta => 'Request this service';
+
+  @override
+  String get serviceRequestingCta => 'Sending…';
+
+  @override
+  String get serviceEstimatedTotalLabel => 'Estimated total';
+
+  @override
+  String get serviceChargeNote =>
+      'Any charge is added to your room account and settled at checkout.';
+
+  @override
+  String get serviceRequestFailedTitle => 'We couldn\'t send your request';
+
+  @override
+  String get myRequestsTitle => 'My requests';
+
+  @override
+  String get myRequestsIntroBanner =>
+      'Track each request. You can cancel one before the team starts it.';
+
+  @override
+  String get myRequestsEmptyTitle => 'No requests yet';
+
+  @override
+  String get myRequestsEmptyBody =>
+      'Request a service and it will show up here.';
+
+  @override
+  String get newRequestCta => 'New request';
+
+  @override
+  String get serviceOrderDetailTitle => 'Request details';
+
+  @override
+  String get serviceOrderRequestedAtLabel => 'Requested';
+
+  @override
+  String get serviceOrderConfirmedAtLabel => 'Accepted';
+
+  @override
+  String get serviceCancelCta => 'Cancel request';
+
+  @override
+  String get serviceCancelConfirmTitle => 'Cancel this request?';
+
+  @override
+  String get serviceCancelConfirmBody =>
+      'The team hasn\'t started this yet, so it can still be cancelled.';
+
+  @override
+  String get serviceCancelConfirmCta => 'Yes, cancel';
+
+  @override
+  String get serviceCancelKeepCta => 'Keep request';
+
+  @override
+  String get serviceCancelNotAllowed =>
+      'This request can no longer be cancelled.';
+
+  @override
+  String get serviceContactReception => 'Contact reception';
+
+  @override
+  String get serviceContactReceptionHint =>
+      'Call reception from your room phone or the front desk for help with this request.';
+
+  @override
+  String get serviceStatusRequested => 'Pending';
+
+  @override
+  String get serviceStatusConfirmed => 'Accepted';
+
+  @override
+  String get serviceStatusFulfilled => 'Completed';
+
+  @override
+  String get serviceStatusCancelled => 'Cancelled';
+
+  @override
+  String get checkoutTitle => 'Checkout';
+
+  @override
+  String get checkoutProcessingTitle => 'Completing checkout';
+
+  @override
+  String get checkoutCompleteTitle => 'Your stay summary';
+
+  @override
+  String get invoiceTitle => 'Invoice';
+
+  @override
+  String get checkoutReadyTitle => 'Ready to check out';
+
+  @override
+  String get checkoutReadyBody => 'No pending tasks.';
+
+  @override
+  String get checkoutNotReadyTitle => 'Checkout isn\'t available yet';
+
+  @override
+  String get checkoutNotReadyBody =>
+      'You can check out once your stay has started.';
+
+  @override
+  String get checkoutUnavailableTitle => 'Checkout is unavailable';
+
+  @override
+  String get folioSummaryTitle => 'Charge summary';
+
+  @override
+  String get folioAccommodationLine => 'Accommodation';
+
+  @override
+  String get folioServiceLine => 'Service charge';
+
+  @override
+  String get folioTotalLabel => 'Total';
+
+  @override
+  String get folioPaidLabel => 'Already paid';
+
+  @override
+  String get folioOutstandingLabel => 'Amount due now';
+
+  @override
+  String get checkoutSettleNote =>
+      'The amount due is charged in one payment to your card on file. Your invoice is sent electronically.';
+
+  @override
+  String get checkoutCompleteCta => 'Complete checkout';
+
+  @override
+  String get checkoutProcessingBody => 'Settling your account…';
+
+  @override
+  String get checkoutDoNotClose => 'Please keep this screen open.';
+
+  @override
+  String get checkoutDoneTitle => 'Thank you for your stay';
+
+  @override
+  String get checkoutDoneBody =>
+      'Your account is settled and your invoice is ready.';
+
+  @override
+  String get checkoutPendingTitle => 'Settlement is processing';
+
+  @override
+  String get checkoutPendingBody =>
+      'Your bank hasn\'t confirmed the payment yet. Check the status again shortly.';
+
+  @override
+  String get checkoutFailedTitle => 'Settlement didn\'t complete';
+
+  @override
+  String get checkoutFailedBody => 'No money was taken. You can try again.';
+
+  @override
+  String get checkoutRetryCta => 'Try again';
+
+  @override
+  String get checkoutViewInvoiceCta => 'View invoice';
+
+  @override
+  String get checkoutDoneCta => 'Done';
+
+  @override
+  String get checkoutStatusInProgress => 'In progress';
+
+  @override
+  String get checkoutStatusAwaitingSettlement => 'Awaiting settlement';
+
+  @override
+  String get checkoutStatusSettlementFailed => 'Settlement failed';
+
+  @override
+  String get checkoutStatusCompleted => 'Completed';
+
+  @override
+  String get invoiceIssuedBannerTitle => 'Your e-invoice was issued';
+
+  @override
+  String get invoiceIssuedBannerBody =>
+      'It was sent to your email and is always saved here — no paper invoice.';
+
+  @override
+  String get invoiceNumberLabel => 'Invoice number';
+
+  @override
+  String get invoiceIssuedLabel => 'Issued';
+
+  @override
+  String get invoiceItemsTitle => 'Items';
+
+  @override
+  String get invoiceSubtotalLabel => 'Subtotal';
+
+  @override
+  String get invoicePaymentsLabel => 'Payments';
+
+  @override
+  String get invoiceOutstandingLabel => 'Outstanding';
+
+  @override
+  String get invoiceSettledTag => 'Settled in full';
+
+  @override
+  String get invoiceNotReadyTitle => 'No invoice yet';
+
+  @override
+  String get invoiceNotReadyBody =>
+      'Your invoice will be here once you check out.';
+
+  @override
+  String get invoiceUnavailableTitle => 'Invoice is unavailable';
 }
