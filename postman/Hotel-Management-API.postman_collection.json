@@ -4931,6 +4931,167 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "13 Notifications",
+      "description": "Phase 11 — Notifications. Reservation-scoped feed of the in_app channel plus its unread markers (Phase 0 §4/§15/§16). GET /api/v1/reservations/{reservation}/notifications, PATCH /api/v1/reservations/{reservation}/notifications/{notification}/read, POST /api/v1/reservations/{reservation}/notifications/read-all. {reservation} is an int id resolved through ReservationService, so a cross-hotel or missing id is an identical plain 404. Permission notifications.view — Group Owner, assigned Hotel Manager, assigned Reception (operational, no financial effect); Guest-role users resolve out of scope (404). Notifications are produced by the approved Reservation lifecycle (deposit held, identity verified, checked in, invoiced, cancelled) — never created over HTTP. The dummy provider makes NO external call. email/sms rows are delivery bookkeeping and are not shown in the feed. Rate limited (throttle:notifications.read). The idempotency key and provider reference are never exposed.",
+      "item": [
+        {
+          "name": "List reservation notifications (in_app feed)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations/{{reservation_id}}/notifications?per_page=20",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations",
+                "{{reservation_id}}",
+                "notifications"
+              ],
+              "query": [
+                {
+                  "key": "per_page",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Newest first, paginated. Only in_app rows. 200 with a NotificationResource collection + meta.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List unread only",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations/{{reservation_id}}/notifications?unread=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations",
+                "{{reservation_id}}",
+                "notifications"
+              ],
+              "query": [
+                {
+                  "key": "unread",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Filters to rows with read_at = null.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark one notification read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations/{{reservation_id}}/notifications/{{notification_id}}/read",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations",
+                "{{reservation_id}}",
+                "notifications",
+                "{{notification_id}}",
+                "read"
+              ]
+            },
+            "description": "Idempotent. in_app only — a mark-read on an email/sms row is a 422. A notification id that belongs to another reservation is a plain 404.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark all read",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{owner_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations/{{reservation_id}}/notifications/read-all",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations",
+                "{{reservation_id}}",
+                "notifications",
+                "read-all"
+              ]
+            },
+            "description": "Marks every unread in_app row for this reservation read. 200 with { marked_read: <count> }.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Feed - Guest role (scope 404)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{guest_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservations/{{reservation_id}}/notifications",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations",
+                "{{reservation_id}}",
+                "notifications"
+              ]
+            },
+            "description": "Guest-role users hold no staff permission and never resolve the reservation scope — identical plain 404.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "auth": {

@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\IdentityVerificationController;
 use App\Http\Controllers\Api\V1\InvoiceController;
 use App\Http\Controllers\Api\V1\LoyaltyController;
 use App\Http\Controllers\Api\V1\LoyaltyRuleController;
+use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\PaymentWebhookController;
 use App\Http\Controllers\Api\V1\PermissionController;
@@ -98,6 +99,18 @@ Route::prefix('v1')->group(function () {
             Route::get('/loyalty/transactions', [LoyaltyController::class, 'transactions']);
             Route::post('/loyalty/earn', [LoyaltyController::class, 'earn']);
             Route::post('/loyalty/redeem', [LoyaltyController::class, 'redeem']);
+
+            // Phase 11 — Notifications (Phase 0 §4/§15/§16). Reservation-scoped
+            // so hotel scope + the guest recipient are resolved server-side
+            // (no guest auth in the MVP). Read-only feed of the `in_app`
+            // channel plus its unread markers; notifications are produced by
+            // the approved Reservation lifecycle, never created over HTTP.
+            // Rate limited per Phase 0 §17.
+            Route::middleware('throttle:notifications.read')->group(function () {
+                Route::get('/notifications', [NotificationController::class, 'index']);
+                Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markRead']);
+                Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead']);
+            });
         });
 
         // Phase 6 — Identity Verification (Phase 0 §16). {reservation} is an

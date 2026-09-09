@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/router/app_routes.dart';
 import '../../../../core/localization/l10n.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
+import '../../../../core/widgets/app_icons.dart';
 import '../../../../core/widgets/ui_state_view.dart';
 import '../../../authentication/presentation/state/auth_controller.dart';
 import '../../domain/entities/hotel_sort.dart';
@@ -42,6 +44,7 @@ class DiscoverPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         titleSpacing: AppSpacing.pageGutter,
+        centerTitle: false,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -57,12 +60,14 @@ class DiscoverPage extends ConsumerWidget {
         ),
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.notifications_none),
+            icon: const Icon(AppIcons.notifications),
             tooltip: l10n.discoverNotificationsTooltip,
             onPressed: () {},
           ),
+          // Sign-out stays here until the "حسابي" account screen exists
+          // (see md/mobile/design-system.md §"Bottom navigation").
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: const Icon(AppIcons.checkout),
             tooltip: l10n.authSignOut,
             onPressed: () => ref.read(authControllerProvider.notifier).signOut(),
           ),
@@ -109,22 +114,43 @@ class DiscoverPage extends ConsumerWidget {
                     ref.read(discoverControllerProvider.notifier).refresh(),
                 emptyTitle: l10n.discoverEmptyTitle,
                 emptyMessage: l10n.discoverEmptyBody,
-                onSuccess: (DiscoverView view) => Column(
-                  children: <Widget>[
-                    for (final hotel in view.featuredHotels) ...<Widget>[
-                      HotelSummaryCard(
-                        hotel: hotel,
-                        layout: HotelCardLayout.tile,
-                        onTap: () => _openHotel(context, hotel.id),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                    ],
-                  ],
+                onSuccess: (DiscoverView view) => LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints c) {
+                    final double w = (c.maxWidth - AppSpacing.md) / 2;
+                    return Wrap(
+                      spacing: AppSpacing.md,
+                      runSpacing: AppSpacing.md,
+                      children: <Widget>[
+                        for (final hotel in view.featuredHotels)
+                          SizedBox(
+                            width: w,
+                            child: HotelSummaryCard(
+                              hotel: hotel,
+                              layout: HotelCardLayout.tile,
+                              onTap: () => _openHotel(context, hotel.id),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ],
           ),
         ),
+      ),
+      // Foundation: the persistent Figma bottom nav. "Home" is this screen; the
+      // other three destinations are not built yet (see
+      // md/mobile/design-system.md) — tapping them explains that rather than
+      // routing to a placeholder.
+      bottomNavigationBar: AppBottomNav(
+        current: AppNavTab.home,
+        onSelected: (AppNavTab tab) {
+          if (tab == AppNavTab.home) return;
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(SnackBar(content: Text(l10n.navComingSoon)));
+        },
       ),
     );
   }

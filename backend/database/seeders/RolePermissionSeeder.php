@@ -45,6 +45,7 @@ class RolePermissionSeeder extends Seeder
             'loyalty.view' => 'View a guest loyalty account and ledger within authorized scope',
             'loyalty.manage' => 'Accrue and redeem loyalty points against a reservation within authorized scope',
             'loyalty.rules.manage' => 'Configure a hotel group loyalty rule',
+            'notifications.view' => 'View and mark read a reservation notification feed within authorized scope',
         ];
 
         foreach ($permissions as $slug => $name) {
@@ -63,7 +64,7 @@ class RolePermissionSeeder extends Seeder
             Role::HOTEL_MANAGER => [
                 'name' => 'Hotel Manager',
                 'description' => 'Manages one or more assigned hotels.',
-                'permissions' => ['hotels.view', 'inventory.view', 'inventory.manage', 'reservations.view', 'reservations.manage', 'payments.manage', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke', 'services.view', 'services.manage', 'service-orders.view', 'service-orders.manage', 'folio.view', 'checkout.perform', 'invoice.view', 'loyalty.view', 'loyalty.manage'],
+                'permissions' => ['hotels.view', 'inventory.view', 'inventory.manage', 'reservations.view', 'reservations.manage', 'payments.manage', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke', 'services.view', 'services.manage', 'service-orders.view', 'service-orders.manage', 'folio.view', 'checkout.perform', 'invoice.view', 'loyalty.view', 'loyalty.manage', 'notifications.view'],
             ],
             Role::RECEPTION => [
                 'name' => 'Reception',
@@ -80,8 +81,11 @@ class RolePermissionSeeder extends Seeder
                 // audited) and read the resulting invoice. Phase 10: Reception
                 // may view a guest's loyalty balance/history (operational) but
                 // NOT accrue/redeem points (loyalty.manage has a monetary
-                // effect on a booking — §32 "no financial edit").
-                'permissions' => ['hotels.view', 'inventory.view', 'reservations.view', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke', 'services.view', 'service-orders.view', 'service-orders.manage', 'folio.view', 'checkout.perform', 'invoice.view', 'loyalty.view'],
+                // effect on a booking — §32 "no financial edit"). Phase 11:
+                // Reception may read a reservation's notification feed and
+                // clear its unread markers (operational, R7 — no financial
+                // effect).
+                'permissions' => ['hotels.view', 'inventory.view', 'reservations.view', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke', 'services.view', 'service-orders.view', 'service-orders.manage', 'folio.view', 'checkout.perform', 'invoice.view', 'loyalty.view', 'notifications.view'],
             ],
             Role::GUEST => [
                 'name' => 'Guest',

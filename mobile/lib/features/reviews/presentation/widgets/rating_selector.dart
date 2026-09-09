@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/localization/l10n.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/app_icons.dart';
 import '../../domain/entities/review_draft.dart';
 
 /// A 1–5 star picker (`05 · Depart & Invoice` — "كيف كانت إقامتك؟"). Integer
@@ -44,7 +45,7 @@ class RatingSelector extends StatelessWidget {
               iconSize: size,
               visualDensity: VisualDensity.compact,
               icon: Icon(
-                star <= rating ? Icons.star_rounded : Icons.star_outline_rounded,
+                star <= rating ? AppIcons.rating : AppIcons.ratingOutline,
                 color: star <= rating ? active : inactive,
               ),
             ),
@@ -75,9 +76,7 @@ class RatingDisplay extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(right: AppSpacing.xxs),
               child: Icon(
-                star <= rating
-                    ? Icons.star_rounded
-                    : Icons.star_outline_rounded,
+                star <= rating ? AppIcons.rating : AppIcons.ratingOutline,
                 size: size,
                 color: star <= rating ? active : theme.colorScheme.outlineVariant,
               ),

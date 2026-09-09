@@ -8,6 +8,7 @@ use App\Domain\Inventory\Models\Room;
 use App\Domain\Inventory\Models\RoomType;
 use App\Domain\Inventory\Repositories\Contracts\RoomRepositoryInterface;
 use App\Domain\Inventory\Repositories\Contracts\RoomTypeRepositoryInterface;
+use App\Domain\Reservation\Events\ReservationStatusChanged;
 use App\Domain\Reservation\Exceptions\ReservationNotAvailableException;
 use App\Domain\Reservation\Exceptions\RoomHotelMismatchException;
 use App\Domain\Reservation\Exceptions\RoomTypeMismatchException;
@@ -205,7 +206,9 @@ class ReservationService
      */
     public function transitionTo(Reservation $reservation, string $targetStatus, ?User $actor = null): Reservation
     {
-        return DB::transaction(function () use ($reservation, $targetStatus, $actor) {
+        $fromStatus = null;
+
+        $transitioned = DB::transaction(function () use ($reservation, $targetStatus, $actor, &$fromStatus) {
             $current = $this->reservations->findForUpdate($reservation->id);
 
             if (! $current) {
@@ -231,5 +234,14 @@ class ReservationService
 
             return $current;
         });
+
+        // Phase 11 — the single post-commit seam for downstream side effects
+        // (notifications). Emitted only after the status change is durable, so
+        // a listener never runs inside this transaction and a listener failure
+        // can never roll the transition back. The Reservation domain has no
+        // dependency on any listener.
+        ReservationStatusChanged::dispatch($transitioned, (string) $fromStatus, $actor, app()->getLocale());
+
+        return $transitioned;
     }
 }

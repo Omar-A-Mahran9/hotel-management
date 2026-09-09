@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
+import '../theme/app_typography.dart';
 
-/// Tonal status chip (e.g. "Available", "Reachable"). Colour is passed in by the
-/// caller from theme/semantic tokens.
+/// Tonal status chip (e.g. "متاحة", "مؤكد", "قيد الانتظار"). Colour is passed in
+/// by the caller from theme/semantic tokens. Matches the Figma pills: pill
+/// shape, small icon, heavy short label.
 class StatusPill extends StatelessWidget {
   const StatusPill({
     super.key,
@@ -24,7 +26,7 @@ class StatusPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xxs,
+        vertical: 5,
       ),
       decoration: BoxDecoration(
         color: background,
@@ -39,10 +41,11 @@ class StatusPill extends StatelessWidget {
           ],
           Text(
             label,
-            style: Theme.of(context)
-                .textTheme
-                .labelMedium
-                ?.copyWith(color: foreground),
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: foreground,
+              fontWeight: AppTypography.bold,
+              height: 1,
+            ),
           ),
         ],
       ),

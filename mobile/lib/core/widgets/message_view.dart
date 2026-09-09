@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_spacing.dart';
 import 'primary_button.dart';
+import 'secondary_button.dart';
 
-/// Shared layout for full-section empty and error states: an icon, a title, an
-/// optional body and an optional action. [EmptyView] and [ErrorView] are thin
-/// presets so call sites read clearly.
+/// Shared layout for full-section empty / error / message states: an icon in a
+/// soft circular badge, a title, an optional body, and up to two stacked
+/// actions (primary + secondary) — matching the Figma empty states
+/// (`لا توجد غرف متاحة …` with `تغيير التاريخ` + `تعديل عدد الضيوف`).
+///
+/// [EmptyView] and [ErrorView] are thin presets so call sites read clearly.
 class MessageView extends StatelessWidget {
   const MessageView({
     super.key,
@@ -14,6 +18,8 @@ class MessageView extends StatelessWidget {
     this.message,
     this.actionLabel,
     this.onAction,
+    this.secondaryActionLabel,
+    this.onSecondaryAction,
     this.iconColor,
   });
 
@@ -22,18 +28,30 @@ class MessageView extends StatelessWidget {
   final String? message;
   final String? actionLabel;
   final VoidCallback? onAction;
+  final String? secondaryActionLabel;
+  final VoidCallback? onSecondaryAction;
   final Color? iconColor;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final Color tint = iconColor ?? theme.colorScheme.onSurfaceVariant;
+
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Icon(icon, size: 44, color: iconColor ?? theme.colorScheme.outline),
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: tint.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 34, color: tint),
+            ),
             const SizedBox(height: AppSpacing.md),
             Text(
               title,
@@ -52,6 +70,14 @@ class MessageView extends StatelessWidget {
               const SizedBox(height: AppSpacing.lg),
               PrimaryButton(label: actionLabel!, onPressed: onAction),
             ],
+            if (secondaryActionLabel != null &&
+                onSecondaryAction != null) ...<Widget>[
+              const SizedBox(height: AppSpacing.xs),
+              SecondaryButton(
+                label: secondaryActionLabel!,
+                onPressed: onSecondaryAction,
+              ),
+            ],
           ],
         ),
       ),
@@ -65,23 +91,31 @@ class EmptyView extends StatelessWidget {
     super.key,
     required this.title,
     this.message,
+    this.icon = Icons.inbox_outlined,
     this.actionLabel,
     this.onAction,
+    this.secondaryActionLabel,
+    this.onSecondaryAction,
   });
 
   final String title;
   final String? message;
+  final IconData icon;
   final String? actionLabel;
   final VoidCallback? onAction;
+  final String? secondaryActionLabel;
+  final VoidCallback? onSecondaryAction;
 
   @override
   Widget build(BuildContext context) {
     return MessageView(
-      icon: Icons.inbox_outlined,
+      icon: icon,
       title: title,
       message: message,
       actionLabel: actionLabel,
       onAction: onAction,
+      secondaryActionLabel: secondaryActionLabel,
+      onSecondaryAction: onSecondaryAction,
     );
   }
 }
@@ -94,22 +128,28 @@ class ErrorView extends StatelessWidget {
     this.message,
     this.actionLabel,
     this.onAction,
+    this.secondaryActionLabel,
+    this.onSecondaryAction,
   });
 
   final String title;
   final String? message;
   final String? actionLabel;
   final VoidCallback? onAction;
+  final String? secondaryActionLabel;
+  final VoidCallback? onSecondaryAction;
 
   @override
   Widget build(BuildContext context) {
     return MessageView(
-      icon: Icons.error_outline,
+      icon: Icons.error_outline_rounded,
       iconColor: Theme.of(context).colorScheme.error,
       title: title,
       message: message,
       actionLabel: actionLabel,
       onAction: onAction,
+      secondaryActionLabel: secondaryActionLabel,
+      onSecondaryAction: onSecondaryAction,
     );
   }
 }

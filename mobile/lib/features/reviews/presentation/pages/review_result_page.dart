@@ -5,12 +5,12 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/router/app_routes.dart';
 import '../../../../core/errors/failure_l10n.dart';
 import '../../../../core/localization/l10n.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/bottom_action_bar.dart';
 import '../../../../core/widgets/hotel_app_bar.dart';
 import '../../../../core/widgets/info_banner.dart';
 import '../../../../core/widgets/loading_view.dart';
 import '../../../../core/widgets/primary_button.dart';
+import '../../../../core/widgets/result_view.dart';
 import '../../../../core/widgets/secondary_button.dart';
 import '../../domain/entities/review.dart';
 import '../../domain/entities/submit_review.dart';
@@ -67,9 +67,6 @@ class _Body extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
-    final ThemeData theme = Theme.of(context);
-    final AppSemanticColors semantic =
-        theme.extension<AppSemanticColors>() ?? AppSemanticColors.light;
 
     final SubmitReviewResult? result = action.resultOrNull;
     final ReviewSubmitOutcome? outcome = result?.outcome;
@@ -80,42 +77,36 @@ class _Body extends ConsumerWidget {
     final bool pendingModeration =
         review != null && review.status.isPending;
 
-    final (IconData icon, Color color, String title, String body) = switch (
+    final (InfoBannerTone tone, String title, String body) = switch (
         (isFailure, outcome)) {
       (true, _) => (
-          Icons.error_outline_rounded,
-          theme.colorScheme.error,
+          InfoBannerTone.error,
           l10n.reviewFailedTitle,
           (action as ReviewSubmitFailed).failure.localizedMessage(l10n),
         ),
       (_, ReviewSubmitOutcome.alreadyReviewed) => (
-          Icons.history_rounded,
-          semantic.info,
+          InfoBannerTone.info,
           l10n.reviewAlreadyTitle,
           l10n.reviewAlreadyBody,
         ),
       (_, ReviewSubmitOutcome.notEligible) => (
-          Icons.block_rounded,
-          semantic.warning,
+          InfoBannerTone.warning,
           l10n.reviewNotEligibleTitle,
           l10n.reviewNotEligibleBody,
         ),
       (_, ReviewSubmitOutcome.invalidRating) => (
-          Icons.block_rounded,
-          semantic.warning,
+          InfoBannerTone.warning,
           l10n.reviewInvalidRatingTitle,
           l10n.reviewInvalidRatingBody,
         ),
       _ => pendingModeration
           ? (
-              Icons.hourglass_bottom_rounded,
-              semantic.warning,
+              InfoBannerTone.warning,
               l10n.reviewSubmittedTitle,
               l10n.reviewPendingModerationBody,
             )
           : (
-              Icons.check_rounded,
-              semantic.success,
+              InfoBannerTone.success,
               l10n.reviewSubmittedTitle,
               l10n.reviewPublishedBody,
             ),
@@ -145,67 +136,29 @@ class _Body extends ConsumerWidget {
     return Column(
       children: <Widget>[
         Expanded(
-          child: ListView(
-            padding: const EdgeInsets.all(AppSpacing.pageGutter),
-            children: <Widget>[
-              Column(
-                children: <Widget>[
-                  CircleAvatar(
-                    radius: 28,
-                    backgroundColor: color.withValues(alpha: 0.12),
-                    child: Icon(icon, color: color, size: 30),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(title,
-                      style: theme.textTheme.headlineSmall,
-                      textAlign: TextAlign.center),
-                  const SizedBox(height: AppSpacing.xxs),
-                  Text(body,
-                      style: theme.textTheme.bodyMedium,
-                      textAlign: TextAlign.center),
-                ],
-              ),
-              if (review != null && !isBlocked) ...<Widget>[
-                const SizedBox(height: AppSpacing.lg),
-                Center(child: RatingDisplay(rating: review.rating, size: 24)),
-              ],
-              if (isBlocked && !isFailure) ...<Widget>[
-                const SizedBox(height: AppSpacing.md),
-                InfoBanner(
-                  tone: outcome == ReviewSubmitOutcome.alreadyReviewed
-                      ? InfoBannerTone.info
-                      : InfoBannerTone.warning,
-                  title: title,
-                  message: body,
-                ),
-              ],
-            ],
+          child: ResultView(
+            tone: tone,
+            title: title,
+            message: body,
+            detail: review != null && !isBlocked
+                ? Center(child: RatingDisplay(rating: review.rating, size: 24))
+                : null,
           ),
         ),
-        SafeArea(
-          minimum: const EdgeInsets.fromLTRB(
-            AppSpacing.pageGutter,
-            AppSpacing.xs,
-            AppSpacing.pageGutter,
-            AppSpacing.md,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              if (isFailure) ...<Widget>[
-                PrimaryButton(label: l10n.actionRetry, onPressed: retry),
-                const SizedBox(height: AppSpacing.xs),
-                SecondaryButton(
-                  label: l10n.reviewBackToReservation,
-                  onPressed: toReservation,
-                ),
-              ] else
-                PrimaryButton(
-                  label: l10n.reviewBackToReservation,
-                  onPressed: toReservation,
-                ),
-            ],
-          ),
+        BottomActionBar(
+          children: <Widget>[
+            if (isFailure) ...<Widget>[
+              PrimaryButton(label: l10n.actionRetry, onPressed: retry),
+              SecondaryButton(
+                label: l10n.reviewBackToReservation,
+                onPressed: toReservation,
+              ),
+            ] else
+              PrimaryButton(
+                label: l10n.reviewBackToReservation,
+                onPressed: toReservation,
+              ),
+          ],
         ),
       ],
     );

@@ -6,7 +6,6 @@ import '../../../../app/router/app_routes.dart';
 import '../../../../core/errors/error_mapper.dart';
 import '../../../../core/errors/failure_l10n.dart';
 import '../../../../core/localization/l10n.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_card.dart';
@@ -82,34 +81,16 @@ class _Body extends StatelessWidget {
     final AppLocalizations l10n = context.l10n;
     final ThemeData theme = Theme.of(context);
     final MaterialLocalizations ml = MaterialLocalizations.of(context);
-    final AppSemanticColors semantic =
-        theme.extension<AppSemanticColors>() ?? AppSemanticColors.light;
 
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.pageGutter),
       children: <Widget>[
-        Column(
-          children: <Widget>[
-            CircleAvatar(
-              radius: 28,
-              backgroundColor: semantic.successContainer,
-              child: Icon(Icons.check_rounded, color: semantic.success, size: 30),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              l10n.reservationSuccessTitle,
-              style: theme.textTheme.headlineSmall,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.xxs),
-            Text(
-              l10n.reservationSuccessBody,
-              style: theme.textTheme.bodyMedium,
-              textAlign: TextAlign.center,
-            ),
-          ],
+        InfoBanner(
+          tone: InfoBannerTone.success,
+          title: l10n.reservationSuccessTitle,
+          message: l10n.reservationSuccessBody,
         ),
-        const SizedBox(height: AppSpacing.lg),
+        const SizedBox(height: AppSpacing.md),
         AppCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

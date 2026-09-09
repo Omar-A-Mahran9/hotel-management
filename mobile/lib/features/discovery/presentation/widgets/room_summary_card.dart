@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_card.dart';
+import '../../../../core/widgets/money_text.dart';
 import '../../domain/entities/available_room.dart';
 import '../discovery_l10n.dart';
 import 'hotel_thumbnail.dart';
@@ -150,12 +151,11 @@ class RoomSummaryCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text(
-                          l10n.pricePerNight(room.nightlyRate.amount),
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            color: semantic.accent,
-                            fontWeight: FontWeight.w700,
-                          ),
+                        MoneyText(
+                          room.nightlyRate.amount,
+                          suffix: l10n.priceNightSuffix,
+                          semanticsLabel:
+                              l10n.pricePerNight(room.nightlyRate.amount),
                         ),
                         Text(
                           '${l10n.priceStayTotal(room.stayTotal(nights).amount)} ${l10n.roomStayTotalLabel(nights)}',

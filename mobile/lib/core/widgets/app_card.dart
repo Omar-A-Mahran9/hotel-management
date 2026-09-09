@@ -5,44 +5,62 @@ import '../theme/app_radius.dart';
 import '../theme/app_shadows.dart';
 import '../theme/app_spacing.dart';
 
-/// Surface container from the design system: white, rounded, hairline border and
-/// a soft shadow. Wrap content sections in this instead of a raw [Container].
+/// Surface container from the design system: white/surface, rounded, with a soft
+/// warm shadow. Matches the Figma cards, which are **borderless** — the hairline
+/// [border] is opt-in for the few list-container cards that show one.
 class AppCard extends StatelessWidget {
   const AppCard({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.all(AppSpacing.md),
+    this.padding = const EdgeInsets.all(AppSpacing.cardPadding),
     this.onTap,
+    this.border = false,
+    this.shadow = true,
+    this.color,
+    this.radius = AppRadius.allCard,
   });
+
+  /// A card with no inner padding — for list containers that draw their own row
+  /// insets and dividers.
+  const AppCard.list({
+    super.key,
+    required this.child,
+    this.onTap,
+    this.border = false,
+    this.shadow = true,
+    this.color,
+    this.radius = AppRadius.allCard,
+  }) : padding = EdgeInsets.zero;
 
   final Widget child;
   final EdgeInsetsGeometry padding;
   final VoidCallback? onTap;
+  final bool border;
+  final bool shadow;
+  final Color? color;
+  final BorderRadius radius;
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
+    final ThemeData theme = Theme.of(context);
+    final bool isLight = theme.brightness == Brightness.light;
+
     final Widget content = DecoratedBox(
       decoration: BoxDecoration(
-        color: scheme.surface,
-        borderRadius: AppRadius.allLg,
-        border: Border.all(color: scheme.outline),
-        boxShadow: Theme.of(context).brightness == Brightness.light
-            ? AppShadows.card
-            : const <BoxShadow>[],
+        color: color ?? theme.colorScheme.surface,
+        borderRadius: radius,
+        border: border ? Border.all(color: theme.colorScheme.outline) : null,
+        boxShadow: (shadow && isLight) ? AppShadows.card : AppShadows.none,
       ),
       child: Padding(padding: padding, child: child),
     );
 
     if (onTap == null) return content;
+
     return Material(
       color: AppColors.white.withValues(alpha: 0),
-      borderRadius: AppRadius.allLg,
-      child: InkWell(
-        borderRadius: AppRadius.allLg,
-        onTap: onTap,
-        child: content,
-      ),
+      borderRadius: radius,
+      child: InkWell(borderRadius: radius, onTap: onTap, child: content),
     );
   }
 }

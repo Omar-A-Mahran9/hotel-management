@@ -10,6 +10,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/time/clock.dart';
 import '../../../../core/widgets/hotel_app_bar.dart';
 import '../../../../core/widgets/message_view.dart';
+import '../../../../core/widgets/money_text.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/secondary_button.dart';
 import '../../domain/entities/availability_request.dart';
@@ -170,10 +171,11 @@ class _Body extends StatelessWidget {
                     child: Text(type.name.resolve(locale),
                         style: theme.textTheme.headlineSmall),
                   ),
-                  Text(
-                    l10n.pricePerNight(room.nightlyRate.amount),
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(color: semantic.accent),
+                  MoneyText(
+                    room.nightlyRate.amount,
+                    suffix: l10n.priceNightSuffix,
+                    semanticsLabel:
+                        l10n.pricePerNight(room.nightlyRate.amount),
                   ),
                 ],
               ),

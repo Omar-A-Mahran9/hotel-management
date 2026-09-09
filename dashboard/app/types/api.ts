@@ -1,0 +1,436 @@
+// Laravel /api/v1 response envelope + domain shapes.
+// These mirror the backend API Resources exactly (see
+// md/dashboard-foundation-audit.md §4 and app/Http/Resources/V1/*).
+// Fields the backend does not return are not invented here. Money values
+// are decimal strings ("120.00"); currency is a 3-letter code.
+
+export interface ApiEnvelope<T> {
+  success: boolean
+  message: string
+  data: T
+  meta?: ApiMeta
+}
+
+export interface ApiMeta {
+  current_page?: number
+  last_page?: number
+  per_page?: number
+  total?: number
+  from?: number
+  to?: number
+  [key: string]: unknown
+}
+
+export interface Paginated<T> {
+  data: T[]
+  meta: ApiMeta
+}
+
+export type ValidationErrors = Record<string, string[]>
+
+// ---- RBAC ---------------------------------------------------------------
+export interface Permission {
+  id: number
+  name: string
+  slug: string
+  description: string | null
+}
+
+export interface Role {
+  id: number
+  name: string
+  slug: string
+  description: string | null
+  permissions?: Permission[]
+}
+
+// ---- Hotels / groups --------------------------------------------------
+export interface Hotel {
+  id: number
+  hotel_group_id: number
+  name: string
+  slug: string
+  country: string | null
+  city: string | null
+  timezone: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface HotelGroup {
+  id: number
+  name: string
+  slug: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+// ---- Auth ------------------------------------------------------------
+export interface AuthUser {
+  id: number
+  name: string
+  email: string
+  is_active: boolean
+  role: Role
+  hotels: Hotel[]
+  created_at: string
+  updated_at: string
+}
+
+export interface LoginResponse {
+  user: AuthUser
+  token: string
+}
+
+// ---- Inventory -----------------------------------------------------
+export interface RoomType {
+  id: number
+  hotel_id: number
+  name: string
+  base_price: string
+  capacity: number
+  amenities: string[] | null
+  description: string | null
+  is_active: boolean
+  rooms_count?: number
+  available_rooms_count?: number
+  maintenance_rooms_count?: number
+  created_at: string
+  updated_at: string
+}
+
+export type RoomStatus = 'available' | 'booked' | 'under_maintenance'
+
+export interface Room {
+  id: number
+  hotel_id: number
+  room_type_id: number
+  room_number: string
+  status: RoomStatus
+  created_at: string
+  updated_at: string
+}
+
+// ---- Reservations -------------------------------------------------
+export type ReservationStatus =
+  | 'pending'
+  | 'deposit_held'
+  | 'verified'
+  | 'checked_in'
+  | 'in_stay'
+  | 'checkout_in_progress'
+  | 'checkout_blocked'
+  | 'checked_out'
+  | 'invoiced'
+  | 'cancelled'
+
+export interface Reservation {
+  id: number
+  hotel_id: number
+  room_type_id: number
+  room_id: number | null
+  guest_id: number | null
+  check_in: string
+  check_out: string
+  status: ReservationStatus
+  price_snapshot: string
+  created_by_staff_id: number | null
+  cancelled_at: string | null
+  cancellation_reason: string | null
+  created_at: string
+  updated_at: string
+}
+
+// ---- Staff users ------------------------------------------------
+export interface StaffUser {
+  id: number
+  name: string
+  email: string
+  is_active: boolean
+  role?: Role
+  hotels?: Hotel[]
+  created_at: string
+  updated_at: string
+}
+
+// ---- Payment (PaymentResource / folio.payment_summary) ---------
+export type PaymentStatus =
+  | 'not_started'
+  | 'hold_requested'
+  | 'hold_active'
+  | 'hold_failed'
+  | 'capture_requested'
+  | 'captured'
+  | 'capture_failed'
+  | 'final_settlement_requested'
+  | 'settled'
+  | 'settlement_failed'
+  | 'cancelled'
+  | 'expired'
+  | 'refund_requested'
+  | 'refunded'
+  | 'refund_failed'
+
+export interface Payment {
+  id: number
+  reservation_id: number
+  hotel_id: number
+  status: PaymentStatus
+  amount: string
+  currency: string
+  hold_expires_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+// ---- Folio (FolioResource) ------------------------------------
+export type FolioChargeStatus = 'posted' | 'cancelled'
+export type FolioChargeSource = 'service_order' | 'accommodation'
+
+export interface FolioCharge {
+  id: number
+  reservation_id: number
+  hotel_id: number
+  source_type: FolioChargeSource | string
+  source_id: number | null
+  description: string
+  quantity: number
+  unit_amount: string
+  total_amount: string
+  currency: string
+  status: FolioChargeStatus
+  charged_at: string | null
+  cancelled_at: string | null
+  created_by_user_id: number | null
+  created_at: string
+  updated_at: string
+}
+
+export interface Folio {
+  reservation: { id: number, hotel_id: number, guest_id: number | null, status: ReservationStatus }
+  currency: string
+  charges: FolioCharge[]
+  totals: {
+    charges_total: string
+    payments_total: string
+    outstanding_total: string
+  }
+  payment_summary: null | {
+    status: PaymentStatus
+    amount: string
+    currency: string
+    is_captured: boolean
+  }
+}
+
+// ---- Stay services -------------------------------------------
+export interface ServiceCategory {
+  id: number
+  hotel_id: number
+  name: string
+  description: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface HotelService {
+  id: number
+  hotel_id: number
+  service_category_id: number | null
+  name: string
+  description: string | null
+  price: string
+  currency: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type ServiceOrderStatus = 'requested' | 'confirmed' | 'fulfilled' | 'cancelled'
+
+export interface ServiceOrder {
+  id: number
+  reservation_id: number
+  hotel_id: number
+  service_id: number
+  quantity: number
+  unit_price_snapshot: string
+  currency_snapshot: string
+  total_amount: string
+  status: ServiceOrderStatus
+  notes: string | null
+  requested_by_user_id: number | null
+  requested_at: string | null
+  confirmed_at: string | null
+  fulfilled_at: string | null
+  cancelled_at: string | null
+  cancellation_reason: string | null
+  created_at: string
+  updated_at: string
+}
+
+// ---- Identity verification (IdentityVerificationResource) ----
+export type IdentityVerificationStatus =
+  | 'not_started'
+  | 'document_uploaded'
+  | 'selfie_captured'
+  | 'matching_in_progress'
+  | 'auto_approved'
+  | 'pending_manual_review'
+  | 'staff_approved'
+  | 'staff_rejected'
+  | 'retry_allowed'
+
+export interface IdentityVerification {
+  reservation_id: number
+  hotel_id: number
+  guest_id: number | null
+  status: IdentityVerificationStatus
+  provider: string | null
+  attempts: number
+  latest_outcome: string | null
+  latest_score: number | null
+  decided_at: string | null
+  created_at: string
+  updated_at: string
+  latest_decision?: {
+    type: string
+    result: string
+    band: string | null
+    reason: string | null
+    decided_by_user_id: number | null
+    decided_at: string
+  }
+}
+
+// ---- Digital access (AccessGrantResource) --------------------
+export type AccessGrantStatus =
+  | 'not_issued'
+  | 'issue_requested'
+  | 'active'
+  | 'failed'
+  | 'revoke_requested'
+  | 'revoked'
+  | 'expired'
+
+export interface AccessGrant {
+  reservation_id: number
+  hotel_id: number
+  guest_id: number | null
+  status: AccessGrantStatus
+  access_mode: 'pin_code' | 'smart_lock' | string | null
+  provider: string | null
+  issued_at: string | null
+  activated_at: string | null
+  expires_at: string | null
+  revoked_at: string | null
+  revocation_reason: string | null
+  failure_reason: string | null
+  created_at: string
+  updated_at: string
+  credential?: string
+}
+
+// ---- Checkout / invoice (CheckoutResource / InvoiceResource) -
+export type CheckoutStatus =
+  | 'in_progress'
+  | 'awaiting_settlement'
+  | 'settlement_failed'
+  | 'completed'
+
+export interface CheckoutResult {
+  reservation: { id: number, hotel_id: number, status: ReservationStatus }
+  checkout: { status: CheckoutStatus, started_at: string | null, completed_at: string | null }
+  totals: { charges_total: string, payments_total: string, outstanding_total: string }
+  currency: string
+  payment: null | { status: PaymentStatus, amount: string, currency: string }
+  invoice: null | { id: number, invoice_number: string, status: string, issued_at: string | null }
+}
+
+export type InvoiceStatus = 'draft' | 'issued'
+
+export interface InvoiceItem {
+  id: number
+  source_type: string
+  source_id: number | null
+  description: string
+  quantity: number
+  unit_amount: string
+  total_amount: string
+}
+
+export interface Invoice {
+  id: number
+  reservation_id: number
+  hotel_id: number
+  invoice_number: string
+  status: InvoiceStatus
+  currency: string
+  subtotal: string
+  payments_total: string
+  outstanding_total: string
+  issued_at: string | null
+  items?: InvoiceItem[]
+  created_at: string
+  updated_at: string
+}
+
+// ---- Loyalty (LoyaltyAccountResource / LoyaltyTransactionResource / LoyaltyRuleResource) -
+export interface LoyaltyAccount {
+  id: number
+  guest_id: number
+  points_balance: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type LoyaltyTransactionType = 'earn' | 'redeem' | string
+
+export interface LoyaltyTransaction {
+  id: number
+  type: LoyaltyTransactionType
+  points: number
+  source_type: string | null
+  source_id: number | null
+  description: string | null
+  metadata: Record<string, unknown> | null
+  created_by_user_id: number | null
+  created_at: string
+}
+
+export interface LoyaltyRule {
+  id: number
+  hotel_group_id: number
+  is_active: boolean
+  earn_points_per_currency: string | null
+  redeem_currency_per_point: string | null
+  eligible_source_types: string[]
+  created_at: string
+  updated_at: string
+}
+
+// ---- Notifications (NotificationResource) --------------------
+export type NotificationChannel = 'in_app' | 'email' | 'sms'
+export type NotificationDeliveryStatus = 'pending' | 'sending' | 'sent' | 'failed'
+
+export interface AppNotification {
+  id: number
+  reservation_id: number
+  hotel_id: number
+  type: string
+  channel: NotificationChannel
+  status: NotificationDeliveryStatus
+  locale: string
+  subject: string
+  body: string
+  context: Record<string, unknown> | null
+  is_read: boolean
+  read_at: string | null
+  sent_at: string | null
+  failed_at: string | null
+  created_at: string
+}

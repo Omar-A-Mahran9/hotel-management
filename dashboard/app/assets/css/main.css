@@ -1,0 +1,292 @@
+/* ===========================================================================
+   Hotel Management Dashboard — global stylesheet
+
+   Layering:
+   1. Tailwind v4 core
+   2. Metronic 9 (KTUI) design-token contract, re-skinned with the Hotel
+      System identity (warm brown / cream / bronze — the Guest Mobile App
+      brand, adapted for desktop administration).
+   3. KTUI component styles
+   4. Keenicons icon fonts (vendored from metronic-v9.4.12)
+   =========================================================================== */
+
+@import 'tailwindcss';
+@import '@keenthemes/ktui/styles.css';
+
+@import '../keenicons/outline/style.css';
+@import '../keenicons/duotone/style.css';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------------
+   Brand tokens — light. These override Metronic's default (blue/zinc) values;
+   every Metronic/KTUI component reads through these variables, so re-skinning
+   here re-skins the whole system.
+   --------------------------------------------------------------------------- */
+:root {
+  --background: #f6f1e9;        /* warm paper */
+  --foreground: #2c241d;        /* warm near-black */
+
+  --card: #fffdf9;
+  --card-foreground: #2c241d;
+
+  --popover: #fffdf9;
+  --popover-foreground: #2c241d;
+
+  --primary: #875a34;          /* warm brown */
+  --primary-foreground: #fdf8f1;
+
+  --secondary: #efe6d8;        /* warm neutral surface */
+  --secondary-foreground: #4b3a2a;
+
+  --muted: #efe6d8;
+  --muted-foreground: #8a7a67;
+
+  --accent: #b58343;           /* bronze / gold */
+  --accent-foreground: #2c241d;
+
+  --destructive: #b3402f;
+  --destructive-foreground: #fdf8f1;
+
+  --success: #4f7a4d;
+  --warning: #b7802b;
+  --info: #4b6b86;
+
+  --mono: #2c241d;
+  --mono-foreground: #fffdf9;
+
+  --border: #e4d8c6;
+  --input: #ddceb8;
+  --ring: #b58343;
+
+  --radius: 0.625rem;
+}
+
+.dark {
+  --background: #1e1a15;
+  --foreground: #f2e9db;
+
+  --card: #262019;
+  --card-foreground: #f2e9db;
+
+  --popover: #262019;
+  --popover-foreground: #f2e9db;
+
+  --primary: #c69463;
+  --primary-foreground: #201810;
+
+  --secondary: #332b21;
+  --secondary-foreground: #f2e9db;
+
+  --muted: #2c251d;
+  --muted-foreground: #a6957f;
+
+  --accent: #c99a52;
+  --accent-foreground: #201810;
+
+  --destructive: #d9634f;
+  --destructive-foreground: #201810;
+
+  --success: #7fae7c;
+  --warning: #d6a45a;
+  --info: #86a6c1;
+
+  --mono: #f2e9db;
+  --mono-foreground: #201810;
+
+  --border: #3a3226;
+  --input: #3a3226;
+  --ring: #c99a52;
+}
+
+/* ---------------------------------------------------------------------------
+   Tailwind theme wiring — expose the tokens above as utility colours and
+   register the brand fonts. Arabic uses Tajawal; the Latin UI uses Inter.
+   --------------------------------------------------------------------------- */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-mono: var(--mono);
+  --color-mono-foreground: var(--mono-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --text-2sm: 0.8125rem;
+  --text-2sm--line-height: calc(1.075 / 0.8125);
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: calc(0.825 / 0.6875);
+
+  --font-sans: 'Inter', 'Tajawal', ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: 'Tajawal', 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Fonts — self-hosted via Google Fonts CSS import is avoided (offline / CSP);
+   we load the two families from the standard CDN link in app.vue <Head>.
+   If the network is unavailable the system-ui fallback applies. */
+
+/* ---------------------------------------------------------------------------
+   Base element styling
+   --------------------------------------------------------------------------- */
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+
+  html[dir='rtl'],
+  html[lang='ar'] {
+    font-family: var(--font-arabic);
+  }
+
+  body {
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 1px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   App shell primitives (Metronic demo1 layout metrics)
+   --------------------------------------------------------------------------- */
+@layer components {
+  .app-shell {
+    --sidebar-width: 270px;
+    --header-height: 64px;
+  }
+
+  .ki {
+    font-size: 1.15rem;
+    line-height: 1;
+    display: inline-flex;
+  }
+
+  .card {
+    background-color: var(--card);
+    color: var(--card-foreground);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 1px 2px rgb(44 36 29 / 0.04), 0 8px 24px -12px rgb(44 36 29 / 0.12);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.5rem 0.9rem;
+    transition: background-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .btn-primary {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background-color: color-mix(in oklab, var(--primary) 88%, black);
+  }
+
+  .btn-secondary {
+    background-color: var(--secondary);
+    color: var(--secondary-foreground);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    background-color: color-mix(in oklab, var(--secondary) 85%, black);
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    background-color: var(--secondary);
+  }
+
+  .btn-destructive {
+    background-color: var(--destructive);
+    color: var(--destructive-foreground);
+  }
+
+  .input {
+    width: 100%;
+    background-color: var(--card);
+    border: 1px solid var(--input);
+    border-radius: var(--radius-md);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: var(--foreground);
+  }
+
+  .input:focus {
+    outline: 2px solid var(--ring);
+    outline-offset: 0;
+    border-color: var(--ring);
+  }
+
+  .table-base {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.875rem;
+  }
+
+  .table-base thead th {
+    text-align: start;
+    font-weight: 600;
+    color: var(--muted-foreground);
+    padding: 0.65rem 0.9rem;
+    border-bottom: 1px solid var(--border);
+    background-color: color-mix(in oklab, var(--card) 60%, var(--secondary));
+    white-space: nowrap;
+  }
+
+  .table-base tbody td {
+    padding: 0.7rem 0.9rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .table-base tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .table-base tbody tr:hover td {
+    background-color: color-mix(in oklab, var(--card) 70%, var(--secondary));
+  }
+}

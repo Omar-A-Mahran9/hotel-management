@@ -1,0 +1,21 @@
+# dependencies
+node_modules
+
+# nuxt
+.nuxt
+.output
+.data
+dist
+
+# env
+.env
+.env.*
+!.env.example
+
+# misc
+.DS_Store
+*.log
+.eslintcache
+
+# metronic source package (licensed vendor drop — kept locally, not committed)
+metronic-v9.4.12

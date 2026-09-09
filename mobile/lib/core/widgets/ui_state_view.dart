@@ -9,7 +9,12 @@ import 'message_view.dart';
 
 /// Renders a [UiState] with the design-system loading / empty / error views,
 /// delegating the success case to [onSuccess]. Keeps every screen's
-/// state-handling consistent (md/mobile/testing_guide.md — "Widget Tests").
+/// state-handling consistent.
+///
+/// Pass [skeleton] to replace the centred spinner with a Figma-style skeleton
+/// placeholder (see `lib/core/widgets/skeleton.dart`). When omitted the loading
+/// state stays a [LoadingView] — screens opt in to skeletons as they are
+/// migrated.
 class UiStateView<T> extends StatelessWidget {
   const UiStateView({
     super.key,
@@ -18,6 +23,7 @@ class UiStateView<T> extends StatelessWidget {
     this.onRetry,
     this.emptyTitle,
     this.emptyMessage,
+    this.skeleton,
   });
 
   final UiState<T> state;
@@ -25,13 +31,14 @@ class UiStateView<T> extends StatelessWidget {
   final VoidCallback? onRetry;
   final String? emptyTitle;
   final String? emptyMessage;
+  final Widget? skeleton;
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     return state.map(
       initial: () => const SizedBox.shrink(),
-      loading: () => LoadingView(label: l10n.stateLoadingTitle),
+      loading: () => skeleton ?? LoadingView(label: l10n.stateLoadingTitle),
       success: onSuccess,
       empty: () => EmptyView(
         title: emptyTitle ?? l10n.stateEmptyTitle,

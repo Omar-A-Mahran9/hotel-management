@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
-import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 
-/// The six-box one-time-code input from `09 · Authentication`.
+/// The one-time-code input from `09 · Authentication`.
 ///
 /// One real [TextField] captures the digits (so paste and OS SMS autofill keep
 /// working); the boxes above are a presentation of its value. Always laid out
-/// left-to-right. When [hasError] the boxes take the error colour, matching the
-/// reference's red state.
+/// left-to-right. Figma boxes are ~48×56 with a fixed gap and a light-red
+/// **filled** error state.
 class OtpCodeField extends StatefulWidget {
   const OtpCodeField({
     super.key,
@@ -59,66 +60,83 @@ class _OtpCodeFieldState extends State<OtpCodeField> {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final String value = widget.controller.text;
-    final Color borderColor =
-        widget.hasError ? theme.colorScheme.error : theme.colorScheme.outline;
-    final Color textColor =
-        widget.hasError ? theme.colorScheme.error : theme.colorScheme.onSurface;
+
+    final Color borderColor = widget.hasError
+        ? theme.colorScheme.error
+        : theme.colorScheme.outline;
+    final Color fill = widget.hasError
+        ? AppColors.errorContainer
+        : theme.colorScheme.surface;
+    final Color textColor = widget.hasError
+        ? theme.colorScheme.error
+        : theme.colorScheme.onSurface;
 
     return Directionality(
       textDirection: TextDirection.ltr,
       child: GestureDetector(
         onTap: () => _focusNode.requestFocus(),
         behavior: HitTestBehavior.opaque,
-        child: Stack(
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List<Widget>.generate(widget.length, (int i) {
-                final bool filled = i < value.length;
-                return Container(
-                  width: 44,
-                  height: 52,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surface,
-                    borderRadius: AppRadius.allMd,
-                    border: Border.all(
-                      color: borderColor,
-                      width: filled ? 1.5 : 1,
-                    ),
+        child: SizedBox(
+          height: 56,
+          child: Stack(
+            children: <Widget>[
+              Center(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      for (int i = 0; i < widget.length; i++) ...<Widget>[
+                        if (i > 0) const SizedBox(width: 8),
+                        Container(
+                          width: 48,
+                          height: 56,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: fill,
+                            borderRadius: AppRadius.allInput,
+                            border: Border.all(
+                              color: borderColor,
+                              width: i < value.length ? 1.5 : 1,
+                            ),
+                          ),
+                          child: Text(
+                            i < value.length ? value[i] : '',
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              color: textColor,
+                              fontWeight: AppTypography.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
-                  child: Text(
-                    filled ? value[i] : '',
-                    style: theme.textTheme.headlineSmall?.copyWith(color: textColor),
-                  ),
-                );
-              }),
-            ),
-            Positioned.fill(
-              child: Opacity(
-                opacity: 0,
-                child: TextField(
-                  controller: widget.controller,
-                  focusNode: _focusNode,
-                  enabled: widget.enabled,
-                  autofocus: widget.autofocus,
-                  keyboardType: TextInputType.number,
-                  showCursor: false,
-                  enableInteractiveSelection: false,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(widget.length),
-                  ],
-                  decoration: const InputDecoration(
-                    counterText: '',
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: AppSpacing.md,
+                ),
+              ),
+              Positioned.fill(
+                child: Opacity(
+                  opacity: 0,
+                  child: TextField(
+                    controller: widget.controller,
+                    focusNode: _focusNode,
+                    enabled: widget.enabled,
+                    autofocus: widget.autofocus,
+                    keyboardType: TextInputType.number,
+                    showCursor: false,
+                    enableInteractiveSelection: false,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(widget.length),
+                    ],
+                    decoration: const InputDecoration(
+                      counterText: '',
+                      contentPadding: EdgeInsets.zero,
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

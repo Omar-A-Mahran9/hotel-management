@@ -6,10 +6,10 @@ import '../../../../app/router/app_routes.dart';
 import '../../../../core/errors/error_mapper.dart';
 import '../../../../core/errors/failure_l10n.dart';
 import '../../../../core/localization/l10n.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/loading_view.dart';
 import '../../../../core/widgets/message_view.dart';
+import '../../../../core/widgets/money_text.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../reservation/presentation/state/create_reservation_controller.dart';
 import '../../domain/entities/hotel.dart';
@@ -119,12 +119,10 @@ class _HotelDetailBody extends StatelessWidget {
                       ),
                     ),
                   const Spacer(),
-                  Text(
-                    l10n.priceFrom(s.nightlyRateFrom.amount),
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: theme.extension<AppSemanticColors>()?.accent ??
-                          AppColors.bronze500,
-                    ),
+                  MoneyText(
+                    s.nightlyRateFrom.amount,
+                    suffix: l10n.priceNightSuffix,
+                    semanticsLabel: l10n.priceFrom(s.nightlyRateFrom.amount),
                   ),
                 ],
               ),

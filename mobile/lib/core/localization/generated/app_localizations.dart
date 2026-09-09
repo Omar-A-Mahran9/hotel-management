@@ -602,6 +602,36 @@ abstract class AppLocalizations {
   /// **'Back'**
   String get commonBack;
 
+  /// No description provided for @navHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navHome;
+
+  /// No description provided for @navBookings.
+  ///
+  /// In en, this message translates to:
+  /// **'My bookings'**
+  String get navBookings;
+
+  /// No description provided for @navServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Services'**
+  String get navServices;
+
+  /// No description provided for @navAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get navAccount;
+
+  /// Snackbar shown when a not-yet-built bottom-nav tab is tapped.
+  ///
+  /// In en, this message translates to:
+  /// **'This section is coming in a later update.'**
+  String get navComingSoon;
+
   /// No description provided for @discoverGreeting.
   ///
   /// In en, this message translates to:
@@ -823,6 +853,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'SAR {amount} total'**
   String priceStayTotal(int amount);
+
+  /// No description provided for @priceFromLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'from'**
+  String get priceFromLabel;
+
+  /// No description provided for @priceNightSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'/ night'**
+  String get priceNightSuffix;
+
+  /// No description provided for @priceTotalSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'total'**
+  String get priceTotalSuffix;
 
   /// No description provided for @hotelRatingValue.
   ///

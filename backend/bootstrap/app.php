@@ -21,6 +21,8 @@ use App\Domain\Inventory\Exceptions\InvalidRoomStatusTransitionException;
 use App\Domain\Inventory\Exceptions\RoomTypeHotelMismatchException;
 use App\Domain\Loyalty\Exceptions\InvalidLoyaltyPointsException;
 use App\Domain\Loyalty\Exceptions\LoyaltyNotAllowedException;
+use App\Domain\Notification\Exceptions\InvalidNotificationStatusTransitionException;
+use App\Domain\Notification\Exceptions\NotificationNotAllowedException;
 use App\Domain\Payment\Exceptions\IdempotencyKeyConflictException;
 use App\Domain\Payment\Exceptions\InvalidPaymentAmountException;
 use App\Domain\Payment\Exceptions\InvalidPaymentCurrencyException;
@@ -328,6 +330,22 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->renderable(function (InvalidLoyaltyPointsException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        // Phase 11 — notification workflow business errors. Fixed, safe
+        // machine strings (no secret, no recipient address, no provider
+        // payload, no SQLSTATE). All 422, consistent with every other domain
+        // exception above.
+        $exceptions->renderable(function (NotificationNotAllowedException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (InvalidNotificationStatusTransitionException $e, Request $request) use ($envelope) {
             if ($request->is('api/*')) {
                 return $envelope($e->getMessage(), 422);
             }

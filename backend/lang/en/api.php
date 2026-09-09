@@ -69,4 +69,10 @@ return [
         'redeemed' => 'Loyalty points were redeemed against the booking.',
         'rule' => 'The hotel group loyalty rule is returned.',
     ],
+
+    'notifications' => [
+        'feed' => 'The reservation notification feed is returned.',
+        'read' => 'The notification was marked as read.',
+        'read_all' => 'The unread notifications were marked as read.',
+    ],
 ];

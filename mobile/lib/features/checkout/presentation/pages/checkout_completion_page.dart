@@ -5,13 +5,14 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/router/app_routes.dart';
 import '../../../../core/errors/failure_l10n.dart';
 import '../../../../core/localization/l10n.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_card.dart';
+import '../../../../core/widgets/bottom_action_bar.dart';
 import '../../../../core/widgets/hotel_app_bar.dart';
 import '../../../../core/widgets/info_banner.dart';
 import '../../../../core/widgets/loading_view.dart';
+import '../../../../core/widgets/money_text.dart';
 import '../../../../core/widgets/primary_button.dart';
+import '../../../../core/widgets/result_view.dart';
 import '../../../../core/widgets/secondary_button.dart';
 import '../../domain/entities/checkout.dart';
 import '../state/checkout_controller.dart';
@@ -62,8 +63,6 @@ class _Body extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
     final ThemeData theme = Theme.of(context);
-    final AppSemanticColors semantic =
-        theme.extension<AppSemanticColors>() ?? AppSemanticColors.light;
 
     final CheckoutResult? result = action.resultOrNull;
     final bool isFailure = action is CheckoutFailed ||
@@ -72,23 +71,20 @@ class _Body extends ConsumerWidget {
         result?.outcome == CheckoutOutcome.settlementPending;
     final bool isSuccess = result?.outcome.isSuccess ?? false;
 
-    final (IconData icon, Color color, String title, String body) = isSuccess
+    final (InfoBannerTone tone, String title, String body) = isSuccess
         ? (
-            Icons.check_rounded,
-            semantic.success,
+            InfoBannerTone.success,
             l10n.checkoutDoneTitle,
             l10n.checkoutDoneBody,
           )
         : isPending
             ? (
-                Icons.hourglass_bottom_rounded,
-                semantic.warning,
+                InfoBannerTone.warning,
                 l10n.checkoutPendingTitle,
                 l10n.checkoutPendingBody,
               )
             : (
-                Icons.error_outline_rounded,
-                theme.colorScheme.error,
+                InfoBannerTone.error,
                 l10n.checkoutFailedTitle,
                 action is CheckoutFailed
                     ? (action as CheckoutFailed).failure.localizedMessage(l10n)
@@ -111,88 +107,43 @@ class _Body extends ConsumerWidget {
     return Column(
       children: <Widget>[
         Expanded(
-          child: ListView(
-            padding: const EdgeInsets.all(AppSpacing.pageGutter),
-            children: <Widget>[
-              Column(
-                children: <Widget>[
-                  CircleAvatar(
-                    radius: 28,
-                    backgroundColor: color.withValues(alpha: 0.12),
-                    child: Icon(icon, color: color, size: 30),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(title,
-                      style: theme.textTheme.headlineSmall,
-                      textAlign: TextAlign.center),
-                  const SizedBox(height: AppSpacing.xxs),
-                  Text(body,
-                      style: theme.textTheme.bodyMedium,
-                      textAlign: TextAlign.center),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              if (result != null && result.checkout.chargesTotal.amount > 0)
-                AppCard(
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text(l10n.invoiceTitle,
-                            style: theme.textTheme.titleSmall),
-                      ),
-                      Text(
-                        l10n.moneyAmount(result.checkout.currency,
-                            result.checkout.chargesTotal.amount),
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          color: semantic.accent,
+          child: ResultView(
+            tone: tone,
+            title: title,
+            message: body,
+            detail: result != null && result.checkout.chargesTotal.amount > 0
+                ? AppCard(
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Text(l10n.invoiceTitle,
+                              style: theme.textTheme.titleSmall),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-              if (isFailure) ...<Widget>[
-                const SizedBox(height: AppSpacing.md),
-                InfoBanner(
-                  tone: InfoBannerTone.error,
-                  title: l10n.checkoutFailedTitle,
-                  message: l10n.checkoutFailedBody,
-                ),
-              ],
-            ],
+                        MoneyText(result.checkout.chargesTotal.amount),
+                      ],
+                    ),
+                  )
+                : null,
           ),
         ),
-        SafeArea(
-          minimum: const EdgeInsets.fromLTRB(
-            AppSpacing.pageGutter,
-            AppSpacing.xs,
-            AppSpacing.pageGutter,
-            AppSpacing.md,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              if (isFailure) ...<Widget>[
-                PrimaryButton(label: l10n.checkoutRetryCta, onPressed: retry),
-                const SizedBox(height: AppSpacing.xs),
-              ],
-              if (isSuccess) ...<Widget>[
-                PrimaryButton(
-                  label: l10n.checkoutViewInvoiceCta,
-                  onPressed: () => context.pushNamed(
-                    AppRoutes.invoiceName,
-                    pathParameters: <String, String>{
-                      'reservationId': reservationId,
-                    },
-                  ),
+        BottomActionBar(
+          children: <Widget>[
+            if (isFailure)
+              PrimaryButton(label: l10n.checkoutRetryCta, onPressed: retry),
+            if (isSuccess)
+              PrimaryButton(
+                label: l10n.checkoutViewInvoiceCta,
+                onPressed: () => context.pushNamed(
+                  AppRoutes.invoiceName,
+                  pathParameters: <String, String>{
+                    'reservationId': reservationId,
+                  },
                 ),
-                const SizedBox(height: AppSpacing.xs),
-              ],
-              (isSuccess)
-                  ? SecondaryButton(label: l10n.checkoutDoneCta, onPressed: done)
-                  : PrimaryButton(
-                      label: l10n.checkoutDoneCta, onPressed: done),
-            ],
-          ),
+              ),
+            (isSuccess)
+                ? SecondaryButton(label: l10n.checkoutDoneCta, onPressed: done)
+                : PrimaryButton(label: l10n.checkoutDoneCta, onPressed: done),
+          ],
         ),
       ],
     );

@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/localization/l10n.dart';
+import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/app_icons.dart';
 
-/// A labelled +/- stepper row (`16 · Stay dates & available rooms`, the "عدد
-/// الضيوف" sheet). Buttons disable at the supplied bounds.
+/// A labelled −/+ stepper row (`16 · Stay dates & available rooms`, the "عدد
+/// الضيوف" sheet).
+///
+/// Figma style: circular tinted −/+ buttons flanking the value in a boxed
+/// field. Buttons disable at [min] / [max]. Increment/decrement behaviour is
+/// unchanged from the previous implementation.
 class GuestStepper extends StatelessWidget {
   const GuestStepper({
     super.key,
@@ -24,28 +31,67 @@ class GuestStepper extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final AppLocalizations l10n = context.l10n;
+
     return Row(
       children: <Widget>[
         Expanded(child: Text(label, style: theme.textTheme.titleSmall)),
-        IconButton.outlined(
-          onPressed: value > min ? () => onChanged(value - 1) : null,
-          icon: const Icon(Icons.remove),
+        _RoundButton(
+          icon: AppIcons.remove,
           tooltip: '${l10n.stepperDecrease} — $label',
+          onPressed: value > min ? () => onChanged(value - 1) : null,
         ),
-        SizedBox(
-          width: 40,
-          child: Text(
-            '$value',
-            textAlign: TextAlign.center,
-            style: theme.textTheme.titleMedium,
+        Container(
+          width: 52,
+          height: 40,
+          margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: AppRadius.allSm,
+            border: Border.all(color: theme.colorScheme.outline),
           ),
+          child: Text('$value', style: theme.textTheme.titleMedium),
         ),
-        IconButton.outlined(
-          onPressed: value < max ? () => onChanged(value + 1) : null,
-          icon: const Icon(Icons.add),
+        _RoundButton(
+          icon: AppIcons.add,
           tooltip: '${l10n.stepperIncrease} — $label',
+          onPressed: value < max ? () => onChanged(value + 1) : null,
         ),
       ],
+    );
+  }
+}
+
+class _RoundButton extends StatelessWidget {
+  const _RoundButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final bool enabled = onPressed != null;
+    return IconButton(
+      onPressed: onPressed,
+      tooltip: tooltip,
+      icon: Icon(icon, size: 18),
+      visualDensity: VisualDensity.compact,
+      style: IconButton.styleFrom(
+        minimumSize: const Size(40, 40),
+        backgroundColor: enabled
+            ? theme.colorScheme.primary.withValues(alpha: 0.12)
+            : theme.colorScheme.surfaceContainerHighest,
+        foregroundColor: enabled
+            ? theme.colorScheme.primary
+            : theme.colorScheme.onSurface.withValues(alpha: 0.35),
+        shape: const CircleBorder(),
+      ),
     );
   }
 }

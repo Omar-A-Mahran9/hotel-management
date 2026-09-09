@@ -1,0 +1,7 @@
+{
+  "extends": "./.nuxt/tsconfig.json",
+  "compilerOptions": {
+    "types": ["vitest/globals"]
+  },
+  "exclude": ["metronic-v9.4.12", "node_modules", "dist", ".output"]
+}

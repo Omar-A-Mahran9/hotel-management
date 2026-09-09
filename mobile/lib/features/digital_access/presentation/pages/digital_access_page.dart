@@ -6,13 +6,13 @@ import '../../../../app/router/app_routes.dart';
 import '../../../../core/errors/error_mapper.dart';
 import '../../../../core/errors/failure_l10n.dart';
 import '../../../../core/localization/l10n.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/hotel_app_bar.dart';
 import '../../../../core/widgets/info_banner.dart';
 import '../../../../core/widgets/loading_view.dart';
 import '../../../../core/widgets/message_view.dart';
 import '../../../../core/widgets/primary_button.dart';
+import '../../../../core/widgets/result_view.dart';
 import '../../../../core/widgets/secondary_button.dart';
 import '../../domain/entities/access_grant.dart';
 import '../../domain/entities/access_status.dart';
@@ -85,8 +85,6 @@ class _Body extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
     final ThemeData theme = Theme.of(context);
-    final AppSemanticColors semantic =
-        theme.extension<AppSemanticColors>() ?? AppSemanticColors.light;
 
     void backToReservation() => context.goNamed(
           AppRoutes.reservationDetailName,
@@ -139,12 +137,11 @@ class _Body extends ConsumerWidget {
       );
     }
 
-    // Non-active states → centred message + the right recovery action.
-    final (IconData icon, Color color, String title, String body,
-        Widget action) = switch (grant.status) {
+    // Non-active states → a tinted result banner + the right recovery action.
+    final (InfoBannerTone tone, String title, String body, Widget action) =
+        switch (grant.status) {
       AccessStatus.failed => (
-          Icons.vpn_key_off_outlined,
-          theme.colorScheme.error,
+          InfoBannerTone.error,
           l10n.checkInFailedTitle,
           l10n.checkInFailedBody,
           _TwoActions(
@@ -155,8 +152,7 @@ class _Body extends ConsumerWidget {
           ),
         ),
       AccessStatus.issueRequested || AccessStatus.revokeRequested => (
-          Icons.hourglass_bottom_rounded,
-          semantic.warning,
+          InfoBannerTone.warning,
           l10n.checkInPendingTitle,
           l10n.checkInPendingBody,
           _TwoActions(
@@ -167,24 +163,21 @@ class _Body extends ConsumerWidget {
           ),
         ),
       AccessStatus.revoked => (
-          Icons.gpp_bad_outlined,
-          theme.colorScheme.error,
+          InfoBannerTone.error,
           l10n.accessRevokedTitle,
           l10n.accessRevokedBody,
           _BottomAction(
               label: l10n.accessBackToReservation, onPressed: backToReservation),
         ),
       AccessStatus.expired => (
-          Icons.timelapse_outlined,
-          semantic.info,
+          InfoBannerTone.info,
           l10n.accessExpiredTitle,
           l10n.accessExpiredBody,
           _BottomAction(
               label: l10n.accessBackToReservation, onPressed: backToReservation),
         ),
       _ => (
-          Icons.vpn_key_outlined,
-          semantic.info,
+          InfoBannerTone.info,
           l10n.accessNotIssuedTitle,
           l10n.accessNotIssuedBody,
           _BottomAction(label: l10n.reservationCheckInCta, onPressed: toCheckIn),
@@ -194,37 +187,19 @@ class _Body extends ConsumerWidget {
     return Column(
       children: <Widget>[
         Expanded(
-          child: ListView(
-            padding: const EdgeInsets.all(AppSpacing.pageGutter),
-            children: <Widget>[
-              Column(
-                children: <Widget>[
-                  CircleAvatar(
-                    radius: 28,
-                    backgroundColor: color.withValues(alpha: 0.12),
-                    child: Icon(icon, color: color, size: 30),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(title,
-                      style: theme.textTheme.headlineSmall,
-                      textAlign: TextAlign.center),
-                  const SizedBox(height: AppSpacing.xxs),
-                  Text(body,
-                      style: theme.textTheme.bodyMedium,
-                      textAlign: TextAlign.center),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Text(l10n.reservationStatusFieldLabel,
-                        style: theme.textTheme.bodySmall),
-                  ),
-                  AccessStatusPill(status: grant.status),
-                ],
-              ),
-            ],
+          child: ResultView(
+            tone: tone,
+            title: title,
+            message: body,
+            detail: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(l10n.reservationStatusFieldLabel,
+                      style: theme.textTheme.bodySmall),
+                ),
+                AccessStatusPill(status: grant.status),
+              ],
+            ),
           ),
         ),
         action,

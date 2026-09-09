@@ -101,6 +101,12 @@
   "commonSeeAll": "عرض الكل",
   "commonBack": "رجوع",
 
+  "navHome": "الرئيسية",
+  "navBookings": "حجوزاتي",
+  "navServices": "الخدمات",
+  "navAccount": "حسابي",
+  "navComingSoon": "هذا القسم قيد الإنشاء وسيتوفّر في تحديث لاحق.",
+
   "discoverGreeting": "أهلاً بك",
   "discoverGreetingNamed": "أهلاً {name}",
   "discoverSubtitle": "اكتشف فنادق المجموعة",
@@ -143,6 +149,9 @@
   "priceFrom": "من {amount} ﷼",
   "pricePerNight": "{amount} ﷼ / الليلة",
   "priceStayTotal": "{amount} ﷼ الإجمالي",
+  "priceFromLabel": "من",
+  "priceNightSuffix": "/ ليلة",
+  "priceTotalSuffix": "للإقامة",
 
   "hotelRatingValue": "{rating}",
   "hotelReviewCount": "{count, plural, =1{مراجعة واحدة} other{{count} مراجعة}}",

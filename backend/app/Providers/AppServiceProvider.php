@@ -64,6 +64,10 @@ use App\Domain\Loyalty\Repositories\Contracts\LoyaltyTransactionRepositoryInterf
 use App\Domain\Loyalty\Repositories\EloquentLoyaltyAccountRepository;
 use App\Domain\Loyalty\Repositories\EloquentLoyaltyRuleRepository;
 use App\Domain\Loyalty\Repositories\EloquentLoyaltyTransactionRepository;
+use App\Domain\Notification\Models\Notification;
+use App\Domain\Notification\Policies\NotificationPolicy;
+use App\Domain\Notification\Repositories\Contracts\NotificationRepositoryInterface;
+use App\Domain\Notification\Repositories\EloquentNotificationRepository;
 use App\Domain\Payment\Gateway\Contracts\PaymentGatewayInterface;
 use App\Domain\Payment\Gateway\DummyPaymentGateway;
 use App\Domain\Payment\Gateway\Exceptions\UnsupportedPaymentProviderException;
@@ -135,6 +139,7 @@ class AppServiceProvider extends ServiceProvider
         LoyaltyAccountRepositoryInterface::class => EloquentLoyaltyAccountRepository::class,
         LoyaltyTransactionRepositoryInterface::class => EloquentLoyaltyTransactionRepository::class,
         LoyaltyRuleRepositoryInterface::class => EloquentLoyaltyRuleRepository::class,
+        NotificationRepositoryInterface::class => EloquentNotificationRepository::class,
     ];
 
     /**
@@ -158,6 +163,7 @@ class AppServiceProvider extends ServiceProvider
         Invoice::class => InvoicePolicy::class,
         LoyaltyAccount::class => LoyaltyPolicy::class,
         LoyaltyRule::class => LoyaltyRulePolicy::class,
+        Notification::class => NotificationPolicy::class,
     ];
 
     public function register(): void
@@ -233,6 +239,19 @@ class AppServiceProvider extends ServiceProvider
         $this->registerIdentityVerificationRateLimiters();
         $this->registerDigitalAccessRateLimiters();
         $this->registerCheckoutRateLimiters();
+        $this->registerNotificationRateLimiters();
+    }
+
+    /**
+     * Phase 0 §17 — rate limiting on the user-triggered notification-feed
+     * endpoints (Phase 11). Config-driven (config/notifications.php), native
+     * RateLimiter, no package. Keyed by authenticated user id (IP fallback).
+     */
+    private function registerNotificationRateLimiters(): void
+    {
+        RateLimiter::for('notifications.read', fn (Request $request) => Limit::perMinute(
+            (int) config('notifications.rate_limits.read.per_minute'),
+        )->by((string) ($request->user()?->id ?? $request->ip())));
     }
 
     /**

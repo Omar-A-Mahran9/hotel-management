@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_card.dart';
+import '../../../../core/widgets/money_text.dart';
 import '../../../../core/widgets/status_pill.dart';
 import '../../domain/entities/hotel_summary.dart';
 import 'hotel_thumbnail.dart';
@@ -64,12 +65,10 @@ class _PriceFrom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    return Text(
-      context.l10n.priceFrom(hotel.nightlyRateFrom.amount),
-      style: theme.textTheme.titleSmall?.copyWith(
-        color: theme.extension<AppSemanticColors>()?.accent ?? AppColors.bronze500,
-      ),
+    return MoneyText(
+      hotel.nightlyRateFrom.amount,
+      markSize: 13,
+      semanticsLabel: context.l10n.priceFrom(hotel.nightlyRateFrom.amount),
     );
   }
 }

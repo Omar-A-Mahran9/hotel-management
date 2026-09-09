@@ -291,6 +291,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonBack => 'Back';
 
   @override
+  String get navHome => 'Home';
+
+  @override
+  String get navBookings => 'My bookings';
+
+  @override
+  String get navServices => 'Services';
+
+  @override
+  String get navAccount => 'Account';
+
+  @override
+  String get navComingSoon => 'This section is coming in a later update.';
+
+  @override
   String get discoverGreeting => 'Welcome';
 
   @override
@@ -441,6 +456,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String priceStayTotal(int amount) {
     return 'SAR $amount total';
   }
+
+  @override
+  String get priceFromLabel => 'from';
+
+  @override
+  String get priceNightSuffix => '/ night';
+
+  @override
+  String get priceTotalSuffix => 'total';
 
   @override
   String hotelRatingValue(double rating) {

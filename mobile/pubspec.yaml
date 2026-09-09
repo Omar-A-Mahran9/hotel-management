@@ -40,3 +40,28 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
+
+  # Real Figma imagery (photographic fills exported from hotel_guest_app.fig).
+  # Filenames keep the original Figma content hash so each asset stays traceable
+  # to md/mobile/Design/assets/manifest.json. Consumed only through AppImage /
+  # AppImages (lib/core/widgets/app_image.dart) — never referenced by path.
+  assets:
+    - assets/images/
+
+  # Tajawal — the Figma-specified Arabic family (font/family/arabic = Tajawal).
+  # A humanist Arabic sans with a full Latin set, so the same family renders the
+  # Arabic UI and the "Hotel System" wordmark. SIL OFL 1.1, see
+  # assets/fonts/OFL.txt.
+  fonts:
+    - family: Tajawal
+      fonts:
+        - asset: assets/fonts/Tajawal-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Tajawal-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Tajawal-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Tajawal-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Tajawal-ExtraBold.ttf
+          weight: 800

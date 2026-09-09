@@ -130,6 +130,13 @@
   "commonSeeAll": "See all",
   "commonBack": "Back",
 
+  "navHome": "Home",
+  "navBookings": "My bookings",
+  "navServices": "Services",
+  "navAccount": "Account",
+  "navComingSoon": "This section is coming in a later update.",
+  "@navComingSoon": { "description": "Snackbar shown when a not-yet-built bottom-nav tab is tapped." },
+
   "discoverGreeting": "Welcome",
   "discoverGreetingNamed": "Welcome, {name}",
   "@discoverGreetingNamed": {
@@ -202,6 +209,9 @@
   "@priceStayTotal": {
     "placeholders": { "amount": { "type": "int" } }
   },
+  "priceFromLabel": "from",
+  "priceNightSuffix": "/ night",
+  "priceTotalSuffix": "total",
 
   "hotelRatingValue": "{rating}",
   "@hotelRatingValue": {

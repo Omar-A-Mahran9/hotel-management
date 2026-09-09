@@ -285,6 +285,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get commonBack => 'رجوع';
 
   @override
+  String get navHome => 'الرئيسية';
+
+  @override
+  String get navBookings => 'حجوزاتي';
+
+  @override
+  String get navServices => 'الخدمات';
+
+  @override
+  String get navAccount => 'حسابي';
+
+  @override
+  String get navComingSoon => 'هذا القسم قيد الإنشاء وسيتوفّر في تحديث لاحق.';
+
+  @override
   String get discoverGreeting => 'أهلاً بك';
 
   @override
@@ -433,6 +448,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String priceStayTotal(int amount) {
     return '$amount ﷼ الإجمالي';
   }
+
+  @override
+  String get priceFromLabel => 'من';
+
+  @override
+  String get priceNightSuffix => '/ ليلة';
+
+  @override
+  String get priceTotalSuffix => 'للإقامة';
 
   @override
   String hotelRatingValue(double rating) {

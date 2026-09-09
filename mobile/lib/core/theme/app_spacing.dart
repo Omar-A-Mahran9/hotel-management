@@ -12,4 +12,15 @@ abstract final class AppSpacing {
 
   /// Default horizontal page padding for phone layouts.
   static const double pageGutter = 20;
+
+  /// Default inner padding for [AppCard] / surface containers.
+  static const double cardPadding = 16;
+
+  /// Vertical gap between stacked sections on a screen.
+  static const double section = 24;
+
+  /// Space above a sticky bottom action bar's content and below its buttons
+  /// (added on top of the safe-area inset). See `BottomActionBar`.
+  static const double bottomBarTop = 12;
+  static const double bottomBarBottom = 16;
 }
