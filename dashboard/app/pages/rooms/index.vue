@@ -58,32 +58,80 @@ const columns = computed<Column[]>(() => [
   ...(canManage ? [{ key: 'actions', label: t('common.actions'), align: 'end' as const }] : []),
 ])
 
-// --- status change --------------------------------------------------------
-const STATUSES: RoomStatus[] = ['available', 'booked', 'under_maintenance']
+// --- create / edit ------------------------------------------------------
+const formOpen = ref(false)
 const editing = ref<Room | null>(null)
-const targetStatus = ref<RoomStatus>('available')
 const saving = ref(false)
-const saveError = ref<string | null>(null)
+const fieldErrors = ref<Record<string, string[]>>({})
+const form = reactive({ room_number: '', room_type_id: null as number | null })
+
+function openCreate() {
+  editing.value = null
+  Object.assign(form, { room_number: '', room_type_id: types.data.value?.[0]?.id ?? null })
+  fieldErrors.value = {}
+  formOpen.value = true
+}
+function openEdit(room: Room) {
+  editing.value = room
+  Object.assign(form, { room_number: room.room_number, room_type_id: room.room_type_id })
+  fieldErrors.value = {}
+  formOpen.value = true
+}
+
+async function submitForm() {
+  if (saving.value || hotelId.value == null || form.room_type_id == null) return
+  saving.value = true
+  fieldErrors.value = {}
+  try {
+    if (editing.value) {
+      await roomsService.update(hotelId.value, editing.value.id, {
+        room_number: form.room_number,
+        room_type_id: form.room_type_id,
+      })
+      app.pushToast('success', t('rooms.updated'))
+    } else {
+      await roomsService.create(hotelId.value, {
+        room_number: form.room_number,
+        room_type_id: form.room_type_id,
+      })
+      app.pushToast('success', t('rooms.created'))
+    }
+    formOpen.value = false
+    list.reload()
+  } catch (e) {
+    if (e instanceof ApiError && e.kind === 'validation' && e.errors) fieldErrors.value = e.errors
+    else app.pushToast('error', e instanceof ApiError ? e.message : t('errors.genericBody'))
+  } finally {
+    saving.value = false
+  }
+}
+
+// --- status change ----------------------------------------------------
+const STATUSES: Array<Extract<RoomStatus, 'available' | 'under_maintenance'>> = ['available', 'under_maintenance']
+const statusEditing = ref<Room | null>(null)
+const targetStatus = ref<'available' | 'under_maintenance'>('available')
+const savingStatus = ref(false)
+const statusError = ref<string | null>(null)
 
 function openStatus(room: Room) {
-  editing.value = room
-  targetStatus.value = room.status
-  saveError.value = null
+  statusEditing.value = room
+  targetStatus.value = room.status === 'under_maintenance' ? 'under_maintenance' : 'available'
+  statusError.value = null
 }
 
 async function saveStatus() {
-  if (!editing.value || saving.value) return
-  saving.value = true
-  saveError.value = null
+  if (!statusEditing.value || savingStatus.value) return
+  savingStatus.value = true
+  statusError.value = null
   try {
-    await roomsService.setStatus(hotelId.value!, editing.value.id, targetStatus.value)
+    await roomsService.setStatus(hotelId.value!, statusEditing.value.id, targetStatus.value)
     app.pushToast('success', t('rooms.statusChanged'))
-    editing.value = null
+    statusEditing.value = null
     list.reload()
   } catch (e) {
-    saveError.value = e instanceof ApiError ? e.message : t('errors.genericBody')
+    statusError.value = e instanceof ApiError ? e.message : t('errors.genericBody')
   } finally {
-    saving.value = false
+    savingStatus.value = false
   }
 }
 </script>
@@ -93,7 +141,13 @@ async function saveStatus() {
     <PageHeader
       :title="t('rooms.title')"
       :subtitle="hotelCtx.currentHotel ? t('rooms.subtitle', { hotel: hotelCtx.currentHotel.name }) : ''"
-    />
+    >
+      <template v-if="canManage && hotelId != null" #actions>
+        <button type="button" class="btn btn-primary" @click="openCreate">
+          <KtIcon name="plus" /> {{ t('rooms.new') }}
+        </button>
+      </template>
+    </PageHeader>
 
     <NeedHotelNotice v-if="hotelId == null" />
 
@@ -134,23 +188,56 @@ async function saveStatus() {
           />
         </template>
         <template #cell-actions="{ row }">
-          <button type="button" class="btn btn-ghost px-2 py-1 text-2sm" @click="openStatus(row as Room)">
-            <KtIcon name="pencil" /> {{ t('rooms.setStatus') }}
-          </button>
+          <div class="flex items-center justify-end gap-1">
+            <button type="button" class="btn btn-ghost px-2 py-1 text-2sm" @click="openEdit(row as Room)">
+              <KtIcon name="pencil" /> {{ t('common.edit') }}
+            </button>
+            <button
+              type="button"
+              class="btn btn-ghost px-2 py-1 text-2sm"
+              :disabled="(row as Room).status === 'booked'"
+              @click="openStatus(row as Room)"
+            >
+              {{ t('rooms.setStatus') }}
+            </button>
+          </div>
         </template>
       </DataTable>
     </template>
 
+    <AppModal v-model:open="formOpen" :title="editing ? t('rooms.editTitle') : t('rooms.new')">
+      <form class="space-y-3" novalidate @submit.prevent="submitForm">
+        <FormField :label="t('rooms.number')" :error="fieldErrors.room_number" required>
+          <input v-model="form.room_number" class="input" required>
+        </FormField>
+        <FormField :label="t('rooms.type')" :error="fieldErrors.room_type_id" required>
+          <select v-model.number="form.room_type_id" class="input" required>
+            <option v-for="rt in types.data.value ?? []" :key="rt.id" :value="rt.id">
+              {{ rt.name }}
+            </option>
+          </select>
+        </FormField>
+      </form>
+      <template #footer>
+        <button type="button" class="btn btn-secondary" :disabled="saving" @click="formOpen = false">
+          {{ t('common.cancel') }}
+        </button>
+        <button type="button" class="btn btn-primary" :disabled="saving" @click="submitForm">
+          {{ saving ? t('common.saving') : t('common.save') }}
+        </button>
+      </template>
+    </AppModal>
+
     <AppModal
-      :open="editing !== null"
+      :open="statusEditing !== null"
       :title="t('rooms.setStatus')"
-      @update:open="v => !v && (editing = null)"
+      @update:open="v => !v && (statusEditing = null)"
     >
-      <div v-if="editing" class="space-y-3">
+      <div v-if="statusEditing" class="space-y-3">
         <p class="text-sm text-muted-foreground">
-          {{ t('rooms.number') }}: <span class="font-medium text-foreground">{{ editing.room_number }}</span>
+          {{ t('rooms.number') }}: <span class="font-medium text-foreground">{{ statusEditing.room_number }}</span>
         </p>
-        <FormField :label="t('rooms.status')" :error="saveError">
+        <FormField :label="t('rooms.status')" :error="statusError">
           <select v-model="targetStatus" class="input">
             <option v-for="s in STATUSES" :key="s" :value="s">
               {{ t(`status.${s}`) }}
@@ -158,14 +245,14 @@ async function saveStatus() {
           </select>
         </FormField>
         <p class="text-2xs text-muted-foreground">
-          The backend validates every status change against its room state machine.
+          {{ t('rooms.statusMachineNote') }}
         </p>
       </div>
       <template #footer>
-        <button type="button" class="btn btn-secondary" :disabled="saving" @click="editing = null">
+        <button type="button" class="btn btn-secondary" :disabled="savingStatus" @click="statusEditing = null">
           {{ t('common.cancel') }}
         </button>
-        <button type="button" class="btn btn-primary" :disabled="saving" @click="saveStatus">
+        <button type="button" class="btn btn-primary" :disabled="savingStatus" @click="saveStatus">
           {{ t('common.save') }}
         </button>
       </template>

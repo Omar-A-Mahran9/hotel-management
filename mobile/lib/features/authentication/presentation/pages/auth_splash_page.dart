@@ -14,9 +14,9 @@ import '../../../../core/widgets/brand_logo.dart';
 class AuthSplashPage extends StatelessWidget {
   const AuthSplashPage({super.key});
 
-  /// The splash's warm espresso brown — lighter and warmer than [AppColors]
-  /// `brown900`; specific to this screen.
-  static const Color _background = Color(0xFF43301E);
+  /// The splash's warm "oud" brown — sampled from the rendered Figma
+  /// `14 · Entry` frame 1 (#513425), same as the primary action colour.
+  static const Color _background = AppColors.brown700;
 
   @override
   Widget build(BuildContext context) {

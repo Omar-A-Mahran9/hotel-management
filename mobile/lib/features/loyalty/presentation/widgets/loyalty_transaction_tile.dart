@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 
 import '../../../../core/localization/l10n.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -32,13 +33,15 @@ class LoyaltyTransactionTile extends StatelessWidget {
         theme.extension<AppSemanticColors>() ?? AppSemanticColors.light;
 
     final bool credit = transaction.isCredit;
-    final Color amountColor =
-        credit ? semantic.success : theme.colorScheme.error;
+    final Color amountColor = credit
+        ? semantic.success
+        : theme.colorScheme.error;
     final String amount = credit
         ? l10n.loyaltyPointsAdded(transaction.magnitude)
         : l10n.loyaltyPointsRemoved(transaction.magnitude);
 
-    final bool isThisStay = highlightReservationId != null &&
+    final bool isThisStay =
+        highlightReservationId != null &&
         transaction.isForReservation(highlightReservationId!);
 
     return Padding(
@@ -48,10 +51,10 @@ class LoyaltyTransactionTile extends StatelessWidget {
         children: <Widget>[
           Icon(
             transaction.type == LoyaltyTransactionType.earn
-                ? Icons.add_circle_outline
+                ? IconsaxPlusLinear.add_circle
                 : transaction.type == LoyaltyTransactionType.redeem
-                    ? Icons.remove_circle_outline
-                    : Icons.swap_horiz,
+                ? IconsaxPlusLinear.minus_cirlce
+                : IconsaxPlusLinear.arrow_swap_horizontal,
             size: 18,
             color: amountColor,
           ),
@@ -75,8 +78,9 @@ class LoyaltyTransactionTile extends StatelessWidget {
                   const SizedBox(height: AppSpacing.xxs),
                   Text(
                     l10n.loyaltyTxThisStay,
-                    style: theme.textTheme.labelSmall
-                        ?.copyWith(color: semantic.accent),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: semantic.accent,
+                    ),
                   ),
                 ],
               ],

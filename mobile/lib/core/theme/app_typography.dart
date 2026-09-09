@@ -5,11 +5,15 @@ import 'package:flutter/material.dart';
 /// ## Font
 ///
 /// **Tajawal** — the family the Figma explicitly specifies
-/// (`font/family/arabic = Tajawal`). SIL OFL 1.1, `assets/fonts/OFL.txt`.
-/// Tajawal is a humanist Arabic sans with a complete Latin set, so the one
-/// family renders both the Arabic UI and the Latin "Hotel System" wordmark.
-/// Bundled static weights: 300 / 400 / 500 / 700 / 800 (Flutter approximates
-/// 600 from the neighbours).
+/// (`font/family/arabic = Tajawal`; verified in `hotel_guest_app.fig` — the
+/// component tree carries `Tajawal-Regular/Medium/Bold/ExtraBold`). SIL OFL 1.1,
+/// `assets/fonts/OFL.txt`. Tajawal is a humanist Arabic sans with a complete
+/// Latin set, so one family renders both the Arabic UI and the Latin
+/// "Hotel System" wordmark, exactly as the 16 rendered Figma boards show.
+///
+/// The `.fig` design-system audit note remarks that the *brief* asked for Inter
+/// on Latin; that was never applied in the delivered frames, and adopting it
+/// now reflows the (secondary) English layout, so the delivered Tajawal is kept.
 ///
 /// ## Rules
 ///
@@ -21,6 +25,10 @@ abstract final class AppTypography {
   /// The bundled family (see `pubspec.yaml`). Applied globally through
   /// [ThemeData.fontFamily] so it also reaches Material-internal text.
   static const String fontFamily = 'Tajawal';
+
+  /// Fallback chain — kept for symmetry with call sites; Tajawal covers both
+  /// scripts so nothing normally resolves here.
+  static const List<String> fontFamilyFallback = <String>['Tajawal'];
 
   /// Weight tokens — named so screens/components don't sprinkle raw
   /// [FontWeight] values that drift from the design.
@@ -52,30 +60,45 @@ abstract final class AppTypography {
       double size,
       FontWeight weight, {
       double height = 1.3,
-    }) => _base(size, weight, height: height, color: primary);
+      double? letterSpacing,
+    }) => _base(
+      size,
+      weight,
+      height: height,
+      color: primary,
+      letterSpacing: letterSpacing,
+    );
 
-    // Sizes + line heights match the original scale (so the font switch +
-    // heavier weights don't reflow existing screens); only the weights move up
-    // to the Figma's heavier feel.
+    // Sizes + line heights match the established scale (so nothing reflows);
+    // display/headline gain the Figma's slight negative tracking.
     return TextTheme(
-      // Display — the entry headline and other hero copy.
-      displayLarge: primaryStyle(34, extraBold, height: 1.15),
-      displayMedium: primaryStyle(32, extraBold, height: 1.15),
-      displaySmall: primaryStyle(30, extraBold, height: 1.2),
-      // Headline — screen headings ("أدخل رقم جوالك").
-      headlineLarge: primaryStyle(26, bold, height: 1.2),
-      headlineMedium: primaryStyle(24, bold, height: 1.25),
+      displayLarge: primaryStyle(
+        34,
+        extraBold,
+        height: 1.15,
+        letterSpacing: -0.5,
+      ),
+      displayMedium: primaryStyle(
+        32,
+        extraBold,
+        height: 1.15,
+        letterSpacing: -0.5,
+      ),
+      displaySmall: primaryStyle(
+        30,
+        extraBold,
+        height: 1.2,
+        letterSpacing: -0.4,
+      ),
+      headlineLarge: primaryStyle(26, bold, height: 1.2, letterSpacing: -0.3),
+      headlineMedium: primaryStyle(24, bold, height: 1.25, letterSpacing: -0.2),
       headlineSmall: primaryStyle(20, bold, height: 1.3),
-      // Title — app-bar title, section headers, card titles.
       titleLarge: primaryStyle(18, bold, height: 1.3),
       titleMedium: primaryStyle(16, bold, height: 1.3),
       titleSmall: primaryStyle(14, bold, height: 1.3),
-      // Body — paragraph and supporting copy. Secondary tone for medium/small
-      // matches the Figma's muted helper text.
       bodyLarge: primaryStyle(16, regular, height: 1.45),
       bodyMedium: _base(14, regular, height: 1.45, color: secondary),
       bodySmall: _base(12, regular, height: 1.4, color: secondary),
-      // Label — buttons and pills.
       labelLarge: primaryStyle(14, bold, height: 1.2),
       labelMedium: _base(12, bold, height: 1.3, color: secondary),
       labelSmall: _base(11, semiBold, height: 1.3, color: secondary),
@@ -83,12 +106,12 @@ abstract final class AppTypography {
   }
 
   /// Large tabular-figure number (room number, deposit amount, points balance).
-  /// Colour is supplied by the caller (often white on the brown card).
   static TextStyle number(Color color, {double size = 40}) => _base(
     size,
     extraBold,
     height: 1.05,
     color: color,
+    letterSpacing: -0.5,
   ).copyWith(fontFeatures: const <FontFeature>[FontFeature.tabularFigures()]);
 
   /// Monospaced-digit style for reference codes / entry codes.
@@ -99,8 +122,7 @@ abstract final class AppTypography {
     letterSpacing: 2,
   ).copyWith(fontFeatures: const <FontFeature>[FontFeature.tabularFigures()]);
 
-  /// Price / money style — bronze accent, heavy, tabular figures. Pair with
-  /// `MoneyText`. Callers may override the colour for on-dark surfaces.
+  /// Price / money style — heavy, tabular figures. Pair with `MoneyText`.
   static TextStyle price(Color color, {double size = 16}) => _base(
     size,
     bold,

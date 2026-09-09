@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/localization/l10n.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// The three-step progress header for the verification flow: Document → Selfie →
 /// Result. Direction-agnostic (lays out correctly in RTL and LTR).
@@ -89,7 +90,7 @@ class _Dot extends StatelessWidget {
           ),
           alignment: Alignment.center,
           child: done
-              ? const Icon(Icons.check, size: 15, color: AppColors.white)
+              ? const Icon(AppIcons.check, size: 15, color: AppColors.white)
               : Text(
                   '$index',
                   style: theme.textTheme.labelSmall?.copyWith(

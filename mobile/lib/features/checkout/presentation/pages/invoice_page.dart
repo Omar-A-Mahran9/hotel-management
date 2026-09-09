@@ -17,6 +17,7 @@ import '../../../reservation/domain/entities/reservation.dart';
 import '../../../reservation/presentation/state/reservation_detail_provider.dart';
 import '../../domain/entities/invoice.dart';
 import '../state/checkout_providers.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// `05 · Depart & Invoice` screen 2 — the issued e-invoice with full line
 /// items. Every figure is backend-supplied; the app renders it and never
@@ -29,8 +30,9 @@ class InvoicePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
-    final AsyncValue<Invoice> invoiceAsync =
-        ref.watch(invoiceProvider(reservationId));
+    final AsyncValue<Invoice> invoiceAsync = ref.watch(
+      invoiceProvider(reservationId),
+    );
 
     return Scaffold(
       appBar: HotelAppBar(title: l10n.invoiceTitle),
@@ -42,7 +44,7 @@ class InvoicePage extends ConsumerWidget {
             final Failure failure = ErrorMapper.toFailure(e);
             if (failure.kind == FailureKind.notFound) {
               return MessageView(
-                icon: Icons.receipt_long_outlined,
+                icon: AppIcons.invoice,
                 title: l10n.invoiceNotReadyTitle,
                 message: l10n.invoiceNotReadyBody,
                 actionLabel: l10n.commonBack,
@@ -50,17 +52,15 @@ class InvoicePage extends ConsumerWidget {
               );
             }
             return MessageView(
-              icon: Icons.receipt_long_outlined,
+              icon: AppIcons.invoice,
               title: l10n.invoiceUnavailableTitle,
               message: failure.localizedMessage(l10n),
               actionLabel: l10n.actionRetry,
               onAction: () => ref.invalidate(invoiceProvider(reservationId)),
             );
           },
-          data: (Invoice invoice) => _Body(
-            reservationId: reservationId,
-            invoice: invoice,
-          ),
+          data: (Invoice invoice) =>
+              _Body(reservationId: reservationId, invoice: invoice),
         ),
       ),
     );
@@ -81,8 +81,9 @@ class _Body extends ConsumerWidget {
     final Locale locale = Localizations.localeOf(context);
     final AppSemanticColors semantic =
         theme.extension<AppSemanticColors>() ?? AppSemanticColors.light;
-    final AsyncValue<Reservation> reservationAsync =
-        ref.watch(reservationDetailProvider(reservationId));
+    final AsyncValue<Reservation> reservationAsync = ref.watch(
+      reservationDetailProvider(reservationId),
+    );
 
     String money(int amount) => l10n.moneyAmount(invoice.currency, amount);
 
@@ -102,15 +103,19 @@ class _Body extends ConsumerWidget {
               Row(
                 children: <Widget>[
                   Expanded(
-                    child: Text(l10n.invoiceNumberLabel,
-                        style: theme.textTheme.bodySmall),
+                    child: Text(
+                      l10n.invoiceNumberLabel,
+                      style: theme.textTheme.bodySmall,
+                    ),
                   ),
-                  Text(invoice.invoiceNumber,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontFeatures: const <FontFeature>[
-                          FontFeature.tabularFigures()
-                        ],
-                      )),
+                  Text(
+                    invoice.invoiceNumber,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontFeatures: const <FontFeature>[
+                        FontFeature.tabularFigures(),
+                      ],
+                    ),
+                  ),
                 ],
               ),
               if (invoice.issuedAt != null) ...<Widget>[
@@ -118,11 +123,15 @@ class _Body extends ConsumerWidget {
                 Row(
                   children: <Widget>[
                     Expanded(
-                      child: Text(l10n.invoiceIssuedLabel,
-                          style: theme.textTheme.bodySmall),
+                      child: Text(
+                        l10n.invoiceIssuedLabel,
+                        style: theme.textTheme.bodySmall,
+                      ),
                     ),
-                    Text(ml.formatMediumDate(invoice.issuedAt!),
-                        style: theme.textTheme.bodyMedium),
+                    Text(
+                      ml.formatMediumDate(invoice.issuedAt!),
+                      style: theme.textTheme.bodyMedium,
+                    ),
                   ],
                 ),
               ],
@@ -132,8 +141,10 @@ class _Body extends ConsumerWidget {
                   child: Row(
                     children: <Widget>[
                       Expanded(
-                        child: Text(l10n.reviewHotelLabel,
-                            style: theme.textTheme.bodySmall),
+                        child: Text(
+                          l10n.reviewHotelLabel,
+                          style: theme.textTheme.bodySmall,
+                        ),
                       ),
                       Flexible(
                         child: Text(
@@ -168,26 +179,36 @@ class _Body extends ConsumerWidget {
                         style: theme.textTheme.bodyMedium,
                       ),
                     ),
-                    Text(money(item.totalAmount.amount),
-                        style: theme.textTheme.bodyMedium),
+                    Text(
+                      money(item.totalAmount.amount),
+                      style: theme.textTheme.bodyMedium,
+                    ),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.xs),
               ],
               const Divider(height: AppSpacing.lg),
-              _totalRow(theme, l10n.invoiceSubtotalLabel,
-                  money(invoice.subtotal.amount)),
+              _totalRow(
+                theme,
+                l10n.invoiceSubtotalLabel,
+                money(invoice.subtotal.amount),
+              ),
               if (invoice.paymentsTotal.amount > 0) ...<Widget>[
                 const SizedBox(height: AppSpacing.xs),
-                _totalRow(theme, l10n.invoicePaymentsLabel,
-                    '−${money(invoice.paymentsTotal.amount)}'),
+                _totalRow(
+                  theme,
+                  l10n.invoicePaymentsLabel,
+                  '−${money(invoice.paymentsTotal.amount)}',
+                ),
               ],
               const SizedBox(height: AppSpacing.xs),
               Row(
                 children: <Widget>[
                   Expanded(
-                    child: Text(l10n.invoiceOutstandingLabel,
-                        style: theme.textTheme.titleSmall),
+                    child: Text(
+                      l10n.invoiceOutstandingLabel,
+                      style: theme.textTheme.titleSmall,
+                    ),
                   ),
                   Text(
                     money(invoice.outstandingTotal.amount),
@@ -205,8 +226,9 @@ class _Body extends ConsumerWidget {
                   alignment: AlignmentDirectional.centerStart,
                   child: Text(
                     l10n.invoiceSettledTag,
-                    style: theme.textTheme.bodySmall
-                        ?.copyWith(color: semantic.success),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: semantic.success,
+                    ),
                   ),
                 ),
               ],
@@ -227,9 +249,10 @@ class _Body extends ConsumerWidget {
     return Row(
       children: <Widget>[
         Expanded(child: Text(label, style: theme.textTheme.bodyMedium)),
-        Text(value,
-            style: theme.textTheme.bodyMedium
-                ?.copyWith(color: AppColors.ink900)),
+        Text(
+          value,
+          style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.ink900),
+        ),
       ],
     );
   }

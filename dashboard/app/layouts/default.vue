@@ -3,7 +3,10 @@ const app = useAppStore()
 </script>
 
 <template>
-  <div class="app-shell min-h-screen bg-background">
+  <div
+    class="app-shell min-h-screen bg-background"
+    :data-sidebar="app.sidebarCollapsed ? 'collapsed' : 'expanded'"
+  >
     <AppSidebar />
 
     <!-- mobile scrim -->
@@ -15,7 +18,7 @@ const app = useAppStore()
 
     <AppHeader />
 
-    <main class="pt-[var(--header-height)] lg:ps-[var(--sidebar-width)]">
+    <main class="pt-[var(--header-height)] transition-[padding] lg:ps-[var(--sidebar-width)]">
       <div class="mx-auto max-w-7xl p-4 lg:p-6">
         <slot />
       </div>

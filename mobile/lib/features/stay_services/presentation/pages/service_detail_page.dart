@@ -22,6 +22,7 @@ import '../../domain/entities/hotel_service.dart';
 import '../../domain/entities/service_order.dart';
 import '../state/service_request_controller.dart';
 import '../state/stay_services_providers.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// `11 · Services & requests` — one service, with quantity + notes and the
 /// "request" action. The estimated total shown here is a client-side
@@ -55,8 +56,9 @@ class _ServiceDetailPageState extends ConsumerState<ServiceDetailPage> {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final Locale locale = Localizations.localeOf(context);
-    final AsyncValue<Reservation> reservationAsync =
-        ref.watch(reservationDetailProvider(widget.reservationId));
+    final AsyncValue<Reservation> reservationAsync = ref.watch(
+      reservationDetailProvider(widget.reservationId),
+    );
 
     return Scaffold(
       appBar: HotelAppBar(title: l10n.serviceDetailTitle),
@@ -66,15 +68,17 @@ class _ServiceDetailPageState extends ConsumerState<ServiceDetailPage> {
               Center(child: LoadingView(label: l10n.stateLoadingTitle)),
           error: (_, _) => _missing(context),
           data: (Reservation reservation) {
-            final AsyncValue<ServiceCatalogue> cat =
-                ref.watch(serviceCatalogueProvider(reservation.hotelId));
+            final AsyncValue<ServiceCatalogue> cat = ref.watch(
+              serviceCatalogueProvider(reservation.hotelId),
+            );
             return cat.when(
               loading: () =>
                   Center(child: LoadingView(label: l10n.stateLoadingTitle)),
               error: (_, _) => _missing(context),
               data: (ServiceCatalogue catalogue) {
-                final HotelService? service =
-                    catalogue.serviceById(widget.serviceId);
+                final HotelService? service = catalogue.serviceById(
+                  widget.serviceId,
+                );
                 if (service == null || !service.isOrderable) {
                   return _missing(context);
                 }
@@ -90,7 +94,7 @@ class _ServiceDetailPageState extends ConsumerState<ServiceDetailPage> {
   Widget _missing(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     return MessageView(
-      icon: Icons.help_outline,
+      icon: AppIcons.help,
       title: l10n.servicesEmptyTitle,
       message: l10n.servicesEmptyBody,
       actionLabel: l10n.commonBack,
@@ -113,15 +117,18 @@ class _ServiceDetailPageState extends ConsumerState<ServiceDetailPage> {
       quantity: _quantity,
       notes: _notes.text,
     );
-    final ServiceRequestState action =
-        ref.watch(serviceRequestControllerProvider);
+    final ServiceRequestState action = ref.watch(
+      serviceRequestControllerProvider,
+    );
     final bool submitting =
         action is ServiceRequestSubmitting && action.request == request;
     final bool paid = service.price.amount > 0;
     final int estimate = service.price.amount * _quantity;
 
-    ref.listen<ServiceRequestState>(serviceRequestControllerProvider,
-        (_, next) {
+    ref.listen<ServiceRequestState>(serviceRequestControllerProvider, (
+      _,
+      next,
+    ) {
       if (next is ServiceRequestDone &&
           next.request.reservationId == reservation.id &&
           next.request.serviceId == service.id) {
@@ -135,7 +142,8 @@ class _ServiceDetailPageState extends ConsumerState<ServiceDetailPage> {
       }
     });
 
-    final Failure? failure = action is ServiceRequestFailed &&
+    final Failure? failure =
+        action is ServiceRequestFailed &&
             action.request.reservationId == reservation.id &&
             action.request.serviceId == service.id
         ? action.failure
@@ -147,15 +155,21 @@ class _ServiceDetailPageState extends ConsumerState<ServiceDetailPage> {
           child: ListView(
             padding: const EdgeInsets.all(AppSpacing.pageGutter),
             children: <Widget>[
-              Text(service.name.resolve(locale),
-                  style: theme.textTheme.titleLarge),
+              Text(
+                service.name.resolve(locale),
+                style: theme.textTheme.titleLarge,
+              ),
               const SizedBox(height: AppSpacing.xs),
-              Text(service.description.resolve(locale),
-                  style: theme.textTheme.bodyMedium),
+              Text(
+                service.description.resolve(locale),
+                style: theme.textTheme.bodyMedium,
+              ),
               if (service.estimatedMinutes != null) ...<Widget>[
                 const SizedBox(height: AppSpacing.xs),
-                Text(l10n.serviceEstimatedMinutes(service.estimatedMinutes!),
-                    style: theme.textTheme.bodySmall),
+                Text(
+                  l10n.serviceEstimatedMinutes(service.estimatedMinutes!),
+                  style: theme.textTheme.bodySmall,
+                ),
               ],
               const SizedBox(height: AppSpacing.lg),
               AppCard(
@@ -183,15 +197,17 @@ class _ServiceDetailPageState extends ConsumerState<ServiceDetailPage> {
                   child: Row(
                     children: <Widget>[
                       Expanded(
-                        child: Text(l10n.serviceEstimatedTotalLabel,
-                            style: theme.textTheme.titleSmall),
+                        child: Text(
+                          l10n.serviceEstimatedTotalLabel,
+                          style: theme.textTheme.titleSmall,
+                        ),
                       ),
                       Text(
                         l10n.moneyAmount(service.price.currency, estimate),
                         style: theme.textTheme.titleSmall?.copyWith(
                           color:
                               theme.extension<AppSemanticColors>()?.accent ??
-                                  AppColors.bronze500,
+                              AppColors.bronze500,
                         ),
                       ),
                     ],
@@ -225,8 +241,8 @@ class _ServiceDetailPageState extends ConsumerState<ServiceDetailPage> {
             onPressed: submitting
                 ? null
                 : () => ref
-                    .read(serviceRequestControllerProvider.notifier)
-                    .submit(request),
+                      .read(serviceRequestControllerProvider.notifier)
+                      .submit(request),
           ),
         ),
       ],

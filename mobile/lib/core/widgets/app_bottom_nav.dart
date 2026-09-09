@@ -26,32 +26,39 @@ class AppBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
+    final ThemeData theme = Theme.of(context);
 
-    return NavigationBar(
-      selectedIndex: AppNavTab.values.indexOf(current),
-      onDestinationSelected: (int i) => onSelected(AppNavTab.values[i]),
-      destinations: <NavigationDestination>[
-        NavigationDestination(
-          icon: const Icon(AppIcons.navHomeOutline),
-          selectedIcon: const Icon(AppIcons.navHome),
-          label: l10n.navHome,
-        ),
-        NavigationDestination(
-          icon: const Icon(AppIcons.navBookingsOutline),
-          selectedIcon: const Icon(AppIcons.navBookings),
-          label: l10n.navBookings,
-        ),
-        NavigationDestination(
-          icon: const Icon(AppIcons.navServicesOutline),
-          selectedIcon: const Icon(AppIcons.navServices),
-          label: l10n.navServices,
-        ),
-        NavigationDestination(
-          icon: const Icon(AppIcons.navAccountOutline),
-          selectedIcon: const Icon(AppIcons.navAccount),
-          label: l10n.navAccount,
-        ),
-      ],
+    // Figma's tab bar sits on a hairline top border, not a shadow.
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: theme.colorScheme.outline)),
+      ),
+      child: NavigationBar(
+        selectedIndex: AppNavTab.values.indexOf(current),
+        onDestinationSelected: (int i) => onSelected(AppNavTab.values[i]),
+        destinations: <NavigationDestination>[
+          NavigationDestination(
+            icon: const Icon(AppIcons.navHomeOutline),
+            selectedIcon: const Icon(AppIcons.navHome),
+            label: l10n.navHome,
+          ),
+          NavigationDestination(
+            icon: const Icon(AppIcons.navBookingsOutline),
+            selectedIcon: const Icon(AppIcons.navBookings),
+            label: l10n.navBookings,
+          ),
+          NavigationDestination(
+            icon: const Icon(AppIcons.navServicesOutline),
+            selectedIcon: const Icon(AppIcons.navServices),
+            label: l10n.navServices,
+          ),
+          NavigationDestination(
+            icon: const Icon(AppIcons.navAccountOutline),
+            selectedIcon: const Icon(AppIcons.navAccount),
+            label: l10n.navAccount,
+          ),
+        ],
+      ),
     );
   }
 }

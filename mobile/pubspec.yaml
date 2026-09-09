@@ -32,6 +32,13 @@ dependencies:
 
   cupertino_icons: ^1.0.8
 
+  # Iconsax — the "Hicon / Bold" + "Hicon / Linear" set the Figma uses for all
+  # nav / status / domain glyphs (verified from the `.fig` component names:
+  # "Hicon / Bold / Home 1", "…/ Profile 1", "…/ Star 1", "…/ Ticket 1",
+  # "…/ Category", "…/ Shield Tick", "…/ Danger Triangle", …). `iconsax_plus`
+  # bundles both weights as a font; consumed only through `AppIcons`.
+  iconsax_plus: ^1.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

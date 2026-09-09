@@ -6,9 +6,10 @@ export interface NavContext {
   hasHotels: boolean
 }
 
-// Pure navigation filter (unit-testable). Mirrors the rules in
-// useNavigation(): permission held, endpoint exists (no backendGap),
-// hotel-scoped items need at least one selectable hotel.
+// Pure navigation filter (unit-testable). An item is shown when the user
+// holds its permission and, for hotel-scoped items, has at least one hotel.
+// `backendGap` no longer hides an item — it only decorates it (lock marker)
+// and its page renders an honest unavailable state.
 export function filterNavigation(sections: NavSection[], ctx: NavContext): NavSection[] {
   return sections
     .map(section => ({
@@ -19,7 +20,6 @@ export function filterNavigation(sections: NavSection[], ctx: NavContext): NavSe
 }
 
 export function isItemVisible(item: NavItem, ctx: NavContext): boolean {
-  if (item.backendGap) return false
   if (item.permission) {
     const list = Array.isArray(item.permission) ? item.permission : [item.permission]
     if (!hasAny(ctx.permissions, list)) return false
@@ -28,7 +28,9 @@ export function isItemVisible(item: NavItem, ctx: NavContext): boolean {
   return true
 }
 
-export function backendGapItemsFor(sections: NavSection[], permissions: readonly string[]): NavItem[] {
+// Items whose backing endpoint is a documented gap AND that the user could
+// otherwise see — used only for docs / the completeness report.
+export function gapItemsFor(sections: NavSection[], permissions: readonly string[]): NavItem[] {
   return sections
     .flatMap(s => s.items)
     .filter((item) => {

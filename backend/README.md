@@ -69,7 +69,7 @@ email TLD and a single shared password — never use these credentials
 outside local/dev/staging, and the seeder itself refuses to run at all
 when `APP_ENV=production`.
 
-Demo password for every account: **`Password123!`**
+Demo password for every account: **`g`**
 
 | Email | Role | Hotel access |
 |---|---|---|

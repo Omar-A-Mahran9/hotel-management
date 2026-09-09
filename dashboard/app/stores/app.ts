@@ -9,6 +9,7 @@ export interface Toast {
 interface AppState {
   sidebarOpenMobile: boolean
   sidebarCollapsed: boolean
+  collapsedNavSections: string[]
   toasts: Toast[]
   theme: 'light' | 'dark'
 }
@@ -21,6 +22,7 @@ export const useAppStore = defineStore('app', {
   state: (): AppState => ({
     sidebarOpenMobile: false,
     sidebarCollapsed: false,
+    collapsedNavSections: [],
     toasts: [],
     theme: 'light',
   }),
@@ -30,6 +32,7 @@ export const useAppStore = defineStore('app', {
       if (!import.meta.client) return
       try {
         this.sidebarCollapsed = localStorage.getItem('hm_sidebar_collapsed') === '1'
+        this.collapsedNavSections = JSON.parse(localStorage.getItem('hm_nav_sections') || '[]')
         const t = localStorage.getItem('hm_theme')
         this.theme = t === 'dark' ? 'dark' : 'light'
       } catch {
@@ -45,6 +48,13 @@ export const useAppStore = defineStore('app', {
     toggleSidebarCollapsed() {
       this.sidebarCollapsed = !this.sidebarCollapsed
       this.persist('hm_sidebar_collapsed', this.sidebarCollapsed ? '1' : '0')
+    },
+
+    toggleNavSection(key: string) {
+      const i = this.collapsedNavSections.indexOf(key)
+      if (i === -1) this.collapsedNavSections.push(key)
+      else this.collapsedNavSections.splice(i, 1)
+      this.persist('hm_nav_sections', JSON.stringify(this.collapsedNavSections))
     },
 
     setTheme(theme: 'light' | 'dark') {

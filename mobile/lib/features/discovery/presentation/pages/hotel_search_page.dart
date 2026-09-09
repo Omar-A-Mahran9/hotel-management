@@ -15,6 +15,7 @@ import '../widgets/hotel_search_field.dart';
 import '../widgets/hotel_summary_card.dart';
 import '../widgets/sort_chip_bar.dart';
 import '../widgets/sort_sheet.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// `15 · Search, filters & sort` — the search screen: a live search field, the
 /// quick-sort chips, a filter button, the result count and the hotel list with
@@ -76,7 +77,7 @@ class _HotelSearchPageState extends ConsumerState<HotelSearchPage> {
         title: l10n.searchTitle,
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.sort),
+            icon: const Icon(AppIcons.sort),
             tooltip: l10n.sortTitle,
             onPressed: () => _openSort(state),
           ),
@@ -105,7 +106,9 @@ class _HotelSearchPageState extends ConsumerState<HotelSearchPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pageGutter),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.pageGutter,
+              ),
               child: SortChipBar(
                 selected: state.sort,
                 onSelected: _controllerNotifier.setSort,

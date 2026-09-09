@@ -43,7 +43,16 @@
     "savedChanges": "Changes saved.",
     "created": "Created.",
     "deleted": "Deleted.",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "unsavedChanges": "You have unsaved changes",
+    "unsavedLeave": "You have unsaved changes. Leave this page and discard them?",
+    "dateRange": "Date range",
+    "from": "From",
+    "to": "To",
+    "reset": "Reset",
+    "apply": "Apply",
+    "lookUp": "Look up",
+    "export": "Export"
   },
   "nav": {
     "overview": "Overview",
@@ -68,6 +77,9 @@
     "hotelGroup": "Hotel group",
     "audit": "Audit log",
     "settings": "Settings",
+    "room-types": "Room types",
+    "hotel-group": "Hotel group",
+    "digital-access": "Digital access",
     "section": {
       "main": "Main",
       "hotels": "Hotels",
@@ -78,7 +90,10 @@
       "administration": "Administration",
       "settings": "Settings"
     },
-    "comingSoon": "Awaiting backend endpoint"
+    "comingSoon": "Awaiting backend endpoint",
+    "menu": "Menu",
+    "expand": "Expand sidebar",
+    "collapse": "Collapse sidebar"
   },
   "auth": {
     "loginTitle": "Sign in",
@@ -122,18 +137,36 @@
     "subtitle": "Hotels you can access.",
     "name": "Name",
     "slug": "Slug",
+    "slugHint": "Lower-case letters, numbers, hyphen and underscore. Used in URLs.",
     "city": "City",
     "country": "Country",
+    "location": "Location",
     "timezone": "Timezone",
+    "timezoneHint": "IANA name, e.g. Africa/Cairo. Defaults to UTC.",
     "status": "Status",
-    "group": "Group",
+    "group": "Hotel group",
     "groupId": "Hotel group ID",
+    "information": "Information",
     "detailTitle": "Hotel",
-    "new": "New hotel",
+    "new": "Add hotel",
+    "newDesc": "Create a hotel and assign it to a hotel group.",
+    "createAction": "Create hotel",
     "editTitle": "Edit hotel",
+    "editTitleNamed": "Edit {name}",
+    "editDesc": "Update this hotel's details.",
     "created": "Hotel created.",
     "updated": "Hotel updated.",
-    "activeHint": "Inactive hotels stay in the system but are hidden from booking flows."
+    "activeHint": "Inactive hotels stay in the system but are hidden from booking flows.",
+    "sectionBasic": "Basic information",
+    "sectionBasicDesc": "Identifies the hotel across the platform.",
+    "sectionLocation": "Location",
+    "sectionLocationDesc": "Where the property is and which timezone it operates in.",
+    "sectionBranding": "Branding & images",
+    "sectionBrandingDesc": "Hotel logo and cover image.",
+    "sectionStatus": "Status",
+    "sectionStatusDesc": "Whether the hotel is live.",
+    "imagesGapTitle": "Image upload is not available yet",
+    "imagesGapBody": "The backend hotels schema has no logo or cover-image field, and the project has no image/media storage architecture. Adding it requires the backend work listed below; no placeholder upload is shown."
   },
   "roomTypes": {
     "title": "Room types",
@@ -319,6 +352,12 @@
     "allRead": "All notifications marked read.",
     "notificationsNote": "This is the reservation's guest-facing notification feed, produced by the approved lifecycle. Notifications are never created from the dashboard."
   },
+  "folio": {
+    "authoritativeNote": "The accommodation charge is the reservation's price snapshot and every total is computed by the backend. This view is read-only."
+  },
+  "payment": {
+    "abstractedNote": "The payment gateway is an abstracted provider (no real third party, no card data). Only a deposit hold can be initiated here; capture and settlement run through the checkout workflow."
+  },
   "users": {
     "title": "Users",
     "subtitle": "Staff accounts.",
@@ -391,7 +430,148 @@
     "reviewsBody": "There is no reviews domain on the backend — no model, routes or controller for staff-side review management or moderation.",
     "notificationsBody": "The notification feed is reservation-scoped and shown inside a reservation's workspace. A staff-wide operational feed needs a dedicated endpoint.",
     "reportsBody": "There are no reporting endpoints (occupancy, revenue, hotel comparison, payments, checkout, services, loyalty).",
-    "auditBody": "Every sensitive action is written to the audit log, but there is no read endpoint to list or filter those records."
+    "auditBody": "Every sensitive action is written to the audit log, but there is no read endpoint to list or filter those records.",
+    "folioBody": "The folio is authoritative per reservation and read via its workspace. A standalone folio ledger needs a hotel- or group-scoped endpoint.",
+    "checkoutBody": "Checkout runs per reservation from its workspace. A checkout desk needs a departures / checkout-queue endpoint."
+  },
+  "lifecycle": {
+    "title": "Reservation lifecycle",
+    "reservation": "Reservation",
+    "payment": "Deposit / payment",
+    "identity": "Identity verification",
+    "checkin": "Digital check-in",
+    "stay": "Stay & services",
+    "checkout": "Checkout",
+    "invoice": "E-invoice",
+    "loyalty": "Loyalty & review"
+  },
+  "guestsPage": {
+    "name": "Guest",
+    "email": "Email",
+    "phone": "Phone",
+    "reservations": "Reservations",
+    "lastStay": "Last stay",
+    "profile": "Profile",
+    "history": "Stay history",
+    "contact": "Contact information",
+    "searchPlaceholder": "Name, email or phone"
+  },
+  "digitalAccessPage": {
+    "subtitle": "Arrivals desk — check-in and room-key issuance.",
+    "reservation": "Reservation",
+    "guest": "Guest",
+    "accessStatus": "Access status",
+    "mode": "Mode",
+    "expires": "Expires",
+    "workspaceNote": "Per-reservation check-in, key issuance and revocation are available now inside each reservation's Digital access tab."
+  },
+  "paymentsPage": {
+    "subtitle": "Reservation payments across your hotels.",
+    "reservation": "Reservation",
+    "amount": "Amount",
+    "currency": "Currency",
+    "paymentStatus": "Status",
+    "provider": "Provider",
+    "reference": "Reference",
+    "created": "Created",
+    "filterStatus": "Payment status"
+  },
+  "folioPage": {
+    "subtitle": "A reservation's charges, payments and outstanding balance.",
+    "lookupLabel": "Reservation ID",
+    "lookupHint": "Open a reservation's folio directly.",
+    "open": "Open folio"
+  },
+  "checkoutPage": {
+    "subtitle": "Perform checkout and final settlement for a reservation.",
+    "lookupLabel": "Reservation ID",
+    "open": "Open checkout"
+  },
+  "invoicesPage": {
+    "subtitle": "Issued invoices across your hotels.",
+    "number": "Invoice",
+    "reservation": "Reservation",
+    "hotel": "Hotel",
+    "invoiceStatus": "Status",
+    "subtotal": "Subtotal",
+    "outstanding": "Outstanding",
+    "issued": "Issued",
+    "lookupLabel": "Reservation ID",
+    "open": "Open invoice"
+  },
+  "settlementsPage": {
+    "subtitle": "Final settlements posted to the payment provider.",
+    "date": "Date",
+    "reservation": "Reservation",
+    "amount": "Amount",
+    "settlementStatus": "Status",
+    "reference": "Reference"
+  },
+  "loyaltyPage": {
+    "subtitle": "Guest loyalty accounts and point ledgers.",
+    "guest": "Guest",
+    "balance": "Points balance",
+    "lastActivity": "Last activity",
+    "searchPlaceholder": "Guest name or email",
+    "workspaceNote": "A guest's balance, ledger and accrual/redemption are available now inside each reservation's Loyalty tab.",
+    "ledger": "Ledger",
+    "type": "Type",
+    "points": "Points",
+    "when": "When"
+  },
+  "reviewsPage": {
+    "subtitle": "Guest reviews and moderation.",
+    "guest": "Guest",
+    "reservation": "Reservation",
+    "rating": "Rating",
+    "text": "Review",
+    "moderation": "Moderation",
+    "created": "Date",
+    "filterRating": "Rating",
+    "filterModeration": "Moderation status",
+    "approve": "Approve",
+    "reject": "Reject",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  },
+  "notificationsPage": {
+    "subtitle": "Operational notification feed.",
+    "type": "Type",
+    "channel": "Channel",
+    "notificationStatus": "Delivery",
+    "created": "Created",
+    "read": "Read",
+    "markRead": "Mark read",
+    "markAllRead": "Mark all read",
+    "workspaceNote": "A reservation's guest notification feed is available now inside each reservation's Notifications tab."
+  },
+  "reportsPage": {
+    "subtitle": "Operational and financial reports.",
+    "categories": "Report",
+    "occupancy": "Occupancy",
+    "reservations": "Reservations",
+    "revenue": "Revenue",
+    "payments": "Payments",
+    "services": "Services",
+    "loyalty": "Loyalty",
+    "reviews": "Reviews",
+    "comparison": "Hotel comparison",
+    "chartArea": "Chart",
+    "tableArea": "Breakdown",
+    "exportHint": "Export becomes available with the report endpoint."
+  },
+  "auditPage": {
+    "subtitle": "A record of every sensitive action.",
+    "time": "Time",
+    "actor": "Actor",
+    "action": "Action",
+    "entity": "Entity",
+    "hotel": "Hotel",
+    "metadata": "Details",
+    "filterActor": "Actor",
+    "filterAction": "Action",
+    "filterEntity": "Entity"
   },
   "errors": {
     "genericTitle": "Something went wrong",

@@ -15,6 +15,7 @@ import '../../../../core/widgets/primary_button.dart';
 import '../../domain/entities/service_order.dart';
 import '../state/stay_services_providers.dart';
 import '../widgets/service_order_card.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// `11 · Services & requests` screen 3 — the guest's service requests.
 class MyServiceRequestsPage extends ConsumerWidget {
@@ -25,8 +26,9 @@ class MyServiceRequestsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
-    final AsyncValue<List<ServiceOrder>> ordersAsync =
-        ref.watch(serviceOrdersProvider(reservationId));
+    final AsyncValue<List<ServiceOrder>> ordersAsync = ref.watch(
+      serviceOrdersProvider(reservationId),
+    );
 
     return Scaffold(
       appBar: HotelAppBar(title: l10n.myRequestsTitle),
@@ -35,16 +37,15 @@ class MyServiceRequestsPage extends ConsumerWidget {
           loading: () =>
               Center(child: LoadingView(label: l10n.stateLoadingTitle)),
           error: (Object e, StackTrace _) => MessageView(
-            icon: Icons.receipt_long_outlined,
+            icon: AppIcons.invoice,
             title: l10n.servicesUnavailableTitle,
             message: ErrorMapper.toFailure(e).localizedMessage(l10n),
             actionLabel: l10n.actionRetry,
-            onAction: () => ref.invalidate(serviceOrdersProvider(reservationId)),
+            onAction: () =>
+                ref.invalidate(serviceOrdersProvider(reservationId)),
           ),
-          data: (List<ServiceOrder> orders) => _Body(
-            reservationId: reservationId,
-            orders: orders,
-          ),
+          data: (List<ServiceOrder> orders) =>
+              _Body(reservationId: reservationId, orders: orders),
         ),
       ),
     );
@@ -62,9 +63,9 @@ class _Body extends StatelessWidget {
     final AppLocalizations l10n = context.l10n;
 
     void newRequest() => context.pushReplacementNamed(
-          AppRoutes.stayServicesName,
-          pathParameters: <String, String>{'reservationId': reservationId},
-        );
+      AppRoutes.stayServicesName,
+      pathParameters: <String, String>{'reservationId': reservationId},
+    );
 
     if (orders.isEmpty) {
       return Column(

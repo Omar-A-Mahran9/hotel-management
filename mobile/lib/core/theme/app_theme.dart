@@ -59,6 +59,7 @@ abstract final class AppTheme {
       scaffoldBackgroundColor: scaffoldBackground,
       textTheme: textTheme,
       fontFamily: AppTypography.fontFamily,
+      fontFamilyFallback: AppTypography.fontFamilyFallback,
       extensions: <ThemeExtension<dynamic>>[
         isDark ? AppSemanticColors.dark : AppSemanticColors.light,
       ],

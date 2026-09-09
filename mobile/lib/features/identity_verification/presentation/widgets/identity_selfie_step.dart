@@ -4,6 +4,7 @@ import '../../../../core/localization/l10n.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/primary_button.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// Step 2 — attach a live selfie.
 ///
@@ -38,19 +39,21 @@ class _IdentitySelfieStepState extends State<IdentitySelfieStep> {
           child: ListView(
             padding: const EdgeInsets.all(AppSpacing.pageGutter),
             children: <Widget>[
-              Text(l10n.identitySelfieStepTitle,
-                  style: theme.textTheme.titleLarge),
+              Text(
+                l10n.identitySelfieStepTitle,
+                style: theme.textTheme.titleLarge,
+              ),
               const SizedBox(height: AppSpacing.xs),
-              Text(l10n.identitySelfieStepBody,
-                  style: theme.textTheme.bodyMedium),
+              Text(
+                l10n.identitySelfieStepBody,
+                style: theme.textTheme.bodyMedium,
+              ),
               const SizedBox(height: AppSpacing.lg),
               AppCard(
                 child: Row(
                   children: <Widget>[
                     Icon(
-                      _captured
-                          ? Icons.check_circle_outline
-                          : Icons.face_outlined,
+                      _captured ? AppIcons.success : AppIcons.camera,
                       color: _captured
                           ? theme.colorScheme.primary
                           : theme.colorScheme.outline,
@@ -86,8 +89,7 @@ class _IdentitySelfieStepState extends State<IdentitySelfieStep> {
           child: PrimaryButton(
             label: l10n.identitySelfieSubmitCta,
             isLoading: widget.submitting,
-            onPressed:
-                _captured && !widget.submitting ? widget.onSubmit : null,
+            onPressed: _captured && !widget.submitting ? widget.onSubmit : null,
           ),
         ),
       ],

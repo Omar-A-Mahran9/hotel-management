@@ -17,6 +17,7 @@ import '../loyalty_l10n.dart';
 import '../state/loyalty_providers.dart';
 import '../state/loyalty_redeem_controller.dart';
 import '../widgets/loyalty_balance_card.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// `14 · Entry, loyalty & completion` — choose how many points to redeem
 /// against **this booking**. Not a rewards catalogue: the guest picks a points
@@ -38,10 +39,12 @@ class _LoyaltyRedeemPageState extends ConsumerState<LoyaltyRedeemPage> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final AsyncValue<LoyaltyAccount> accountAsync =
-        ref.watch(loyaltyAccountProvider(widget.reservationId));
-    final AsyncValue<LoyaltyContext> ctxAsync =
-        ref.watch(loyaltyContextProvider(widget.reservationId));
+    final AsyncValue<LoyaltyAccount> accountAsync = ref.watch(
+      loyaltyAccountProvider(widget.reservationId),
+    );
+    final AsyncValue<LoyaltyContext> ctxAsync = ref.watch(
+      loyaltyContextProvider(widget.reservationId),
+    );
 
     return Scaffold(
       appBar: HotelAppBar(title: l10n.loyaltyRedeemTitle),
@@ -52,7 +55,7 @@ class _LoyaltyRedeemPageState extends ConsumerState<LoyaltyRedeemPage> {
           loading: () =>
               Center(child: LoadingView(label: l10n.stateLoadingTitle)),
           error: (Object e) => MessageView(
-            icon: Icons.redeem_outlined,
+            icon: AppIcons.loyalty,
             title: l10n.loyaltyUnavailableTitle,
             message: l10n.errorGeneric,
             actionLabel: l10n.commonBack,
@@ -63,7 +66,7 @@ class _LoyaltyRedeemPageState extends ConsumerState<LoyaltyRedeemPage> {
                 !account.hasPoints ||
                 !ctx.isRedeemableBooking) {
               return MessageView(
-                icon: Icons.redeem_outlined,
+                icon: AppIcons.loyalty,
                 title: l10n.loyaltyRedeemNotEligibleTitle,
                 message: l10n.loyaltyRedeemNotEligibleBody,
                 actionLabel: l10n.commonBack,
@@ -126,8 +129,9 @@ class _Body extends ConsumerWidget {
     final bool forThis = action.requestOrNull?.reservationId == reservationId;
     final bool submitting = action is RedeemSubmitting && forThis;
 
-    final RedeemPointsResult? result =
-        action is RedeemDone && forThis ? action.result : null;
+    final RedeemPointsResult? result = action is RedeemDone && forThis
+        ? action.result
+        : null;
 
     return Column(
       children: <Widget>[
@@ -141,8 +145,10 @@ class _Body extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(l10n.loyaltyRedeemAmountLabel,
-                        style: theme.textTheme.titleSmall),
+                    Text(
+                      l10n.loyaltyRedeemAmountLabel,
+                      style: theme.textTheme.titleSmall,
+                    ),
                     const SizedBox(height: AppSpacing.sm),
                     Row(
                       children: <Widget>[
@@ -159,16 +165,17 @@ class _Body extends ConsumerWidget {
                             textAlign: TextAlign.center,
                             style: theme.textTheme.titleLarge?.copyWith(
                               fontFeatures: const <FontFeature>[
-                                FontFeature.tabularFigures()
+                                FontFeature.tabularFigures(),
                               ],
                             ),
                           ),
                         ),
                         IconButton.outlined(
                           onPressed:
-                              (submitting || points + step > account.pointsBalance)
-                                  ? null
-                                  : () => onChanged(points + step),
+                              (submitting ||
+                                  points + step > account.pointsBalance)
+                              ? null
+                              : () => onChanged(points + step),
                           icon: const Icon(Icons.add),
                           tooltip: l10n.stepperIncrease,
                         ),
@@ -181,8 +188,9 @@ class _Body extends ConsumerWidget {
                         onPressed: submitting
                             ? null
                             : () => onChanged(account.pointsBalance),
-                        child: Text(l10n
-                            .loyaltyRedeemMax(account.pointsBalance)),
+                        child: Text(
+                          l10n.loyaltyRedeemMax(account.pointsBalance),
+                        ),
                       ),
                     ),
                   ],
@@ -225,8 +233,8 @@ class _Body extends ConsumerWidget {
                   onPressed: submitting
                       ? null
                       : () => ref
-                          .read(loyaltyRedeemControllerProvider.notifier)
-                          .submit(reservationId, points),
+                            .read(loyaltyRedeemControllerProvider.notifier)
+                            .submit(reservationId, points),
                 ),
         ),
       ],

@@ -6,6 +6,7 @@ import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../domain/entities/identity_document.dart';
 import '../identity_verification_l10n.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// Step 1 — choose a document type and attach a photo of the ID.
 ///
@@ -37,8 +38,7 @@ class _IdentityDocumentStepState extends State<IdentityDocumentStep> {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final ThemeData theme = Theme.of(context);
-    final bool canSubmit =
-        _captured && !widget.submitting;
+    final bool canSubmit = _captured && !widget.submitting;
 
     return Column(
       children: <Widget>[
@@ -50,14 +50,20 @@ class _IdentityDocumentStepState extends State<IdentityDocumentStep> {
                 widget.retryBanner!,
                 const SizedBox(height: AppSpacing.md),
               ],
-              Text(l10n.identityDocumentStepTitle,
-                  style: theme.textTheme.titleLarge),
+              Text(
+                l10n.identityDocumentStepTitle,
+                style: theme.textTheme.titleLarge,
+              ),
               const SizedBox(height: AppSpacing.xs),
-              Text(l10n.identityDocumentStepBody,
-                  style: theme.textTheme.bodyMedium),
+              Text(
+                l10n.identityDocumentStepBody,
+                style: theme.textTheme.bodyMedium,
+              ),
               const SizedBox(height: AppSpacing.lg),
-              Text(l10n.identityDocumentTypeLabel,
-                  style: theme.textTheme.bodySmall),
+              Text(
+                l10n.identityDocumentTypeLabel,
+                style: theme.textTheme.bodySmall,
+              ),
               const SizedBox(height: AppSpacing.xs),
               Wrap(
                 spacing: AppSpacing.xs,
@@ -78,9 +84,7 @@ class _IdentityDocumentStepState extends State<IdentityDocumentStep> {
                 child: Row(
                   children: <Widget>[
                     Icon(
-                      _captured
-                          ? Icons.check_circle_outline
-                          : Icons.badge_outlined,
+                      _captured ? AppIcons.success : AppIcons.identity,
                       color: _captured
                           ? theme.colorScheme.primary
                           : theme.colorScheme.outline,

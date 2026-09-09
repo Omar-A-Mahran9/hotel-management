@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -22,6 +23,7 @@ import '../state/loyalty_earn_controller.dart';
 import '../state/loyalty_providers.dart';
 import '../widgets/loyalty_balance_card.dart';
 import '../widgets/loyalty_transaction_tile.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// `14 · Entry, loyalty & completion` — the guest's loyalty screen for a
 /// reservation: balance, contextual earn / redeem, and the points history.
@@ -38,12 +40,15 @@ class LoyaltyPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
-    final AsyncValue<LoyaltyContext> ctxAsync =
-        ref.watch(loyaltyContextProvider(reservationId));
-    final AsyncValue<LoyaltyAccount> accountAsync =
-        ref.watch(loyaltyAccountProvider(reservationId));
-    final AsyncValue<List<LoyaltyTransaction>> txAsync =
-        ref.watch(loyaltyTransactionsProvider(reservationId));
+    final AsyncValue<LoyaltyContext> ctxAsync = ref.watch(
+      loyaltyContextProvider(reservationId),
+    );
+    final AsyncValue<LoyaltyAccount> accountAsync = ref.watch(
+      loyaltyAccountProvider(reservationId),
+    );
+    final AsyncValue<List<LoyaltyTransaction>> txAsync = ref.watch(
+      loyaltyTransactionsProvider(reservationId),
+    );
 
     return Scaffold(
       appBar: HotelAppBar(title: l10n.loyaltyTitle),
@@ -54,7 +59,7 @@ class LoyaltyPage extends ConsumerWidget {
           loading: () =>
               Center(child: LoadingView(label: l10n.stateLoadingTitle)),
           error: (Object e) => MessageView(
-            icon: Icons.card_giftcard_outlined,
+            icon: AppIcons.loyalty,
             title: l10n.loyaltyUnavailableTitle,
             message: ErrorMapper.toFailure(e).localizedMessage(l10n),
             actionLabel: l10n.actionRetry,
@@ -106,24 +111,26 @@ class _Body extends ConsumerWidget {
   Widget build(BuildContext buildContext, WidgetRef ref) {
     final AppLocalizations l10n = buildContext.l10n;
     final EarnActionState earn = ref.watch(loyaltyEarnControllerProvider);
-    final bool earnForThis =
-        earn.requestOrNull?.reservationId == reservationId;
+    final bool earnForThis = earn.requestOrNull?.reservationId == reservationId;
     final bool submitting = earn is EarnSubmitting && earnForThis;
 
-    final EarnPointsResult? earnResult =
-        earn is EarnDone && earnForThis ? earn.result : null;
-    final bool alreadyEarned = earnResult != null &&
+    final EarnPointsResult? earnResult = earn is EarnDone && earnForThis
+        ? earn.result
+        : null;
+    final bool alreadyEarned =
+        earnResult != null &&
             (earnResult.outcome == LoyaltyEarnOutcome.earned ||
                 earnResult.outcome == LoyaltyEarnOutcome.alreadyEarned) ||
         transactions.maybeWhen(
-          data: (List<LoyaltyTransaction> txs) => txs.any((LoyaltyTransaction t) =>
-              t.type.isCredit && t.isForReservation(reservationId)),
+          data: (List<LoyaltyTransaction> txs) => txs.any(
+            (LoyaltyTransaction t) =>
+                t.type.isCredit && t.isForReservation(reservationId),
+          ),
           orElse: () => false,
         );
 
-    final bool canRedeem = account.isActive &&
-        account.hasPoints &&
-        context.isRedeemableBooking;
+    final bool canRedeem =
+        account.isActive && account.hasPoints && context.isRedeemableBooking;
 
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.pageGutter),
@@ -152,13 +159,13 @@ class _Body extends ConsumerWidget {
           else
             PrimaryButton(
               label: submitting ? l10n.loyaltyEarningCta : l10n.loyaltyEarnCta,
-              icon: Icons.add_circle_outline,
+              icon: IconsaxPlusLinear.add_circle,
               isLoading: submitting,
               onPressed: submitting
                   ? null
                   : () => ref
-                      .read(loyaltyEarnControllerProvider.notifier)
-                      .submit(reservationId),
+                        .read(loyaltyEarnControllerProvider.notifier)
+                        .submit(reservationId),
             ),
           if (earn is EarnFailed && earnForThis) ...<Widget>[
             const SizedBox(height: AppSpacing.xs),
@@ -175,7 +182,7 @@ class _Body extends ConsumerWidget {
         if (canRedeem) ...<Widget>[
           SecondaryButton(
             label: l10n.loyaltyRedeemCta,
-            icon: Icons.redeem_outlined,
+            icon: AppIcons.loyalty,
             onPressed: () => buildContext.pushNamed(
               AppRoutes.loyaltyRedeemName,
               pathParameters: <String, String>{'reservationId': reservationId},
@@ -187,12 +194,12 @@ class _Body extends ConsumerWidget {
         const SizedBox(height: AppSpacing.md),
 
         // ── History ──
-        Text(l10n.loyaltyHistoryTitle, style: Theme.of(buildContext).textTheme.titleMedium),
-        const SizedBox(height: AppSpacing.xs),
-        InfoBanner(
-          tone: InfoBannerTone.info,
-          title: l10n.loyaltyHistoryNote,
+        Text(
+          l10n.loyaltyHistoryTitle,
+          style: Theme.of(buildContext).textTheme.titleMedium,
         ),
+        const SizedBox(height: AppSpacing.xs),
+        InfoBanner(tone: InfoBannerTone.info, title: l10n.loyaltyHistoryNote),
         const SizedBox(height: AppSpacing.md),
         transactions.when(
           loading: () => const Padding(
@@ -240,25 +247,25 @@ class _EarnResultBanner extends StatelessWidget {
     final int points = result.transaction?.magnitude ?? 0;
     final (InfoBannerTone tone, String message) = switch (result.outcome) {
       LoyaltyEarnOutcome.earned => (
-          InfoBannerTone.success,
-          l10n.loyaltyEarnedBody(points),
-        ),
+        InfoBannerTone.success,
+        l10n.loyaltyEarnedBody(points),
+      ),
       LoyaltyEarnOutcome.alreadyEarned => (
-          InfoBannerTone.success,
-          l10n.loyaltyAlreadyEarnedBody,
-        ),
+        InfoBannerTone.success,
+        l10n.loyaltyAlreadyEarnedBody,
+      ),
       LoyaltyEarnOutcome.notEligible => (
-          InfoBannerTone.warning,
-          l10n.loyaltyNotEligibleBody,
-        ),
+        InfoBannerTone.warning,
+        l10n.loyaltyNotEligibleBody,
+      ),
       LoyaltyEarnOutcome.programInactive => (
-          InfoBannerTone.warning,
-          l10n.loyaltyProgramOffBody,
-        ),
+        InfoBannerTone.warning,
+        l10n.loyaltyProgramOffBody,
+      ),
       LoyaltyEarnOutcome.nothingToEarn => (
-          InfoBannerTone.warning,
-          l10n.loyaltyNothingToEarnBody,
-        ),
+        InfoBannerTone.warning,
+        l10n.loyaltyNothingToEarnBody,
+      ),
     };
     return InfoBanner(
       tone: tone,
@@ -276,10 +283,12 @@ class _HistoryEmpty extends StatelessWidget {
     return AppCard(
       child: Column(
         children: <Widget>[
-          Icon(Icons.history_toggle_off_outlined,
-              size: 32, color: theme.colorScheme.outline),
+          Icon(AppIcons.time, size: 32, color: theme.colorScheme.outline),
           const SizedBox(height: AppSpacing.sm),
-          Text(l10n.loyaltyHistoryEmptyTitle, style: theme.textTheme.titleSmall),
+          Text(
+            l10n.loyaltyHistoryEmptyTitle,
+            style: theme.textTheme.titleSmall,
+          ),
           const SizedBox(height: AppSpacing.xxs),
           Text(
             l10n.loyaltyHistoryEmptyBody,

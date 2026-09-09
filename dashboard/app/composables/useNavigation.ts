@@ -1,5 +1,5 @@
 import { NAVIGATION } from '~/config/navigation'
-import { backendGapItemsFor, filterNavigation } from '~/utils/navigation'
+import { filterNavigation, gapItemsFor } from '~/utils/navigation'
 
 // Resolves NAVIGATION down to what the current user may actually see. All
 // rules live in the pure `filterNavigation` helper (unit-tested); this
@@ -14,7 +14,7 @@ export function useNavigation() {
   }))
 
   const visibleSections = computed(() => filterNavigation(NAVIGATION, ctx.value))
-  const backendGapItems = computed(() => backendGapItemsFor(NAVIGATION, auth.permissions))
+  const gapItems = computed(() => gapItemsFor(NAVIGATION, auth.permissions))
 
-  return { visibleSections, backendGapItems }
+  return { visibleSections, gapItems }
 }

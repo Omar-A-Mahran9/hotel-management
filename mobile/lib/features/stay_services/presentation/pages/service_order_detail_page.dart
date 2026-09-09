@@ -19,6 +19,7 @@ import '../state/service_request_controller.dart';
 import '../state/stay_services_providers.dart';
 import '../stay_services_l10n.dart';
 import '../widgets/service_order_status_pill.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// `11 · Services & requests` screens 2 & 4 — one service request: its status,
 /// details, and (while still `requested`) the cancel action. Doubles as the
@@ -36,10 +37,13 @@ class ServiceOrderDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
-    final ServiceOrderKey key =
-        (reservationId: reservationId, orderId: orderId);
-    final AsyncValue<ServiceOrder> orderAsync =
-        ref.watch(serviceOrderProvider(key));
+    final ServiceOrderKey key = (
+      reservationId: reservationId,
+      orderId: orderId,
+    );
+    final AsyncValue<ServiceOrder> orderAsync = ref.watch(
+      serviceOrderProvider(key),
+    );
 
     return Scaffold(
       appBar: HotelAppBar(title: l10n.serviceOrderDetailTitle),
@@ -48,14 +52,13 @@ class ServiceOrderDetailPage extends ConsumerWidget {
           loading: () =>
               Center(child: LoadingView(label: l10n.stateLoadingTitle)),
           error: (Object e, StackTrace _) => MessageView(
-            icon: Icons.receipt_long_outlined,
+            icon: AppIcons.invoice,
             title: l10n.servicesUnavailableTitle,
             message: ErrorMapper.toFailure(e).localizedMessage(l10n),
             actionLabel: l10n.actionRetry,
             onAction: () => ref.invalidate(serviceOrderProvider(key)),
           ),
-          data: (ServiceOrder order) =>
-              _Body(orderKey: key, order: order),
+          data: (ServiceOrder order) => _Body(orderKey: key, order: order),
         ),
       ),
     );
@@ -74,23 +77,28 @@ class _Body extends ConsumerWidget {
     final ThemeData theme = Theme.of(context);
     final MaterialLocalizations ml = MaterialLocalizations.of(context);
     final Locale locale = Localizations.localeOf(context);
-    final CancelOrderState cancel =
-        ref.watch(cancelOrderControllerProvider(orderKey));
+    final CancelOrderState cancel = ref.watch(
+      cancelOrderControllerProvider(orderKey),
+    );
 
-    ref.listen<CancelOrderState>(cancelOrderControllerProvider(orderKey),
-        (_, next) {
+    ref.listen<CancelOrderState>(cancelOrderControllerProvider(orderKey), (
+      _,
+      next,
+    ) {
       if (next is CancelOrderDone && context.canPop()) {
         context.pop();
       } else if (next is CancelOrderFailed) {
         ScaffoldMessenger.of(context)
           ..clearSnackBars()
-          ..showSnackBar(SnackBar(
-            content: Text(
-              next.failure.kind == FailureKind.conflict
-                  ? l10n.serviceCancelNotAllowed
-                  : next.failure.localizedMessage(l10n),
+          ..showSnackBar(
+            SnackBar(
+              content: Text(
+                next.failure.kind == FailureKind.conflict
+                    ? l10n.serviceCancelNotAllowed
+                    : next.failure.localizedMessage(l10n),
+              ),
             ),
-          ));
+          );
       }
     });
 
@@ -118,8 +126,10 @@ class _Body extends ConsumerWidget {
                     Row(
                       children: <Widget>[
                         Expanded(
-                          child: Text(order.reference,
-                              style: theme.textTheme.titleMedium),
+                          child: Text(
+                            order.reference,
+                            style: theme.textTheme.titleMedium,
+                          ),
                         ),
                         ServiceOrderStatusPill(status: order.status),
                       ],
@@ -131,23 +141,33 @@ class _Body extends ConsumerWidget {
                       _row(
                         theme,
                         l10n.serviceEstimatedTotalLabel,
-                        l10n.moneyAmount(order.totalAmount.currency,
-                            order.totalAmount.amount),
+                        l10n.moneyAmount(
+                          order.totalAmount.currency,
+                          order.totalAmount.amount,
+                        ),
                       ),
                     ],
                     const SizedBox(height: AppSpacing.xs),
-                    _row(theme, l10n.serviceOrderRequestedAtLabel,
-                        ml.formatMediumDate(order.requestedAt)),
+                    _row(
+                      theme,
+                      l10n.serviceOrderRequestedAtLabel,
+                      ml.formatMediumDate(order.requestedAt),
+                    ),
                     if (order.confirmedAt != null) ...<Widget>[
                       const SizedBox(height: AppSpacing.xs),
-                      _row(theme, l10n.serviceOrderConfirmedAtLabel,
-                          ml.formatMediumDate(order.confirmedAt!)),
+                      _row(
+                        theme,
+                        l10n.serviceOrderConfirmedAtLabel,
+                        ml.formatMediumDate(order.confirmedAt!),
+                      ),
                     ],
                     if (order.notes != null &&
                         order.notes!.isNotEmpty) ...<Widget>[
                       const Divider(height: AppSpacing.lg),
-                      Text(l10n.serviceNotesLabel,
-                          style: theme.textTheme.bodySmall),
+                      Text(
+                        l10n.serviceNotesLabel,
+                        style: theme.textTheme.bodySmall,
+                      ),
                       const SizedBox(height: AppSpacing.xxs),
                       Text(order.notes!, style: theme.textTheme.bodyMedium),
                     ],
@@ -177,14 +197,16 @@ class _Body extends ConsumerWidget {
                       ? () => _confirmCancel(context, ref)
                       : null,
                 ),
-              if (order.isGuestCancellable) const SizedBox(height: AppSpacing.xs),
+              if (order.isGuestCancellable)
+                const SizedBox(height: AppSpacing.xs),
               SecondaryButton(
                 label: l10n.serviceContactReception,
-                icon: Icons.support_agent_outlined,
+                icon: AppIcons.support,
                 onPressed: () => ScaffoldMessenger.of(context)
                   ..clearSnackBars()
                   ..showSnackBar(
-                      SnackBar(content: Text(l10n.serviceContactReceptionHint))),
+                    SnackBar(content: Text(l10n.serviceContactReceptionHint)),
+                  ),
               ),
             ],
           ),
@@ -213,18 +235,14 @@ class _Body extends ConsumerWidget {
       ),
     );
     if (confirmed == true) {
-      await ref
-          .read(cancelOrderControllerProvider(orderKey).notifier)
-          .cancel();
+      await ref.read(cancelOrderControllerProvider(orderKey).notifier).cancel();
     }
   }
 
   Widget _row(ThemeData theme, String label, String value) {
     return Row(
       children: <Widget>[
-        Expanded(
-          child: Text(label, style: theme.textTheme.bodySmall),
-        ),
+        Expanded(child: Text(label, style: theme.textTheme.bodySmall)),
         Text(value, style: theme.textTheme.bodyMedium),
       ],
     );

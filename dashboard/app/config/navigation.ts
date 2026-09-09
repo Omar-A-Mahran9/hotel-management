@@ -1,9 +1,10 @@
-// Single navigation definition for the whole dashboard. The sidebar renders
-// only the items whose `permission` the signed-in user holds AND whose
-// backing endpoint actually exists today. Items blocked purely by a missing
-// backend endpoint carry `backendGap: true`: they are shown, disabled, in a
-// dedicated "Awaiting backend endpoint" group — never as a live link, never
-// as a fake page (md/dashboard-master.md §"Backend API gaps").
+// Single navigation definition for the whole dashboard (the final approved
+// information architecture). The sidebar renders every item whose
+// `permission` the signed-in user holds. An item whose backing list/detail
+// endpoint does not exist yet carries `backendGap: true` — it still appears
+// in its proper section with a lock marker and routes to a professionally
+// structured page that shows an honest "awaiting backend endpoint" state
+// (never fake data). See md/dashboard-master.md §"Backend API gaps".
 
 export interface NavItem {
   key: string
@@ -106,6 +107,22 @@ export const NAVIGATION: NavSection[] = [
         icon: 'ki-dollar',
         permission: 'payments.manage',
         backendGap: true, // only reservation-scoped; no hotel/group ledger
+      },
+      {
+        key: 'folio',
+        labelKey: 'nav.folio',
+        to: '/folio',
+        icon: 'ki-book-open',
+        permission: 'folio.view',
+        backendGap: true, // reservation-scoped only; lookup routes into the workspace
+      },
+      {
+        key: 'checkout',
+        labelKey: 'nav.checkout',
+        to: '/checkout',
+        icon: 'ki-exit-right-corner',
+        permission: 'checkout.perform',
+        backendGap: true, // reservation-scoped only; lookup routes into the workspace
       },
       {
         key: 'invoices',

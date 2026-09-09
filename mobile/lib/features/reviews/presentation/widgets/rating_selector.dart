@@ -26,16 +26,17 @@ class RatingSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final ThemeData theme = Theme.of(context);
-    final Color active = theme.extension<AppSemanticColors>()?.accent ??
-        AppColors.bronze500;
+    const Color active = AppColors.bronze400;
     final Color inactive = theme.colorScheme.outlineVariant;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        for (int star = ReviewDraft.minRating;
-            star <= ReviewDraft.maxRating;
-            star++)
+        for (
+          int star = ReviewDraft.minRating;
+          star <= ReviewDraft.maxRating;
+          star++
+        )
           Semantics(
             button: true,
             selected: rating == star,
@@ -65,8 +66,7 @@ class RatingDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final Color active = theme.extension<AppSemanticColors>()?.accent ??
-        AppColors.bronze500;
+    const Color active = AppColors.bronze400;
     return Semantics(
       label: context.l10n.reviewStarsLabel(rating),
       child: Row(
@@ -78,7 +78,9 @@ class RatingDisplay extends StatelessWidget {
               child: Icon(
                 star <= rating ? AppIcons.rating : AppIcons.ratingOutline,
                 size: size,
-                color: star <= rating ? active : theme.colorScheme.outlineVariant,
+                color: star <= rating
+                    ? active
+                    : theme.colorScheme.outlineVariant,
               ),
             ),
         ],

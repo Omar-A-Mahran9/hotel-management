@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/localization/l10n.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// The rounded search field from `02 · Discover & Book` — a search icon, the
 /// field, an optional clear button and an optional trailing filter/sort button.
@@ -49,10 +50,10 @@ class HotelSearchField extends StatelessWidget {
             textInputAction: TextInputAction.search,
             decoration: InputDecoration(
               hintText: l10n.discoverSearchHint,
-              prefixIcon: const Icon(Icons.search, size: 20),
+              prefixIcon: const Icon(AppIcons.search, size: 20),
               suffixIcon: hasText && onClear != null
                   ? IconButton(
-                      icon: const Icon(Icons.close, size: 18),
+                      icon: const Icon(AppIcons.close, size: 18),
                       tooltip: l10n.searchClearTooltip,
                       onPressed: onClear,
                     )
@@ -67,7 +68,10 @@ class HotelSearchField extends StatelessWidget {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: AppRadius.allPill,
-                borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5),
+                borderSide: BorderSide(
+                  color: theme.colorScheme.primary,
+                  width: 1.5,
+                ),
               ),
             ),
           ),
@@ -106,7 +110,11 @@ class _FilterButton extends StatelessWidget {
           child: Stack(
             alignment: Alignment.center,
             children: <Widget>[
-              Icon(Icons.tune, size: 20, color: theme.colorScheme.onSurface),
+              Icon(
+                AppIcons.filter,
+                size: 20,
+                color: theme.colorScheme.onSurface,
+              ),
               if (count > 0)
                 Positioned(
                   top: 8,

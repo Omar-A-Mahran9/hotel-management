@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../domain/entities/access_grant.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// The brown room-number + entry-code card from `04 · Check in & Stay`.
 ///
@@ -37,7 +38,9 @@ class AccessCredentialCard extends StatelessWidget {
           if (grant.roomNumber != null) ...<Widget>[
             Text(
               l10n.accessRoomNumberLabel,
-              style: theme.textTheme.bodySmall?.copyWith(color: AppColors.bronze200),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: AppColors.bronze200,
+              ),
             ),
             const SizedBox(height: AppSpacing.xxs),
             Text(
@@ -53,7 +56,9 @@ class AccessCredentialCard extends StatelessWidget {
           if (code != null) ...<Widget>[
             Text(
               l10n.accessEntryCodeLabel,
-              style: theme.textTheme.bodySmall?.copyWith(color: AppColors.bronze200),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: AppColors.bronze200,
+              ),
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
@@ -70,14 +75,16 @@ class AccessCredentialCard extends StatelessWidget {
           if (grant.expiresAt != null)
             Row(
               children: <Widget>[
-                const Icon(Icons.schedule_outlined,
-                    size: 15, color: AppColors.bronze200),
+                const Icon(AppIcons.time, size: 15, color: AppColors.bronze200),
                 const SizedBox(width: AppSpacing.xxs),
                 Flexible(
                   child: Text(
-                    l10n.accessExpiresLabel(ml.formatMediumDate(grant.expiresAt!)),
-                    style: theme.textTheme.bodySmall
-                        ?.copyWith(color: AppColors.bronze200),
+                    l10n.accessExpiresLabel(
+                      ml.formatMediumDate(grant.expiresAt!),
+                    ),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppColors.bronze200,
+                    ),
                   ),
                 ),
               ],

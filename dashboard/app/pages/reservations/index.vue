@@ -3,23 +3,31 @@ import { reservationsService } from '~/services'
 import type { Column } from '~/components/DataTable.vue'
 import type { Reservation, ReservationStatus } from '~/types/api'
 import { RESERVATION_STATUSES, RESERVATION_STATUS_TONE } from '~/utils/reservationStateMachine'
+import { date, money } from '~/utils/format'
 
 definePageMeta({ permission: 'reservations.view' })
 
 const { t } = useI18n()
 const router = useRouter()
+const auth = useAuthStore()
+const { can } = useCan()
 
 const page = ref(1)
 const list = useResource(() => reservationsService.list(page.value))
 
 // Client-side filters over the loaded page only — the backend list endpoint
-// has no status/hotel/date query params yet (audit §6 gap #1).
+// has no status/hotel/date query params yet (audit §6 gap #1). Labelled.
 const statusFilter = ref<ReservationStatus | ''>('')
+const hotelFilter = ref<number | ''>('')
 const search = ref('')
+
+const hotelName = (hotelId: number) =>
+  auth.assignedHotels.find(h => h.id === hotelId)?.name ?? `#${hotelId}`
 
 const rows = computed<Reservation[]>(() => {
   let all = list.data.value?.data ?? []
   if (statusFilter.value) all = all.filter(r => r.status === statusFilter.value)
+  if (hotelFilter.value) all = all.filter(r => r.hotel_id === hotelFilter.value)
   const q = search.value.trim()
   if (q) all = all.filter(r => String(r.id).includes(q))
   return all
@@ -27,9 +35,7 @@ const rows = computed<Reservation[]>(() => {
 
 const columns: Column[] = [
   { key: 'id', label: t('reservations.id') },
-  { key: 'hotel_id', label: t('reservations.hotel'), align: 'end' },
-  { key: 'room_type_id', label: t('reservations.roomType'), align: 'end' },
-  { key: 'room_id', label: t('reservations.room'), align: 'end' },
+  { key: 'hotel_id', label: t('reservations.hotel') },
   { key: 'check_in', label: t('reservations.checkIn'), nowrap: true },
   { key: 'check_out', label: t('reservations.checkOut'), nowrap: true },
   { key: 'price_snapshot', label: t('reservations.price'), align: 'end' },
@@ -40,11 +46,19 @@ function changePage(n: number) {
   page.value = n
   list.reload()
 }
+
+const gapOpen = ref(false)
 </script>
 
 <template>
   <div>
-    <PageHeader :title="t('reservations.title')" :subtitle="t('reservations.subtitle')" />
+    <PageHeader :title="t('reservations.title')" :subtitle="t('reservations.subtitle')">
+      <template v-if="can('reservations.manage')" #actions>
+        <button type="button" class="btn btn-secondary" @click="gapOpen = true">
+          <KtIcon name="plus" /> {{ t('reservations.new') }}
+        </button>
+      </template>
+    </PageHeader>
 
     <InfoNote class="mb-4">
       {{ t('common.clientFilterNote') }} {{ t('common.perPageNote') }}
@@ -64,6 +78,16 @@ function changePage(n: number) {
           </option>
         </select>
       </FormField>
+      <FormField v-if="auth.assignedHotels.length > 1 || auth.isGroupOwner" :label="t('reservations.filterHotel')">
+        <select v-model="hotelFilter" class="input min-w-44">
+          <option value="">
+            {{ t('common.all') }}
+          </option>
+          <option v-for="h in auth.assignedHotels" :key="h.id" :value="h.id">
+            {{ h.name }}
+          </option>
+        </select>
+      </FormField>
     </div>
 
     <DataTable
@@ -80,11 +104,17 @@ function changePage(n: number) {
       <template #cell-id="{ row }">
         <span class="font-medium text-primary">#{{ (row as Reservation).id }}</span>
       </template>
-      <template #cell-room_id="{ row }">
-        {{ (row as Reservation).room_id ?? t('reservations.unassigned') }}
+      <template #cell-hotel_id="{ row }">
+        {{ hotelName((row as Reservation).hotel_id) }}
+      </template>
+      <template #cell-check_in="{ row }">
+        {{ date((row as Reservation).check_in) }}
+      </template>
+      <template #cell-check_out="{ row }">
+        {{ date((row as Reservation).check_out) }}
       </template>
       <template #cell-price_snapshot="{ row }">
-        {{ (row as Reservation).price_snapshot }}
+        {{ money((row as Reservation).price_snapshot) }}
       </template>
       <template #cell-status="{ row }">
         <StatusBadge
@@ -93,5 +123,11 @@ function changePage(n: number) {
         />
       </template>
     </DataTable>
+
+    <AppModal v-model:open="gapOpen" :title="t('reservations.createGapTitle')">
+      <p class="text-sm text-muted-foreground">
+        {{ t('reservations.createGapBody') }}
+      </p>
+    </AppModal>
   </div>
 </template>

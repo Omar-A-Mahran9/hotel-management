@@ -18,6 +18,7 @@ import '../../../reservation/presentation/state/reservation_detail_provider.dart
 import '../../domain/entities/hotel_service.dart';
 import '../state/stay_services_providers.dart';
 import '../widgets/service_card.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// `11 · Services & requests` — the hotel service catalogue, grouped by
 /// category. Read-only: ordering happens on the service detail screen.
@@ -29,8 +30,9 @@ class StayServicesPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
-    final AsyncValue<Reservation> reservationAsync =
-        ref.watch(reservationDetailProvider(reservationId));
+    final AsyncValue<Reservation> reservationAsync = ref.watch(
+      reservationDetailProvider(reservationId),
+    );
 
     return Scaffold(
       appBar: HotelAppBar(title: l10n.servicesTitle),
@@ -40,16 +42,15 @@ class StayServicesPage extends ConsumerWidget {
               Center(child: LoadingView(label: l10n.stateLoadingTitle)),
           error: (Object e, StackTrace _) => _error(context, ref, e),
           data: (Reservation reservation) {
-            final AsyncValue<ServiceCatalogue> cat =
-                ref.watch(serviceCatalogueProvider(reservation.hotelId));
+            final AsyncValue<ServiceCatalogue> cat = ref.watch(
+              serviceCatalogueProvider(reservation.hotelId),
+            );
             return cat.when(
               loading: () =>
                   Center(child: LoadingView(label: l10n.stateLoadingTitle)),
               error: (Object e, StackTrace _) => _error(context, ref, e),
-              data: (ServiceCatalogue catalogue) => _Body(
-                reservationId: reservationId,
-                catalogue: catalogue,
-              ),
+              data: (ServiceCatalogue catalogue) =>
+                  _Body(reservationId: reservationId, catalogue: catalogue),
             );
           },
         ),
@@ -60,7 +61,7 @@ class StayServicesPage extends ConsumerWidget {
   Widget _error(BuildContext context, WidgetRef ref, Object error) {
     final AppLocalizations l10n = context.l10n;
     return MessageView(
-      icon: Icons.room_service_outlined,
+      icon: AppIcons.roomService,
       title: l10n.servicesUnavailableTitle,
       message: ErrorMapper.toFailure(error).localizedMessage(l10n),
       actionLabel: l10n.actionRetry,
@@ -82,8 +83,8 @@ class _Body extends StatelessWidget {
     final AppLocalizations l10n = context.l10n;
     final ThemeData theme = Theme.of(context);
     final Locale locale = Localizations.localeOf(context);
-    final List<(ServiceCategory?, List<HotelService>)> groups =
-        catalogue.grouped();
+    final List<(ServiceCategory?, List<HotelService>)> groups = catalogue
+        .grouped();
 
     if (groups.isEmpty) {
       return Column(
@@ -114,7 +115,9 @@ class _Body extends StatelessWidget {
                   in groups) ...<Widget>[
                 Padding(
                   padding: const EdgeInsets.only(
-                      bottom: AppSpacing.xs, top: AppSpacing.xs),
+                    bottom: AppSpacing.xs,
+                    top: AppSpacing.xs,
+                  ),
                   child: Text(
                     group.$1?.name.resolve(locale) ?? l10n.serviceUncategorised,
                     style: theme.textTheme.titleMedium,
@@ -166,7 +169,7 @@ class _MyRequestsButton extends StatelessWidget {
       ),
       child: SecondaryButton(
         label: context.l10n.myRequestsTitle,
-        icon: Icons.receipt_long_outlined,
+        icon: AppIcons.invoice,
         onPressed: () => context.pushNamed(
           AppRoutes.serviceOrdersName,
           pathParameters: <String, String>{'reservationId': reservationId},

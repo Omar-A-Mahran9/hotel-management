@@ -15,6 +15,7 @@ import '../state/guest_party_controller.dart';
 import '../state/stay_dates_controller.dart';
 import '../widgets/guest_party_sheet.dart';
 import '../widgets/stay_range_calendar.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// `16 · Stay dates & available rooms` — the check-in / check-out picker.
 ///
@@ -35,12 +36,14 @@ class StayDatesPage extends ConsumerWidget {
     final DateTime today = ref.today();
     final StayDatesDraft draft = ref.watch(stayDatesControllerProvider);
     final GuestParty party = ref.watch(guestPartyControllerProvider);
-    final StayDatesController dates =
-        ref.read(stayDatesControllerProvider.notifier);
+    final StayDatesController dates = ref.read(
+      stayDatesControllerProvider.notifier,
+    );
 
     final StayRange? range = draft.rangeAgainst(today);
-    final String? errorText =
-        l10n.stayDatesErrorLabel(draft.errorAgainst(today));
+    final String? errorText = l10n.stayDatesErrorLabel(
+      draft.errorAgainst(today),
+    );
 
     // Which field the next tap fills — gets the highlighted border.
     final bool checkInActive = draft.checkIn == null || draft.checkOut != null;
@@ -55,8 +58,9 @@ class StayDatesPage extends ConsumerWidget {
           '${l10n.stayDatesSelectedRange(ml.formatMediumDate(range.checkIn), ml.formatMediumDate(range.checkOut))} · ${l10n.stayNights(range.nights)}';
       guidanceIsError = false;
     } else if (draft.checkIn != null) {
-      guidance =
-          l10n.stayDatesHintPickCheckOut(ml.formatMediumDate(draft.checkIn!));
+      guidance = l10n.stayDatesHintPickCheckOut(
+        ml.formatMediumDate(draft.checkIn!),
+      );
       guidanceIsError = false;
     } else {
       guidance = l10n.stayDatesHintPickCheckIn;
@@ -135,7 +139,7 @@ class StayDatesPage extends ConsumerWidget {
                 ),
                 child: Row(
                   children: <Widget>[
-                    const Icon(Icons.person_outline, size: 18),
+                    const Icon(AppIcons.guests, size: 18),
                     const SizedBox(width: AppSpacing.xs),
                     Expanded(
                       child: Text(
@@ -178,9 +182,9 @@ class StayDatesPage extends ConsumerWidget {
           onPressed: range == null
               ? null
               : () => context.pushNamed(
-                    AppRoutes.availableRoomsName,
-                    pathParameters: <String, String>{'hotelId': hotelId},
-                  ),
+                  AppRoutes.availableRoomsName,
+                  pathParameters: <String, String>{'hotelId': hotelId},
+                ),
         ),
       ),
     );
@@ -207,9 +211,7 @@ class _DateField extends StatelessWidget {
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: active
-              ? theme.colorScheme.primary
-              : theme.colorScheme.outline,
+          color: active ? theme.colorScheme.primary : theme.colorScheme.outline,
           width: active ? 1.5 : 1,
         ),
       ),

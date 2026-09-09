@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
+import 'app_icons.dart';
 
 /// Tone of an [InfoBanner], mapped to the design system's semantic containers.
 enum InfoBannerTone { info, success, warning, error }
@@ -42,16 +43,10 @@ class InfoBanner extends StatelessWidget {
     ColorScheme scheme,
   ) {
     return switch (tone) {
-      InfoBannerTone.info => (fg: semantic.info, icon: Icons.info_rounded),
-      InfoBannerTone.success => (
-        fg: semantic.success,
-        icon: Icons.check_circle_rounded,
-      ),
-      InfoBannerTone.warning => (
-        fg: semantic.warning,
-        icon: Icons.warning_amber_rounded,
-      ),
-      InfoBannerTone.error => (fg: scheme.error, icon: Icons.error_rounded),
+      InfoBannerTone.info => (fg: semantic.info, icon: AppIcons.info),
+      InfoBannerTone.success => (fg: semantic.success, icon: AppIcons.success),
+      InfoBannerTone.warning => (fg: semantic.warning, icon: AppIcons.warning),
+      InfoBannerTone.error => (fg: scheme.error, icon: AppIcons.error),
     };
   }
 

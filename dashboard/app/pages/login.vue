@@ -87,7 +87,7 @@ async function submit() {
       </FormField>
 
       <button type="submit" class="btn btn-primary w-full" :disabled="submitting">
-        <KtIcon v-if="submitting" name="loading" />
+        <KtIcon v-if="submitting" name="loading" class="animate-spin" />
         {{ submitting ? t('auth.signingIn') : t('auth.signIn') }}
       </button>
     </form>

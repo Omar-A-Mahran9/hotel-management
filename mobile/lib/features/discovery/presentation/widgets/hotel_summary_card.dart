@@ -10,6 +10,7 @@ import '../../../../core/widgets/status_pill.dart';
 import '../../domain/entities/hotel_summary.dart';
 import 'hotel_thumbnail.dart';
 import 'rating_pill.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// A hotel card for the discover grid and the search-result list
 /// (`02 · Discover & Book`). Lays out correctly in both text directions.
@@ -44,16 +45,18 @@ class _AvailabilityBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final AppSemanticColors semantic = Theme.of(context)
-            .extension<AppSemanticColors>() ??
+    final AppSemanticColors semantic =
+        Theme.of(context).extension<AppSemanticColors>() ??
         AppSemanticColors.light;
     return StatusPill(
       label: isAvailable ? l10n.hotelAvailable : l10n.hotelUnavailable,
-      foreground: isAvailable ? semantic.success : Theme.of(context).colorScheme.error,
+      foreground: isAvailable
+          ? semantic.success
+          : Theme.of(context).colorScheme.error,
       background: isAvailable
           ? semantic.successContainer
           : AppColors.errorContainer,
-      icon: isAvailable ? Icons.check_circle : Icons.pause_circle_filled,
+      icon: isAvailable ? AppIcons.shieldCheck : AppIcons.close,
     );
   }
 }
@@ -117,7 +120,10 @@ class _RowCard extends StatelessWidget {
                 ),
                 if (hotel.rating != null) ...<Widget>[
                   const SizedBox(height: AppSpacing.xs),
-                  RatingPill(rating: hotel.rating!, reviewCount: hotel.reviewCount),
+                  RatingPill(
+                    rating: hotel.rating!,
+                    reviewCount: hotel.reviewCount,
+                  ),
                 ],
               ],
             ),
@@ -164,10 +170,16 @@ class _TileCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: AppSpacing.xxs),
-                Text(hotel.cityName.resolve(locale), style: theme.textTheme.bodySmall),
+                Text(
+                  hotel.cityName.resolve(locale),
+                  style: theme.textTheme.bodySmall,
+                ),
                 const SizedBox(height: AppSpacing.xs),
                 if (hotel.rating != null)
-                  RatingPill(rating: hotel.rating!, reviewCount: hotel.reviewCount),
+                  RatingPill(
+                    rating: hotel.rating!,
+                    reviewCount: hotel.reviewCount,
+                  ),
                 const SizedBox(height: AppSpacing.xs),
                 Row(
                   children: <Widget>[

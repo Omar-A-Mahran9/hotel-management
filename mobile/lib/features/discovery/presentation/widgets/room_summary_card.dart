@@ -9,6 +9,7 @@ import '../../../../core/widgets/money_text.dart';
 import '../../domain/entities/available_room.dart';
 import '../discovery_l10n.dart';
 import 'hotel_thumbnail.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// A room row in the available-rooms list (`16 · Stay dates & available
 /// rooms`): thumbnail, name + description, two spec lines, status/policy pills,
@@ -45,7 +46,8 @@ class RoomSummaryCard extends StatelessWidget {
       room.roomType.bedType.resolve(locale),
     ];
     final List<String> specs2 = <String>[
-      for (final amenity in room.roomType.amenities) l10n.roomAmenityLabel(amenity),
+      for (final amenity in room.roomType.amenities)
+        l10n.roomAmenityLabel(amenity),
       if (room.roomType.breakfastIncluded) l10n.amenityBreakfast,
     ];
 
@@ -85,7 +87,7 @@ class RoomSummaryCard extends StatelessWidget {
                                 label: l10n.roomSelected,
                                 foreground: theme.colorScheme.onPrimary,
                                 background: theme.colorScheme.primary,
-                                icon: Icons.check,
+                                icon: AppIcons.check,
                               ),
                             ],
                           ],
@@ -98,10 +100,15 @@ class RoomSummaryCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: AppSpacing.xs),
-                        Text(specs1.join('  ·  '), style: theme.textTheme.bodySmall),
+                        Text(
+                          specs1.join('  ·  '),
+                          style: theme.textTheme.bodySmall,
+                        ),
                         if (specs2.isNotEmpty)
-                          Text(specs2.join('  ·  '),
-                              style: theme.textTheme.bodySmall),
+                          Text(
+                            specs2.join('  ·  '),
+                            style: theme.textTheme.bodySmall,
+                          ),
                       ],
                     ),
                   ),
@@ -110,7 +117,7 @@ class RoomSummaryCard extends StatelessWidget {
                     seed: room.roomType.id,
                     width: 84,
                     height: 84,
-                    icon: Icons.king_bed_outlined,
+                    icon: AppIcons.bed,
                   ),
                 ],
               ),
@@ -124,14 +131,14 @@ class RoomSummaryCard extends StatelessWidget {
                       label: l10n.roomSoldOut,
                       foreground: theme.colorScheme.error,
                       background: AppColors.errorContainer,
-                      icon: Icons.do_not_disturb_on_outlined,
+                      icon: AppIcons.close,
                     )
                   else
                     _Pill(
                       label: l10n.hotelAvailable,
                       foreground: semantic.success,
                       background: semantic.successContainer,
-                      icon: Icons.check_circle,
+                      icon: AppIcons.shieldCheck,
                     ),
                   if (room.roomType.refundable)
                     _Pill(
@@ -154,8 +161,9 @@ class RoomSummaryCard extends StatelessWidget {
                         MoneyText(
                           room.nightlyRate.amount,
                           suffix: l10n.priceNightSuffix,
-                          semanticsLabel:
-                              l10n.pricePerNight(room.nightlyRate.amount),
+                          semanticsLabel: l10n.pricePerNight(
+                            room.nightlyRate.amount,
+                          ),
                         ),
                         Text(
                           '${l10n.priceStayTotal(room.stayTotal(nights).amount)} ${l10n.roomStayTotalLabel(nights)}',
@@ -171,7 +179,8 @@ class RoomSummaryCard extends StatelessWidget {
                     onPressed: soldOut ? null : onViewDetails,
                     style: _compactButtonStyle,
                     child: Text(
-                        soldOut ? l10n.roomSoldOut : l10n.roomViewDetails),
+                      soldOut ? l10n.roomSoldOut : l10n.roomViewDetails,
+                    ),
                   ),
                 ],
               ),
@@ -225,9 +234,7 @@ class _Pill extends StatelessWidget {
           ],
           Text(
             label,
-            style: Theme.of(context)
-                .textTheme
-                .labelMedium
+            style: Theme.of(context).textTheme.labelMedium
                 ?.copyWith(color: foreground),
           ),
         ],

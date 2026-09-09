@@ -21,6 +21,7 @@ import '../../../reservation/presentation/state/create_reservation_controller.da
 import '../../domain/entities/room_selection.dart';
 import '../state/room_selection_controller.dart';
 import '../widgets/guest_party_sheet.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// Review the chosen room + stay + party, then **confirm the reservation**
 /// (Mobile Phase 4). Confirming creates a `PENDING` reservation and moves to the
@@ -35,25 +36,28 @@ class RoomSelectionReviewPage extends ConsumerWidget {
   final String hotelId;
 
   String? _guestReference(AuthState auth) => auth.map(
-        unknown: () => null,
-        unauthenticated: () => null,
-        awaitingProfile: (session) => session.profile.phone.e164,
-        authenticated: (session) => session.profile.phone.e164,
-        sessionExpired: () => null,
-      );
+    unknown: () => null,
+    unauthenticated: () => null,
+    awaitingProfile: (session) => session.profile.phone.e164,
+    authenticated: (session) => session.profile.phone.e164,
+    sessionExpired: () => null,
+  );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
     final RoomSelection? selection = ref.watch(roomSelectionControllerProvider);
-    final String? guestReference =
-        _guestReference(ref.watch(authControllerProvider));
+    final String? guestReference = _guestReference(
+      ref.watch(authControllerProvider),
+    );
 
-    if (selection == null || selection.hotelId != hotelId || guestReference == null) {
+    if (selection == null ||
+        selection.hotelId != hotelId ||
+        guestReference == null) {
       return Scaffold(
         appBar: HotelAppBar(title: l10n.reviewTitle),
         body: MessageView(
-          icon: Icons.bookmark_border,
+          icon: AppIcons.rating,
           title: l10n.reviewNoSelectionTitle,
           message: l10n.reviewNoSelectionBody,
           actionLabel: l10n.reviewBackToRooms,
@@ -64,11 +68,12 @@ class RoomSelectionReviewPage extends ConsumerWidget {
 
     final CreateReservationRequest request =
         CreateReservationRequest.fromSelection(
-      selection,
-      guestReference: guestReference,
+          selection,
+          guestReference: guestReference,
+        );
+    final CreateReservationState reservationState = ref.watch(
+      createReservationControllerProvider,
     );
-    final CreateReservationState reservationState =
-        ref.watch(createReservationControllerProvider);
 
     // Navigate to the confirmation screen once this exact request succeeds.
     ref.listen<CreateReservationState>(createReservationControllerProvider, (
@@ -85,11 +90,14 @@ class RoomSelectionReviewPage extends ConsumerWidget {
       }
     });
 
-    final bool submitting = reservationState is CreateReservationSubmitting &&
+    final bool submitting =
+        reservationState is CreateReservationSubmitting &&
         reservationState.request == request;
-    final bool alreadyCreated = reservationState is CreateReservationDone &&
+    final bool alreadyCreated =
+        reservationState is CreateReservationDone &&
         reservationState.request == request;
-    final Failure? failure = reservationState is CreateReservationFailed &&
+    final Failure? failure =
+        reservationState is CreateReservationFailed &&
             reservationState.request == request
         ? reservationState.failure
         : null;
@@ -151,13 +159,13 @@ class RoomSelectionReviewPage extends ConsumerWidget {
                 onPressed: submitting
                     ? null
                     : () => ref
-                        .read(createReservationControllerProvider.notifier)
-                        .submit(request),
+                          .read(createReservationControllerProvider.notifier)
+                          .submit(request),
               ),
             const SizedBox(height: AppSpacing.xs),
             SecondaryButton(
               label: l10n.reviewChangeSelection,
-              icon: Icons.edit_outlined,
+              icon: AppIcons.edit,
               onPressed: submitting ? null : () => context.pop(),
             ),
           ],
@@ -230,7 +238,8 @@ class _SummaryCard extends StatelessWidget {
               Text(
                 l10n.priceStayTotal(selection.stayTotal.amount),
                 style: theme.textTheme.titleSmall?.copyWith(
-                  color: theme.extension<AppSemanticColors>()?.accent ??
+                  color:
+                      theme.extension<AppSemanticColors>()?.accent ??
                       AppColors.bronze500,
                 ),
               ),

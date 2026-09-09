@@ -21,6 +21,7 @@ import '../state/review_providers.dart';
 import '../state/review_submission_controller.dart';
 import '../widgets/rating_selector.dart';
 import '../widgets/review_status_pill.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// `05 · Depart & Invoice` — "كيف كانت إقامتك؟". Rate 1–5, add optional text,
 /// submit. If a review already exists it is shown read-only. Eligibility is a
@@ -48,10 +49,12 @@ class _ReviewFormPageState extends ConsumerState<ReviewFormPage> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final AsyncValue<ReviewContext> ctxAsync =
-        ref.watch(reviewContextProvider(widget.reservationId));
-    final AsyncValue<Review?> reviewAsync =
-        ref.watch(reservationReviewProvider(widget.reservationId));
+    final AsyncValue<ReviewContext> ctxAsync = ref.watch(
+      reviewContextProvider(widget.reservationId),
+    );
+    final AsyncValue<Review?> reviewAsync = ref.watch(
+      reservationReviewProvider(widget.reservationId),
+    );
 
     return Scaffold(
       appBar: HotelAppBar(title: l10n.reviewFormTitle),
@@ -62,7 +65,7 @@ class _ReviewFormPageState extends ConsumerState<ReviewFormPage> {
           loading: () =>
               Center(child: LoadingView(label: l10n.stateLoadingTitle)),
           error: (Object e) => MessageView(
-            icon: Icons.rate_review_outlined,
+            icon: AppIcons.review,
             title: l10n.reviewUnavailableTitle,
             message: ErrorMapper.toFailure(e).localizedMessage(l10n),
             actionLabel: l10n.actionRetry,
@@ -75,7 +78,7 @@ class _ReviewFormPageState extends ConsumerState<ReviewFormPage> {
             if (review != null) return _ExistingReview(review: review);
             if (!ctx.eligibility.canReview) {
               return MessageView(
-                icon: Icons.rate_review_outlined,
+                icon: AppIcons.review,
                 title: l10n.reviewNotEligibleTitle,
                 message: l10n.reviewNotEligibleBody,
                 actionLabel: l10n.commonBack,
@@ -151,9 +154,11 @@ class _Form extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
     final ThemeData theme = Theme.of(context);
-    final ReviewActionState action =
-        ref.watch(reviewSubmissionControllerProvider);
-    final bool submitting = action is ReviewSubmitting &&
+    final ReviewActionState action = ref.watch(
+      reviewSubmissionControllerProvider,
+    );
+    final bool submitting =
+        action is ReviewSubmitting &&
         action.request.reservationId == reservationId;
 
     return Column(
@@ -175,8 +180,9 @@ class _Form extends ConsumerWidget {
                       const SizedBox(height: AppSpacing.xs),
                       Text(
                         l10n.reviewRatingRequired,
-                        style: theme.textTheme.bodySmall
-                            ?.copyWith(color: theme.colorScheme.error),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.error,
+                        ),
                       ),
                     ],
                   ],
@@ -242,16 +248,16 @@ class _ExistingReview extends StatelessWidget {
                 tone: review.status.isPublished
                     ? InfoBannerTone.success
                     : review.status.isRejected
-                        ? InfoBannerTone.error
-                        : InfoBannerTone.info,
+                    ? InfoBannerTone.error
+                    : InfoBannerTone.info,
                 title: review.status.isRejected
                     ? l10n.reviewRejectedTitle
                     : l10n.reviewAlreadyTitle,
                 message: review.status.isRejected
                     ? l10n.reviewRejectedBody
                     : review.status.isPublished
-                        ? l10n.reviewPublishedBody
-                        : l10n.reviewPendingModerationBody,
+                    ? l10n.reviewPublishedBody
+                    : l10n.reviewPendingModerationBody,
               ),
               const SizedBox(height: AppSpacing.md),
               AppCard(
@@ -261,8 +267,10 @@ class _ExistingReview extends StatelessWidget {
                     Row(
                       children: <Widget>[
                         Expanded(
-                          child: Text(l10n.reviewYourRatingLabel,
-                              style: theme.textTheme.bodySmall),
+                          child: Text(
+                            l10n.reviewYourRatingLabel,
+                            style: theme.textTheme.bodySmall,
+                          ),
                         ),
                         ReviewStatusPill(status: review.status),
                       ],

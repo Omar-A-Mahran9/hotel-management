@@ -79,8 +79,7 @@ class MoneyText extends StatelessWidget {
     final Color muted = Theme.of(context).colorScheme.onSurfaceVariant;
 
     return Semantics(
-      label: semanticsLabel ??
-          'SAR $text${suffix == null ? '' : ' $suffix'}',
+      label: semanticsLabel ?? 'SAR $text${suffix == null ? '' : ' $suffix'}',
       child: ExcludeSemantics(
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -106,9 +105,11 @@ class MoneyText extends StatelessWidget {
     );
   }
 
+  // The rendered Figma prices are the warm near-black brown (`#513425`), not
+  // gold — gold is reserved for ratings. Callers on dark/accent surfaces pass an
+  // explicit [color].
   Color _defaultColor(BuildContext context) =>
-      Theme.of(context).extension<AppSemanticColors>()?.accent ??
-      AppColors.bronze500;
+      Theme.of(context).colorScheme.onSurface;
 }
 
 /// The Saudi Riyal currency mark, drawn to [size] (roughly a capital-letter

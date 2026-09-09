@@ -16,6 +16,7 @@ import '../state/identity_verification_controller.dart';
 import '../widgets/identity_document_step.dart';
 import '../widgets/identity_selfie_step.dart';
 import '../widgets/identity_step_indicator.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// `10 · Identity verification` — the guest verification flow before check-in.
 ///
@@ -46,9 +47,7 @@ class _IdentityVerificationPageState
       _handedOff = true;
       context.pushReplacementNamed(
         AppRoutes.identityVerificationResultName,
-        pathParameters: <String, String>{
-          'reservationId': widget.reservationId,
-        },
+        pathParameters: <String, String>{'reservationId': widget.reservationId},
       );
     }
   }
@@ -56,8 +55,9 @@ class _IdentityVerificationPageState
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final IdentityVerificationState state =
-        ref.watch(identityVerificationControllerProvider(widget.reservationId));
+    final IdentityVerificationState state = ref.watch(
+      identityVerificationControllerProvider(widget.reservationId),
+    );
 
     ref.listen<IdentityVerificationState>(
       identityVerificationControllerProvider(widget.reservationId),
@@ -82,13 +82,15 @@ class _IdentityVerificationPageState
     if (session == null) {
       if (state.hasFailure) {
         return MessageView(
-          icon: Icons.badge_outlined,
+          icon: AppIcons.identity,
           title: l10n.identityUnavailableTitle,
           message: state.failure!.localizedMessage(l10n),
           actionLabel: l10n.actionRetry,
           onAction: () => ref
-              .read(identityVerificationControllerProvider(widget.reservationId)
-                  .notifier)
+              .read(
+                identityVerificationControllerProvider(widget.reservationId)
+                    .notifier,
+              )
               .refresh(),
         );
       }
@@ -160,17 +162,17 @@ class _IdentityVerificationPageState
     final AppLocalizations l10n = context.l10n;
     return switch (session.status) {
       IdentityVerificationStatus.retryAllowed => InfoBanner(
-          tone: InfoBannerTone.warning,
-          title: l10n.identityRetryTitle,
-          message: l10n.identityRetryBody,
-        ),
+        tone: InfoBannerTone.warning,
+        title: l10n.identityRetryTitle,
+        message: l10n.identityRetryBody,
+      ),
       IdentityVerificationStatus.staffRejected => InfoBanner(
-          tone: InfoBannerTone.error,
-          title: l10n.identityRejectedTitle,
-          message: session.canRetry
-              ? l10n.identityRejectedRetryBody
-              : l10n.identityRejectedBody,
-        ),
+        tone: InfoBannerTone.error,
+        title: l10n.identityRejectedTitle,
+        message: session.canRetry
+            ? l10n.identityRejectedRetryBody
+            : l10n.identityRejectedBody,
+      ),
       _ => null,
     };
   }

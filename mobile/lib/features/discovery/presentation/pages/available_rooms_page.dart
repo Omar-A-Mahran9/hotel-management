@@ -35,6 +35,7 @@ import '../state/stay_dates_controller.dart';
 import '../widgets/guest_party_sheet.dart';
 import '../widgets/room_sort_sheet.dart';
 import '../widgets/room_summary_card.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// `16 · Stay dates & available rooms` — the available-rooms list.
 ///
@@ -68,8 +69,9 @@ class _AvailableRoomsPageState extends ConsumerState<AvailableRoomsPage> {
   }
 
   AvailabilityRequest? _currentRequest() {
-    final StayRange? stay =
-        ref.read(stayDatesControllerProvider).rangeAgainst(ref.today());
+    final StayRange? stay = ref
+        .read(stayDatesControllerProvider)
+        .rangeAgainst(ref.today());
     if (stay == null) return null;
     return AvailabilityRequest(
       hotelId: widget.hotelId,
@@ -104,8 +106,9 @@ class _AvailableRoomsPageState extends ConsumerState<AvailableRoomsPage> {
     });
 
     final AvailabilityRequest? request = _currentRequest();
-    final RoomAvailabilityState availability =
-        ref.watch(roomAvailabilityControllerProvider);
+    final RoomAvailabilityState availability = ref.watch(
+      roomAvailabilityControllerProvider,
+    );
     if (request != null &&
         !availability.isFreshFor(request) &&
         availability.result is! UiLoading<AvailabilityResult>) {
@@ -114,8 +117,9 @@ class _AvailableRoomsPageState extends ConsumerState<AvailableRoomsPage> {
       });
     }
 
-    final AsyncValue<Hotel> hotelAsync =
-        ref.watch(hotelDetailProvider(widget.hotelId));
+    final AsyncValue<Hotel> hotelAsync = ref.watch(
+      hotelDetailProvider(widget.hotelId),
+    );
 
     return hotelAsync.when(
       loading: () => Scaffold(
@@ -160,18 +164,20 @@ class _Loaded extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
     final DateTime today = ref.today();
-    final StayRange? range =
-        ref.watch(stayDatesControllerProvider).rangeAgainst(today);
+    final StayRange? range = ref
+        .watch(stayDatesControllerProvider)
+        .rangeAgainst(today);
     final GuestParty party = ref.watch(guestPartyControllerProvider);
-    final RoomAvailabilityState state =
-        ref.watch(roomAvailabilityControllerProvider);
+    final RoomAvailabilityState state = ref.watch(
+      roomAvailabilityControllerProvider,
+    );
     final RoomSelection? selection = ref.watch(roomSelectionControllerProvider);
 
     if (range == null) {
       return Scaffold(
         appBar: HotelAppBar(title: l10n.roomsTitle),
         body: MessageView(
-          icon: Icons.event_busy_outlined,
+          icon: AppIcons.calendar,
           title: l10n.roomsNoResultsTitle,
           message: l10n.roomsNoResultsBody,
           actionLabel: l10n.roomsChangeDates,
@@ -235,15 +241,17 @@ class _Loaded extends ConsumerWidget {
             Expanded(
               child: UiStateView<AvailabilityResult>(
                 state: state.result,
-                onRetry: () =>
-                    ref.read(roomAvailabilityControllerProvider.notifier).retry(),
+                onRetry: () => ref
+                    .read(roomAvailabilityControllerProvider.notifier)
+                    .retry(),
                 emptyTitle: l10n.roomsNoResultsTitle,
                 emptyMessage: l10n.roomsNoResultsBody,
                 onSuccess: (AvailabilityResult result) => _RoomList(
                   result: result,
                   nights: range.nights,
-                  selectedRoomTypeId:
-                      selectionMatches ? selection.roomTypeId : null,
+                  selectedRoomTypeId: selectionMatches
+                      ? selection.roomTypeId
+                      : null,
                   onOpenRoom: onOpenRoom,
                 ),
               ),
@@ -385,9 +393,8 @@ class _LinkButton extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-              ),
+          style: Theme.of(context).textTheme.labelMedium
+              ?.copyWith(color: Theme.of(context).colorScheme.primary),
         ),
       ),
     );
@@ -418,11 +425,13 @@ class _SortRow extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
             ),
             onPressed: () async {
-              final RoomSort? picked =
-                  await showRoomSortSheet(context, current: sort);
+              final RoomSort? picked = await showRoomSortSheet(
+                context,
+                current: sort,
+              );
               if (picked != null) onPick(picked);
             },
-            icon: const Icon(Icons.swap_vert, size: 16),
+            icon: const Icon(AppIcons.sort, size: 16),
             label: Text(l10n.roomsSortTrigger(l10n.roomSortLabel(sort))),
           ),
         ],
@@ -470,7 +479,10 @@ class _RoomList extends StatelessWidget {
           child: Row(
             children: <Widget>[
               Expanded(
-                child: Text(l10n.roomsTitle, style: theme.textTheme.titleMedium),
+                child: Text(
+                  l10n.roomsTitle,
+                  style: theme.textTheme.titleMedium,
+                ),
               ),
               Text(
                 l10n.roomsAvailableCount(result.bookableCount),
@@ -511,10 +523,7 @@ class _NoResultsActions extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          PrimaryButton(
-            label: l10n.roomsChangeDates,
-            onPressed: onChangeDates,
-          ),
+          PrimaryButton(label: l10n.roomsChangeDates, onPressed: onChangeDates),
           const SizedBox(height: AppSpacing.xs),
           SecondaryButton(
             label: l10n.roomsChangeGuests,

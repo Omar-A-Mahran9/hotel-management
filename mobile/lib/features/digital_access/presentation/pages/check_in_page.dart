@@ -19,6 +19,7 @@ import '../../domain/entities/access_grant.dart';
 import '../../domain/entities/check_in.dart';
 import '../state/check_in_controller.dart';
 import '../state/digital_access_providers.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// `04 · Check in & Stay` — the check-in review / eligibility screen.
 ///
@@ -50,10 +51,12 @@ class _CheckInPageState extends ConsumerState<CheckInPage> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final AsyncValue<Reservation> reservationAsync =
-        ref.watch(reservationDetailProvider(widget.reservationId));
-    final AsyncValue<AccessGrant> grantAsync =
-        ref.watch(accessGrantProvider(widget.reservationId));
+    final AsyncValue<Reservation> reservationAsync = ref.watch(
+      reservationDetailProvider(widget.reservationId),
+    );
+    final AsyncValue<AccessGrant> grantAsync = ref.watch(
+      accessGrantProvider(widget.reservationId),
+    );
 
     return Scaffold(
       appBar: HotelAppBar(title: l10n.checkInTitle),
@@ -66,22 +69,20 @@ class _CheckInPageState extends ConsumerState<CheckInPage> {
           error: (Object error) {
             final failure = ErrorMapper.toFailure(error);
             return MessageView(
-              icon: Icons.meeting_room_outlined,
+              icon: AppIcons.room,
               title: l10n.checkInUnavailableTitle,
               message: failure.localizedMessage(l10n),
               actionLabel: l10n.actionRetry,
               onAction: () {
                 ref.invalidate(accessGrantProvider(widget.reservationId));
-                ref.invalidate(
-                    reservationDetailProvider(widget.reservationId));
+                ref.invalidate(reservationDetailProvider(widget.reservationId));
               },
             );
           },
           data: (Reservation reservation, AccessGrant grant) {
             // A grant already exists — the access screen owns it from here.
             if (grant.exists) {
-              WidgetsBinding.instance
-                  .addPostFrameCallback((_) => _handOff());
+              WidgetsBinding.instance.addPostFrameCallback((_) => _handOff());
               return Center(child: LoadingView(label: l10n.stateLoadingTitle));
             }
             return _Body(reservation: reservation);
@@ -114,8 +115,9 @@ class _Body extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
     final ThemeData theme = Theme.of(context);
-    final CheckInEligibility eligibility =
-        CheckInEligibility.fromReservation(reservation.status);
+    final CheckInEligibility eligibility = CheckInEligibility.fromReservation(
+      reservation.status,
+    );
     final CheckInRequest request = CheckInRequest.forReservation(reservation);
     final CheckInActionState action = ref.watch(checkInControllerProvider);
     final bool submitting =
@@ -123,25 +125,25 @@ class _Body extends ConsumerWidget {
 
     final (IconData icon, String title, String body) = switch (eligibility) {
       CheckInEligibility.ready => (
-          Icons.how_to_reg_outlined,
-          l10n.checkInReadyTitle,
-          l10n.checkInReadyBody,
-        ),
+        AppIcons.shieldCheck,
+        l10n.checkInReadyTitle,
+        l10n.checkInReadyBody,
+      ),
       CheckInEligibility.notReady => (
-          Icons.pending_actions_outlined,
-          l10n.checkInNotReadyTitle,
-          l10n.checkInNotReadyBody,
-        ),
+        AppIcons.pending,
+        l10n.checkInNotReadyTitle,
+        l10n.checkInNotReadyBody,
+      ),
       CheckInEligibility.alreadyCheckedIn => (
-          Icons.verified_outlined,
-          l10n.checkInAlreadyDoneTitle,
-          l10n.checkInReadyBody,
-        ),
+        AppIcons.shieldCheck,
+        l10n.checkInAlreadyDoneTitle,
+        l10n.checkInReadyBody,
+      ),
       CheckInEligibility.unavailable => (
-          Icons.block_outlined,
-          l10n.checkInUnavailableTitle,
-          l10n.checkInNotReadyBody,
-        ),
+        AppIcons.close,
+        l10n.checkInUnavailableTitle,
+        l10n.checkInNotReadyBody,
+      ),
     };
 
     return Column(

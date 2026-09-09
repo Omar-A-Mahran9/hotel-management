@@ -19,6 +19,7 @@ import '../core/widgets/primary_button.dart';
 import '../core/widgets/secondary_button.dart';
 import '../core/widgets/status_pill.dart';
 import '../core/widgets/ui_state_view.dart';
+import '../core/widgets/app_icons.dart';
 
 /// Phase 0 placeholder screen.
 ///
@@ -50,7 +51,10 @@ class FoundationHomePage extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.pageGutter),
           children: <Widget>[
-            Text(l10n.appTagline, style: Theme.of(context).textTheme.headlineSmall),
+            Text(
+              l10n.appTagline,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
             const SizedBox(height: AppSpacing.xs),
             Text(
               l10n.foundationScreenSubtitle,
@@ -147,7 +151,9 @@ class _LanguageSelector extends ConsumerWidget {
       ],
       selected: <String>{current.languageCode},
       onSelectionChanged: (Set<String> selection) {
-        ref.read(localeControllerProvider.notifier).set(
+        ref
+            .read(localeControllerProvider.notifier)
+            .set(
               selection.first == 'ar'
                   ? SupportedLocales.arabic
                   : SupportedLocales.english,
@@ -192,7 +198,9 @@ class _BackendStatusView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
-    final state = backendHealthUiState(ref.watch(backendHealthControllerProvider));
+    final state = backendHealthUiState(
+      ref.watch(backendHealthControllerProvider),
+    );
 
     return UiStateView<BackendHealth>(
       state: state,
@@ -201,20 +209,20 @@ class _BackendStatusView extends ConsumerWidget {
       onSuccess: (BackendHealth health) {
         final (String label, Color fg, Color bg) = switch (health.status) {
           HealthStatus.ok => (
-              l10n.backendStatusOk,
-              AppColors.success,
-              AppColors.successContainer,
-            ),
+            l10n.backendStatusOk,
+            AppColors.success,
+            AppColors.successContainer,
+          ),
           HealthStatus.degraded => (
-              l10n.backendStatusDegraded,
-              AppColors.warning,
-              AppColors.warningContainer,
-            ),
+            l10n.backendStatusDegraded,
+            AppColors.warning,
+            AppColors.warningContainer,
+          ),
           HealthStatus.down => (
-              l10n.backendStatusDown,
-              AppColors.error,
-              AppColors.errorContainer,
-            ),
+            l10n.backendStatusDown,
+            AppColors.error,
+            AppColors.errorContainer,
+          ),
         };
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -235,10 +243,9 @@ class _BackendStatusView extends ConsumerWidget {
             const SizedBox(height: AppSpacing.sm),
             SecondaryButton(
               label: l10n.actionCheckAgain,
-              icon: Icons.refresh,
-              onPressed: () => ref
-                  .read(backendHealthControllerProvider.notifier)
-                  .refresh(),
+              icon: AppIcons.refresh,
+              onPressed: () =>
+                  ref.read(backendHealthControllerProvider.notifier).refresh(),
             ),
           ],
         );

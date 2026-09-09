@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
+import 'app_icons.dart';
 import 'primary_button.dart';
 import 'secondary_button.dart';
 
@@ -43,14 +45,16 @@ class MessageView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
+            // Figma: the icon "sits in a soft tile so the block has weight
+            // rather than floating" — a rounded square, not a circle.
             Container(
-              width: 72,
-              height: 72,
+              width: 76,
+              height: 76,
               decoration: BoxDecoration(
-                color: tint.withValues(alpha: 0.12),
-                shape: BoxShape.circle,
+                color: tint.withValues(alpha: 0.10),
+                borderRadius: AppRadius.allXl,
               ),
-              child: Icon(icon, size: 34, color: tint),
+              child: Icon(icon, size: 32, color: tint),
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
@@ -91,7 +95,7 @@ class EmptyView extends StatelessWidget {
     super.key,
     required this.title,
     this.message,
-    this.icon = Icons.inbox_outlined,
+    this.icon = AppIcons.search,
     this.actionLabel,
     this.onAction,
     this.secondaryActionLabel,
@@ -142,7 +146,7 @@ class ErrorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MessageView(
-      icon: Icons.error_outline_rounded,
+      icon: AppIcons.warning,
       iconColor: Theme.of(context).colorScheme.error,
       title: title,
       message: message,

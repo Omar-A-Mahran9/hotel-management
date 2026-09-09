@@ -26,6 +26,7 @@ import '../state/room_availability_controller.dart';
 import '../state/room_selection_controller.dart';
 import '../state/stay_dates_controller.dart';
 import '../widgets/hotel_thumbnail.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// `08 · Room selection & stay actions` (screen 1) — one room type in full, with
 /// the stay context, amenities, cancellation summary and a single
@@ -45,17 +46,23 @@ class RoomDetailPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
     final DateTime today = ref.today();
-    final StayRange? stay =
-        ref.watch(stayDatesControllerProvider).rangeAgainst(today);
+    final StayRange? stay = ref
+        .watch(stayDatesControllerProvider)
+        .rangeAgainst(today);
     final party = ref.watch(guestPartyControllerProvider);
-    final RoomAvailabilityState availability =
-        ref.watch(roomAvailabilityControllerProvider);
-    final AsyncValue<Hotel> hotelAsync = ref.watch(hotelDetailProvider(hotelId));
+    final RoomAvailabilityState availability = ref.watch(
+      roomAvailabilityControllerProvider,
+    );
+    final AsyncValue<Hotel> hotelAsync = ref.watch(
+      hotelDetailProvider(hotelId),
+    );
     final RoomSelection? selection = ref.watch(roomSelectionControllerProvider);
 
     final AvailableRoom? room = switch (availability.result) {
       UiSuccess<AvailabilityResult>(:final AvailabilityResult data) =>
-        data.rooms.where((AvailableRoom r) => r.roomType.id == roomTypeId).firstOrNull,
+        data.rooms
+            .where((AvailableRoom r) => r.roomType.id == roomTypeId)
+            .firstOrNull,
       _ => null,
     };
 
@@ -63,7 +70,7 @@ class RoomDetailPage extends ConsumerWidget {
       return Scaffold(
         appBar: HotelAppBar(title: l10n.roomDetailsTitle),
         body: MessageView(
-          icon: Icons.meeting_room_outlined,
+          icon: AppIcons.room,
           title: l10n.reviewNoSelectionTitle,
           message: l10n.roomsNoResultsBody,
           actionLabel: l10n.reviewBackToRooms,
@@ -78,12 +85,15 @@ class RoomDetailPage extends ConsumerWidget {
       stay: stay,
       party: party,
     );
-    final bool isSelected = selection != null &&
+    final bool isSelected =
+        selection != null &&
         selection.matches(request) &&
         selection.roomTypeId == roomTypeId;
 
     void select() {
-      ref.read(roomSelectionControllerProvider.notifier).select(
+      ref
+          .read(roomSelectionControllerProvider.notifier)
+          .select(
             RoomSelection.fromAvailableRoom(
               room: room,
               hotelId: hotel.id,
@@ -110,7 +120,7 @@ class RoomDetailPage extends ConsumerWidget {
                 children: <Widget>[
                   PrimaryButton(
                     label: l10n.roomSelected,
-                    icon: Icons.check,
+                    icon: AppIcons.check,
                     onPressed: () => context.pop(),
                   ),
                   const SizedBox(height: AppSpacing.xs),
@@ -121,7 +131,9 @@ class RoomDetailPage extends ConsumerWidget {
                 ],
               )
             : PrimaryButton(
-                label: room.isAvailable ? l10n.roomSelectThisRoom : l10n.roomSoldOut,
+                label: room.isAvailable
+                    ? l10n.roomSelectThisRoom
+                    : l10n.roomSoldOut,
                 onPressed: room.isAvailable ? select : null,
               ),
       ),
@@ -156,7 +168,7 @@ class _Body extends StatelessWidget {
               width: double.infinity,
               height: 220,
               borderRadius: BorderRadius.zero,
-              icon: Icons.king_bed_outlined,
+              icon: AppIcons.bed,
             ),
           ),
         ),
@@ -168,14 +180,15 @@ class _Body extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Expanded(
-                    child: Text(type.name.resolve(locale),
-                        style: theme.textTheme.headlineSmall),
+                    child: Text(
+                      type.name.resolve(locale),
+                      style: theme.textTheme.headlineSmall,
+                    ),
                   ),
                   MoneyText(
                     room.nightlyRate.amount,
                     suffix: l10n.priceNightSuffix,
-                    semanticsLabel:
-                        l10n.pricePerNight(room.nightlyRate.amount),
+                    semanticsLabel: l10n.pricePerNight(room.nightlyRate.amount),
                   ),
                 ],
               ),
@@ -185,11 +198,11 @@ class _Body extends StatelessWidget {
                 runSpacing: AppSpacing.xs,
                 children: <Widget>[
                   _Spec(
-                    icon: Icons.person_outline,
+                    icon: AppIcons.guests,
                     label: l10n.roomOccupancy(type.maxOccupancy),
                   ),
                   _Spec(
-                    icon: Icons.king_bed_outlined,
+                    icon: AppIcons.bed,
                     label: type.bedType.resolve(locale),
                   ),
                 ],
@@ -212,15 +225,18 @@ class _Body extends StatelessWidget {
                     ),
                     Text(
                       l10n.priceStayTotal(room.stayTotal(stay.nights).amount),
-                      style: theme.textTheme.titleSmall
-                          ?.copyWith(color: semantic.accent),
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: semantic.accent,
+                      ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              Text(l10n.roomDetailAmenitiesHeading,
-                  style: theme.textTheme.titleMedium),
+              Text(
+                l10n.roomDetailAmenitiesHeading,
+                style: theme.textTheme.titleMedium,
+              ),
               const SizedBox(height: AppSpacing.xs),
               Text(
                 type.description.resolve(locale),
@@ -238,8 +254,10 @@ class _Body extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: AppSpacing.lg),
-              Text(l10n.roomDetailCancellationHeading,
-                  style: theme.textTheme.titleMedium),
+              Text(
+                l10n.roomDetailCancellationHeading,
+                style: theme.textTheme.titleMedium,
+              ),
               const SizedBox(height: AppSpacing.xs),
               Text(
                 type.refundable
@@ -275,4 +293,3 @@ class _Spec extends StatelessWidget {
     );
   }
 }
-

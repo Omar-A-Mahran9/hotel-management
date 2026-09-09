@@ -7,23 +7,29 @@ import 'package:flutter/material.dart';
 /// future re-branding stay centralised (md/mobile/architecture.md §9,
 /// md/mobile/coding_rules.md §8).
 abstract final class AppColors {
-  // Brand — warm brown, taken from the Guest App design references.
-  static const Color brown900 = Color(0xFF2E2018);
-  static const Color brown700 = Color(0xFF4A3427);
-  static const Color brown500 = Color(0xFF5B4034);
-  static const Color brown300 = Color(0xFF8A6F5E);
+  // Brand — warm "oud" brown. Sampled from the rendered Figma boards
+  // (`mobile/design/*.png`): the primary CTA, the splash ground, the digital-key
+  // card, the selected chip and the price text all render at #513425.
+  static const Color brown900 = Color(0xFF3E2A1E); // deep / pressed
+  static const Color brown700 = Color(0xFF513425); // primary action, splash
+  static const Color brown500 = Color(0xFF6A4636); // hover / lighter fill
+  static const Color brown300 = Color(0xFF9A7C68); // muted brown
 
-  // Accent — bronze/gold used for prices and ratings.
-  static const Color bronze500 = Color(0xFFA9793F);
-  static const Color bronze200 = Color(0xFFE7D6BF);
+  // Accent — bronze/gold. Figma variable `color/accent/warm` = sand/400
+  // (#C6A15B) for fills & strokes only; a darker tone carries gold text
+  // (`color/accent/warm-fg`, ~4.97:1 on white).
+  static const Color bronze500 = Color(0xFF9C7238); // gold-toned text
+  static const Color bronze400 = Color(0xFFC6A15B); // stars / accent fills
+  static const Color bronze200 = Color(0xFFE7D8BD); // warm-sand surface
 
-  // Neutrals — warm paper background and near-black warm text.
-  static const Color ink900 = Color(0xFF1F1A17);
-  static const Color ink600 = Color(0xFF6F655E);
-  static const Color ink400 = Color(0xFF9C938C);
-  static const Color paper = Color(0xFFF7F4EF);
+  // Neutrals — warm off-white ground, warm near-black text. Sampled:
+  // canvas #FCFAF7, text #1D1A16, secondary #847E72, hairline #E5E0D7.
+  static const Color ink900 = Color(0xFF1D1A16);
+  static const Color ink600 = Color(0xFF847E72);
+  static const Color ink400 = Color(0xFFA8A093);
+  static const Color paper = Color(0xFFFCFAF7);
   static const Color surface = Color(0xFFFFFFFF);
-  static const Color hairline = Color(0xFFE8E2D9);
+  static const Color hairline = Color(0xFFE5E0D7);
 
   // Dark theme neutrals.
   static const Color darkBackground = Color(0xFF16120F);
@@ -32,14 +38,15 @@ abstract final class AppColors {
   static const Color darkInk = Color(0xFFF3EEE8);
 
   // Semantic — success / warning / error / info, with soft container tints.
-  static const Color success = Color(0xFF3E8E5A);
-  static const Color successContainer = Color(0xFFE7F1EA);
-  static const Color warning = Color(0xFFB4802A);
-  static const Color warningContainer = Color(0xFFFBF3E3);
-  static const Color error = Color(0xFFB3352F);
-  static const Color errorContainer = Color(0xFFFBEAEA);
-  static const Color info = Color(0xFF3A6C99);
-  static const Color infoContainer = Color(0xFFE8F0F6);
+  // Foregrounds & backgrounds sampled from the rendered Figma banners/pills.
+  static const Color success = Color(0xFF256349);
+  static const Color successContainer = Color(0xFFEAF3EF);
+  static const Color warning = Color(0xFF9C6F2A);
+  static const Color warningContainer = Color(0xFFF9F1E4);
+  static const Color error = Color(0xFFA33A3A);
+  static const Color errorContainer = Color(0xFFFAEBEB);
+  static const Color info = Color(0xFF4E7C90);
+  static const Color infoContainer = Color(0xFFEAF1F5);
 
   static const Color white = Color(0xFFFFFFFF);
 }
@@ -119,9 +126,17 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     if (other is! AppSemanticColors) return this;
     return AppSemanticColors(
       success: Color.lerp(success, other.success, t)!,
-      successContainer: Color.lerp(successContainer, other.successContainer, t)!,
+      successContainer: Color.lerp(
+        successContainer,
+        other.successContainer,
+        t,
+      )!,
       warning: Color.lerp(warning, other.warning, t)!,
-      warningContainer: Color.lerp(warningContainer, other.warningContainer, t)!,
+      warningContainer: Color.lerp(
+        warningContainer,
+        other.warningContainer,
+        t,
+      )!,
       info: Color.lerp(info, other.info, t)!,
       infoContainer: Color.lerp(infoContainer, other.infoContainer, t)!,
       accent: Color.lerp(accent, other.accent, t)!,

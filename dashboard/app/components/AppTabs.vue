@@ -1,11 +1,11 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="K extends string">
 interface Tab {
-  key: string
+  key: K
   label: string
   count?: number | null
 }
 defineProps<{ tabs: Tab[] }>()
-const model = defineModel<string>({ required: true })
+const model = defineModel<K>({ required: true })
 </script>
 
 <template>

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'app_icons.dart';
+
 /// Standard app bar for the Guest App.
 ///
 /// Figma app bars are flat, background-aware (no Material surface tint or
@@ -55,7 +57,7 @@ class _DirectionalBackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool rtl = Directionality.of(context) == TextDirection.rtl;
     return IconButton(
-      icon: Icon(rtl ? Icons.arrow_forward_rounded : Icons.arrow_back_rounded),
+      icon: Icon(AppIcons.backFor(rtl ? TextDirection.rtl : TextDirection.ltr)),
       tooltip: MaterialLocalizations.of(context).backButtonTooltip,
       onPressed: () => Navigator.maybePop(context),
     );

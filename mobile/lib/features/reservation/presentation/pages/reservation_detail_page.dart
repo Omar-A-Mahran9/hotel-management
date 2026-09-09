@@ -22,6 +22,7 @@ import '../../domain/entities/reservation_status.dart';
 import '../state/reservation_detail_provider.dart';
 import '../widgets/reservation_status_pill.dart';
 import '../widgets/reservation_summary_card.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// Confirmation + details for one reservation (`03 · Pay & Verify` /
 /// `08 · Room selection & stay actions` — "تم التحقق وتأكيد حجزك"). This is the
@@ -35,18 +36,20 @@ class ReservationDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
-    final AsyncValue<Reservation> async =
-        ref.watch(reservationDetailProvider(reservationId));
+    final AsyncValue<Reservation> async = ref.watch(
+      reservationDetailProvider(reservationId),
+    );
 
     return Scaffold(
       appBar: HotelAppBar(title: l10n.reservationDetailTitle),
       body: SafeArea(
         child: async.when(
-          loading: () => Center(child: LoadingView(label: l10n.stateLoadingTitle)),
+          loading: () =>
+              Center(child: LoadingView(label: l10n.stateLoadingTitle)),
           error: (Object error, StackTrace _) {
             final failure = ErrorMapper.toFailure(error);
             return MessageView(
-              icon: Icons.receipt_long_outlined,
+              icon: AppIcons.invoice,
               title: l10n.reservationNotFoundTitle,
               message: failure.localizedMessage(l10n),
               actionLabel: l10n.actionRetry,
@@ -95,8 +98,10 @@ class _Body extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(l10n.reservationReferenceLabel,
-                  style: theme.textTheme.bodySmall),
+              Text(
+                l10n.reservationReferenceLabel,
+                style: theme.textTheme.bodySmall,
+              ),
               const SizedBox(height: AppSpacing.xxs),
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -121,8 +126,10 @@ class _Body extends StatelessWidget {
               Row(
                 children: <Widget>[
                   Expanded(
-                    child: Text(l10n.reservationStatusFieldLabel,
-                        style: theme.textTheme.bodySmall),
+                    child: Text(
+                      l10n.reservationStatusFieldLabel,
+                      style: theme.textTheme.bodySmall,
+                    ),
                   ),
                   ReservationStatusPill(status: reservation.status),
                 ],
@@ -131,8 +138,10 @@ class _Body extends StatelessWidget {
               Row(
                 children: <Widget>[
                   Expanded(
-                    child: Text(l10n.reservationBookedOnLabel,
-                        style: theme.textTheme.bodySmall),
+                    child: Text(
+                      l10n.reservationBookedOnLabel,
+                      style: theme.textTheme.bodySmall,
+                    ),
                   ),
                   Text(
                     ml.formatMediumDate(reservation.createdAt),
@@ -155,7 +164,7 @@ class _Body extends StatelessWidget {
         const SizedBox(height: AppSpacing.md),
         PrimaryButton(
           label: l10n.reservationPayCta,
-          icon: Icons.payments_outlined,
+          icon: AppIcons.payment,
           onPressed: () => context.pushNamed(
             AppRoutes.paymentReviewName,
             pathParameters: <String, String>{'reservationId': reservation.id},
@@ -164,7 +173,7 @@ class _Body extends StatelessWidget {
         const SizedBox(height: AppSpacing.xs),
         SecondaryButton(
           label: l10n.reservationVerifyIdentityCta,
-          icon: Icons.badge_outlined,
+          icon: AppIcons.identity,
           onPressed: () => context.pushNamed(
             AppRoutes.identityVerificationName,
             pathParameters: <String, String>{'reservationId': reservation.id},
@@ -173,7 +182,7 @@ class _Body extends StatelessWidget {
         const SizedBox(height: AppSpacing.xs),
         SecondaryButton(
           label: l10n.reservationCheckInCta,
-          icon: Icons.meeting_room_outlined,
+          icon: AppIcons.room,
           onPressed: () => context.pushNamed(
             AppRoutes.checkInName,
             pathParameters: <String, String>{'reservationId': reservation.id},
@@ -182,7 +191,7 @@ class _Body extends StatelessWidget {
         const SizedBox(height: AppSpacing.xs),
         SecondaryButton(
           label: l10n.reservationServicesCta,
-          icon: Icons.room_service_outlined,
+          icon: AppIcons.roomService,
           onPressed: () => context.pushNamed(
             AppRoutes.stayServicesName,
             pathParameters: <String, String>{'reservationId': reservation.id},
@@ -191,7 +200,7 @@ class _Body extends StatelessWidget {
         const SizedBox(height: AppSpacing.xs),
         SecondaryButton(
           label: l10n.reservationCheckoutCta,
-          icon: Icons.logout_outlined,
+          icon: AppIcons.checkout,
           onPressed: () => context.pushNamed(
             AppRoutes.checkoutName,
             pathParameters: <String, String>{'reservationId': reservation.id},
@@ -222,8 +231,9 @@ class _CompletedStayActions extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     if (!_isCompletedStay) return const SizedBox.shrink();
     final AppLocalizations l10n = context.l10n;
-    final AsyncValue<Review?> review =
-        ref.watch(reservationReviewProvider(reservation.id));
+    final AsyncValue<Review?> review = ref.watch(
+      reservationReviewProvider(reservation.id),
+    );
     final bool hasReview = review.valueOrNull != null;
 
     return Column(
@@ -231,7 +241,7 @@ class _CompletedStayActions extends ConsumerWidget {
         const SizedBox(height: AppSpacing.xs),
         SecondaryButton(
           label: l10n.reservationLoyaltyCta,
-          icon: Icons.card_giftcard_outlined,
+          icon: AppIcons.loyalty,
           onPressed: () => context.pushNamed(
             AppRoutes.loyaltyName,
             pathParameters: <String, String>{'reservationId': reservation.id},
@@ -242,7 +252,7 @@ class _CompletedStayActions extends ConsumerWidget {
           label: hasReview
               ? l10n.reservationViewReviewCta
               : l10n.reservationReviewCta,
-          icon: Icons.rate_review_outlined,
+          icon: AppIcons.review,
           onPressed: () => context.pushNamed(
             AppRoutes.reviewFormName,
             pathParameters: <String, String>{'reservationId': reservation.id},

@@ -21,6 +21,7 @@ import '../state/check_in_controller.dart';
 import '../state/digital_access_providers.dart';
 import '../widgets/access_credential_card.dart';
 import '../widgets/access_status_pill.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// `04 · Check in & Stay` — the digital room-key screen.
 ///
@@ -36,16 +37,17 @@ class DigitalAccessPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
-    final AsyncValue<AccessGrant> grantAsync =
-        ref.watch(accessGrantProvider(reservationId));
+    final AsyncValue<AccessGrant> grantAsync = ref.watch(
+      accessGrantProvider(reservationId),
+    );
     final CheckInActionState action = ref.watch(checkInControllerProvider);
 
     // A just-completed check-in action can carry a fresher grant than a cached
     // fetch — prefer it when it targets this reservation.
     final AccessGrant? fromAction =
         action is CheckInDone && action.request.reservationId == reservationId
-            ? action.result.grant
-            : null;
+        ? action.result.grant
+        : null;
 
     return Scaffold(
       appBar: HotelAppBar(title: l10n.accessTitle),
@@ -57,16 +59,18 @@ class DigitalAccessPage extends ConsumerWidget {
           error: (Object error, StackTrace _) {
             final failure = ErrorMapper.toFailure(error);
             return MessageView(
-              icon: Icons.vpn_key_outlined,
+              icon: AppIcons.key,
               title: l10n.accessUnavailableTitle,
               message: failure.localizedMessage(l10n),
               actionLabel: l10n.actionRetry,
-              onAction: () => ref.invalidate(accessGrantProvider(reservationId)),
+              onAction: () =>
+                  ref.invalidate(accessGrantProvider(reservationId)),
             );
           },
           data: (AccessGrant grant) {
-            final AccessGrant shown =
-                (fromAction != null && !grant.isActive) ? fromAction : grant;
+            final AccessGrant shown = (fromAction != null && !grant.isActive)
+                ? fromAction
+                : grant;
             return _Body(grant: shown, reservationId: reservationId);
           },
         ),
@@ -87,14 +91,14 @@ class _Body extends ConsumerWidget {
     final ThemeData theme = Theme.of(context);
 
     void backToReservation() => context.goNamed(
-          AppRoutes.reservationDetailName,
-          pathParameters: <String, String>{'reservationId': reservationId},
-        );
+      AppRoutes.reservationDetailName,
+      pathParameters: <String, String>{'reservationId': reservationId},
+    );
 
     void toCheckIn() => context.pushReplacementNamed(
-          AppRoutes.checkInName,
-          pathParameters: <String, String>{'reservationId': reservationId},
-        );
+      AppRoutes.checkInName,
+      pathParameters: <String, String>{'reservationId': reservationId},
+    );
 
     void retryCheckIn() {
       ref
@@ -116,8 +120,10 @@ class _Body extends ConsumerWidget {
                 Row(
                   children: <Widget>[
                     Expanded(
-                      child: Text(l10n.accessCheckedInTitle,
-                          style: theme.textTheme.titleLarge),
+                      child: Text(
+                        l10n.accessCheckedInTitle,
+                        style: theme.textTheme.titleLarge,
+                      ),
                     ),
                     AccessStatusPill(status: grant.status),
                   ],
@@ -132,56 +138,67 @@ class _Body extends ConsumerWidget {
               ],
             ),
           ),
-          _BottomAction(label: l10n.accessBackToReservation, onPressed: backToReservation),
+          _BottomAction(
+            label: l10n.accessBackToReservation,
+            onPressed: backToReservation,
+          ),
         ],
       );
     }
 
     // Non-active states → a tinted result banner + the right recovery action.
-    final (InfoBannerTone tone, String title, String body, Widget action) =
-        switch (grant.status) {
+    final (
+      InfoBannerTone tone,
+      String title,
+      String body,
+      Widget action,
+    ) = switch (grant.status) {
       AccessStatus.failed => (
-          InfoBannerTone.error,
-          l10n.checkInFailedTitle,
-          l10n.checkInFailedBody,
-          _TwoActions(
-            primaryLabel: l10n.checkInRetryCta,
-            onPrimary: retryCheckIn,
-            secondaryLabel: l10n.accessBackToReservation,
-            onSecondary: backToReservation,
-          ),
+        InfoBannerTone.error,
+        l10n.checkInFailedTitle,
+        l10n.checkInFailedBody,
+        _TwoActions(
+          primaryLabel: l10n.checkInRetryCta,
+          onPrimary: retryCheckIn,
+          secondaryLabel: l10n.accessBackToReservation,
+          onSecondary: backToReservation,
         ),
+      ),
       AccessStatus.issueRequested || AccessStatus.revokeRequested => (
-          InfoBannerTone.warning,
-          l10n.checkInPendingTitle,
-          l10n.checkInPendingBody,
-          _TwoActions(
-            primaryLabel: l10n.actionCheckAgain,
-            onPrimary: () => ref.invalidate(accessGrantProvider(reservationId)),
-            secondaryLabel: l10n.accessBackToReservation,
-            onSecondary: backToReservation,
-          ),
+        InfoBannerTone.warning,
+        l10n.checkInPendingTitle,
+        l10n.checkInPendingBody,
+        _TwoActions(
+          primaryLabel: l10n.actionCheckAgain,
+          onPrimary: () => ref.invalidate(accessGrantProvider(reservationId)),
+          secondaryLabel: l10n.accessBackToReservation,
+          onSecondary: backToReservation,
         ),
+      ),
       AccessStatus.revoked => (
-          InfoBannerTone.error,
-          l10n.accessRevokedTitle,
-          l10n.accessRevokedBody,
-          _BottomAction(
-              label: l10n.accessBackToReservation, onPressed: backToReservation),
+        InfoBannerTone.error,
+        l10n.accessRevokedTitle,
+        l10n.accessRevokedBody,
+        _BottomAction(
+          label: l10n.accessBackToReservation,
+          onPressed: backToReservation,
         ),
+      ),
       AccessStatus.expired => (
-          InfoBannerTone.info,
-          l10n.accessExpiredTitle,
-          l10n.accessExpiredBody,
-          _BottomAction(
-              label: l10n.accessBackToReservation, onPressed: backToReservation),
+        InfoBannerTone.info,
+        l10n.accessExpiredTitle,
+        l10n.accessExpiredBody,
+        _BottomAction(
+          label: l10n.accessBackToReservation,
+          onPressed: backToReservation,
         ),
+      ),
       _ => (
-          InfoBannerTone.info,
-          l10n.accessNotIssuedTitle,
-          l10n.accessNotIssuedBody,
-          _BottomAction(label: l10n.reservationCheckInCta, onPressed: toCheckIn),
-        ),
+        InfoBannerTone.info,
+        l10n.accessNotIssuedTitle,
+        l10n.accessNotIssuedBody,
+        _BottomAction(label: l10n.reservationCheckInCta, onPressed: toCheckIn),
+      ),
     };
 
     return Column(
@@ -194,8 +211,10 @@ class _Body extends ConsumerWidget {
             detail: Row(
               children: <Widget>[
                 Expanded(
-                  child: Text(l10n.reservationStatusFieldLabel,
-                      style: theme.textTheme.bodySmall),
+                  child: Text(
+                    l10n.reservationStatusFieldLabel,
+                    style: theme.textTheme.bodySmall,
+                  ),
                 ),
                 AccessStatusPill(status: grant.status),
               ],

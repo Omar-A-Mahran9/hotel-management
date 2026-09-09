@@ -20,6 +20,7 @@ import '../../domain/entities/payment_request.dart';
 import '../state/payment_controller.dart';
 import '../state/payment_providers.dart';
 import '../widgets/payment_summary_card.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// `03 · Pay & Verify` — review the deposit hold before requesting it.
 ///
@@ -35,10 +36,12 @@ class PaymentReviewPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
-    final AsyncValue<Reservation> reservationAsync =
-        ref.watch(reservationDetailProvider(reservationId));
-    final AsyncValue<Payment> paymentAsync =
-        ref.watch(currentPaymentProvider(reservationId));
+    final AsyncValue<Reservation> reservationAsync = ref.watch(
+      reservationDetailProvider(reservationId),
+    );
+    final AsyncValue<Payment> paymentAsync = ref.watch(
+      currentPaymentProvider(reservationId),
+    );
 
     return Scaffold(
       appBar: HotelAppBar(title: l10n.paymentReviewTitle),
@@ -51,7 +54,7 @@ class PaymentReviewPage extends ConsumerWidget {
           error: (Object error) {
             final failure = ErrorMapper.toFailure(error);
             return MessageView(
-              icon: Icons.payments_outlined,
+              icon: AppIcons.payment,
               title: l10n.paymentUnavailableTitle,
               message: failure.localizedMessage(l10n),
               actionLabel: l10n.actionRetry,
@@ -61,10 +64,8 @@ class PaymentReviewPage extends ConsumerWidget {
               },
             );
           },
-          data: (Reservation reservation, Payment payment) => _Body(
-            reservation: reservation,
-            payment: payment,
-          ),
+          data: (Reservation reservation, Payment payment) =>
+              _Body(reservation: reservation, payment: payment),
         ),
       ),
     );
@@ -94,8 +95,9 @@ class _Body extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
     final ThemeData theme = Theme.of(context);
-    final PaymentHoldRequest request =
-        PaymentHoldRequest.forReservation(reservation);
+    final PaymentHoldRequest request = PaymentHoldRequest.forReservation(
+      reservation,
+    );
     final PaymentActionState action = ref.watch(paymentControllerProvider);
 
     final bool secured = payment.status.isSecured;

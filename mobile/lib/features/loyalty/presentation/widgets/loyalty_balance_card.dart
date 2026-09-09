@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../domain/entities/loyalty_account.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// The brown points-balance card (`14 · Entry, loyalty & completion`). Shows the
 /// **backend** balance and the group-wide copy — no tier, no rate, no
@@ -31,7 +32,9 @@ class LoyaltyBalanceCard extends StatelessWidget {
         children: <Widget>[
           Text(
             l10n.loyaltyBalanceLabel,
-            style: theme.textTheme.bodySmall?.copyWith(color: AppColors.bronze200),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppColors.bronze200,
+            ),
           ),
           const SizedBox(height: AppSpacing.xxs),
           Text(
@@ -46,13 +49,14 @@ class LoyaltyBalanceCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const Icon(Icons.groups_outlined, size: 15, color: AppColors.bronze200),
+              const Icon(AppIcons.guests, size: 15, color: AppColors.bronze200),
               const SizedBox(width: AppSpacing.xxs),
               Expanded(
                 child: Text(
                   l10n.loyaltyGroupWideNote,
-                  style: theme.textTheme.bodySmall
-                      ?.copyWith(color: AppColors.bronze200),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.bronze200,
+                  ),
                 ),
               ),
             ],

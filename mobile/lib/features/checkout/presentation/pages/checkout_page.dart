@@ -19,6 +19,7 @@ import '../../domain/entities/folio.dart';
 import '../state/checkout_controller.dart';
 import '../state/checkout_providers.dart';
 import '../widgets/folio_summary_card.dart';
+import '../../../../core/widgets/app_icons.dart';
 
 /// `05 · Depart & Invoice` screen 1 — review the outstanding amount before
 /// checkout. Shows the authoritative folio; the primary action settles it in
@@ -32,9 +33,12 @@ class CheckoutPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
-    final AsyncValue<Reservation> reservationAsync =
-        ref.watch(reservationDetailProvider(reservationId));
-    final AsyncValue<Folio> folioAsync = ref.watch(folioProvider(reservationId));
+    final AsyncValue<Reservation> reservationAsync = ref.watch(
+      reservationDetailProvider(reservationId),
+    );
+    final AsyncValue<Folio> folioAsync = ref.watch(
+      folioProvider(reservationId),
+    );
 
     return Scaffold(
       appBar: HotelAppBar(title: l10n.checkoutTitle),
@@ -45,7 +49,7 @@ class CheckoutPage extends ConsumerWidget {
           loading: () =>
               Center(child: LoadingView(label: l10n.stateLoadingTitle)),
           error: (Object e) => MessageView(
-            icon: Icons.logout_outlined,
+            icon: AppIcons.checkout,
             title: l10n.checkoutUnavailableTitle,
             message: ErrorMapper.toFailure(e).localizedMessage(l10n),
             actionLabel: l10n.actionRetry,
@@ -94,7 +98,8 @@ class _Body extends ConsumerWidget {
     final AppLocalizations l10n = context.l10n;
     final ThemeData theme = Theme.of(context);
     final CheckoutActionState action = ref.watch(checkoutControllerProvider);
-    final bool submitting = action is CheckoutSubmitting &&
+    final bool submitting =
+        action is CheckoutSubmitting &&
         action.request.reservationId == reservation.id;
     final bool eligible = _canCheckout.contains(reservation.status);
 
@@ -106,8 +111,9 @@ class _Body extends ConsumerWidget {
             children: <Widget>[
               InfoBanner(
                 tone: eligible ? InfoBannerTone.info : InfoBannerTone.warning,
-                title:
-                    eligible ? l10n.checkoutReadyTitle : l10n.checkoutNotReadyTitle,
+                title: eligible
+                    ? l10n.checkoutReadyTitle
+                    : l10n.checkoutNotReadyTitle,
                 message: eligible
                     ? l10n.checkoutReadyBody
                     : l10n.checkoutNotReadyBody,

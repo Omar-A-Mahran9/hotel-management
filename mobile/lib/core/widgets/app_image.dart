@@ -133,23 +133,13 @@ class _Fallback extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Figma renders unfilled image slots as a plain warm-grey box — match that
+    // rather than a branded gradient.
     return Container(
       width: width,
       height: height,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: <Color>[AppColors.brown500, AppColors.brown300],
-        ),
-      ),
-      child: Center(
-        child: Icon(
-          icon,
-          size: 28,
-          color: AppColors.white.withValues(alpha: 0.6),
-        ),
-      ),
+      color: AppColors.bronze200.withValues(alpha: 0.45),
+      child: Center(child: Icon(icon, size: 26, color: AppColors.ink400)),
     );
   }
 }
