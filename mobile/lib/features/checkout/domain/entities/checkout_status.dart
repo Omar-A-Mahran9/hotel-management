@@ -1,7 +1,7 @@
 /// The checkout process lifecycle, mirroring the Laravel `Checkout` status
 /// vocabulary **exactly** (backend `App\Domain\Checkout\Models\Checkout`
 /// constants and `CheckoutStateMachine`; Phase 0 §12). No new statuses are
-/// invented (md/mobile/architecture.md §6).
+/// invented (mobile/docs/architecture.md §6).
 ///
 /// ```
 /// in_progress ─┐

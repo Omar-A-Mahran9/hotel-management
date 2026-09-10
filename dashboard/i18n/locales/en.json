@@ -93,7 +93,10 @@
     "comingSoon": "Awaiting backend endpoint",
     "menu": "Menu",
     "expand": "Expand sidebar",
-    "collapse": "Collapse sidebar"
+    "collapse": "Collapse sidebar",
+    "locations": "Locations",
+    "countries": "Countries",
+    "cities": "Cities"
   },
   "auth": {
     "loginTitle": "Sign in",
@@ -648,5 +651,64 @@
   "theme": {
     "light": "Light",
     "dark": "Dark"
+  },
+  "locations": {
+    "title": "Locations",
+    "country": "Country",
+    "city": "City",
+    "selectCountry": "Select a country",
+    "selectCity": "Select a city",
+    "selectCountryFirst": "Select a country first",
+    "noCountries": "No countries found",
+    "noCities": "No cities found",
+    "code": "Code",
+    "status": "Status"
+  },
+  "countries": {
+    "title": "Countries",
+    "subtitle": "Global country reference data used across hotels, discovery and search.",
+    "nameEn": "Name (English)",
+    "nameAr": "Name (Arabic)",
+    "code": "Code",
+    "codeHint": "Short unique code, e.g. EG. Stored upper-case.",
+    "status": "Status",
+    "cities": "Cities",
+    "citiesCount": "{count} cities",
+    "new": "Add country",
+    "newDesc": "Create a country. Cities are added from the Cities screen.",
+    "editTitle": "Edit country",
+    "editTitleNamed": "Edit {name}",
+    "createAction": "Create country",
+    "created": "Country created.",
+    "updated": "Country updated.",
+    "deleted": "Country deleted.",
+    "activated": "Country activated.",
+    "deactivated": "Country deactivated.",
+    "deleteConfirm": "Delete “{name}”? This is only possible when no city or hotel references it.",
+    "filterStatus": "Status",
+    "searchPlaceholder": "Search by name or code"
+  },
+  "cities": {
+    "title": "Cities",
+    "subtitle": "Cities belong to a country and are referenced by hotels.",
+    "country": "Country",
+    "nameEn": "Name (English)",
+    "nameAr": "Name (Arabic)",
+    "status": "Status",
+    "new": "Add city",
+    "newDesc": "Create a city under a country.",
+    "editTitle": "Edit city",
+    "editTitleNamed": "Edit {name}",
+    "createAction": "Create city",
+    "created": "City created.",
+    "updated": "City updated.",
+    "deleted": "City deleted.",
+    "activated": "City activated.",
+    "deactivated": "City deactivated.",
+    "deleteConfirm": "Delete “{name}”? This is only possible when no hotel references it.",
+    "filterCountry": "Country",
+    "filterStatus": "Status",
+    "allCountries": "All countries",
+    "searchPlaceholder": "Search cities"
   }
 }

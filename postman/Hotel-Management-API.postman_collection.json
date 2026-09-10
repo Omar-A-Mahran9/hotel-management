@@ -1,7 +1,7 @@
 {
   "info": {
     "_postman_id": "51ad8dfc-71b5-43b5-ae25-1a80387b705b",
-    "name": "Hotel Management API \u2014 Phase 1",
+    "name": "Hotel Management API — Phase 1",
     "description": "Phase 1 (Foundation / RBAC) endpoints for the Hotel Group Management Platform API, generated directly from the current Laravel routes, Form Requests, and API Resources under /api/v1. Only endpoints that exist in the codebase today are included. Collection-level auth is Bearer {{access_token}}, populated automatically by the Login request.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "0"
@@ -69,7 +69,7 @@
                 "login"
               ]
             },
-            "description": "Authenticates a staff user (Group Owner / Hotel Manager / Reception) via App\\Http\\Controllers\\Api\\V1\\AuthController::login. Body validated by LoginRequest: email (required, string, email:filter), password (required, string). On success, issues a Sanctum bearer token and saves it to {{access_token}}.\n\nThe seeded local Group Owner (php artisan db:seed, local environment only) is owner@example.com / password \u2014 adjust to a real account for other environments."
+            "description": "Authenticates a staff user (Group Owner / Hotel Manager / Reception) via App\\Http\\Controllers\\Api\\V1\\AuthController::login. Body validated by LoginRequest: email (required, string, email:filter), password (required, string). On success, issues a Sanctum bearer token and saves it to {{access_token}}.\n\nThe seeded local Group Owner (php artisan db:seed, local environment only) is owner@example.com / password — adjust to a real account for other environments."
           },
           "response": []
         },
@@ -150,7 +150,7 @@
                 "logout"
               ]
             },
-            "description": "Revokes the current Sanctum access token (App\\Http\\Controllers\\Api\\V1\\AuthController::logout). Requires auth:sanctum. After this call, {{access_token}} is no longer valid \u2014 run Login again before further requests."
+            "description": "Revokes the current Sanctum access token (App\\Http\\Controllers\\Api\\V1\\AuthController::logout). Requires auth:sanctum. After this call, {{access_token}} is no longer valid — run Login again before further requests."
           },
           "response": []
         }
@@ -342,7 +342,7 @@
           "response": []
         }
       ],
-      "description": "HotelGroupController: R1 \"one owning entity, one control plane\" \u2014 Group-Owner-only management of Hotel Groups."
+      "description": "HotelGroupController: R1 \"one owning entity, one control plane\" — Group-Owner-only management of Hotel Groups."
     },
     {
       "name": "Hotels",
@@ -382,7 +382,7 @@
                 "hotels"
               ]
             },
-            "description": "App\\Http\\Controllers\\Api\\V1\\HotelController::index. Requires hotels.view. Results are always resolved from the authenticated user's own hotel access (Group Owner sees all; Hotel Manager/Reception see only their assigned hotels) \u2014 never from a client-supplied parameter."
+            "description": "App\\Http\\Controllers\\Api\\V1\\HotelController::index. Requires hotels.view. Results are always resolved from the authenticated user's own hotel access (Group Owner sees all; Hotel Manager/Reception see only their assigned hotels) — never from a client-supplied parameter."
           },
           "response": []
         },
@@ -424,7 +424,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"hotel_group_id\": {{hotel_group_id}},\n    \"name\": \"Hotel A\",\n    \"slug\": \"hotel-a\",\n    \"country\": \"US\",\n    \"city\": \"New York\",\n    \"timezone\": \"UTC\",\n    \"is_active\": true\n}"
+              "raw": "{\n    \"hotel_group_id\": {{hotel_group_id}},\n    \"name\": \"Hotel A\",\n    \"slug\": \"hotel-a\",\n    \"country_id\": {{country_id}},\n    \"city_id\": {{city_id}},\n    \"timezone\": \"UTC\",\n    \"is_active\": true\n}"
             },
             "url": {
               "raw": "{{base_url}}/hotels",
@@ -435,7 +435,7 @@
                 "hotels"
               ]
             },
-            "description": "App\\Http\\Controllers\\Api\\V1\\HotelController::store. Validated by StoreHotelRequest: hotel_group_id (required, integer, exists:hotel_groups,id), name (required, string, max:255), slug (required, string, max:255, alpha_dash, unique:hotels,slug), country (nullable, string), city (nullable, string), timezone (optional, string, max:64), is_active (optional, boolean). Requires hotels.manage (Group Owner only). Saves the created id to {{hotel_id}}. Run \"Create Hotel Group\" first so {{hotel_group_id}} is set."
+            "description": "App\\Http\\Controllers\\Api\\V1\\HotelController::store. Validated by StoreHotelRequest: hotel_group_id (required, integer, exists:hotel_groups,id), name (required, string, max:255), slug (required, string, max:255, alpha_dash, unique:hotels,slug), country (nullable, string), city (nullable, string), timezone (optional, string, max:64), is_active (optional, boolean). Requires hotels.manage (Group Owner only). Saves the created id to {{hotel_id}}. Run \"Create Hotel Group\" first so {{hotel_group_id}} is set. NOW REQUIRES country_id (exists:countries,id) + city_id (exists:cities,id); the city must belong to the country or the response is 422 on city_id. Run \"Create Country\" then \"Create City\" first. Legacy country/city strings are synced server-side."
           },
           "response": []
         },
@@ -511,7 +511,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"city\": \"Brooklyn\"\n}"
+              "raw": "{\n    \"name\": \"Hotel A (updated)\",\n    \"country_id\": {{country_id}},\n    \"city_id\": {{city_id}}\n}"
             },
             "url": {
               "raw": "{{base_url}}/hotels/{{hotel_id}}",
@@ -523,12 +523,854 @@
                 "{{hotel_id}}"
               ]
             },
-            "description": "App\\Http\\Controllers\\Api\\V1\\HotelController::update. Validated by UpdateHotelRequest (all fields \"sometimes\", same rules as create, slug uniqueness ignores the current record). Requires hotels.manage (Group Owner only)."
+            "description": "App\\Http\\Controllers\\Api\\V1\\HotelController::update. Validated by UpdateHotelRequest (all fields \"sometimes\", same rules as create, slug uniqueness ignores the current record). Requires hotels.manage (Group Owner only). country_id (required, exists:countries,id) and city_id (required, exists:cities,id) — the selected city MUST belong to the selected country or the request is a 422 on city_id. Legacy country/city strings are kept in sync server-side."
           },
           "response": []
         }
       ],
-      "description": "HotelController: hotel-scope isolation enforced server-side via the authenticated user's own stored hotel access \u2014 a client-supplied hotel_id can select which hotel to view, never widen what is authorized."
+      "description": "HotelController: hotel-scope isolation enforced server-side via the authenticated user's own stored hotel access — a client-supplied hotel_id can select which hotel to view, never widen what is authorized."
+    },
+    {
+      "name": "Country Management",
+      "item": [
+        {
+          "name": "List Countries",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "var d = pm.response.json();",
+                  "pm.test(\"paginated envelope\", () => { pm.expect(d.success).to.eql(true); pm.expect(d.data).to.be.an(\"array\"); pm.expect(d.meta).to.have.property(\"current_page\"); });",
+                  "if (d.data[0]) pm.collectionVariables.set(\"country_id\", d.data[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/countries",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "countries"
+              ]
+            },
+            "description": "CountryController::index. Requires locations.view. Filters: search, is_active, page, per_page (explicit allow-list)."
+          },
+          "response": []
+        },
+        {
+          "name": "Search Countries",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"filtered\", () => pm.expect(pm.response.json().data).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/countries?search=egy&is_active=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "countries"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "egy"
+                },
+                {
+                  "key": "is_active",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Server-side search over name_en / name_ar / code, plus is_active filter."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Country",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"201\", () => pm.response.to.have.status(201));",
+                  "var d = pm.response.json();",
+                  "pm.test(\"code normalized upper-case\", () => pm.expect(d.data.code).to.eql(\"TL\"));",
+                  "pm.collectionVariables.set(\"country_id\", d.data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/countries",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "countries"
+              ]
+            },
+            "description": "CountryController::store (StoreCountryRequest). Requires locations.manage. code is unique and stored upper-case.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name_en\": \"Testland\",\n    \"name_ar\": \"\\u0623\\u0631\\u0636 \\u0627\\u0644\\u0627\\u062e\\u062a\\u0628\\u0627\\u0631\",\n    \"code\": \"tl\",\n    \"is_active\": true\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Country — Duplicate Code (422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"422\", () => pm.response.to.have.status(422));",
+                  "pm.test(\"code error\", () => pm.expect(pm.response.json().errors).to.have.property(\"code\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/countries",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "countries"
+              ]
+            },
+            "description": "Duplicate code is rejected by the unique rule.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name_en\": \"Dupe\",\n    \"name_ar\": \"\\u0645\\u0643\\u0631\\u0631\",\n    \"code\": \"TL\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Country — Validation Error (422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"422\", () => pm.response.to.have.status(422));",
+                  "pm.test(\"required fields\", () => { var e = pm.response.json().errors; pm.expect(e).to.have.property(\"name_en\"); pm.expect(e).to.have.property(\"name_ar\"); pm.expect(e).to.have.property(\"code\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/countries",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "countries"
+              ]
+            },
+            "description": "name_en, name_ar, code are required.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Country",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"cities_count present\", () => pm.expect(pm.response.json().data).to.have.property(\"cities_count\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/countries/{{country_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "countries",
+                "{{country_id}}"
+              ]
+            },
+            "description": "CountryController::show. Returns cities_count."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Country",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"renamed\", () => pm.expect(pm.response.json().data.name_en).to.eql(\"Testland Renamed\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/countries/{{country_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "countries",
+                "{{country_id}}"
+              ]
+            },
+            "description": "CountryController::update (UpdateCountryRequest). is_active is NOT accepted here — use activate/deactivate.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name_en\": \"Testland Renamed\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deactivate Country",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"inactive\", () => pm.expect(pm.response.json().data.is_active).to.eql(false));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/countries/{{country_id}}/deactivate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "countries",
+                "{{country_id}}",
+                "deactivate"
+              ]
+            },
+            "description": "Distinct audited operation."
+          },
+          "response": []
+        },
+        {
+          "name": "Activate Country",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"active\", () => pm.expect(pm.response.json().data.is_active).to.eql(true));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/countries/{{country_id}}/activate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "countries",
+                "{{country_id}}",
+                "activate"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "Country → Cities (dependent select)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "var d = pm.response.json();",
+                  "pm.test(\"only this country's cities\", () => { pm.expect(d.data).to.be.an(\"array\"); d.data.forEach(x => pm.expect(x.country_id).to.eql(Number(pm.collectionVariables.get(\"country_id\")))); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/countries/{{country_id}}/cities",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "countries",
+                "{{country_id}}",
+                "cities"
+              ]
+            },
+            "description": "CityController::forCountry. Powers the dependent Country → City SelectBox. Always scoped to the route country."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Country",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/countries/{{country_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "countries",
+                "{{country_id}}"
+              ]
+            },
+            "description": "CountryController::destroy. Blocked (422) when the country still has cities or hotels."
+          },
+          "response": []
+        },
+        {
+          "name": "Authorization — Guest Denied (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/countries",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "countries"
+              ]
+            },
+            "description": "Run after \"Login as Guest\". A user without locations.view has no access."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "City Management",
+      "item": [
+        {
+          "name": "List Cities",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "var d = pm.response.json();",
+                  "pm.test(\"paginated + country summary\", () => { pm.expect(d.data).to.be.an(\"array\"); if (d.data[0]) pm.expect(d.data[0]).to.have.property(\"country\"); });",
+                  "if (d.data[0]) pm.collectionVariables.set(\"city_id\", d.data[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/cities",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cities"
+              ]
+            },
+            "description": "CityController::index. Requires locations.view. Filters: search, country_id, is_active, page, per_page."
+          },
+          "response": []
+        },
+        {
+          "name": "List Cities — Filter by Country",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"scoped\", () => pm.response.json().data.forEach(x => pm.expect(x.country_id).to.eql(Number(pm.collectionVariables.get(\"country_id\")))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/cities?country_id={{country_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cities"
+              ],
+              "query": [
+                {
+                  "key": "country_id",
+                  "value": "{{country_id}}"
+                }
+              ]
+            },
+            "description": "Server-side country_id filter."
+          },
+          "response": []
+        },
+        {
+          "name": "Search Cities",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/cities?search=cai",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cities"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "cai"
+                }
+              ]
+            },
+            "description": "Server-side search over name_en / name_ar."
+          },
+          "response": []
+        },
+        {
+          "name": "Create City",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"201\", () => pm.response.to.have.status(201));",
+                  "var d = pm.response.json();",
+                  "pm.collectionVariables.set(\"city_id\", d.data.id);",
+                  "pm.test(\"belongs to country\", () => pm.expect(d.data.country_id).to.eql(Number(pm.collectionVariables.get(\"country_id\"))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cities",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cities"
+              ]
+            },
+            "description": "CityController::store (StoreCityRequest). Requires locations.manage. name_en / name_ar unique within the country.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"country_id\": \"{{country_id}}\",\n    \"name_en\": \"Test City\",\n    \"name_ar\": \"\\u0645\\u062f\\u064a\\u0646\\u0629 \\u0627\\u0644\\u0627\\u062e\\u062a\\u0628\\u0627\\u0631\",\n    \"is_active\": true\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create City — Duplicate Within Country (422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"422\", () => pm.response.to.have.status(422));",
+                  "pm.test(\"name errors\", () => { var e = pm.response.json().errors; pm.expect(e).to.have.property(\"name_en\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cities",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cities"
+              ]
+            },
+            "description": "Same name twice in one country is rejected; the same name in another country is fine.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"country_id\": \"{{country_id}}\",\n    \"name_en\": \"Test City\",\n    \"name_ar\": \"\\u0645\\u062f\\u064a\\u0646\\u0629 \\u0627\\u0644\\u0627\\u062e\\u062a\\u0628\\u0627\\u0631\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create City — Unknown Country (422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"422\", () => pm.response.to.have.status(422));",
+                  "pm.test(\"country_id error\", () => pm.expect(pm.response.json().errors).to.have.property(\"country_id\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cities",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cities"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"country_id\": 999999,\n    \"name_en\": \"Nowhere\",\n    \"name_ar\": \"\\u0644\\u0627 \\u0645\\u0643\\u0627\\u0646\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get City",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"country summary\", () => pm.expect(pm.response.json().data.country).to.have.property(\"name_en\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/cities/{{city_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cities",
+                "{{city_id}}"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "Update City",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"renamed\", () => pm.expect(pm.response.json().data.name_en).to.eql(\"Test City Renamed\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cities/{{city_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cities",
+                "{{city_id}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name_en\": \"Test City Renamed\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deactivate City",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/cities/{{city_id}}/deactivate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cities",
+                "{{city_id}}",
+                "deactivate"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "Activate City",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/cities/{{city_id}}/activate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cities",
+                "{{city_id}}",
+                "activate"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "Delete City",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/cities/{{city_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cities",
+                "{{city_id}}"
+              ]
+            },
+            "description": "CityController::destroy. Blocked (422) when a hotel references the city."
+          },
+          "response": []
+        },
+        {
+          "name": "Authorization — Guest Denied (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/cities",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cities"
+              ]
+            },
+            "description": "Run after \"Login as Guest\"."
+          },
+          "response": []
+        }
+      ]
     },
     {
       "name": "Users",
@@ -741,7 +1583,7 @@
                 "{{user_id}}"
               ]
             },
-            "description": "App\\Http\\Controllers\\Api\\V1\\UserController::update. Validated by UpdateUserRequest (all fields \"sometimes\"; password nullable \u2014 omit or leave blank to keep the current password; hotel_ids, when supplied, replaces the user's hotel access). Requires users.manage (Group Owner only)."
+            "description": "App\\Http\\Controllers\\Api\\V1\\UserController::update. Validated by UpdateUserRequest (all fields \"sometimes\"; password nullable — omit or leave blank to keep the current password; hotel_ids, when supplied, replaces the user's hotel access). Requires users.manage (Group Owner only)."
           },
           "response": []
         },
@@ -786,7 +1628,7 @@
           "response": []
         }
       ],
-      "description": "UserController: staff account management, RBAC role assignment, and user_hotel_access \u2014 Group-Owner-only for create/update/delete; any user may view their own profile."
+      "description": "UserController: staff account management, RBAC role assignment, and user_hotel_access — Group-Owner-only for create/update/delete; any user may view their own profile."
     },
     {
       "name": "Roles & Permissions",
@@ -877,7 +1719,7 @@
                 "permissions"
               ]
             },
-            "description": "App\\Http\\Controllers\\Api\\V1\\PermissionController::index. Requires the permissions.view permission (Group Owner). Returns the fixed Phase 1 permission set seeded by RolePermissionSeeder. Saves the first permission's id to {{permission_id}} \u2014 no Phase 1 endpoint currently consumes a single permission id, this is kept for later phases."
+            "description": "App\\Http\\Controllers\\Api\\V1\\PermissionController::index. Requires the permissions.view permission (Group Owner). Returns the fixed Phase 1 permission set seeded by RolePermissionSeeder. Saves the first permission's id to {{permission_id}} — no Phase 1 endpoint currently consumes a single permission id, this is kept for later phases."
           },
           "response": []
         }
@@ -1042,7 +1884,7 @@
                 "login"
               ]
             },
-            "description": "Demo Guest \u2014 carries no inventory permissions in Phase 1/2. Saves {{guest_token}}.",
+            "description": "Demo Guest — carries no inventory permissions in Phase 1/2. Saves {{guest_token}}.",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"email\": \"guest@hotel.test\",\n    \"password\": \"Password123!\"\n}"
@@ -1086,7 +1928,7 @@
                 "hotels"
               ]
             },
-            "description": "Resolves {{hotel_id}} (Cairo \u2014 assigned to Manager/Reception) and {{other_hotel_id}} (Hurghada \u2014 assigned to Manager only, NOT Reception) from the demo dataset, for every scenario below.",
+            "description": "Resolves {{hotel_id}} (Cairo — assigned to Manager/Reception) and {{other_hotel_id}} (Hurghada — assigned to Manager only, NOT Reception) from the demo dataset, for every scenario below.",
             "auth": {
               "type": "noauth"
             }
@@ -1150,7 +1992,7 @@
           ]
         }
       ],
-      "description": "Logs in as each of the four demo roles and resolves the demo hotel ids \u2014 every later folder depends on running this one first."
+      "description": "Logs in as each of the four demo roles and resolves the demo hotel ids — every later folder depends on running this one first."
     },
     {
       "name": "02 Room Types",
@@ -1597,7 +2439,7 @@
                 "room-types"
               ]
             },
-            "description": "Same name as 'Create Room Type' above, same hotel \u2014 UNIQUE(hotel_id, name) violation surfaced as a clean 422.",
+            "description": "Same name as 'Create Room Type' above, same hotel — UNIQUE(hotel_id, name) violation surfaced as a clean 422.",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"name\": \"2D Verification Suite\",\n    \"base_price\": 100,\n    \"capacity\": 1\n}"
@@ -1988,7 +2830,7 @@
                 "room-types"
               ]
             },
-            "description": "Setup only \u2014 creates a Room Type that belongs to {{other_hotel_id}} (Hurghada), saved as {{other_room_type_id}}, so the next request can prove cross-hotel room_type_id is rejected.",
+            "description": "Setup only — creates a Room Type that belongs to {{other_hotel_id}} (Hurghada), saved as {{other_room_type_id}}, so the next request can prove cross-hotel room_type_id is rejected.",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"name\": \"2D Cross-Hotel Setup Type\",\n    \"base_price\": 90,\n    \"capacity\": 2\n}"
@@ -2037,7 +2879,7 @@
                 "rooms"
               ]
             },
-            "description": "{{other_room_type_id}} belongs to {{other_hotel_id}}, but this request targets {{hotel_id}} \u2014 RoomTypeHotelMismatchException, mapped to 422.",
+            "description": "{{other_room_type_id}} belongs to {{other_hotel_id}}, but this request targets {{hotel_id}} — RoomTypeHotelMismatchException, mapped to 422.",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"room_type_id\": \"{{other_room_type_id}}\",\n    \"room_number\": \"2D-CROSS\"\n}"
@@ -2356,7 +3198,7 @@
                 "status"
               ]
             },
-            "description": "PREREQUISITE: {{room_id}} must already be in `booked` status. Phase 2's API has no way to reach `booked` (by design), so set it directly for this check only: `UPDATE rooms SET status='booked' WHERE id = {{room_id}}`. Not a normal applicati\u00adon flow \u2014 verification-only.",
+            "description": "PREREQUISITE: {{room_id}} must already be in `booked` status. Phase 2's API has no way to reach `booked` (by design), so set it directly for this check only: `UPDATE rooms SET status='booked' WHERE id = {{room_id}}`. Not a normal applicati­on flow — verification-only.",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"status\": \"available\"\n}"
@@ -2407,7 +3249,7 @@
                 "status"
               ]
             },
-            "description": "Same prerequisite as the previous request \u2014 {{room_id}} must be manually set to `booked` in the database first.",
+            "description": "Same prerequisite as the previous request — {{room_id}} must be manually set to `booked` in the database first.",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"status\": \"under_maintenance\"\n}"
@@ -2509,7 +3351,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status 200 \u2014 Group Owner bypass applies to every hotel', () => pm.response.to.have.status(200));"
+                  "pm.test('Status 200 — Group Owner bypass applies to every hotel', () => pm.response.to.have.status(200));"
                 ]
               }
             }
@@ -2627,7 +3469,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status 200 \u2014 view-only access granted', () => pm.response.to.have.status(200));"
+                  "pm.test('Status 200 — view-only access granted', () => pm.response.to.have.status(200));"
                 ]
               }
             }
@@ -2749,7 +3591,7 @@
                 "{{room_id}}"
               ]
             },
-            "description": "{{room_id}} belongs to {{hotel_id}} (Cairo), addressed through {{other_hotel_id}} (Hurghada)'s URL. Route/tenancy consistency check \u2014 independent of the requester's own permissions.",
+            "description": "{{room_id}} belongs to {{hotel_id}} (Cairo), addressed through {{other_hotel_id}} (Hurghada)'s URL. Route/tenancy consistency check — independent of the requester's own permissions.",
             "auth": {
               "type": "noauth"
             }
@@ -2761,7 +3603,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status 404 \u2014 even for Group Owner', () => pm.response.to.have.status(404));",
+                  "pm.test('Status 404 — even for Group Owner', () => pm.response.to.have.status(404));",
                   "pm.test('Standard not-found envelope', () => {",
                   "    var json = pm.response.json();",
                   "    pm.expect(json.success).to.eql(false);",
@@ -2806,7 +3648,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status 404 \u2014 even for Group Owner', () => pm.response.to.have.status(404));",
+                  "pm.test('Status 404 — even for Group Owner', () => pm.response.to.have.status(404));",
                   "pm.test('Standard not-found envelope', () => {",
                   "    var json = pm.response.json();",
                   "    pm.expect(json.success).to.eql(false);",
@@ -3197,7 +4039,7 @@
                 "rooms"
               ]
             },
-            "description": "{{room_type_id}} belongs to {{hotel_id}} (Cairo), this request targets {{other_hotel_id}} (Hurghada) \u2014 RoomTypeHotelMismatchException.",
+            "description": "{{room_type_id}} belongs to {{hotel_id}} (Cairo), this request targets {{other_hotel_id}} (Hurghada) — RoomTypeHotelMismatchException.",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"room_type_id\": \"{{room_type_id}}\",\n    \"room_number\": \"2D-BIZ-EXC\"\n}"
@@ -3298,7 +4140,7 @@
                 "reservations"
               ]
             },
-            "description": "Saves {{reservation_id}} for the rest of the folder. REQUIRES {{guest_id}} to already be set to an existing `guests` table row id \u2014 there is no Guest API yet (Phase 3-Pre created only the model/migration/factory), so this must be created manually before running this request, e.g. via `php artisan tinker` -> App\\Domain\\Reservation\\Models\\Guest::factory()->create()->id.",
+            "description": "Saves {{reservation_id}} for the rest of the folder. REQUIRES {{guest_id}} to already be set to an existing `guests` table row id — there is no Guest API yet (Phase 3-Pre created only the model/migration/factory), so this must be created manually before running this request, e.g. via `php artisan tinker` -> App\\Domain\\Reservation\\Models\\Guest::factory()->create()->id.",
             "auth": {
               "type": "noauth"
             },
@@ -3435,7 +4277,7 @@
                 "reservations"
               ]
             },
-            "description": "Manager is assigned to the Cairo hotel {{hotel_id}} belongs to \u2014 create succeeds.",
+            "description": "Manager is assigned to the Cairo hotel {{hotel_id}} belongs to — create succeeds.",
             "auth": {
               "type": "noauth"
             },
@@ -3476,7 +4318,7 @@
                 "hotels"
               ]
             },
-            "description": "Manager (demo dataset) is assigned to Cairo + Hurghada but NOT Luxor \u2014 resolves {{luxor_hotel_id}} for the 'unassigned hotel' scenario below, since {{other_hotel_id}} (Hurghada) is also assigned to the Manager and cannot be used for that case.",
+            "description": "Manager (demo dataset) is assigned to Cairo + Hurghada but NOT Luxor — resolves {{luxor_hotel_id}} for the 'unassigned hotel' scenario below, since {{other_hotel_id}} (Hurghada) is also assigned to the Manager and cannot be used for that case.",
             "auth": {
               "type": "noauth"
             }
@@ -3569,7 +4411,7 @@
                 "reservations"
               ]
             },
-            "description": "Manager has no access to Luxor \u2014 denied even though hotel_id is only derived, never sent.",
+            "description": "Manager has no access to Luxor — denied even though hotel_id is only derived, never sent.",
             "auth": {
               "type": "noauth"
             },
@@ -3614,7 +4456,7 @@
                 "reservations"
               ]
             },
-            "description": "Reception has reservations.view but never reservations.manage (approved D4) \u2014 denied.",
+            "description": "Reception has reservations.view but never reservations.manage (approved D4) — denied.",
             "auth": {
               "type": "noauth"
             },
@@ -3704,7 +4546,7 @@
                 "reservations"
               ]
             },
-            "description": "hotel_id is silently stripped by the Form Request and re-derived from room_type_id \u2014 it can never widen or redirect access.",
+            "description": "hotel_id is silently stripped by the Form Request and re-derived from room_type_id — it can never widen or redirect access.",
             "auth": {
               "type": "noauth"
             },
@@ -3754,7 +4596,7 @@
                 "reservations"
               ]
             },
-            "description": "status/price_snapshot/created_by_staff_id/cancelled_at/cancellation_reason are all server-controlled (Phase 3B) \u2014 none are accepted by the Form Request.",
+            "description": "status/price_snapshot/created_by_staff_id/cancelled_at/cancellation_reason are all server-controlled (Phase 3B) — none are accepted by the Form Request.",
             "auth": {
               "type": "noauth"
             },
@@ -3854,7 +4696,7 @@
                 "reservations"
               ]
             },
-            "description": "room_type_id resolves to Cairo but room_id belongs to Hurghada \u2014 RoomHotelMismatchException, 422.",
+            "description": "room_type_id resolves to Cairo but room_id belongs to Hurghada — RoomHotelMismatchException, 422.",
             "auth": {
               "type": "noauth"
             },
@@ -3899,7 +4741,7 @@
                 "reservations"
               ]
             },
-            "description": "Structural validation only (approved D2) \u2014 not an availability check.",
+            "description": "Structural validation only (approved D2) — not an availability check.",
             "auth": {
               "type": "noauth"
             },
@@ -4041,7 +4883,7 @@
                 "reservations"
               ]
             },
-            "description": "Saves {{luxor_reservation_id}} \u2014 Owner can create anywhere, used to prove cross-hotel show() below.",
+            "description": "Saves {{luxor_reservation_id}} — Owner can create anywhere, used to prove cross-hotel show() below.",
             "auth": {
               "type": "noauth"
             },
@@ -4084,7 +4926,7 @@
                 "{{luxor_reservation_id}}"
               ]
             },
-            "description": "Manager has no access to Luxor. Approved D1: this returns 404, the same as a genuinely nonexistent id \u2014 never a 403 that would leak the reservation's existence.",
+            "description": "Manager has no access to Luxor. Approved D1: this returns 404, the same as a genuinely nonexistent id — never a 403 that would leak the reservation's existence.",
             "auth": {
               "type": "noauth"
             }
@@ -5092,6 +5934,340 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "14 Guest — Authentication",
+      "description": "Slice 0. Phone + OTP, separate `auth:guest` Sanctum guard. OTP endpoints are unauthenticated and rate limited (guest.otp.request 5/min, guest.otp.verify 10/min by phone). Wrong-code / lock-out are 200 outcomes. Dev: OTP_FIXED_CODE=123456.",
+      "item": [
+        {
+          "name": "Request OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/guest/auth/otp/request",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "guest",
+                "auth",
+                "otp",
+                "request"
+              ]
+            },
+            "description": "→ 200 { challenge_id, phone, code_length, attempts_remaining, expires_in, resend_available_in }. 422 on a malformed phone.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+966500000000\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Resend OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/guest/auth/otp/resend",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "guest",
+                "auth",
+                "otp",
+                "resend"
+              ]
+            },
+            "description": "Enforces the 42s cooldown + max 3 resends (422 OtpResendCooldownException).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"challenge_id\": \"{{otp_challenge_id}}\",\n  \"phone\": \"+966500000000\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/guest/auth/otp/verify",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "guest",
+                "auth",
+                "otp",
+                "verify"
+              ]
+            },
+            "description": "→ 200 { outcome: authenticated|rejected|locked_out }. authenticated ⇒ { token, guest, profile_complete }. rejected ⇒ { attempts_remaining }. 422 only for an expired/unknown challenge. Save data.token as {{guest_token}}.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"challenge_id\": \"{{otp_challenge_id}}\",\n  \"phone\": \"+966500000000\",\n  \"code\": \"123456\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{guest_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/guest/auth/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "guest",
+                "auth",
+                "me"
+              ]
+            },
+            "description": "→ 200 { guest: GuestResource, profile_complete }. A staff token here is 401."
+          }
+        },
+        {
+          "name": "Complete / edit profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{guest_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/guest/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "guest",
+                "profile"
+              ]
+            },
+            "description": "→ 200 { guest, profile_complete:true }.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sara Al Amri\",\n  \"email\": \"sara@example.com\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{guest_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/guest/auth/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "guest",
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Revokes the current guest-api token."
+          }
+        }
+      ]
+    },
+    {
+      "name": "15 Guest — Discovery",
+      "description": "Slice 1. Anonymous, read-only. Active hotels / active room types only. Availability reuses ReservationService overlap math as a non-locking preview.",
+      "item": [
+        {
+          "name": "List hotels",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/guest/hotels?city=Riyadh&q=oasis&per_page=15&page=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "guest",
+                "hotels"
+              ],
+              "query": [
+                {
+                  "key": "city",
+                  "value": "Riyadh"
+                },
+                {
+                  "key": "q",
+                  "value": "oasis"
+                },
+                {
+                  "key": "per_page",
+                  "value": "15"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Paginated PublicHotelResource[]. Filters optional. No auth."
+          }
+        },
+        {
+          "name": "Hotel cities",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/guest/hotels/cities",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "guest",
+                "hotels",
+                "cities"
+              ]
+            },
+            "description": "→ [{ city, hotel_count }] over active hotels."
+          }
+        },
+        {
+          "name": "Hotel detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/guest/hotels/{{hotel_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "guest",
+                "hotels",
+                "{{hotel_id}}"
+              ]
+            },
+            "description": "PublicHotelResource + room_types[] (active only). Inactive/missing ⇒ 404."
+          }
+        },
+        {
+          "name": "Availability",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/guest/hotels/{{hotel_id}}/availability?check_in=2026-10-01&check_out=2026-10-04&adults=2&children=0",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "guest",
+                "hotels",
+                "{{hotel_id}}",
+                "availability"
+              ],
+              "query": [
+                {
+                  "key": "check_in",
+                  "value": "2026-10-01"
+                },
+                {
+                  "key": "check_out",
+                  "value": "2026-10-04"
+                },
+                {
+                  "key": "adults",
+                  "value": "2"
+                },
+                {
+                  "key": "children",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "→ { hotel_id, check_in, check_out, adults, children, nights, currency, rooms:[{ room_type_id, name, base_price, capacity, amenities, description, rooms_total, rooms_available, is_available, estimated_total }] }. 422 if check_in<today or check_out<=check_in."
+          }
+        }
+      ]
     }
   ],
   "auth": {
@@ -5129,6 +6305,30 @@
       "key": "base_url",
       "value": "http://127.0.0.1:8000/api/v1",
       "type": "string"
+    },
+    {
+      "key": "guest_token",
+      "value": ""
+    },
+    {
+      "key": "otp_challenge_id",
+      "value": ""
+    },
+    {
+      "key": "country_id",
+      "value": ""
+    },
+    {
+      "key": "city_id",
+      "value": ""
+    },
+    {
+      "key": "other_country_id",
+      "value": ""
+    },
+    {
+      "key": "other_city_id",
+      "value": ""
     }
   ]
 }

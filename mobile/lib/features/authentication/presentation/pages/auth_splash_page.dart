@@ -14,9 +14,10 @@ import '../../../../core/widgets/brand_logo.dart';
 class AuthSplashPage extends StatelessWidget {
   const AuthSplashPage({super.key});
 
-  /// The splash's warm "oud" brown — sampled from the rendered Figma
-  /// `14 · Entry` frame 1 (#513425), same as the primary action colour.
-  static const Color _background = AppColors.brown700;
+  /// The splash's warm "oud" brown (`oud/700` = `color/bg/primary`, light). The
+  /// splash renders before the themed surface is ready, so it references the
+  /// primitive directly and commits to a single fixed look.
+  static const Color _background = AppPrimitives.oud700;
 
   @override
   Widget build(BuildContext context) {
@@ -32,9 +33,9 @@ class AuthSplashPage extends StatelessWidget {
             alignment: Alignment(0, -0.12),
             child: BrandLogo(
               variant: BrandLogoVariant.stacked,
-              markColor: AppColors.white,
-              wordmarkColor: AppColors.white,
-              taglineColor: AppColors.bronze200,
+              markColor: AppPrimitives.white,
+              wordmarkColor: AppPrimitives.white,
+              taglineColor: AppPrimitives.gold200,
               markSize: 34,
               showTagline: true,
             ),

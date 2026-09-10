@@ -17,9 +17,7 @@ class PaymentStatusPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final ThemeData theme = Theme.of(context);
-    final AppSemanticColors semantic =
-        theme.extension<AppSemanticColors>() ?? AppSemanticColors.light;
+    final AppColorTokens c = context.colors;
 
     final (Color fg, Color bg) = switch (status) {
       PaymentStatus.holdFailed ||
@@ -28,16 +26,16 @@ class PaymentStatusPill extends StatelessWidget {
       PaymentStatus.refundFailed ||
       PaymentStatus.cancelled ||
       PaymentStatus.expired =>
-        (theme.colorScheme.error, AppColors.errorContainer),
+        (c.errorFg, c.errorBg),
       PaymentStatus.notStarted ||
       PaymentStatus.holdRequested ||
       PaymentStatus.captureRequested ||
       PaymentStatus.finalSettlementRequested ||
       PaymentStatus.refundRequested =>
-        (semantic.warning, semantic.warningContainer),
+        (c.warningFg, c.warningBg),
       PaymentStatus.refunded =>
-        (semantic.info, semantic.infoContainer),
-      _ => (semantic.success, semantic.successContainer),
+        (c.infoFg, c.infoBg),
+      _ => (c.successFg, c.successBg),
     };
 
     return StatusPill(

@@ -17,15 +17,12 @@ class ReviewStatusPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final ThemeData theme = Theme.of(context);
-    final AppSemanticColors semantic =
-        theme.extension<AppSemanticColors>() ?? AppSemanticColors.light;
+    final AppColorTokens c = context.colors;
 
     final (Color fg, Color bg) = switch (status) {
-      ReviewStatus.pending => (semantic.warning, semantic.warningContainer),
-      ReviewStatus.published => (semantic.success, semantic.successContainer),
-      ReviewStatus.rejected =>
-        (theme.colorScheme.error, AppColors.errorContainer),
+      ReviewStatus.pending => (c.warningFg, c.warningBg),
+      ReviewStatus.published => (c.successFg, c.successBg),
+      ReviewStatus.rejected => (c.errorFg, c.errorBg),
     };
 
     return StatusPill(

@@ -3,7 +3,7 @@ import '../entities/loyalty_operations.dart';
 import '../entities/loyalty_transaction.dart';
 
 /// The loyalty contract the presentation layer depends on
-/// (md/mobile/architecture.md §4). Which data source fulfils it (dummy vs the
+/// (mobile/docs/architecture.md §4). Which data source fulfils it (dummy vs the
 /// future guest loyalty API) is a DI decision, exactly as in
 /// `CheckoutRepository` / `PaymentRepository`.
 ///

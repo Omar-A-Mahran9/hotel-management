@@ -7,6 +7,8 @@ import type {
   AccessGrant,
   AppNotification,
   CheckoutResult,
+  City,
+  Country,
   Folio,
   Hotel,
   HotelGroup,
@@ -59,6 +61,57 @@ export const hotelsService = {
   create: (body: Record<string, unknown>) => api()<Hotel>('/hotels', { method: 'POST', body }),
   update: (id: number, body: Record<string, unknown>) =>
     api()<Hotel>(`/hotels/${id}`, { method: 'PUT', body }),
+}
+
+// ---- Locations: countries + cities (global reference data) ----------
+// Real, paginated Laravel endpoints. `search` / `is_active` / `country_id`
+// are server-side filters. The bare `options*` helpers pull a large page
+// for API-backed selects.
+export interface LocationListParams {
+  page?: number
+  per_page?: number
+  search?: string
+  is_active?: boolean | 0 | 1
+  country_id?: number
+  [key: string]: unknown
+}
+
+export const countriesService = {
+  list: (params: LocationListParams = {}) =>
+    api().withMeta<Country[]>('/countries', { query: cleanQuery(params) }),
+  get: (id: number) => api()<Country>(`/countries/${id}`),
+  create: (body: Record<string, unknown>) => api()<Country>('/countries', { method: 'POST', body }),
+  update: (id: number, body: Record<string, unknown>) =>
+    api()<Country>(`/countries/${id}`, { method: 'PATCH', body }),
+  activate: (id: number) => api()<Country>(`/countries/${id}/activate`, { method: 'PATCH' }),
+  deactivate: (id: number) => api()<Country>(`/countries/${id}/deactivate`, { method: 'PATCH' }),
+  remove: (id: number) => api()<null>(`/countries/${id}`, { method: 'DELETE' }),
+  // For EntitySelect — active countries only, large page, optional search.
+  options: (search?: string) =>
+    api()<Country[]>('/countries', { query: cleanQuery({ search, is_active: 1, per_page: 100 }) }),
+}
+
+export const citiesService = {
+  list: (params: LocationListParams = {}) =>
+    api().withMeta<City[]>('/cities', { query: cleanQuery(params) }),
+  get: (id: number) => api()<City>(`/cities/${id}`),
+  create: (body: Record<string, unknown>) => api()<City>('/cities', { method: 'POST', body }),
+  update: (id: number, body: Record<string, unknown>) =>
+    api()<City>(`/cities/${id}`, { method: 'PATCH', body }),
+  activate: (id: number) => api()<City>(`/cities/${id}/activate`, { method: 'PATCH' }),
+  deactivate: (id: number) => api()<City>(`/cities/${id}/deactivate`, { method: 'PATCH' }),
+  remove: (id: number) => api()<null>(`/cities/${id}`, { method: 'DELETE' }),
+  // Dependent select: cities of ONE country (server-scoped, never leaks others).
+  forCountry: (countryId: number, search?: string) =>
+    api()<City[]>(`/countries/${countryId}/cities`, {
+      query: cleanQuery({ search, is_active: 1, per_page: 100 }),
+    }),
+}
+
+function cleanQuery(params: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== ''),
+  )
 }
 
 // ---- Room types (hotel-scoped) -------------------------------------

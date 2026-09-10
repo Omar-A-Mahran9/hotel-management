@@ -15,6 +15,13 @@ void main() {
 
     expect(light.extension<AppSemanticColors>(), isNotNull);
     expect(dark.extension<AppSemanticColors>(), isNotNull);
+
+    // The design-system token set is registered for both modes …
+    expect(light.extension<AppColorTokens>(), isNotNull);
+    expect(dark.extension<AppColorTokens>(), isNotNull);
+    // … and the dark theme is the real one from the Figma, not a guess.
+    expect(dark.colorScheme.surface, const Color(0xFF1D1A16));
+    expect(light.colorScheme.primary, const Color(0xFF513425));
   });
 
   test('button and input theming is centralised', () {

@@ -16,18 +16,13 @@ class ServiceOrderStatusPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final ThemeData theme = Theme.of(context);
-    final AppSemanticColors semantic =
-        theme.extension<AppSemanticColors>() ?? AppSemanticColors.light;
+    final AppColorTokens c = context.colors;
 
     final (Color fg, Color bg) = switch (status) {
-      ServiceOrderStatus.cancelled =>
-        (theme.colorScheme.error, AppColors.errorContainer),
-      ServiceOrderStatus.requested =>
-        (semantic.warning, semantic.warningContainer),
-      ServiceOrderStatus.confirmed => (semantic.info, semantic.infoContainer),
-      ServiceOrderStatus.fulfilled =>
-        (semantic.success, semantic.successContainer),
+      ServiceOrderStatus.cancelled => (c.errorFg, c.errorBg),
+      ServiceOrderStatus.requested => (c.warningFg, c.warningBg),
+      ServiceOrderStatus.confirmed => (c.infoFg, c.infoBg),
+      ServiceOrderStatus.fulfilled => (c.successFg, c.successBg),
     };
 
     return StatusPill(

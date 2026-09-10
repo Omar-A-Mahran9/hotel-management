@@ -10,7 +10,7 @@ import 'health_data_source.dart';
 /// contract yet, so [fetchStatus] deliberately raises
 /// [NotImplementedInPhaseException] rather than guessing a URL. The
 /// [ApiClient] dependency and the wiring are in place; the single method body is
-/// completed when the endpoint is approved (md/mobile/README.md — "Backend-First
+/// completed when the endpoint is approved (mobile/docs/README.md — "Backend-First
 /// Rule").
 class ApiHealthDataSource implements HealthDataSource, RemoteDataSource {
   ApiHealthDataSource(this._client);

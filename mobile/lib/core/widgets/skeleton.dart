@@ -59,7 +59,7 @@ class SkeletonBox extends StatelessWidget {
   const SkeletonBox({
     super.key,
     this.width,
-    this.height = 14,
+    this.height = 15,
     this.borderRadius = AppRadius.allSm,
   });
 
@@ -114,7 +114,7 @@ class SkeletonText extends StatelessWidget {
   const SkeletonText({
     super.key,
     this.lines = 3,
-    this.lineHeight = 12,
+    this.lineHeight = 13,
     this.spacing = AppSpacing.xs,
     this.lastLineFraction = 0.55,
   });
@@ -183,9 +183,9 @@ class SkeletonCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const <Widget>[
-                    SkeletonBox(width: 140, height: 15),
+                    SkeletonBox(width: 140, height: 17),
                     SizedBox(height: AppSpacing.xs),
-                    SkeletonText(lines: 2, lineHeight: 11),
+                    SkeletonText(lines: 2, lineHeight: 13),
                   ],
                 ),
               ),

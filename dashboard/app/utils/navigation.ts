@@ -14,12 +14,20 @@ export function filterNavigation(sections: NavSection[], ctx: NavContext): NavSe
   return sections
     .map(section => ({
       ...section,
-      items: section.items.filter(item => isItemVisible(item, ctx)),
+      items: section.items
+        .filter(item => isItemVisible(item, ctx))
+        .map(item => item.children
+          ? { ...item, children: item.children.filter(child => isItemVisible(child, ctx)) }
+          : item),
     }))
     .filter(section => section.items.length > 0)
 }
 
 export function isItemVisible(item: NavItem, ctx: NavContext): boolean {
+  // A sub-group is visible when at least one of its children is.
+  if (item.children && item.children.length > 0) {
+    return item.children.some(child => isItemVisible(child, ctx))
+  }
   if (item.permission) {
     const list = Array.isArray(item.permission) ? item.permission : [item.permission]
     if (!hasAny(ctx.permissions, list)) return false

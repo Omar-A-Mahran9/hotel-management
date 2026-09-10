@@ -101,6 +101,10 @@ void main() {
 
 class _ThrowingDataSource implements AuthDataSource {
   @override
+  Future<AuthSessionModel?> fetchCurrentSession(String accessToken) async =>
+      throw const NetworkException();
+
+  @override
   Future<OtpChallengeModel> requestOtp(String phoneE164) async =>
       throw const NetworkException();
 

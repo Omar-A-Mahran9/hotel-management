@@ -16,19 +16,16 @@ class AccessStatusPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final ThemeData theme = Theme.of(context);
-    final AppSemanticColors semantic =
-        theme.extension<AppSemanticColors>() ?? AppSemanticColors.light;
+    final AppColorTokens c = context.colors;
 
     final (Color fg, Color bg) = switch (status) {
-      AccessStatus.failed || AccessStatus.revoked =>
-        (theme.colorScheme.error, AppColors.errorContainer),
+      AccessStatus.failed || AccessStatus.revoked => (c.errorFg, c.errorBg),
       AccessStatus.notIssued ||
       AccessStatus.issueRequested ||
       AccessStatus.revokeRequested =>
-        (semantic.warning, semantic.warningContainer),
-      AccessStatus.expired => (semantic.info, semantic.infoContainer),
-      AccessStatus.active => (semantic.success, semantic.successContainer),
+        (c.warningFg, c.warningBg),
+      AccessStatus.expired => (c.infoFg, c.infoBg),
+      AccessStatus.active => (c.successFg, c.successBg),
     };
 
     return StatusPill(

@@ -17,21 +17,19 @@ class ReservationStatusPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final ThemeData theme = Theme.of(context);
-    final AppSemanticColors semantic =
-        theme.extension<AppSemanticColors>() ?? AppSemanticColors.light;
+    final AppColorTokens c = context.colors;
 
     final (Color fg, Color bg) = switch (status) {
       ReservationStatus.cancelled ||
       ReservationStatus.checkoutBlocked =>
-        (theme.colorScheme.error, AppColors.errorContainer),
+        (c.errorFg, c.errorBg),
       ReservationStatus.pending ||
       ReservationStatus.checkoutInProgress =>
-        (semantic.warning, semantic.warningContainer),
+        (c.warningFg, c.warningBg),
       ReservationStatus.checkedOut ||
       ReservationStatus.invoiced =>
-        (semantic.info, semantic.infoContainer),
-      _ => (semantic.success, semantic.successContainer),
+        (c.infoFg, c.infoBg),
+      _ => (c.successFg, c.successBg),
     };
 
     return StatusPill(

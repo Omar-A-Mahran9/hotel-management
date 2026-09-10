@@ -14,6 +14,10 @@ export interface NavItem {
   permission?: string | string[] // any-of
   scope?: 'group' | 'hotel' // 'hotel' items need a concrete hotel selected
   backendGap?: boolean
+  // A collapsible sub-group (e.g. Administration -> Locations). The parent
+  // is shown when at least one child is visible; `to` is the first child's
+  // route so the header stays a valid link.
+  children?: NavItem[]
 }
 
 export interface NavSection {
@@ -210,6 +214,29 @@ export const NAVIGATION: NavSection[] = [
         to: '/hotel-group',
         icon: 'ki-abstract-26',
         permission: 'hotel-groups.manage',
+      },
+      {
+        key: 'locations',
+        labelKey: 'nav.locations',
+        to: '/countries',
+        icon: 'ki-geolocation',
+        permission: ['locations.view', 'locations.manage'],
+        children: [
+          {
+            key: 'countries',
+            labelKey: 'nav.countries',
+            to: '/countries',
+            icon: 'ki-flag',
+            permission: ['locations.view', 'locations.manage'],
+          },
+          {
+            key: 'cities',
+            labelKey: 'nav.cities',
+            to: '/cities',
+            icon: 'ki-geolocation',
+            permission: ['locations.view', 'locations.manage'],
+          },
+        ],
       },
       {
         key: 'audit',

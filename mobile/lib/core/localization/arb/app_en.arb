@@ -394,6 +394,10 @@
   "reservationNotFoundBody": "We couldn't find that reservation.",
 
   "reservationStatusPending": "Pending",
+  "reservationStatusConfirmed": "Confirmed",
+  "@reservationStatusConfirmed": {
+    "description": "Guest-facing umbrella label for a secured booking (design-system content/status/confirmed). ReservationStatus itself has no `confirmed` member; used on the confirmation screen and future Bookings-list filter."
+  },
   "reservationStatusDepositHeld": "Deposit held",
   "reservationStatusVerified": "Verified",
   "reservationStatusCheckedIn": "Checked in",

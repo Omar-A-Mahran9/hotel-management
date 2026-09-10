@@ -6,6 +6,7 @@ use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\HotelGroup\Models\HotelGroup;
 use App\Domain\IdentityAccess\Models\Role;
 use App\Domain\IdentityAccess\Models\User;
+use App\Domain\Location\Models\City;
 use Illuminate\Database\Seeder;
 
 /**
@@ -42,6 +43,8 @@ class Phase1DemoSeeder extends Seeder
         // Demo users reference roles/permissions seeded here; safe to call
         // repeatedly since RolePermissionSeeder is itself idempotent.
         $this->call(RolePermissionSeeder::class);
+        // Country/City reference data the demo hotels below point at.
+        $this->call(LocationSeeder::class);
 
         $group = HotelGroup::query()->firstOrCreate(
             ['slug' => 'demo-hotel-group'],
@@ -51,41 +54,9 @@ class Phase1DemoSeeder extends Seeder
             ]
         );
 
-        $cairo = Hotel::query()->firstOrCreate(
-            ['slug' => 'demo-cairo-hotel'],
-            [
-                'hotel_group_id' => $group->id,
-                'name' => 'Cairo Hotel',
-                'country' => 'Egypt',
-                'city' => 'Cairo',
-                'timezone' => 'Africa/Cairo',
-                'is_active' => true,
-            ]
-        );
-
-        $hurghada = Hotel::query()->firstOrCreate(
-            ['slug' => 'demo-hurghada-hotel'],
-            [
-                'hotel_group_id' => $group->id,
-                'name' => 'Hurghada Hotel',
-                'country' => 'Egypt',
-                'city' => 'Hurghada',
-                'timezone' => 'Africa/Cairo',
-                'is_active' => true,
-            ]
-        );
-
-        Hotel::query()->firstOrCreate(
-            ['slug' => 'demo-luxor-hotel'],
-            [
-                'hotel_group_id' => $group->id,
-                'name' => 'Luxor Hotel',
-                'country' => 'Egypt',
-                'city' => 'Luxor',
-                'timezone' => 'Africa/Cairo',
-                'is_active' => true,
-            ]
-        );
+        $cairo = $this->demoHotel($group->id, 'demo-cairo-hotel', 'Cairo Hotel', 'Cairo');
+        $hurghada = $this->demoHotel($group->id, 'demo-hurghada-hotel', 'Hurghada Hotel', 'Hurghada');
+        $this->demoHotel($group->id, 'demo-luxor-hotel', 'Luxor Hotel', 'Luxor');
 
         $roleIdBySlug = Role::query()->pluck('id', 'slug');
 
@@ -109,6 +80,30 @@ class Phase1DemoSeeder extends Seeder
         $this->command?->line("  {$receptionHurghada->email} — Reception (Hurghada)");
         $this->command?->line('  guest@hotel.test — Guest (no staff access)');
         $this->command?->line('  Password for all demo accounts: '.self::DEMO_PASSWORD);
+    }
+
+    /**
+     * Idempotent demo hotel wired to the normalized Country/City reference
+     * data (all demo hotels are Egyptian). Backfills the FK columns on an
+     * already-existing row too.
+     */
+    private function demoHotel(int $groupId, string $slug, string $name, string $cityName): Hotel
+    {
+        $city = City::query()->where('name_en', $cityName)->firstOrFail();
+
+        return Hotel::query()->updateOrCreate(
+            ['slug' => $slug],
+            [
+                'hotel_group_id' => $groupId,
+                'name' => $name,
+                'country_id' => $city->country_id,
+                'city_id' => $city->id,
+                'country' => 'Egypt',
+                'city' => $cityName,
+                'timezone' => 'Africa/Cairo',
+                'is_active' => true,
+            ]
+        );
     }
 
     private function demoUser(string $email, string $name, int $roleId): User

@@ -915,6 +915,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reservationStatusPending => 'قيد الانتظار';
 
   @override
+  String get reservationStatusConfirmed => 'مؤكد';
+
+  @override
   String get reservationStatusDepositHeld => 'تم حجز التأمين';
 
   @override

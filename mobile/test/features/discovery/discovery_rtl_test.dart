@@ -6,6 +6,7 @@ import 'package:hotel_guest_app/core/time/clock.dart';
 import 'package:hotel_guest_app/features/discovery/presentation/widgets/stay_range_calendar.dart';
 
 import '../../support/auth_test_support.dart';
+import '../../support/calendar_test_support.dart';
 import '../../support/pump_app.dart';
 
 void main() {
@@ -85,10 +86,8 @@ void main() {
     await tester.tap(find.text(ar.hotelSelectDates));
     await tester.pumpAndSettle();
     // Calendar day cells render Arabic-Indic digits for `ar`.
-    await tester.tap(find.text('٦').first);
-    await tester.pump();
-    await tester.tap(find.text('٨').first);
-    await tester.pump();
+    await tapCalendarDay(tester, '٦');
+    await tapCalendarDay(tester, '٨');
     await tester.tap(find.widgetWithText(FilledButton, ar.stayDatesShowRooms));
     await tester.pumpAndSettle();
 

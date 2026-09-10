@@ -1,5 +1,5 @@
 /// Deployment targets. Each maps to a different Laravel API base URL
-/// (md/mobile/ci_cd_guide.md — "Build Configuration").
+/// (mobile/docs/ci_cd_guide.md — "Build Configuration").
 enum AppEnvironment {
   development,
   staging,

@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/localization/l10n.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../domain/entities/access_grant.dart';
+import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_icons.dart';
+import '../../domain/entities/access_grant.dart';
 
-/// The brown room-number + entry-code card from `04 · Check in & Stay`.
+/// The brown room-number + entry-code card from `04 · Check in & Stay`. Built on
+/// the `Card` component's `inverse` style.
 ///
 /// SECURITY: renders the credential **only** when the grant is active
 /// ([AccessGrant.visibleCredential]); the value is never logged and never
@@ -22,69 +23,57 @@ class AccessCredentialCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final ThemeData theme = Theme.of(context);
+    final AppColorTokens c = context.colors;
     final MaterialLocalizations ml = MaterialLocalizations.of(context);
     final String? code = grant.visibleCredential;
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: AppColors.brown700,
-        borderRadius: AppRadius.allLg,
-      ),
+    final TextStyle? labelStyle =
+        theme.textTheme.bodySmall?.copyWith(color: c.accentWarm);
+
+    return AppCard(
+      style: AppCardStyle.inverse,
+      padding: const EdgeInsets.all(AppSpacing.space5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           if (grant.roomNumber != null) ...<Widget>[
-            Text(
-              l10n.accessRoomNumberLabel,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: AppColors.bronze200,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xxs),
+            Text(l10n.accessRoomNumberLabel, style: labelStyle),
+            const SizedBox(height: AppSpacing.space1),
             Text(
               grant.roomNumber!,
               style: theme.textTheme.displaySmall?.copyWith(
-                color: AppColors.white,
-                fontWeight: FontWeight.w700,
+                color: c.textOnInverse,
                 fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
               ),
             ),
-            const Divider(height: AppSpacing.xl, color: AppColors.brown500),
+            Divider(
+              height: AppSpacing.space6,
+              color: c.borderOnInverse.withValues(alpha: 0.2),
+            ),
           ],
           if (code != null) ...<Widget>[
-            Text(
-              l10n.accessEntryCodeLabel,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: AppColors.bronze200,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xs),
+            Text(l10n.accessEntryCodeLabel, style: labelStyle),
+            const SizedBox(height: AppSpacing.space2),
             Text(
               code.split('').join(' '),
               style: theme.textTheme.headlineMedium?.copyWith(
-                color: AppColors.white,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 2,
+                color: c.textOnInverse,
                 fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
               ),
             ),
-            const SizedBox(height: AppSpacing.sm),
+            const SizedBox(height: AppSpacing.space3),
           ],
           if (grant.expiresAt != null)
             Row(
               children: <Widget>[
-                const Icon(AppIcons.time, size: 15, color: AppColors.bronze200),
-                const SizedBox(width: AppSpacing.xxs),
+                Icon(AppIcons.time, size: 15, color: c.accentWarm),
+                const SizedBox(width: AppSpacing.space1),
                 Flexible(
                   child: Text(
                     l10n.accessExpiresLabel(
                       ml.formatMediumDate(grant.expiresAt!),
                     ),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppColors.bronze200,
-                    ),
+                    style: labelStyle,
                   ),
                 ),
               ],

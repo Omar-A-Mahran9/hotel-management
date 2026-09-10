@@ -13,10 +13,13 @@ import '../core/theme/app_colors.dart';
 import '../core/theme/app_spacing.dart';
 import '../core/theme/theme_controller.dart';
 import '../core/widgets/app_card.dart';
+import '../core/widgets/app_icon_button.dart';
+import '../core/widgets/app_list_row.dart';
 import '../core/widgets/app_text_field.dart';
 import '../core/widgets/hotel_app_bar.dart';
 import '../core/widgets/primary_button.dart';
 import '../core/widgets/secondary_button.dart';
+import '../core/widgets/section_header.dart';
 import '../core/widgets/status_pill.dart';
 import '../core/widgets/ui_state_view.dart';
 import '../core/widgets/app_icons.dart';
@@ -207,22 +210,15 @@ class _BackendStatusView extends ConsumerWidget {
       onRetry: () =>
           ref.read(backendHealthControllerProvider.notifier).refresh(),
       onSuccess: (BackendHealth health) {
+        final AppColorTokens c = context.colors;
         final (String label, Color fg, Color bg) = switch (health.status) {
-          HealthStatus.ok => (
-            l10n.backendStatusOk,
-            AppColors.success,
-            AppColors.successContainer,
-          ),
+          HealthStatus.ok => (l10n.backendStatusOk, c.successFg, c.successBg),
           HealthStatus.degraded => (
             l10n.backendStatusDegraded,
-            AppColors.warning,
-            AppColors.warningContainer,
+            c.warningFg,
+            c.warningBg,
           ),
-          HealthStatus.down => (
-            l10n.backendStatusDown,
-            AppColors.error,
-            AppColors.errorContainer,
-          ),
+          HealthStatus.down => (l10n.backendStatusDown, c.errorFg, c.errorBg),
         };
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -271,6 +267,40 @@ class _ComponentGallery extends StatelessWidget {
         AppTextField(
           label: l10n.textFieldExampleLabel,
           hintText: l10n.textFieldExampleHint,
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        SectionHeader(
+          title: l10n.sectionComponents,
+          action: l10n.commonSeeAll,
+          onAction: () {},
+        ),
+        Row(
+          children: <Widget>[
+            AppIconButton(icon: AppIcons.search, onPressed: () {}),
+            const SizedBox(width: AppSpacing.xs),
+            AppIconButton(
+              icon: AppIcons.rating,
+              onPressed: () {},
+              selected: true,
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        AppCard(
+          style: AppCardStyle.subtle,
+          child: Column(
+            children: <Widget>[
+              AppListRow(
+                label: l10n.reservationStatusConfirmed,
+                value: Text(l10n.commonSeeAll),
+              ),
+              AppListRow(
+                label: l10n.reservationStatusConfirmed,
+                value: Text(l10n.commonSeeAll),
+                style: AppListRowStyle.total,
+              ),
+            ],
+          ),
         ),
       ],
     );

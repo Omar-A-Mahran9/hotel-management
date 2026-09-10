@@ -1,7 +1,7 @@
 import '../errors/failure.dart';
 
 /// The canonical screen/section state every feature represents
-/// (md/mobile/feature_guide.md Step 6). Workflow features that must mirror a
+/// (mobile/docs/feature_guide.md Step 6). Workflow features that must mirror a
 /// backend state machine (reservations, payments, identity) model those states
 /// explicitly on top of this — they do not collapse everything to success.
 sealed class UiState<T> {

@@ -26,7 +26,7 @@ enum IdentityMatchOutcome {
 /// (`reservation_id`, `status`, `attempts`, `latest_outcome`, `decided_at`).
 /// Document/selfie storage paths, provider references, raw scores, attempt
 /// metadata and PII are deliberately absent there and here
-/// (md/mobile/architecture.md §8).
+/// (mobile/docs/architecture.md §8).
 ///
 /// Laravel stays authoritative for [status]; the app never transitions a
 /// session itself.

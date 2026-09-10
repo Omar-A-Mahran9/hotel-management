@@ -7,16 +7,16 @@ import 'app_icons.dart';
 /// The real Figma imagery, addressed by *purpose* rather than by path.
 ///
 /// Filenames keep the original Figma content hash (see
-/// `md/mobile/Design/assets/manifest.json`) so every asset stays traceable to
+/// `mobile/Design/assets/manifest.json`) so every asset stays traceable to
 /// the source. Nothing outside this file references an image path.
 abstract final class AppImages {
   static const String _dir = 'assets/images';
 
   // ── Named slots (mapped from the Figma frames) ───────────────────────────
 
-  /// Jeddah waterfront at night — the entry / welcome hero (Figma `01 · Entry`).
-  static const String entryHero =
-      '$_dir/11_d7f543b9397080a7e25c7302da8858468b895fc8.jpg';
+  /// Warm hotel exterior at golden hour — the entry / welcome hero
+  /// (Figma `01 · Entry`, exported text-free as `entry_hero.jpg`).
+  static const String entryHero = '$_dir/entry_hero.jpg';
 
   /// AlUla landscape — the flagship hotel hero ("فندق الواحة").
   static const String hotelHero =
@@ -135,11 +135,14 @@ class _Fallback extends StatelessWidget {
   Widget build(BuildContext context) {
     // Figma renders unfilled image slots as a plain warm-grey box — match that
     // rather than a branded gradient.
+    final AppColorTokens c = context.colors;
     return Container(
       width: width,
       height: height,
-      color: AppColors.bronze200.withValues(alpha: 0.45),
-      child: Center(child: Icon(icon, size: 26, color: AppColors.ink400)),
+      color: c.bgSubtle,
+      child: Center(
+        child: Icon(icon, size: 26, color: c.textSecondary),
+      ),
     );
   }
 }

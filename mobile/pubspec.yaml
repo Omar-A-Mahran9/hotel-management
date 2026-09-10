@@ -19,11 +19,11 @@ dependencies:
   flutter_riverpod: ^2.6.1
 
   # Declarative routing / navigation foundation. Flutter-team package, deep-link
-  # ready for the journeys described in md/mobile/architecture.md §10.
+  # ready for the journeys described in mobile/docs/architecture.md §10.
   go_router: ^14.6.2
 
   # HTTP client foundation for the API layer (interceptors, timeouts, centralized
-  # error parsing per md/mobile/architecture.md §5). Pure Dart — no native pods,
+  # error parsing per mobile/docs/architecture.md §5). Pure Dart — no native pods,
   # so it builds on every target while Android SDK / Xcode / CocoaPods are absent.
   dio: ^5.7.0
 
@@ -50,7 +50,7 @@ flutter:
 
   # Real Figma imagery (photographic fills exported from hotel_guest_app.fig).
   # Filenames keep the original Figma content hash so each asset stays traceable
-  # to md/mobile/Design/assets/manifest.json. Consumed only through AppImage /
+  # to mobile/Design/assets/manifest.json. Consumed only through AppImage /
   # AppImages (lib/core/widgets/app_image.dart) — never referenced by path.
   assets:
     - assets/images/

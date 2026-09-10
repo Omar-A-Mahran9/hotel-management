@@ -9,6 +9,9 @@ use App\Domain\DigitalAccess\Exceptions\CheckInNotAllowedException;
 use App\Domain\DigitalAccess\Exceptions\DigitalAccessActionNotAllowedException;
 use App\Domain\DigitalAccess\Exceptions\DigitalAccessIdempotencyKeyConflictException;
 use App\Domain\DigitalAccess\Exceptions\InvalidDigitalAccessStatusTransitionException;
+use App\Domain\GuestAccess\Exceptions\OtpChallengeExpiredException;
+use App\Domain\GuestAccess\Exceptions\OtpChallengeNotFoundException;
+use App\Domain\GuestAccess\Exceptions\OtpResendCooldownException;
 use App\Domain\IdentityAccess\Exceptions\AccountInactiveException;
 use App\Domain\IdentityAccess\Exceptions\InvalidCredentialsException;
 use App\Domain\IdentityVerification\Exceptions\IdentityVerificationActionNotAllowedException;
@@ -19,6 +22,8 @@ use App\Domain\IdentityVerification\Exceptions\IdentityVerificationRetryNotAllow
 use App\Domain\IdentityVerification\Exceptions\InvalidIdentityVerificationStatusTransitionException;
 use App\Domain\Inventory\Exceptions\InvalidRoomStatusTransitionException;
 use App\Domain\Inventory\Exceptions\RoomTypeHotelMismatchException;
+use App\Domain\Location\Exceptions\CountryCityMismatchException;
+use App\Domain\Location\Exceptions\LocationDeletionBlockedException;
 use App\Domain\Loyalty\Exceptions\InvalidLoyaltyPointsException;
 use App\Domain\Loyalty\Exceptions\LoyaltyNotAllowedException;
 use App\Domain\Notification\Exceptions\InvalidNotificationStatusTransitionException;
@@ -110,7 +115,43 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
+        // Slice 0 — guest OTP business errors. Fixed, safe machine strings
+        // (no code, no phone, no SQLSTATE). All 422, consistent with every
+        // other domain exception. Wrong-code / lock-out never reach here —
+        // they are 200 outcomes.
+        $exceptions->renderable(function (OtpChallengeNotFoundException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (OtpChallengeExpiredException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (OtpResendCooldownException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
         $exceptions->renderable(function (RoomTypeHotelMismatchException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        // Country + City master data business errors. Fixed, safe strings —
+        // 422 like every other domain exception above.
+        $exceptions->renderable(function (CountryCityMismatchException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (LocationDeletionBlockedException $e, Request $request) use ($envelope) {
             if ($request->is('api/*')) {
                 return $envelope($e->getMessage(), 422);
             }

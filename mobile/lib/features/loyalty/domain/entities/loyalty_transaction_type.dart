@@ -1,6 +1,6 @@
 /// The loyalty ledger vocabulary, mirroring the Laravel
 /// `App\Domain\Loyalty\Models\LoyaltyTransaction::TYPES` **exactly** (Phase 0
-/// §13). No types are invented (md/mobile/architecture.md §6).
+/// §13). No types are invented (mobile/docs/architecture.md §6).
 ///
 /// The guest app only ever *creates* [earn] and [redeem] entries — the MVP
 /// backend exposes no endpoint for the rest. [reverse] / [adjust] are

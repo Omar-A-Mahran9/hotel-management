@@ -1,7 +1,7 @@
 /// Internal, developer-facing error types raised by the data layer.
 ///
 /// These are never shown to users directly — the presentation layer converts a
-/// [Failure] into a localized message (md/mobile/coding_rules.md §9). Messages
+/// [Failure] into a localized message (mobile/docs/coding_rules.md §9). Messages
 /// carried here are for logs/tests only and must not contain secrets or
 /// sensitive identity/payment data.
 sealed class AppException implements Exception {
@@ -75,7 +75,7 @@ class ValidationException extends AppException {
   int get statusCode => 422;
 }
 
-/// 429 — rate limited (md/mobile/guides/rate_limiting.md).
+/// 429 — rate limited (mobile/docs/guides/rate_limiting.md).
 class RateLimitException extends AppException {
   const RateLimitException({String message = 'Too many requests', this.retryAfter})
       : super(message);

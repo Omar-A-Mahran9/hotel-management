@@ -13,8 +13,11 @@ const canManage = can('users.manage')
 
 const page = ref(1)
 const list = useResource(() => usersService.list(page.value))
-const roles = useResource(() => rbacService.roles(), { immediate: canManage })
 const hotels = useResource(() => hotelsService.list(1), { immediate: canManage })
+
+// Role is a real entity relationship — options come from the RBAC API,
+// the form submits role_id (never a typed id).
+const fetchRoles = () => rbacService.roles()
 
 const search = ref('')
 const rows = computed<StaffUser[]>(() => {
@@ -53,7 +56,7 @@ const form = reactive({
 
 function openCreate() {
   editing.value = null
-  Object.assign(form, { name: '', email: '', password: '', role_id: roles.data.value?.[0]?.id ?? null, is_active: true, hotel_ids: [] })
+  Object.assign(form, { name: '', email: '', password: '', role_id: null, is_active: true, hotel_ids: [] })
   fieldErrors.value = {}
   open.value = true
 }
@@ -192,11 +195,15 @@ async function confirmDelete() {
           <input v-model="form.password" type="password" autocomplete="new-password" class="input" :required="!editing">
         </FormField>
         <FormField :label="t('users.role')" :error="fieldErrors.role_id" required>
-          <select v-model.number="form.role_id" class="input" required>
-            <option v-for="r in roles.data.value ?? []" :key="r.id" :value="r.id">
-              {{ r.name }}
-            </option>
-          </select>
+          <EntitySelect
+            v-model="form.role_id"
+            :fetcher="fetchRoles"
+            label-key="name"
+            :placeholder="t('users.role')"
+            :selected-label="editing?.role?.name ?? null"
+            :invalid="!!fieldErrors.role_id"
+            required
+          />
         </FormField>
         <FormField :label="t('users.hotels')" :error="fieldErrors.hotel_ids" :hint="t('users.hotelsHint')">
           <div class="max-h-40 space-y-1 overflow-y-auto rounded-md border border-input p-2">

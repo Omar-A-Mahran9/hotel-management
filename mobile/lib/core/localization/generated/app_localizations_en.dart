@@ -920,6 +920,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reservationStatusPending => 'Pending';
 
   @override
+  String get reservationStatusConfirmed => 'Confirmed';
+
+  @override
   String get reservationStatusDepositHeld => 'Deposit held';
 
   @override

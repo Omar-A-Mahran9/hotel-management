@@ -6,13 +6,13 @@ import 'package:hotel_guest_app/app/router/app_router.dart';
 import 'package:hotel_guest_app/core/errors/app_exception.dart';
 import 'package:hotel_guest_app/core/localization/generated/app_localizations.dart';
 import 'package:hotel_guest_app/core/time/clock.dart';
-import 'package:hotel_guest_app/features/discovery/presentation/widgets/stay_range_calendar.dart';
 import 'package:hotel_guest_app/features/reservation/data/datasources/dummy_reservation_data_source.dart';
 import 'package:hotel_guest_app/features/reservation/data/repositories/reservation_repository_impl.dart';
 import 'package:hotel_guest_app/features/reservation/presentation/state/reservation_providers.dart';
 import 'package:hotel_guest_app/features/reservation/presentation/widgets/reservation_summary_card.dart';
 
 import '../../support/auth_test_support.dart';
+import '../../support/calendar_test_support.dart';
 import '../../support/pump_app.dart';
 
 final DateTime _now = DateTime(2026, 9, 1);
@@ -20,10 +20,6 @@ final List<Override> _fixedClock = <Override>[
   clockProvider.overrideWithValue(() => _now),
 ];
 
-Finder _calDay(String d) => find.descendant(
-      of: find.byType(StayRangeCalendar),
-      matching: find.text(d),
-    );
 
 Future<AppLocalizations> _toReview(
   WidgetTester tester, {
@@ -41,10 +37,8 @@ Future<AppLocalizations> _toReview(
   await tester.pumpAndSettle();
   await tester.tap(find.text(en.hotelSelectDates));
   await tester.pumpAndSettle();
-  await tester.tap(_calDay('6').first);
-  await tester.pumpAndSettle();
-  await tester.tap(_calDay('8').first);
-  await tester.pumpAndSettle();
+  await tapCalendarDay(tester, '6');
+  await tapCalendarDay(tester, '8');
   await tester.tap(find.widgetWithText(FilledButton, en.stayDatesShowRooms));
   await tester.pumpAndSettle();
   await tester.tap(find.widgetWithText(OutlinedButton, en.roomViewDetails).first);

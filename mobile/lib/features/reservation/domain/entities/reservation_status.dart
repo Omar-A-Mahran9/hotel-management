@@ -1,6 +1,6 @@
 /// The reservation lifecycle, mirroring the Laravel `Reservation` status enum
 /// **exactly** (backend `App\Domain\Reservation\Models\Reservation` constants;
-/// md/mobile/feature_guide.md — "Hotel-Specific Rule: the mobile state must
+/// mobile/docs/feature_guide.md — "Hotel-Specific Rule: the mobile state must
 /// reflect the Laravel state machine. Do not invent alternative states").
 ///
 /// Mobile Phase 4 only ever *creates* a reservation, which the backend places in

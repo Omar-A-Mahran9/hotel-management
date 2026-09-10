@@ -5,9 +5,12 @@ import type { Hotel } from '~/types/api'
 
 definePageMeta({ permission: 'hotels.view' })
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const router = useRouter()
 const { can } = useCan()
+
+const localized = (s?: { name_en: string, name_ar: string } | null) =>
+  s ? (locale.value === 'ar' ? s.name_ar : s.name_en) : null
 
 const canManage = can('hotels.manage')
 
@@ -38,7 +41,9 @@ function changePage(n: number) {
 }
 
 function locationOf(h: Hotel) {
-  return [h.city, h.country].filter(Boolean).join(', ') || t('common.notAvailable')
+  const city = localized(h.city_summary) || h.city
+  const country = localized(h.country_summary) || h.country
+  return [city, country].filter(Boolean).join(', ') || t('common.notAvailable')
 }
 </script>
 

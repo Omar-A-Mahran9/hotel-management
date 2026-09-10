@@ -17,21 +17,18 @@ class IdentityStatusPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final ThemeData theme = Theme.of(context);
-    final AppSemanticColors semantic =
-        theme.extension<AppSemanticColors>() ?? AppSemanticColors.light;
+    final AppColorTokens c = context.colors;
 
     final (Color fg, Color bg) = switch (status) {
-      IdentityVerificationStatus.staffRejected =>
-        (theme.colorScheme.error, AppColors.errorContainer),
+      IdentityVerificationStatus.staffRejected => (c.errorFg, c.errorBg),
       IdentityVerificationStatus.retryAllowed ||
       IdentityVerificationStatus.pendingManualReview ||
       IdentityVerificationStatus.notStarted =>
-        (semantic.warning, semantic.warningContainer),
+        (c.warningFg, c.warningBg),
       IdentityVerificationStatus.autoApproved ||
       IdentityVerificationStatus.staffApproved =>
-        (semantic.success, semantic.successContainer),
-      _ => (semantic.info, semantic.infoContainer),
+        (c.successFg, c.successBg),
+      _ => (c.infoFg, c.infoBg),
     };
 
     return StatusPill(

@@ -3,7 +3,7 @@
 /// `App\Domain\IdentityVerification\Models\IdentityVerificationSession`
 /// constants and `IdentityVerificationStateMachine`; Phase 0 §10). The mobile
 /// state must reflect the backend state machine — no alternative states are
-/// invented (md/mobile/feature_guide.md).
+/// invented (mobile/docs/feature_guide.md).
 enum IdentityVerificationStatus {
   notStarted('not_started'),
   documentUploaded('document_uploaded'),

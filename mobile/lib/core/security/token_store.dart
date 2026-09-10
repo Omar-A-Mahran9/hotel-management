@@ -4,7 +4,7 @@
 /// ships only [InMemoryTokenStore]; a platform-backed secure implementation
 /// (Keychain / Keystore) is added in a later phase once Android SDK / Xcode /
 /// CocoaPods are available. Tokens are never written to source or logs
-/// (md/mobile/architecture.md §8, md/mobile/coding_rules.md §10).
+/// (mobile/docs/architecture.md §8, mobile/docs/coding_rules.md §10).
 abstract interface class TokenStore {
   Future<String?> readAccessToken();
 

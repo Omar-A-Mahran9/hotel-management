@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_spacing.dart';
 
 /// Centered loading indicator with an optional label. Use for full-section
-/// loading states (md/mobile/testing_guide.md — "Widget Tests").
+/// loading states (mobile/docs/testing_guide.md — "Widget Tests").
 class LoadingView extends StatelessWidget {
   const LoadingView({super.key, this.label});
 

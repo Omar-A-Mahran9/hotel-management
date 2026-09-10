@@ -5,15 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:hotel_guest_app/app/router/app_router.dart';
 import 'package:hotel_guest_app/core/localization/generated/app_localizations.dart';
 import 'package:hotel_guest_app/core/time/clock.dart';
-import 'package:hotel_guest_app/features/discovery/presentation/widgets/stay_range_calendar.dart';
 
 import '../../support/auth_test_support.dart';
+import '../../support/calendar_test_support.dart';
 import '../../support/pump_app.dart';
-
-Finder _calendarDay(String day) => find.descendant(
-      of: find.byType(StayRangeCalendar),
-      matching: find.text(day),
-    );
 
 final List<Override> _fixedClock = <Override>[
   clockProvider.overrideWithValue(() => DateTime(2026, 9, 1)),
@@ -36,10 +31,8 @@ Future<AppLocalizations> _openRooms(WidgetTester tester) async {
   await tester.pumpAndSettle();
   await tester.tap(find.text(en.hotelSelectDates));
   await tester.pumpAndSettle();
-  await tester.tap(_calendarDay('6').first);
-  await tester.pump();
-  await tester.tap(_calendarDay('8').first);
-  await tester.pump();
+  await tapCalendarDay(tester, '6');
+  await tapCalendarDay(tester, '8');
   await tester.tap(find.widgetWithText(FilledButton, en.stayDatesShowRooms));
   await tester.pumpAndSettle();
   return en;
@@ -116,12 +109,8 @@ void main() {
     expect(find.text(en.stayDatesTitle), findsOneWidget);
 
     // A new check-in day restarts the range and invalidates the selection.
-    await tester.ensureVisible(_calendarDay('3').first);
-    await tester.tap(_calendarDay('3').first);
-    await tester.pumpAndSettle();
-    await tester.ensureVisible(_calendarDay('5').first);
-    await tester.tap(_calendarDay('5').first);
-    await tester.pumpAndSettle();
+    await tapCalendarDay(tester, '3');
+    await tapCalendarDay(tester, '5');
     await tester.tap(find.widgetWithText(FilledButton, en.stayDatesShowRooms));
     await tester.pumpAndSettle();
 

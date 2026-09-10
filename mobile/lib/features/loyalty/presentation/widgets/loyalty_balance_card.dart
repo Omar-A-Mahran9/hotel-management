@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/localization/l10n.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../domain/entities/loyalty_account.dart';
+import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_icons.dart';
+import '../../domain/entities/loyalty_account.dart';
 
 /// The brown points-balance card (`14 · Entry, loyalty & completion`). Shows the
 /// **backend** balance and the group-wide copy — no tier, no rate, no
-/// conversion (none exist in the MVP).
+/// conversion (none exist in the MVP). Built on the `Card` component's
+/// `inverse` style.
 class LoyaltyBalanceCard extends StatelessWidget {
   const LoyaltyBalanceCard({super.key, required this.account});
 
@@ -19,44 +20,36 @@ class LoyaltyBalanceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final ThemeData theme = Theme.of(context);
+    final AppColorTokens c = context.colors;
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: AppColors.brown700,
-        borderRadius: AppRadius.allLg,
-      ),
+    return AppCard(
+      style: AppCardStyle.inverse,
+      padding: const EdgeInsets.all(AppSpacing.space5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
             l10n.loyaltyBalanceLabel,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: AppColors.bronze200,
-            ),
+            style: theme.textTheme.bodySmall?.copyWith(color: c.accentWarm),
           ),
-          const SizedBox(height: AppSpacing.xxs),
+          const SizedBox(height: AppSpacing.space1),
           Text(
             l10n.loyaltyPointsValue(account.pointsBalance),
             style: theme.textTheme.displaySmall?.copyWith(
-              color: AppColors.white,
-              fontWeight: FontWeight.w700,
+              color: c.textOnInverse,
               fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
             ),
           ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacing.space3),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const Icon(AppIcons.guests, size: 15, color: AppColors.bronze200),
-              const SizedBox(width: AppSpacing.xxs),
+              Icon(AppIcons.guests, size: 15, color: c.accentWarm),
+              const SizedBox(width: AppSpacing.space1),
               Expanded(
                 child: Text(
                   l10n.loyaltyGroupWideNote,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.bronze200,
-                  ),
+                  style: theme.textTheme.bodySmall?.copyWith(color: c.accentWarm),
                 ),
               ),
             ],

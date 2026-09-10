@@ -58,7 +58,43 @@ const drawerClass = computed(() =>
 
         <ul v-show="!sectionCollapsed(section.key)" class="mt-1 space-y-0.5">
           <li v-for="item in section.items" :key="item.key">
+            <!-- Collapsible sub-group (e.g. Locations) -->
+            <template v-if="item.children && item.children.length">
+              <button
+                v-if="!iconMode"
+                type="button"
+                class="group flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-2sm font-medium text-secondary-foreground transition-colors hover:bg-secondary"
+                @click="app.toggleNavSection(item.key)"
+              >
+                <KtIcon :name="item.icon" class="shrink-0" />
+                <span class="truncate">{{ t(item.labelKey) }}</span>
+                <KtIcon
+                  name="down"
+                  class="ms-auto text-2xs transition-transform"
+                  :class="{ '-rotate-90 rtl:rotate-90': sectionCollapsed(item.key) }"
+                />
+              </button>
+              <ul v-show="iconMode || !sectionCollapsed(item.key)" class="space-y-0.5" :class="iconMode ? '' : 'ms-3.5 mt-0.5 border-s border-border ps-2'">
+                <li v-for="child in item.children" :key="child.key">
+                  <NuxtLink
+                    :to="child.to"
+                    class="group flex items-center rounded-md py-2 text-2sm font-medium transition-colors"
+                    :class="[
+                      iconMode ? 'justify-center px-0' : 'gap-2.5 px-2.5',
+                      isActive(child.to) ? 'bg-primary/12 text-primary' : 'text-secondary-foreground hover:bg-secondary',
+                    ]"
+                    :title="iconMode ? t(child.labelKey) : undefined"
+                    @click="app.toggleSidebarMobile(false)"
+                  >
+                    <KtIcon :name="child.icon" class="shrink-0" />
+                    <span v-if="!iconMode" class="truncate">{{ t(child.labelKey) }}</span>
+                  </NuxtLink>
+                </li>
+              </ul>
+            </template>
+
             <NuxtLink
+              v-else
               :to="item.to"
               class="group flex items-center rounded-md py-2 text-2sm font-medium transition-colors"
               :class="[

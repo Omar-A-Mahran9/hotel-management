@@ -2,139 +2,138 @@ import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
 import 'app_radius.dart';
+import 'app_sizes.dart';
 import 'app_spacing.dart';
 import 'app_typography.dart';
 
 /// Builds the light and dark [ThemeData] for the Guest App from the design
-/// tokens. This is the single source of truth for visual styling — widgets must
-/// not define their own colours or text styles (md/mobile/design-system.md).
+/// tokens (`mobile/docs/design-system-tokens.md`). Single source of truth for
+/// visual styling — widgets must not define their own colours or text styles.
 ///
-/// The goal is the Figma appearance implemented on Material infrastructure —
-/// wherever a Material default is visibly different from the Figma, the
-/// component is themed here, not left at its default.
+/// Colour comes from [AppColorTokens] (registered as a [ThemeExtension] and read
+/// via `context.colors`); the [ColorScheme] mirrors the subset Material's own
+/// widgets consume. Both modes are fully specified in the Figma.
 abstract final class AppTheme {
   static ThemeData get light => _build(Brightness.light);
   static ThemeData get dark => _build(Brightness.dark);
 
   static ThemeData _build(Brightness brightness) {
     final bool isDark = brightness == Brightness.dark;
+    final AppColorTokens c = AppColorTokens.of(brightness);
 
     final ColorScheme scheme = ColorScheme(
       brightness: brightness,
-      primary: isDark ? AppColors.bronze200 : AppColors.brown700,
-      onPrimary: isDark ? AppColors.brown900 : AppColors.white,
-      secondary: AppColors.bronze500,
-      onSecondary: AppColors.white,
-      surface: isDark ? AppColors.darkSurface : AppColors.surface,
-      onSurface: isDark ? AppColors.darkInk : AppColors.ink900,
-      surfaceContainerHighest: isDark
-          ? const Color(0xFF2B2420)
-          : const Color(0xFFF1ECE3),
-      error: AppColors.error,
-      onError: AppColors.white,
-      errorContainer: AppColors.errorContainer,
-      onErrorContainer: AppColors.error,
-      outline: isDark ? AppColors.darkHairline : AppColors.hairline,
-      outlineVariant: isDark
-          ? const Color(0xFF2E2620)
-          : const Color(0xFFEFE9DF),
+      primary: c.bgPrimary,
+      onPrimary: c.textOnPrimary,
+      secondary: c.accentWarm,
+      onSecondary: isDark ? AppPrimitives.stone900 : AppPrimitives.white,
+      surface: c.bgSurface,
+      onSurface: c.textPrimary,
+      onSurfaceVariant: c.textSecondary,
+      surfaceContainerHighest: c.bgSubtle,
+      error: c.errorFg,
+      onError: AppPrimitives.white,
+      errorContainer: c.errorBg,
+      onErrorContainer: c.errorFg,
+      outline: c.borderDefault,
+      outlineVariant: c.bgSubtle,
     );
 
-    final Color secondaryText = isDark
-        ? const Color(0xFFB9B0A7)
-        : AppColors.ink600;
     final TextTheme textTheme = AppTypography.textTheme(
-      scheme.onSurface,
-      secondaryText,
+      c.textPrimary,
+      c.textSecondary,
     );
-    final Color scaffoldBackground = isDark
-        ? AppColors.darkBackground
-        : AppColors.paper;
-    final Color cream = isDark ? AppColors.darkSurface : AppColors.paper;
+
+    /// Secondary-button fill — a cream/raised surface, not a coloured outline.
+    final Color secondaryFill = isDark ? c.bgSurfaceRaised : c.bgCanvas;
 
     return ThemeData(
       useMaterial3: true,
       brightness: brightness,
       colorScheme: scheme,
-      scaffoldBackgroundColor: scaffoldBackground,
+      scaffoldBackgroundColor: c.bgCanvas,
       textTheme: textTheme,
       fontFamily: AppTypography.fontFamily,
       fontFamilyFallback: AppTypography.fontFamilyFallback,
       extensions: <ThemeExtension<dynamic>>[
+        c,
         isDark ? AppSemanticColors.dark : AppSemanticColors.light,
       ],
 
       // ── App bar ──────────────────────────────────────────────────────────
       // Flat, background-aware, centred title, no Material tint/elevation.
       appBarTheme: AppBarTheme(
-        backgroundColor: scaffoldBackground,
+        backgroundColor: c.bgCanvas,
         surfaceTintColor: Colors.transparent,
         shadowColor: Colors.transparent,
         scrolledUnderElevation: 0,
         elevation: 0,
         centerTitle: true,
         titleTextStyle: textTheme.titleLarge,
-        foregroundColor: scheme.onSurface,
-        iconTheme: IconThemeData(color: scheme.onSurface, size: 24),
+        foregroundColor: c.textPrimary,
+        iconTheme: IconThemeData(
+          color: c.textPrimary,
+          size: AppIconSizes.appBar,
+        ),
       ),
 
       // ── Cards ────────────────────────────────────────────────────────────
-      // Borderless by default (see AppCard for the soft warm shadow); the
-      // hairline is opt-in for list-container cards only.
       cardTheme: CardThemeData(
-        color: scheme.surface,
+        color: c.bgSurface,
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.allCard),
       ),
 
       dividerTheme: DividerThemeData(
-        color: scheme.outline,
+        color: c.borderDefault,
         thickness: 1,
-        space: AppSpacing.md,
+        space: AppSpacing.space4,
       ),
 
       // ── Inputs ───────────────────────────────────────────────────────────
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: scheme.surface,
+        fillColor: c.bgSurface,
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
+          horizontal: AppSpacing.space4,
+          vertical: AppSpacing.space3,
         ),
         border: OutlineInputBorder(
           borderRadius: AppRadius.allInput,
-          borderSide: BorderSide(color: scheme.outline),
+          borderSide: BorderSide(color: c.borderDefault),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: AppRadius.allInput,
-          borderSide: BorderSide(color: scheme.outline),
+          borderSide: BorderSide(color: c.borderDefault),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppRadius.allInput,
-          borderSide: BorderSide(color: scheme.primary, width: 1.5),
+          borderSide: BorderSide(color: c.borderFocus, width: 1.5),
         ),
-        errorBorder: const OutlineInputBorder(
+        errorBorder: OutlineInputBorder(
           borderRadius: AppRadius.allInput,
-          borderSide: BorderSide(color: AppColors.error),
+          borderSide: BorderSide(color: c.errorFg),
         ),
-        focusedErrorBorder: const OutlineInputBorder(
+        focusedErrorBorder: OutlineInputBorder(
           borderRadius: AppRadius.allInput,
-          borderSide: BorderSide(color: AppColors.error, width: 1.5),
+          borderSide: BorderSide(color: c.errorFg, width: 1.5),
         ),
-        hintStyle: textTheme.bodyMedium,
+        hintStyle: textTheme.bodyMedium?.copyWith(color: c.textPlaceholder),
         labelStyle: textTheme.bodyMedium,
       ),
 
       // ── Buttons ──────────────────────────────────────────────────────────
-      // Full-width pill CTAs, ~54 tall, heavy label. See PrimaryButton /
-      // SecondaryButton / DangerButton for the composed components.
+      // Full-width pill CTAs (radius 999, Figma `Button` component). The
+      // composed widgets (PrimaryButton / SecondaryButton / DangerButton) take a
+      // `size` for the Small 40 / Medium 48 / Large 56 axis; 52 is the standing
+      // full-width height.
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: scheme.primary,
-          foregroundColor: scheme.onPrimary,
-          disabledBackgroundColor: scheme.outline,
-          disabledForegroundColor: scheme.onSurface.withValues(alpha: 0.5),
+          backgroundColor: c.bgPrimary,
+          foregroundColor: c.textOnPrimary,
+          disabledBackgroundColor: c.bgDisabled,
+          disabledForegroundColor: c.textDisabled,
           minimumSize: const Size.fromHeight(52),
           textStyle: textTheme.labelLarge,
           shape: const RoundedRectangleBorder(borderRadius: AppRadius.allPill),
@@ -143,61 +142,73 @@ abstract final class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: scheme.onSurface,
-          backgroundColor: cream,
-          disabledForegroundColor: scheme.onSurface.withValues(alpha: 0.4),
+          foregroundColor: c.textPrimary,
+          backgroundColor: secondaryFill,
+          disabledForegroundColor: c.textDisabled,
           minimumSize: const Size.fromHeight(52),
           textStyle: textTheme.labelLarge,
-          side: BorderSide(color: scheme.outline),
+          side: BorderSide(color: c.borderDefault),
           shape: const RoundedRectangleBorder(borderRadius: AppRadius.allPill),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: scheme.primary,
+          foregroundColor: c.textAccent,
           textStyle: textTheme.labelLarge,
         ),
       ),
 
       // ── Chips ────────────────────────────────────────────────────────────
-      // Quick-sort / filter chips: brown-filled when selected, cream pill with
-      // a hairline when not. Overrides Material's grey default.
+      // Brown-filled when selected, cream pill with a hairline when not.
       chipTheme: ChipThemeData(
-        backgroundColor: scheme.surface,
-        selectedColor: scheme.primary,
-        checkmarkColor: scheme.onPrimary,
+        backgroundColor: c.bgSurface,
+        selectedColor: c.bgPrimary,
+        checkmarkColor: c.textOnPrimary,
         showCheckmark: false,
-        side: BorderSide(color: scheme.outline),
+        side: BorderSide(color: c.borderDefault),
         shape: const StadiumBorder(),
-        labelStyle: textTheme.labelLarge?.copyWith(
-          color: scheme.onSurface,
-          fontWeight: AppTypography.semiBold,
-        ),
+        labelStyle: textTheme.labelLarge?.copyWith(color: c.textPrimary),
         secondaryLabelStyle: textTheme.labelLarge?.copyWith(
-          color: scheme.onPrimary,
+          color: c.textOnPrimary,
         ),
         padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.xs,
+          horizontal: AppSpacing.space3,
+          vertical: AppSpacing.space2,
         ),
         elevation: 0,
         pressElevation: 0,
       ),
 
+      // ── Toggle (Figma `Toggle` component) ────────────────────────────────
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((Set<WidgetState> s) {
+          if (s.contains(WidgetState.disabled)) return c.textDisabled;
+          return AppPrimitives.white;
+        }),
+        trackColor: WidgetStateProperty.resolveWith((Set<WidgetState> s) {
+          if (s.contains(WidgetState.disabled)) return c.bgDisabled;
+          if (s.contains(WidgetState.selected)) return c.bgPrimary;
+          return c.borderStrong;
+        }),
+        trackOutlineColor: const WidgetStatePropertyAll<Color>(
+          Colors.transparent,
+        ),
+      ),
+
       // ── Bottom sheets ────────────────────────────────────────────────────
       bottomSheetTheme: BottomSheetThemeData(
-        backgroundColor: scheme.surface,
+        backgroundColor: c.bgSurface,
         surfaceTintColor: Colors.transparent,
-        modalBackgroundColor: scheme.surface,
+        modalBackgroundColor: c.bgSurface,
         showDragHandle: true,
-        dragHandleColor: scheme.outline,
+        dragHandleColor: c.borderStrong,
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.topSheet),
       ),
 
       // ── Bottom navigation (Figma's persistent 4-tab bar) ─────────────────
       navigationBarTheme: NavigationBarThemeData(
         height: 64,
-        backgroundColor: scheme.surface,
+        backgroundColor: c.bgSurface,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         indicatorColor: Colors.transparent,
@@ -205,29 +216,29 @@ abstract final class AppTheme {
         iconTheme: WidgetStateProperty.resolveWith((Set<WidgetState> states) {
           final bool selected = states.contains(WidgetState.selected);
           return IconThemeData(
-            size: 24,
-            color: selected ? scheme.primary : secondaryText,
+            size: AppIconSizes.nav,
+            color: selected ? c.bgPrimary : c.textSecondary,
           );
         }),
         labelTextStyle: WidgetStateProperty.resolveWith((Set<WidgetState> s) {
           final bool selected = s.contains(WidgetState.selected);
           return textTheme.labelMedium?.copyWith(
-            color: selected ? scheme.primary : secondaryText,
-            fontWeight: selected ? AppTypography.bold : AppTypography.semiBold,
+            color: selected ? c.bgPrimary : c.textSecondary,
+            fontWeight: selected ? AppTypography.bold : AppTypography.medium,
           );
         }),
       ),
 
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.ink900,
+        backgroundColor: c.bgInverse,
         contentTextStyle: textTheme.bodyMedium?.copyWith(
-          color: AppColors.white,
+          color: c.textOnInverse,
         ),
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.allMd),
       ),
 
-      progressIndicatorTheme: ProgressIndicatorThemeData(color: scheme.primary),
+      progressIndicatorTheme: ProgressIndicatorThemeData(color: c.bgPrimary),
     );
   }
 }

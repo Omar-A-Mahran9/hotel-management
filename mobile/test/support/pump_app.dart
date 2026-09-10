@@ -29,6 +29,15 @@ Future<ProviderContainer> pumpApp(
   );
   addTearDown(container.dispose);
 
+  // Keep the default 800 logical width (horizontal layouts assume it) but give
+  // tests a tall viewport: the design-system type scale uses Arabic (loose)
+  // line-heights, so screens are ~15–20% taller and the stock 600px height
+  // leaves sticky-footer CTAs and calendar rows clipped.
+  tester.view.devicePixelRatio = 1.0;
+  tester.view.physicalSize = const Size(800, 1600);
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+
   if (locale != null) {
     container.read(localeControllerProvider.notifier).set(locale);
   }

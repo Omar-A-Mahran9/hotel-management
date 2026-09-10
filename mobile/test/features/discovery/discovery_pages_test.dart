@@ -8,6 +8,7 @@ import 'package:hotel_guest_app/features/discovery/presentation/widgets/room_sum
 import 'package:hotel_guest_app/features/discovery/presentation/widgets/stay_range_calendar.dart';
 
 import '../../support/auth_test_support.dart';
+import '../../support/calendar_test_support.dart';
 import '../../support/pump_app.dart';
 
 final List<Override> _fixedClock = <Override>[
@@ -126,19 +127,11 @@ void main() {
     final Finder cta = find.widgetWithText(FilledButton, en.stayDatesShowRooms);
     expect(tester.widget<FilledButton>(cta).onPressed, isNull);
 
-    await tester.tap(find.descendant(
-      of: find.byType(StayRangeCalendar),
-      matching: find.text('6'),
-    ).first);
-    await tester.pumpAndSettle();
+    await tapCalendarDay(tester, '6');
     // After the first tap the guidance moves past the initial hint.
     expect(find.text(en.stayDatesHintPickCheckIn), findsNothing);
 
-    await tester.tap(find.descendant(
-      of: find.byType(StayRangeCalendar),
-      matching: find.text('8'),
-    ).first);
-    await tester.pumpAndSettle();
+    await tapCalendarDay(tester, '8');
     // Both chosen → range + nights guidance and an enabled CTA.
     expect(find.textContaining(en.stayNights(2)), findsWidgets);
 
@@ -175,10 +168,8 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text(en.hotelSelectDates));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('6').first);
-    await tester.pump();
-    await tester.tap(find.text('8').first);
-    await tester.pump();
+    await tapCalendarDay(tester, '6');
+    await tapCalendarDay(tester, '8');
     await tester.tap(find.widgetWithText(FilledButton, en.stayDatesShowRooms));
     await tester.pumpAndSettle();
 

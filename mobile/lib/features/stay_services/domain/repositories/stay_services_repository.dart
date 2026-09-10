@@ -2,7 +2,7 @@ import '../entities/hotel_service.dart';
 import '../entities/service_order.dart';
 
 /// The stay-services contract the presentation layer depends on
-/// (md/mobile/architecture.md §4). Dummy vs API is a DI decision, exactly as in
+/// (mobile/docs/architecture.md §4). Dummy vs API is a DI decision, exactly as in
 /// `PaymentRepository`.
 ///
 /// Every method throws a `Failure` on error (mapped by the implementation).

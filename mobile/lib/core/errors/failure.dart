@@ -15,7 +15,7 @@ enum FailureKind {
 }
 
 /// Immutable, presentation-friendly error. Carries no stack traces or raw
-/// server payloads (md/mobile/coding_rules.md §9).
+/// server payloads (mobile/docs/coding_rules.md §9).
 class Failure {
   const Failure(
     this.kind, {

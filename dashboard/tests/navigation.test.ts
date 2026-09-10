@@ -8,6 +8,7 @@ const GROUP_OWNER_PERMS = [
   'reservations.view', 'reservations.manage', 'payments.manage', 'loyalty.view',
   'services.view', 'services.manage', 'loyalty.rules.manage', 'invoice.view',
   'folio.view', 'checkout.perform', 'notifications.view', 'check-in.perform',
+  'locations.view', 'locations.manage',
 ]
 const RECEPTION_PERMS = [
   'hotels.view', 'inventory.view', 'reservations.view', 'check-in.perform',
@@ -54,6 +55,18 @@ describe('navigation filter', () => {
       { key: 'rooms', labelKey: '', to: '/rooms', icon: '', permission: 'inventory.view', scope: 'hotel' },
       { permissions: ['inventory.view'], hasHotels: false },
     )).toBe(false)
+  })
+
+  it('shows the Locations sub-group only when the user holds a locations permission', () => {
+    const withPerm = filterNavigation(NAVIGATION, { permissions: ['locations.view'], hasHotels: true })
+    const admin = withPerm.find(s => s.key === 'administration')
+    const locations = admin?.items.find(i => i.key === 'locations')
+    expect(locations).toBeTruthy()
+    expect(locations?.children?.map(c => c.key)).toEqual(['countries', 'cities'])
+
+    const without = filterNavigation(NAVIGATION, { permissions: RECEPTION_PERMS, hasHotels: true })
+    const adminWithout = without.find(s => s.key === 'administration')
+    expect(adminWithout?.items.find(i => i.key === 'locations')).toBeFalsy()
   })
 
   it('gapItemsFor lists the documented gaps the user could otherwise see', () => {

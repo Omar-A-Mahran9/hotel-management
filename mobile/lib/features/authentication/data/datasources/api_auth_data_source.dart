@@ -1,33 +1,54 @@
+import 'package:dio/dio.dart';
+
 import '../../../../core/data/data_source.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../core/network/api_client.dart';
 import '../models/auth_models.dart';
 import 'auth_data_source.dart';
 
-/// API-backed authentication source.
+/// API-backed guest authentication against the Laravel `/api/v1/guest/auth/*`
+/// surface (Slice 0). Contract — `md/integration-contract-matrix.md`:
 ///
-/// Phase 1 keeps this a documented stub: the Laravel guest-auth endpoints
-/// (`/api/v1/auth/otp`, `/auth/otp/verify`, …) are not part of an approved
-/// contract yet, so each method raises [NotImplementedInPhaseException] rather
-/// than guessing a route or payload (README — "Backend-First Rule"). The
-/// [ApiClient] dependency and the wiring are in place; completing a method is a
-/// localized change once the contract lands. The commented calls show the
-/// intended shape.
+/// * `POST /guest/auth/otp/request`  `{phone}`                        → challenge
+/// * `POST /guest/auth/otp/resend`   `{challenge_id, phone}`          → challenge
+/// * `POST /guest/auth/otp/verify`   `{challenge_id, phone, code}`    → outcome
+/// * `PATCH /guest/profile`          `{name, email}`  (bearer token)  → guest
+///
+/// Wrong code / lock-out come back as **200** with an `outcome` discriminator,
+/// not as errors — mirrored here onto [OtpVerifyResult].
 class ApiAuthDataSource implements AuthDataSource, RemoteDataSource {
   ApiAuthDataSource(this._client);
 
-  // Retained so wiring approved endpoints stays a small change.
-  // ignore: unused_field
   final ApiClient _client;
 
-  static const String _reason =
-      'Guest authentication endpoints are not part of an approved contract yet';
+  @override
+  Future<AuthSessionModel?> fetchCurrentSession(String accessToken) async {
+    try {
+      final Map<String, dynamic> json = await _client.getJson('/guest/auth/me');
+      final Map<String, dynamic> data = _data(json);
+      final Map<String, dynamic> guest =
+          (data['guest'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
+      return AuthSessionModel(
+        accessToken: accessToken,
+        phoneE164: guest['phone'] as String? ?? '',
+        fullName: guest['name'] as String?,
+        email: guest['email'] as String?,
+      );
+    } on UnauthorizedException {
+      return null;
+    } on DioException catch (e) {
+      if (e.error is UnauthorizedException) return null;
+      rethrow;
+    }
+  }
 
   @override
   Future<OtpChallengeModel> requestOtp(String phoneE164) async {
-    // final json = await _client.postJson('/auth/otp', body: {'phone': phoneE164});
-    // return OtpChallengeModel.fromJson(json['data'] as Map<String, dynamic>);
-    throw const NotImplementedInPhaseException(_reason);
+    final Map<String, dynamic> json = await _client.postJson(
+      '/guest/auth/otp/request',
+      body: <String, dynamic>{'phone': phoneE164},
+    );
+    return OtpChallengeModel.fromJson(_data(json));
   }
 
   @override
@@ -35,7 +56,11 @@ class ApiAuthDataSource implements AuthDataSource, RemoteDataSource {
     required String challengeId,
     required String phoneE164,
   }) async {
-    throw const NotImplementedInPhaseException(_reason);
+    final Map<String, dynamic> json = await _client.postJson(
+      '/guest/auth/otp/resend',
+      body: <String, dynamic>{'challenge_id': challengeId, 'phone': phoneE164},
+    );
+    return OtpChallengeModel.fromJson(_data(json));
   }
 
   @override
@@ -45,7 +70,27 @@ class ApiAuthDataSource implements AuthDataSource, RemoteDataSource {
     required int attemptsRemaining,
     required String code,
   }) async {
-    throw const NotImplementedInPhaseException(_reason);
+    final Map<String, dynamic> json = await _client.postJson(
+      '/guest/auth/otp/verify',
+      body: <String, dynamic>{
+        'challenge_id': challengeId,
+        'phone': phoneE164,
+        'code': code,
+      },
+    );
+    final Map<String, dynamic> data = _data(json);
+
+    switch (data['outcome'] as String?) {
+      case 'authenticated':
+        return OtpVerifyAccepted(AuthSessionModel.fromVerify(data));
+      case 'locked_out':
+        return const OtpVerifyLockedOut();
+      case 'rejected':
+      default:
+        return OtpVerifyRejected(
+          attemptsRemaining: (data['attempts_remaining'] as num?)?.toInt() ?? 0,
+        );
+    }
   }
 
   @override
@@ -55,6 +100,27 @@ class ApiAuthDataSource implements AuthDataSource, RemoteDataSource {
     required String fullName,
     required String email,
   }) async {
-    throw const NotImplementedInPhaseException(_reason);
+    // The token is already persisted by the repository, so AuthInterceptor
+    // attaches it — no explicit header needed here.
+    final Map<String, dynamic> json = await _client.patchJson(
+      '/guest/profile',
+      body: <String, dynamic>{'name': fullName, 'email': email},
+    );
+    final Map<String, dynamic> data = _data(json);
+    final Map<String, dynamic> guest =
+        (data['guest'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
+
+    return AuthSessionModel(
+      accessToken: accessToken,
+      phoneE164: guest['phone'] as String? ?? phoneE164,
+      fullName: guest['name'] as String?,
+      email: guest['email'] as String?,
+    );
+  }
+
+  Map<String, dynamic> _data(Map<String, dynamic> json) {
+    final Object? data = json['data'];
+    if (data is Map<String, dynamic>) return data;
+    throw const UnknownException(message: 'Malformed auth response');
   }
 }

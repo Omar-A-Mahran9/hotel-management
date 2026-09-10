@@ -51,12 +51,8 @@ class BrandLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
     final AppLocalizations l10n = context.l10n;
-    final Color mc =
-        markColor ??
-        theme.extension<AppSemanticColors>()?.accent ??
-        AppColors.bronze500;
+    final Color mc = markColor ?? context.colors.accentWarm;
     final Color wc = wordmarkColor ?? mc;
     final Color tc = taglineColor ?? wc.withValues(alpha: 0.7);
 
@@ -74,10 +70,7 @@ class BrandLogo extends StatelessWidget {
             SizedBox(width: markSize * 0.42),
             Text(
               l10n.appName,
-              style: AppTypography.price(
-                wc,
-                size: markSize * 0.66,
-              ).copyWith(letterSpacing: 0.2),
+              style: AppTypography.brand(wc, size: markSize * 0.66),
             ),
           ],
         );
@@ -90,22 +83,13 @@ class BrandLogo extends StatelessWidget {
             SizedBox(height: markSize * 0.55),
             Text(
               l10n.appName,
-              style: AppTypography.price(
-                wc,
-                size: markSize * 0.72,
-              ).copyWith(letterSpacing: 0.3),
+              style: AppTypography.brand(wc, size: markSize * 0.72),
             ),
             if (showTagline) ...<Widget>[
               SizedBox(height: markSize * 0.22),
               Text(
                 l10n.entryTagline,
-                style: TextStyle(
-                  fontFamily: AppTypography.fontFamily,
-                  fontSize: markSize * 0.42,
-                  fontWeight: AppTypography.medium,
-                  letterSpacing: 0.4,
-                  color: tc,
-                ),
+                style: AppTypography.labelRegular(tc),
               ),
             ],
           ],

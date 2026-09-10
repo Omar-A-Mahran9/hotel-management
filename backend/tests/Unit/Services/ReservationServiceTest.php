@@ -367,6 +367,21 @@ class ReservationServiceTest extends TestCase
 
                 return $this->guest;
             }
+
+            public function findByPhone(string $phone): ?Guest
+            {
+                return $this->guest;
+            }
+
+            public function create(array $data): Guest
+            {
+                return $this->guest;
+            }
+
+            public function update(Guest $guest, array $data): Guest
+            {
+                return $guest;
+            }
         };
 
         $service = new ReservationService(

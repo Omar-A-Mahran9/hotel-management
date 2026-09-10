@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Hotel, HotelGroup } from '~/types/api'
-import { hotelsService } from '~/services'
+import { citiesService, countriesService, hotelsService } from '~/services'
 import { ApiError } from '~/utils/apiError'
 
 const props = defineProps<{
@@ -10,7 +10,7 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{ saved: [hotel: Hotel] }>()
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const app = useAppStore()
 const router = useRouter()
 
@@ -20,8 +20,8 @@ interface FormState {
   hotel_group_id: number | null
   name: string
   slug: string
-  country: string
-  city: string
+  country_id: number | null
+  city_id: number | null
   timezone: string
   is_active: boolean
 }
@@ -31,8 +31,8 @@ function snapshot(h?: Hotel | null): FormState {
     hotel_group_id: h?.hotel_group_id ?? props.groups[0]?.id ?? null,
     name: h?.name ?? '',
     slug: h?.slug ?? '',
-    country: h?.country ?? '',
-    city: h?.city ?? '',
+    country_id: h?.country_id ?? null,
+    city_id: h?.city_id ?? null,
     timezone: h?.timezone ?? 'UTC',
     is_active: h?.is_active ?? true,
   }
@@ -41,16 +41,28 @@ function snapshot(h?: Hotel | null): FormState {
 const form = reactive<FormState>(snapshot(props.hotel))
 let initial = JSON.stringify(form)
 
-// The edit page resolves the hotel async — seed the form from it exactly
-// once it arrives, without clobbering anything the user has already typed.
+// Human labels for a pre-selected country/city that may not be in the first
+// page of options (edit flow) — taken from the hotel's embedded summaries.
+const localized = (s?: { name_en: string, name_ar: string } | null) =>
+  s ? (locale.value === 'ar' ? s.name_ar : s.name_en) : null
+const countryLabel = ref<string | null>(localized(props.hotel?.country_summary))
+const cityLabel = ref<string | null>(localized(props.hotel?.city_summary))
+
+// True while we seed the form from an incoming hotel, so the
+// country-change watcher below does not wipe the seeded city.
+const seeding = ref(false)
+
 watch(() => props.hotel, (h) => {
   if (h) {
+    seeding.value = true
     Object.assign(form, snapshot(h))
+    countryLabel.value = localized(h.country_summary)
+    cityLabel.value = localized(h.city_summary)
     initial = JSON.stringify(form)
+    nextTick(() => { seeding.value = false })
   }
 })
 
-// Pre-select the first group once the list resolves, if nothing is chosen.
 watch(() => props.groups, (groups) => {
   if (form.hotel_group_id == null && groups[0]) {
     form.hotel_group_id = groups[0].id
@@ -58,13 +70,20 @@ watch(() => props.groups, (groups) => {
   }
 }, { immediate: true })
 
+// Country -> City dependency: when the country changes, drop a city that no
+// longer belongs to it (the City select reloads via :reload-key).
+watch(() => form.country_id, (next, prev) => {
+  if (!seeding.value && prev !== undefined && next !== prev) {
+    form.city_id = null
+    cityLabel.value = null
+  }
+})
+
 const dirty = computed(() => JSON.stringify(form) !== initial)
 
 const saving = ref(false)
 const fieldErrors = ref<Record<string, string[]>>({})
 
-// Suggest a slug from the name while creating — until the user edits the
-// slug field themselves, after which it is left alone.
 const slugTouched = ref(isEdit.value)
 function slugify(s: string) {
   return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60)
@@ -72,6 +91,11 @@ function slugify(s: string) {
 watch(() => form.name, (name) => {
   if (!slugTouched.value) form.slug = slugify(name)
 })
+
+// EntitySelect fetchers — thin wrappers over the real Laravel endpoints.
+const fetchCountries = ({ search }: { search?: string }) => countriesService.options(search)
+const fetchCities = ({ search }: { search?: string }) =>
+  form.country_id ? citiesService.forCountry(form.country_id, search) : Promise.resolve([])
 
 async function save() {
   if (saving.value || form.hotel_group_id == null) return
@@ -81,8 +105,8 @@ async function save() {
     hotel_group_id: form.hotel_group_id,
     name: form.name,
     slug: form.slug,
-    country: form.country || null,
-    city: form.city || null,
+    country_id: form.country_id,
+    city_id: form.city_id,
     timezone: form.timezone || undefined,
     is_active: form.is_active,
   }
@@ -90,7 +114,7 @@ async function save() {
     const hotel = props.hotel
       ? await hotelsService.update(props.hotel.id, body)
       : await hotelsService.create(body)
-    initial = JSON.stringify(form) // clear dirty so the leave guard doesn't fire
+    initial = JSON.stringify(form)
     app.pushToast('success', isEdit.value ? t('hotels.updated') : t('hotels.created'))
     emit('saved', hotel)
   } catch (e) {
@@ -110,7 +134,6 @@ function cancel() {
   else router.push('/hotels')
 }
 
-// --- unsaved-changes protection ---------------------------------------
 function beforeUnload(e: BeforeUnloadEvent) {
   if (dirty.value && !saving.value) {
     e.preventDefault()
@@ -163,11 +186,53 @@ onBeforeRouteLeave(() => {
 
     <FormSection :title="t('hotels.sectionLocation')" :description="t('hotels.sectionLocationDesc')">
       <div class="grid gap-4 sm:grid-cols-2">
-        <FormField for-id="hotel-country" :label="t('hotels.country')" :error="fieldErrors.country">
-          <input id="hotel-country" v-model="form.country" class="input" autocomplete="off">
+        <FormField
+          for-id="hotel-country"
+          :label="t('locations.country')"
+          :error="fieldErrors.country_id"
+          required
+        >
+          <EntitySelect
+            id="hotel-country"
+            v-model="form.country_id"
+            :fetcher="fetchCountries"
+            :label-fn="(c) => locale === 'ar' ? c.name_ar : c.name_en"
+            :placeholder="t('locations.selectCountry')"
+            :selected-label="countryLabel"
+            :invalid="!!fieldErrors.country_id"
+            clearable
+            required
+          >
+            <template #empty>
+              {{ t('locations.noCountries') }}
+            </template>
+          </EntitySelect>
         </FormField>
-        <FormField for-id="hotel-city" :label="t('hotels.city')" :error="fieldErrors.city">
-          <input id="hotel-city" v-model="form.city" class="input" autocomplete="off">
+
+        <FormField
+          for-id="hotel-city"
+          :label="t('locations.city')"
+          :error="fieldErrors.city_id"
+          required
+        >
+          <EntitySelect
+            id="hotel-city"
+            v-model="form.city_id"
+            :fetcher="fetchCities"
+            :label-fn="(c) => locale === 'ar' ? c.name_ar : c.name_en"
+            :placeholder="t('locations.selectCity')"
+            :selected-label="cityLabel"
+            :reload-key="form.country_id"
+            :disabled="form.country_id == null"
+            :disabled-hint="t('locations.selectCountryFirst')"
+            :invalid="!!fieldErrors.city_id"
+            clearable
+            required
+          >
+            <template #empty>
+              {{ t('locations.noCities') }}
+            </template>
+          </EntitySelect>
         </FormField>
       </div>
       <FormField
@@ -193,12 +258,6 @@ onBeforeRouteLeave(() => {
             <p class="mt-0.5 text-muted-foreground">
               {{ t('hotels.imagesGapBody') }}
             </p>
-            <ul class="mt-2 space-y-0.5 font-mono text-2xs text-foreground">
-              <li>migration: hotels.logo_path, hotels.cover_path (nullable string)</li>
-              <li>Store/UpdateHotelRequest: image|mimes:jpg,jpeg,png,webp|max:…</li>
-              <li>HotelResource: logo_url, cover_url (Storage::disk('public')-&gt;url)</li>
-              <li>route: POST /hotels/{hotel}/media · DELETE /hotels/{hotel}/media/{type}</li>
-            </ul>
           </div>
         </div>
       </div>
@@ -214,7 +273,6 @@ onBeforeRouteLeave(() => {
       </label>
     </FormSection>
 
-    <!-- sticky action bar -->
     <div
       class="fixed bottom-0 z-20 border-t border-border bg-card/95 px-4 py-3 backdrop-blur end-0 start-0 lg:start-[var(--sidebar-width)] lg:px-6"
     >

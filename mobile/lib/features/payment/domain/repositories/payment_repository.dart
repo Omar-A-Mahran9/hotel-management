@@ -3,7 +3,7 @@ import '../entities/payment_request.dart';
 import '../entities/payment_result.dart';
 
 /// The payment contract the presentation layer depends on
-/// (md/mobile/architecture.md §4). Which data source fulfils it (dummy vs the
+/// (mobile/docs/architecture.md §4). Which data source fulfils it (dummy vs the
 /// future guest payment API) is a DI decision, exactly as in
 /// `ReservationRepository` / `DiscoveryRepository`.
 ///

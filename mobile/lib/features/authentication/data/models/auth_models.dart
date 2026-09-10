@@ -42,13 +42,26 @@ class AuthSessionModel {
   final String? fullName;
   final String? email;
 
+  /// Parses the `data` object of a successful `POST /guest/auth/otp/verify`
+  /// (`{outcome:"authenticated", token, guest:{...}}`).
+  factory AuthSessionModel.fromVerify(Map<String, dynamic> data) {
+    final Map<String, dynamic> guest =
+        (data['guest'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
+    return AuthSessionModel(
+      accessToken: data['token'] as String,
+      phoneE164: guest['phone'] as String? ?? '',
+      fullName: guest['name'] as String?,
+      email: guest['email'] as String?,
+    );
+  }
+
   factory AuthSessionModel.fromJson(Map<String, dynamic> json) {
     final Map<String, dynamic> guest =
         (json['guest'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
     return AuthSessionModel(
-      accessToken: json['access_token'] as String,
+      accessToken: json['token'] as String? ?? json['access_token'] as String,
       phoneE164: guest['phone'] as String? ?? json['phone'] as String? ?? '',
-      fullName: guest['full_name'] as String?,
+      fullName: guest['name'] as String?,
       email: guest['email'] as String?,
     );
   }

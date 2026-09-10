@@ -2,7 +2,7 @@ import '../entities/identity_verification_request.dart';
 import '../entities/identity_verification_session.dart';
 
 /// The identity-verification contract the presentation layer depends on
-/// (md/mobile/architecture.md §4). Which data source fulfils it (dummy vs the
+/// (mobile/docs/architecture.md §4). Which data source fulfils it (dummy vs the
 /// future guest API) is a DI decision, exactly as in `ReservationRepository`.
 ///
 /// Every method throws a `Failure` on error (mapped by the implementation) so

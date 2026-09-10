@@ -11,8 +11,19 @@ void main() {
     final AppLocalizations en = await tester.l10n();
 
     expect(find.text(en.entryHeadline), findsOneWidget);
-    expect(find.text(en.entryTagline), findsOneWidget);
+    expect(find.text(en.entrySubtext), findsOneWidget);
     expect(find.text(en.entryStartAction), findsOneWidget);
+  });
+
+  testWidgets('the entry screen shows a single call to action and no chrome',
+      (WidgetTester tester) async {
+    await pumpApp(tester);
+    final AppLocalizations en = await tester.l10n();
+
+    // `01 · Entry` is photo-forward: no eyebrow tagline, no language toggle.
+    expect(find.text(en.entryTagline), findsNothing);
+    expect(find.text(en.languageArabic), findsNothing);
+    expect(find.text(en.languageEnglish), findsNothing);
   });
 
   testWidgets('the call to action opens the phone sign-in screen',
@@ -26,24 +37,14 @@ void main() {
     expect(find.text(en.authPhoneHeading), findsOneWidget);
   });
 
-  testWidgets('the language switch flips the entry screen to Arabic RTL',
+  testWidgets('the entry headline follows the active locale direction',
       (WidgetTester tester) async {
     await pumpApp(tester);
     final AppLocalizations en = await tester.l10n();
-    final AppLocalizations ar = await tester.l10n('ar');
 
     expect(
       Directionality.of(tester.element(find.text(en.entryHeadline))),
       TextDirection.ltr,
-    );
-
-    await tester.tap(find.text(en.languageArabic));
-    await tester.pumpAndSettle();
-
-    expect(find.text(ar.entryHeadline), findsOneWidget);
-    expect(
-      Directionality.of(tester.element(find.text(ar.entryHeadline))),
-      TextDirection.rtl,
     );
   });
 }

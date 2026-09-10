@@ -5,6 +5,12 @@ import '../models/auth_models.dart';
 /// backend contract is approved). Both honour the same behaviour, including
 /// error behaviour (coding_rules.md §7).
 abstract interface class AuthDataSource {
+  /// Rebuilds the session for a persisted [accessToken] by calling the
+  /// backend `me` endpoint. Returns `null` when the token is no longer
+  /// valid (the caller then clears local state). Infrastructure errors are
+  /// thrown as usual.
+  Future<AuthSessionModel?> fetchCurrentSession(String accessToken);
+
   Future<OtpChallengeModel> requestOtp(String phoneE164);
 
   Future<OtpChallengeModel> resendOtp({

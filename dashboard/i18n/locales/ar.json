@@ -93,7 +93,10 @@
     "comingSoon": "بانتظار واجهة الخادم",
     "menu": "القائمة",
     "expand": "توسيع الشريط الجانبي",
-    "collapse": "طي الشريط الجانبي"
+    "collapse": "طي الشريط الجانبي",
+    "locations": "المواقع",
+    "countries": "الدول",
+    "cities": "المدن"
   },
   "auth": {
     "loginTitle": "تسجيل الدخول",
@@ -648,5 +651,64 @@
   "theme": {
     "light": "فاتح",
     "dark": "داكن"
+  },
+  "locations": {
+    "title": "المواقع",
+    "country": "الدولة",
+    "city": "المدينة",
+    "selectCountry": "اختر دولة",
+    "selectCity": "اختر مدينة",
+    "selectCountryFirst": "اختر دولة أولاً",
+    "noCountries": "لا توجد دول",
+    "noCities": "لا توجد مدن",
+    "code": "الرمز",
+    "status": "الحالة"
+  },
+  "countries": {
+    "title": "الدول",
+    "subtitle": "بيانات مرجعية للدول تُستخدم عبر الفنادق والاستكشاف والبحث.",
+    "nameEn": "الاسم (بالإنجليزية)",
+    "nameAr": "الاسم (بالعربية)",
+    "code": "الرمز",
+    "codeHint": "رمز قصير فريد، مثل EG. يُحفظ بحروف كبيرة.",
+    "status": "الحالة",
+    "cities": "المدن",
+    "citiesCount": "{count} مدينة",
+    "new": "إضافة دولة",
+    "newDesc": "أنشئ دولة. تُضاف المدن من شاشة المدن.",
+    "editTitle": "تعديل الدولة",
+    "editTitleNamed": "تعديل {name}",
+    "createAction": "إنشاء دولة",
+    "created": "تم إنشاء الدولة.",
+    "updated": "تم تحديث الدولة.",
+    "deleted": "تم حذف الدولة.",
+    "activated": "تم تفعيل الدولة.",
+    "deactivated": "تم إلغاء تفعيل الدولة.",
+    "deleteConfirm": "حذف «{name}»؟ ممكن فقط عندما لا ترتبط بها أي مدينة أو فندق.",
+    "filterStatus": "الحالة",
+    "searchPlaceholder": "ابحث بالاسم أو الرمز"
+  },
+  "cities": {
+    "title": "المدن",
+    "subtitle": "تنتمي المدن إلى دولة وتُستخدم من قبل الفنادق.",
+    "country": "الدولة",
+    "nameEn": "الاسم (بالإنجليزية)",
+    "nameAr": "الاسم (بالعربية)",
+    "status": "الحالة",
+    "new": "إضافة مدينة",
+    "newDesc": "أنشئ مدينة ضمن دولة.",
+    "editTitle": "تعديل المدينة",
+    "editTitleNamed": "تعديل {name}",
+    "createAction": "إنشاء مدينة",
+    "created": "تم إنشاء المدينة.",
+    "updated": "تم تحديث المدينة.",
+    "deleted": "تم حذف المدينة.",
+    "activated": "تم تفعيل المدينة.",
+    "deactivated": "تم إلغاء تفعيل المدينة.",
+    "deleteConfirm": "حذف «{name}»؟ ممكن فقط عندما لا يرتبط بها أي فندق.",
+    "filterCountry": "الدولة",
+    "filterStatus": "الحالة",
+    "allCountries": "كل الدول",
+    "searchPlaceholder": "ابحث في المدن"
   }
 }

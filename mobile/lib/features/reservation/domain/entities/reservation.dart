@@ -11,7 +11,7 @@ import 'reservation_status.dart';
 /// Mirrors the fields of the Laravel `ReservationResource` the guest surface
 /// needs (`id`, `hotel_id`, `room_type_id`, `room_id`, `check_in`, `check_out`,
 /// `status`, `price_snapshot`, `created_at`). Laravel remains authoritative for
-/// the status and the price (md/mobile/architecture.md §6); the app never
+/// the status and the price (mobile/docs/architecture.md §6); the app never
 /// transitions the status itself.
 ///
 /// [hotelName] / [roomName] are display snapshots carried from the create

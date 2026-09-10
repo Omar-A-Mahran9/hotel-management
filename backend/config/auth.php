@@ -1,6 +1,7 @@
 <?php
 
 use App\Domain\IdentityAccess\Models\User;
+use App\Domain\Reservation\Models\Guest;
 
 return [
 
@@ -42,6 +43,22 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // Staff API guard. Declaring it explicitly (rather than relying on
+        // Sanctum's implicit default) pins the provider to `users`, so
+        // Sanctum's Guard::hasValidProvider() rejects a guest token on any
+        // `auth:sanctum` route — defence in depth for the staff surface.
+        'sanctum' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ],
+
+        // Guest API guard (phone + OTP). Provider `guests` means a staff
+        // token is likewise rejected on any `auth:guest` route.
+        'guest' => [
+            'driver' => 'sanctum',
+            'provider' => 'guests',
+        ],
     ],
 
     /*
@@ -67,10 +84,10 @@ return [
             'model' => env('AUTH_MODEL', User::class),
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'guests' => [
+            'driver' => 'eloquent',
+            'model' => Guest::class,
+        ],
     ],
 
     /*

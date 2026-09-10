@@ -3,7 +3,7 @@
 /// `App\Domain\DigitalAccess\Models\AccessGrant` constants and
 /// `DigitalAccessStateMachine`; Phase 0 §11). The mobile state reflects the
 /// backend state machine — no alternative states are invented
-/// (md/mobile/architecture.md §6).
+/// (mobile/docs/architecture.md §6).
 enum AccessStatus {
   notIssued('not_issued'),
   issueRequested('issue_requested'),

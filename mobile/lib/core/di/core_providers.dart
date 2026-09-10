@@ -30,7 +30,7 @@ final apiClientProvider = Provider<ApiClient>((Ref ref) {
 });
 
 /// Selects the health data source by configuration — the UI never sees this
-/// choice (md/mobile/README.md — "Development Strategy").
+/// choice (mobile/docs/README.md — "Development Strategy").
 final healthDataSourceProvider = Provider<HealthDataSource>((Ref ref) {
   final AppConfig config = ref.watch(appConfigProvider);
   return config.useDummyData

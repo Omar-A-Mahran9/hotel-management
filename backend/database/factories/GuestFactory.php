@@ -17,14 +17,28 @@ class GuestFactory extends Factory
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
-            'phone' => fake()->phoneNumber(),
+            'phone' => '+'.fake()->unique()->numerify('9665########'),
+            'phone_verified_at' => now(),
+            'profile_completed_at' => now(),
         ];
     }
 
-    public function withoutPhone(): static
+    /**
+     * A first-time guest: phone proven, but the name/email step not done.
+     */
+    public function unregistered(): static
     {
         return $this->state(fn (array $attributes) => [
-            'phone' => null,
+            'name' => null,
+            'email' => null,
+            'profile_completed_at' => null,
+        ]);
+    }
+
+    public function unverifiedPhone(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'phone_verified_at' => null,
         ]);
     }
 }

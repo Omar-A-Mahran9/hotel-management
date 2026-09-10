@@ -20,6 +20,8 @@ class RolePermissionSeeder extends Seeder
             'hotel-groups.manage' => 'Create and update hotel groups',
             'hotels.view' => 'View hotels within authorized scope',
             'hotels.manage' => 'Create and update hotels',
+            'locations.view' => 'View country and city master data',
+            'locations.manage' => 'Create, update, delete, activate/deactivate countries and cities',
             'users.view' => 'View staff users',
             'users.manage' => 'Create, update, and delete staff users',
             'roles.view' => 'View roles',
@@ -64,7 +66,7 @@ class RolePermissionSeeder extends Seeder
             Role::HOTEL_MANAGER => [
                 'name' => 'Hotel Manager',
                 'description' => 'Manages one or more assigned hotels.',
-                'permissions' => ['hotels.view', 'inventory.view', 'inventory.manage', 'reservations.view', 'reservations.manage', 'payments.manage', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke', 'services.view', 'services.manage', 'service-orders.view', 'service-orders.manage', 'folio.view', 'checkout.perform', 'invoice.view', 'loyalty.view', 'loyalty.manage', 'notifications.view'],
+                'permissions' => ['hotels.view', 'locations.view', 'inventory.view', 'inventory.manage', 'reservations.view', 'reservations.manage', 'payments.manage', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke', 'services.view', 'services.manage', 'service-orders.view', 'service-orders.manage', 'folio.view', 'checkout.perform', 'invoice.view', 'loyalty.view', 'loyalty.manage', 'notifications.view'],
             ],
             Role::RECEPTION => [
                 'name' => 'Reception',
@@ -85,7 +87,7 @@ class RolePermissionSeeder extends Seeder
                 // Reception may read a reservation's notification feed and
                 // clear its unread markers (operational, R7 — no financial
                 // effect).
-                'permissions' => ['hotels.view', 'inventory.view', 'reservations.view', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke', 'services.view', 'service-orders.view', 'service-orders.manage', 'folio.view', 'checkout.perform', 'invoice.view', 'loyalty.view', 'notifications.view'],
+                'permissions' => ['hotels.view', 'locations.view', 'inventory.view', 'reservations.view', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke', 'services.view', 'service-orders.view', 'service-orders.manage', 'folio.view', 'checkout.perform', 'invoice.view', 'loyalty.view', 'notifications.view'],
             ],
             Role::GUEST => [
                 'name' => 'Guest',

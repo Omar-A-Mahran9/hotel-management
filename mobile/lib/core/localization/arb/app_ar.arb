@@ -283,6 +283,7 @@
   "reservationNotFoundBody": "تعذّر العثور على هذا الحجز.",
 
   "reservationStatusPending": "قيد الانتظار",
+  "reservationStatusConfirmed": "مؤكد",
   "reservationStatusDepositHeld": "تم حجز التأمين",
   "reservationStatusVerified": "تم التحقق",
   "reservationStatusCheckedIn": "تم تسجيل الدخول",

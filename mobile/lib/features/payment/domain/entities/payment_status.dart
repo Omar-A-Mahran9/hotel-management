@@ -1,6 +1,6 @@
 /// The payment money-lifecycle, mirroring the Laravel `Payment` status
 /// vocabulary **exactly** (backend `App\Domain\Payment\Models\Payment`
-/// constants and `PaymentStateMachine`; md/mobile/architecture.md §6 — "Laravel
+/// constants and `PaymentStateMachine`; mobile/docs/architecture.md §6 — "Laravel
 /// MUST remain authoritative for … payment state").
 ///
 /// Mobile Phase 5 only ever *requests a hold* (`POST

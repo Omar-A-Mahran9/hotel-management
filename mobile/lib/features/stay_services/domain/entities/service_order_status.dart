@@ -1,7 +1,7 @@
 /// The service-order lifecycle, mirroring the Laravel `ServiceOrder` status
 /// vocabulary **exactly** (backend `App\Domain\StayServices\Models\ServiceOrder`
 /// constants and `ServiceOrderStateMachine`; Phase 8). No new statuses are
-/// invented (md/mobile/architecture.md §6).
+/// invented (mobile/docs/architecture.md §6).
 ///
 /// ```
 /// requested → confirmed, cancelled

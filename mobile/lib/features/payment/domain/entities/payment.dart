@@ -10,7 +10,7 @@ import 'payment_status.dart';
 /// `hold_expires_at`, `created_at`, `updated_at`). Provider references,
 /// transaction rows, webhook data and idempotency keys are deliberately absent
 /// there and here — the client only ever sees application-level state
-/// (md/mobile/architecture.md §8).
+/// (mobile/docs/architecture.md §8).
 ///
 /// Laravel stays authoritative for [status] and [amount]; the app never
 /// transitions a payment itself.

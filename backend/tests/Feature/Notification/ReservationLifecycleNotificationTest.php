@@ -83,15 +83,18 @@ class ReservationLifecycleNotificationTest extends TestCase
         );
     }
 
-    public function test_sms_is_skipped_when_the_guest_has_no_phone(): void
+    public function test_email_is_skipped_when_the_guest_has_not_completed_their_profile(): void
     {
-        $guest = Guest::factory()->withoutPhone()->create();
+        // Slice 0: a guest always has a verified phone, but may not yet have
+        // supplied a name/email — so the email channel is the one that can
+        // legitimately be unreachable.
+        $guest = Guest::factory()->unregistered()->create();
         $reservation = $this->reservation(Reservation::STATUS_VERIFIED, $guest);
 
         $this->service()->transitionTo($reservation, Reservation::STATUS_CHECKED_IN);
 
         $this->assertEqualsCanonicalizing(
-            ['in_app', 'email'],
+            ['in_app', 'sms'],
             Notification::query()->where('reservation_id', $reservation->id)->pluck('channel')->map->value->all(),
         );
     }

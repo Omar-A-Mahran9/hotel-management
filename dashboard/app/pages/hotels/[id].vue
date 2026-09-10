@@ -3,11 +3,14 @@ import { hotelGroupsService, hotelsService } from '~/services'
 
 definePageMeta({ permission: 'hotels.view' })
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const route = useRoute()
 const { can } = useCan()
 const id = Number(route.params.id)
 const canManage = can('hotels.manage')
+
+const localized = (s?: { name_en: string, name_ar: string } | null) =>
+  s ? (locale.value === 'ar' ? s.name_ar : s.name_en) : null
 
 const hotel = useResource(() => hotelsService.get(id))
 
@@ -25,8 +28,8 @@ const facts = computed(() => {
   const h = hotel.data.value
   if (!h) return []
   return [
-    { label: t('hotels.city'), value: h.city || t('common.notAvailable') },
-    { label: t('hotels.country'), value: h.country || t('common.notAvailable') },
+    { label: t('hotels.city'), value: localized(h.city_summary) || h.city || t('common.notAvailable') },
+    { label: t('hotels.country'), value: localized(h.country_summary) || h.country || t('common.notAvailable') },
     { label: t('hotels.timezone'), value: h.timezone || t('common.notAvailable') },
     { label: t('hotels.slug'), value: h.slug },
     { label: t('hotels.group'), value: group.data.value?.name ?? `#${h.hotel_group_id}` },
@@ -36,7 +39,8 @@ const facts = computed(() => {
 const locationLine = computed(() => {
   const h = hotel.data.value
   if (!h) return ''
-  return [h.city, h.country].filter(Boolean).join(', ')
+  return [localized(h.city_summary) || h.city, localized(h.country_summary) || h.country]
+    .filter(Boolean).join(', ')
 })
 </script>
 

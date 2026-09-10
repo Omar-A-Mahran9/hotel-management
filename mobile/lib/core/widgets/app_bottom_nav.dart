@@ -7,7 +7,7 @@ import 'app_icons.dart';
 ///
 /// **Foundation only.** Three of the four destinations (bookings list, a global
 /// services hub, account) do not exist as screens yet — see
-/// `md/mobile/design-system.md` §"Bottom navigation". This widget provides the
+/// `mobile/docs/design-system.md` §"Bottom navigation". This widget provides the
 /// visual + the destination model so a `StatefulShellRoute` can adopt it once
 /// those screens are built, without re-deriving the styling. It never routes
 /// anywhere itself; the host supplies [onSelected].

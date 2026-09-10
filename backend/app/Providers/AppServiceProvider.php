@@ -18,6 +18,13 @@ use App\Domain\DigitalAccess\Provider\Exceptions\UnsupportedDigitalAccessProvide
 use App\Domain\DigitalAccess\Provider\SimulationDirective as DigitalAccessSimulationDirective;
 use App\Domain\DigitalAccess\Repositories\Contracts\AccessGrantRepositoryInterface;
 use App\Domain\DigitalAccess\Repositories\EloquentAccessGrantRepository;
+use App\Domain\Discovery\Repositories\Contracts\HotelCatalogRepositoryInterface;
+use App\Domain\Discovery\Repositories\EloquentHotelCatalogRepository;
+use App\Domain\GuestAccess\Otp\Contracts\OtpSenderInterface;
+use App\Domain\GuestAccess\Otp\DummyOtpSender;
+use App\Domain\GuestAccess\Otp\Exceptions\UnsupportedOtpSenderException;
+use App\Domain\GuestAccess\Repositories\Contracts\GuestOtpChallengeRepositoryInterface;
+use App\Domain\GuestAccess\Repositories\EloquentGuestOtpChallengeRepository;
 use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\HotelGroup\Models\HotelGroup;
 use App\Domain\HotelGroup\Policies\HotelGroupPolicy;
@@ -54,6 +61,14 @@ use App\Domain\Inventory\Repositories\Contracts\RoomRepositoryInterface;
 use App\Domain\Inventory\Repositories\Contracts\RoomTypeRepositoryInterface;
 use App\Domain\Inventory\Repositories\EloquentRoomRepository;
 use App\Domain\Inventory\Repositories\EloquentRoomTypeRepository;
+use App\Domain\Location\Models\City;
+use App\Domain\Location\Models\Country;
+use App\Domain\Location\Policies\CityPolicy;
+use App\Domain\Location\Policies\CountryPolicy;
+use App\Domain\Location\Repositories\Contracts\CityRepositoryInterface;
+use App\Domain\Location\Repositories\Contracts\CountryRepositoryInterface;
+use App\Domain\Location\Repositories\EloquentCityRepository;
+use App\Domain\Location\Repositories\EloquentCountryRepository;
 use App\Domain\Loyalty\Models\LoyaltyAccount;
 use App\Domain\Loyalty\Models\LoyaltyRule;
 use App\Domain\Loyalty\Policies\LoyaltyPolicy;
@@ -123,6 +138,10 @@ class AppServiceProvider extends ServiceProvider
         RoomRepositoryInterface::class => EloquentRoomRepository::class,
         ReservationRepositoryInterface::class => EloquentReservationRepository::class,
         GuestRepositoryInterface::class => EloquentGuestRepository::class,
+        GuestOtpChallengeRepositoryInterface::class => EloquentGuestOtpChallengeRepository::class,
+        HotelCatalogRepositoryInterface::class => EloquentHotelCatalogRepository::class,
+        CountryRepositoryInterface::class => EloquentCountryRepository::class,
+        CityRepositoryInterface::class => EloquentCityRepository::class,
         PaymentRepositoryInterface::class => EloquentPaymentRepository::class,
         PaymentTransactionRepositoryInterface::class => EloquentPaymentTransactionRepository::class,
         PaymentWebhookEventRepositoryInterface::class => EloquentPaymentWebhookEventRepository::class,
@@ -148,6 +167,8 @@ class AppServiceProvider extends ServiceProvider
     public array $policies = [
         HotelGroup::class => HotelGroupPolicy::class,
         Hotel::class => HotelPolicy::class,
+        Country::class => CountryPolicy::class,
+        City::class => CityPolicy::class,
         User::class => UserPolicy::class,
         RoomType::class => RoomTypePolicy::class,
         Room::class => RoomPolicy::class,
@@ -168,6 +189,19 @@ class AppServiceProvider extends ServiceProvider
 
     public function register(): void
     {
+        // The OTP sender boundary (Slice 0). The app depends only on
+        // OtpSenderInterface; the concrete sender is chosen from
+        // config('otp.sender'). "dummy" is the only implementation — an
+        // explicitly configured but unsupported sender fails loudly.
+        $this->app->singleton(OtpSenderInterface::class, function (): OtpSenderInterface {
+            $sender = (string) config('otp.sender');
+
+            return match ($sender) {
+                'dummy' => new DummyOtpSender,
+                default => throw new UnsupportedOtpSenderException($sender),
+            };
+        });
+
         // The payment provider boundary (Phase 5B). The rest of the app
         // depends only on PaymentGatewayInterface; the concrete provider is
         // chosen from config('payment.provider'). "dummy" is the only
@@ -235,6 +269,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('roles.view', fn (User $user) => $user->hasPermission('roles.view'));
         Gate::define('permissions.view', fn (User $user) => $user->hasPermission('permissions.view'));
 
+        $this->registerGuestAuthRateLimiters();
         $this->registerPaymentRateLimiters();
         $this->registerIdentityVerificationRateLimiters();
         $this->registerDigitalAccessRateLimiters();
@@ -266,6 +301,23 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('checkout.perform', fn (Request $request) => Limit::perMinute(
             (int) config('checkout.rate_limits.perform.per_minute'),
         )->by((string) ($request->user()?->id ?? $request->ip())));
+    }
+
+    /**
+     * Phase 0 §17 — rate limiting on the unauthenticated guest OTP
+     * endpoints (Slice 0). Config-driven (config/otp.php), keyed by the
+     * submitted phone (IP fallback) so one number cannot be flooded and
+     * one IP cannot farm codes for many numbers.
+     */
+    private function registerGuestAuthRateLimiters(): void
+    {
+        RateLimiter::for('guest.otp.request', fn (Request $request) => Limit::perMinute(
+            (int) config('otp.rate_limits.request.per_minute'),
+        )->by((string) ($request->input('phone') ?: $request->ip())));
+
+        RateLimiter::for('guest.otp.verify', fn (Request $request) => Limit::perMinute(
+            (int) config('otp.rate_limits.verify.per_minute'),
+        )->by((string) ($request->input('phone') ?: $request->ip())));
     }
 
     /**

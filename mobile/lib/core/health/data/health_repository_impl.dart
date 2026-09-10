@@ -6,7 +6,7 @@ import 'health_data_source.dart';
 /// Coordinates the health data source and maps failures to the domain contract.
 ///
 /// Which [HealthDataSource] it receives (dummy vs API) is decided by DI, not
-/// here (md/mobile/feature_guide.md Step 5).
+/// here (mobile/docs/feature_guide.md Step 5).
 class HealthRepositoryImpl implements HealthRepository {
   HealthRepositoryImpl(this._dataSource);
 

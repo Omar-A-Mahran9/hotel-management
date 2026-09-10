@@ -31,6 +31,24 @@ class GuestPhone {
     return GuestPhone(dialCode: dialCode, nationalNumber: normalised);
   }
 
+  /// Best-effort split of a canonical E.164 string back into a dialling code
+  /// and national number — used when restoring a session from the backend
+  /// (`GET /guest/auth/me` returns only the combined `phone`). Recognises the
+  /// GCC + a few common codes; otherwise assumes a 3-digit code.
+  factory GuestPhone.fromE164(String e164) {
+    final String digits = e164.replaceAll(RegExp(r'[^0-9]'), '');
+    for (final String cc in <String>['966', '971', '973', '974', '965', '968', '20', '1']) {
+      if (digits.startsWith(cc)) {
+        return GuestPhone(dialCode: '+$cc', nationalNumber: digits.substring(cc.length));
+      }
+    }
+    final int split = digits.length >= 3 ? 3 : 0;
+    return GuestPhone(
+      dialCode: '+${digits.substring(0, split)}',
+      nationalNumber: digits.substring(split),
+    );
+  }
+
   /// `true` when the number looks well-formed enough to send to the backend:
   /// a `+` dialling code and 6–14 national digits.
   bool get isValid {

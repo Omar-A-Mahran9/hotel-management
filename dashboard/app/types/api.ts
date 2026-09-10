@@ -44,14 +44,50 @@ export interface Role {
   permissions?: Permission[]
 }
 
+// ---- Locations (global reference data — CountryResource / CityResource) -
+export interface Country {
+  id: number
+  name_en: string
+  name_ar: string
+  code: string
+  is_active: boolean
+  cities_count?: number
+  created_at?: string
+  updated_at?: string
+}
+
+export interface City {
+  id: number
+  country_id: number
+  name_en: string
+  name_ar: string
+  is_active: boolean
+  country?: { id: number, name_en: string, name_ar: string }
+  created_at?: string
+  updated_at?: string
+}
+
+/** Flat {id, name_en, name_ar} summary embedded in HotelResource. */
+export interface LocationSummary {
+  id: number
+  name_en: string
+  name_ar: string
+}
+
 // ---- Hotels / groups --------------------------------------------------
 export interface Hotel {
   id: number
   hotel_group_id: number
   name: string
   slug: string
+  country_id: number | null
+  city_id: number | null
+  // Legacy free-text strings, kept for backward compatibility.
   country: string | null
   city: string | null
+  // Normalized summaries — present when the backend eager-loads the relations.
+  country_summary?: LocationSummary | null
+  city_summary?: LocationSummary | null
   timezone: string | null
   is_active: boolean
   created_at: string

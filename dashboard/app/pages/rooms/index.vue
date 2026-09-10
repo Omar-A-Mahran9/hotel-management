@@ -44,6 +44,11 @@ watch(typeFilter, () => hotelId.value != null && list.reload())
 const typeName = (id: number) =>
   (types.data.value ?? []).find(rt => rt.id === id)?.name ?? `#${id}`
 
+// Room type is a hotel-scoped entity relationship — options come from the
+// room-types API for the current hotel; the form submits room_type_id.
+const fetchRoomTypes = () =>
+  hotelId.value == null ? Promise.resolve([]) : roomTypesService.list(hotelId.value)
+
 const search = ref('')
 const rows = computed<Room[]>(() => {
   const all = list.data.value ?? []
@@ -157,14 +162,16 @@ async function saveStatus() {
           <SearchField v-model="search" :hint="t('common.clientFilterNote')" />
         </div>
         <FormField :label="t('rooms.filterByType')">
-          <select v-model="typeFilter" class="input min-w-40">
-            <option :value="null">
-              {{ t('common.all') }}
-            </option>
-            <option v-for="rt in types.data.value ?? []" :key="rt.id" :value="rt.id">
-              {{ rt.name }}
-            </option>
-          </select>
+          <div class="min-w-44">
+            <EntitySelect
+              v-model="typeFilter"
+              :fetcher="fetchRoomTypes"
+              label-key="name"
+              :placeholder="t('common.all')"
+              :reload-key="hotelId"
+              clearable
+            />
+          </div>
         </FormField>
       </div>
 
@@ -211,11 +218,16 @@ async function saveStatus() {
           <input v-model="form.room_number" class="input" required>
         </FormField>
         <FormField :label="t('rooms.type')" :error="fieldErrors.room_type_id" required>
-          <select v-model.number="form.room_type_id" class="input" required>
-            <option v-for="rt in types.data.value ?? []" :key="rt.id" :value="rt.id">
-              {{ rt.name }}
-            </option>
-          </select>
+          <EntitySelect
+            v-model="form.room_type_id"
+            :fetcher="fetchRoomTypes"
+            label-key="name"
+            :placeholder="t('rooms.type')"
+            :reload-key="hotelId"
+            :selected-label="editing ? typeName(editing.room_type_id) : null"
+            :invalid="!!fieldErrors.room_type_id"
+            required
+          />
         </FormField>
       </form>
       <template #footer>

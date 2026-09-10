@@ -9,7 +9,7 @@ import 'access_status.dart';
 /// `expires_at`, `revoked_at`, `revocation_reason`, `failure_reason`, and the
 /// `credential` — present ONLY while `status == active`). The provider
 /// reference, `idempotency_key`, attempt metadata and any provider internals
-/// are absent there and here (md/mobile/architecture.md §8, Phase 0 §17).
+/// are absent there and here (mobile/docs/architecture.md §8, Phase 0 §17).
 ///
 /// SECURITY: [credential] is the one piece of sensitive data. It is held only
 /// in memory on this immutable object for the lifetime of the screen, never

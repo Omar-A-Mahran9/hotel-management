@@ -37,8 +37,7 @@ class RoomSummaryCard extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     final AppLocalizations l10n = context.l10n;
     final Locale locale = Localizations.localeOf(context);
-    final AppSemanticColors semantic =
-        theme.extension<AppSemanticColors>() ?? AppSemanticColors.light;
+    final AppColorTokens colors = context.colors;
     final bool soldOut = !room.isAvailable;
 
     final List<String> specs1 = <String>[
@@ -129,15 +128,15 @@ class RoomSummaryCard extends StatelessWidget {
                   if (soldOut)
                     _Pill(
                       label: l10n.roomSoldOut,
-                      foreground: theme.colorScheme.error,
-                      background: AppColors.errorContainer,
+                      foreground: colors.errorFg,
+                      background: colors.errorBg,
                       icon: AppIcons.close,
                     )
                   else
                     _Pill(
                       label: l10n.hotelAvailable,
-                      foreground: semantic.success,
-                      background: semantic.successContainer,
+                      foreground: colors.successFg,
+                      background: colors.successBg,
                       icon: AppIcons.shieldCheck,
                     ),
                   if (room.roomType.refundable)
@@ -218,8 +217,8 @@ class _Pill extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.xs,
-        vertical: 3,
+        horizontal: AppSpacing.space2,
+        vertical: AppSpacing.space1,
       ),
       decoration: BoxDecoration(
         color: background,
@@ -230,7 +229,7 @@ class _Pill extends StatelessWidget {
         children: <Widget>[
           if (icon != null) ...<Widget>[
             Icon(icon, size: 13, color: foreground),
-            const SizedBox(width: 3),
+            const SizedBox(width: AppSpacing.space1),
           ],
           Text(
             label,

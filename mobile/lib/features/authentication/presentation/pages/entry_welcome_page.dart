@@ -5,19 +5,17 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/app_routes.dart';
 import '../../../../core/localization/l10n.dart';
-import '../../../../core/localization/locale_controller.dart';
-import '../../../../core/localization/supported_locales.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_image.dart';
 import '../../../../core/widgets/brand_logo.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../state/login_flow_controller.dart';
 
-/// `01 · Entry` — first run. A full-bleed hero photo fills the upper screen; a
-/// rounded-top paper card carries the brand lock-up, the promise headline and a
-/// single call to action. RTL-first (the Figma is Arabic).
+/// `01 · Entry` — first run. A single full-bleed hero photo fills the whole
+/// screen; its lower third fades into the paper ground so the brand mark, the
+/// promise headline and a single call to action read directly on the image.
+/// RTL-first (the Figma is Arabic).
 class EntryWelcomePage extends ConsumerWidget {
   const EntryWelcomePage({super.key});
 
@@ -25,44 +23,43 @@ class EntryWelcomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
     final ThemeData theme = Theme.of(context);
-    final Locale locale = Localizations.localeOf(context);
+    const Color paper = AppColors.paper;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
+      value: SystemUiOverlayStyle.dark.copyWith(
         statusBarColor: Colors.transparent,
       ),
       child: Scaffold(
-        backgroundColor: AppColors.paper,
-        body: Column(
+        backgroundColor: paper,
+        body: Stack(
+          fit: StackFit.expand,
           children: <Widget>[
-            Expanded(
-              child: Stack(
-                fit: StackFit.expand,
-                children: const <Widget>[
-                  AppImage(
-                    asset: AppImages.entryHero,
-                    fit: BoxFit.cover,
-                    borderRadius: BorderRadius.zero,
-                  ),
-                  // Soft fade into the card seam.
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment(0, 0.4),
-                        end: Alignment.bottomCenter,
-                        colors: <Color>[Color(0x00000000), Color(0x33000000)],
-                      ),
-                    ),
-                  ),
-                ],
+            const AppImage(
+              asset: AppImages.entryHero,
+              fit: BoxFit.cover,
+              borderRadius: BorderRadius.zero,
+            ),
+            // The photo dissolves into the paper ground over its lower half so
+            // the content sits on a calm, near-solid field while the top of the
+            // frame stays a clean photograph.
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: <Color>[
+                    paper.withValues(alpha: 0),
+                    paper.withValues(alpha: 0),
+                    paper,
+                  ],
+                  stops: const <double>[0.0, 0.36, 0.82],
+                ),
               ),
             ),
-            Container(
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                color: AppColors.paper,
-                borderRadius: AppRadius.topSheet,
-              ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
               child: SafeArea(
                 top: false,
                 child: Padding(
@@ -76,36 +73,15 @@ class EntryWelcomePage extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          _LanguageToggle(
-                            currentLocale: locale,
-                            onChanged: (Locale next) => ref
-                                .read(localeControllerProvider.notifier)
-                                .set(next),
-                          ),
-                          const Spacer(),
-                          const Flexible(
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              alignment: AlignmentDirectional.centerEnd,
-                              child: BrandLogo(
-                                markColor: AppColors.bronze500,
-                                wordmarkColor: AppColors.ink900,
-                                markSize: 26,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      Text(
-                        l10n.entryTagline,
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          color: AppColors.bronze500,
+                      const Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: BrandLogo(
+                          variant: BrandLogoVariant.markOnly,
+                          markColor: AppColors.bronze500,
+                          markSize: 30,
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.xs),
+                      const SizedBox(height: AppSpacing.lg),
                       Text(
                         l10n.entryHeadline,
                         style: theme.textTheme.displaySmall?.copyWith(
@@ -134,43 +110,6 @@ class EntryWelcomePage extends ConsumerWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-/// A small, discreet language switch. The Figma entry frame has no visible
-/// toggle, but language switching is a first-class feature (`14 · Entry` has a
-/// dedicated language screen that is not built yet) and the app must stay
-/// switchable before sign-in — so it sits quietly opposite the logo.
-class _LanguageToggle extends StatelessWidget {
-  const _LanguageToggle({required this.currentLocale, required this.onChanged});
-
-  final Locale currentLocale;
-  final ValueChanged<Locale> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = context.l10n;
-    final bool isArabic = currentLocale.languageCode == 'ar';
-    return Semantics(
-      label: l10n.entryLanguageSwitchLabel,
-      button: true,
-      child: TextButton(
-        style: TextButton.styleFrom(
-          foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.xs,
-            vertical: AppSpacing.xxs,
-          ),
-          minimumSize: Size.zero,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          textStyle: Theme.of(context).textTheme.labelMedium,
-        ),
-        onPressed: () => onChanged(
-          isArabic ? SupportedLocales.english : SupportedLocales.arabic,
-        ),
-        child: Text(isArabic ? l10n.languageEnglish : l10n.languageArabic),
       ),
     );
   }

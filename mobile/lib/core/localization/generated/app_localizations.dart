@@ -1574,6 +1574,12 @@ abstract class AppLocalizations {
   /// **'Pending'**
   String get reservationStatusPending;
 
+  /// Guest-facing umbrella label for a secured booking (design-system content/status/confirmed). ReservationStatus itself has no `confirmed` member; used on the confirmation screen and future Bookings-list filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get reservationStatusConfirmed;
+
   /// No description provided for @reservationStatusDepositHeld.
   ///
   /// In en, this message translates to:

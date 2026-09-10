@@ -2,7 +2,7 @@ import '../entities/create_reservation_request.dart';
 import '../entities/reservation.dart';
 
 /// The reservation contract the presentation layer depends on
-/// (md/mobile/architecture.md §4). Which data source fulfils it (dummy vs the
+/// (mobile/docs/architecture.md §4). Which data source fulfils it (dummy vs the
 /// future guest reservation API) is a DI decision, exactly as in
 /// `DiscoveryRepository` / `AuthRepository`.
 ///

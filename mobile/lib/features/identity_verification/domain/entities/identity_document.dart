@@ -23,7 +23,7 @@ enum IdentityDocumentType {
 /// A locally captured image, referenced only by non-sensitive metadata.
 ///
 /// The app never keeps the image bytes in domain/state objects and never logs
-/// them (md/mobile/architecture.md §8, phase brief "Security"). A real capture
+/// them (mobile/docs/architecture.md §8, phase brief "Security"). A real capture
 /// flow (camera / file picker) would hand the bytes straight to the upload data
 /// source; this value object carries just enough to show "a photo was added"
 /// and to describe the payload shape. In dummy mode it is a fixed placeholder.

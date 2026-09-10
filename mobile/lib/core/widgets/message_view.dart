@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
+import '../theme/app_sizes.dart';
 import '../theme/app_spacing.dart';
 import 'app_icons.dart';
 import 'primary_button.dart';
@@ -41,22 +43,22 @@ class MessageView extends StatelessWidget {
 
     return Center(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.xl),
+        padding: const EdgeInsets.all(AppSpacing.space6),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             // Figma: the icon "sits in a soft tile so the block has weight
             // rather than floating" — a rounded square, not a circle.
             Container(
-              width: 76,
-              height: 76,
+              width: AppSizes.emptyStateTile,
+              height: AppSizes.emptyStateTile,
               decoration: BoxDecoration(
-                color: tint.withValues(alpha: 0.10),
+                color: context.colors.bgSubtle,
                 borderRadius: AppRadius.allXl,
               ),
               child: Icon(icon, size: 32, color: tint),
             ),
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(height: AppSpacing.space4),
             Text(
               title,
               style: theme.textTheme.titleMedium,

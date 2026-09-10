@@ -2,8 +2,8 @@
 
 Feature modules live here, one folder per business capability. **No feature is
 implemented in Mobile Phase 0** — this file documents the shape each one takes so
-later phases stay consistent with `md/mobile/architecture.md` and
-`md/mobile/feature_guide.md`.
+later phases stay consistent with `mobile/docs/architecture.md` and
+`mobile/docs/feature_guide.md`.
 
 ## Planned modules (added per mobile phase)
 

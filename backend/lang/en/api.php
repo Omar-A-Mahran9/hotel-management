@@ -14,6 +14,22 @@ return [
     'account_inactive' => 'This account has been deactivated.',
     'server_error' => 'Something went wrong. Please try again later.',
 
+    'location' => [
+        'city_country_mismatch' => 'The selected city does not belong to the selected country.',
+        'country_delete_blocked' => 'This country still has cities or hotels and cannot be deleted. Deactivate it instead.',
+        'city_delete_blocked' => 'This city is still referenced by one or more hotels and cannot be deleted. Deactivate it instead.',
+    ],
+
+    'guest_auth' => [
+        'otp_sent' => 'A verification code has been sent.',
+        'verified' => 'Your phone number has been verified.',
+        'otp_incorrect' => 'The verification code is incorrect.',
+        'otp_locked_out' => 'Too many incorrect attempts. Request a new code.',
+        'otp_challenge_invalid' => 'This verification request is no longer valid. Request a new code.',
+        'otp_challenge_expired' => 'The verification code has expired. Request a new code.',
+        'otp_resend_cooldown' => 'Please wait before requesting another code.',
+    ],
+
     'payment' => [
         'hold_placed' => 'The deposit hold was placed successfully.',
         'hold_pending' => 'The deposit hold is awaiting confirmation from the payment provider.',

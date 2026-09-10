@@ -37,12 +37,21 @@ class AuthRepositoryImpl implements AuthRepository {
         return null;
       }
       if (_current?.accessToken == token) return _current;
-      // A token exists but the session object is gone (e.g. hot restart with a
-      // persistent store in a later phase). Without an approved "me" endpoint we
-      // cannot rebuild the profile, so treat it as signed-out.
-      await _tokenStore.clear();
-      _current = null;
-      return null;
+      // A token exists but the in-memory session is gone (cold start). Rebuild
+      // it from the backend `me` endpoint (Slice 0); a rejected token clears.
+      final AuthSessionModel? model =
+          await _dataSource.fetchCurrentSession(token);
+      if (model == null) {
+        await _tokenStore.clear();
+        _current = null;
+        return null;
+      }
+      final AuthSession restored = _toSession(
+        model,
+        fallbackPhone: GuestPhone.fromE164(model.phoneE164),
+      );
+      _current = restored;
+      return restored;
     } catch (error) {
       throw ErrorMapper.toFailure(error);
     }

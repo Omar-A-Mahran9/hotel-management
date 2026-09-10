@@ -65,7 +65,7 @@ class DiscoverPage extends ConsumerWidget {
             onPressed: () {},
           ),
           // Sign-out stays here until the "حسابي" account screen exists
-          // (see md/mobile/design-system.md §"Bottom navigation").
+          // (see mobile/docs/design-system.md §"Bottom navigation").
           IconButton(
             icon: const Icon(AppIcons.checkout),
             tooltip: l10n.authSignOut,
@@ -141,7 +141,7 @@ class DiscoverPage extends ConsumerWidget {
       ),
       // Foundation: the persistent Figma bottom nav. "Home" is this screen; the
       // other three destinations are not built yet (see
-      // md/mobile/design-system.md) — tapping them explains that rather than
+      // mobile/docs/design-system.md) — tapping them explains that rather than
       // routing to a placeholder.
       bottomNavigationBar: AppBottomNav(
         current: AppNavTab.home,

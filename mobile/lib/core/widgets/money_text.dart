@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 
 /// Centralised currency presentation.
@@ -27,7 +28,7 @@ class MoneyText extends StatelessWidget {
   /// The amount in whole Saudi Riyals, exactly as the backend provides it.
   final num amount;
 
-  /// Overrides the default price text style ([AppTypography.price]).
+  /// Overrides the default number style ([AppTypography.numMd]).
   final TextStyle? style;
 
   /// Overrides both the text and mark colour.
@@ -66,10 +67,10 @@ class MoneyText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextStyle resolved =
-        (style ?? AppTypography.price(_defaultColor(context))).copyWith(
+        (style ?? AppTypography.numMd(_defaultColor(context))).copyWith(
           color: color,
         );
-    final double size = markSize ?? resolved.fontSize ?? 16;
+    final double size = markSize ?? resolved.fontSize ?? 17;
     final Color markColor = color ?? resolved.color ?? _defaultColor(context);
     final String text = _digits(context, amount);
 
@@ -86,16 +87,16 @@ class MoneyText extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Text(text, style: numberStyle),
-            const SizedBox(width: 3),
+            const SizedBox(width: AppSpacing.space1),
             RiyalMark(size: size * 0.92, color: markColor),
             if (suffix != null) ...<Widget>[
-              const SizedBox(width: 4),
+              const SizedBox(width: AppSpacing.space1),
               Text(
                 suffix!,
                 style: (style ?? numberStyle).copyWith(
                   color: muted,
                   fontWeight: AppTypography.regular,
-                  fontSize: (resolved.fontSize ?? 16) * 0.82,
+                  fontSize: (resolved.fontSize ?? 17) * 0.82,
                 ),
               ),
             ],
@@ -123,10 +124,7 @@ class RiyalMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color c =
-        color ??
-        Theme.of(context).extension<AppSemanticColors>()?.accent ??
-        AppColors.bronze500;
+    final Color c = color ?? context.colors.accentWarmFg;
     return CustomPaint(
       size: Size(size * 1.02, size),
       painter: _RiyalPainter(c),

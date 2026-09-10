@@ -3,8 +3,12 @@
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CheckInController;
 use App\Http\Controllers\Api\V1\CheckoutController;
+use App\Http\Controllers\Api\V1\CityController;
+use App\Http\Controllers\Api\V1\CountryController;
 use App\Http\Controllers\Api\V1\DigitalAccessController;
 use App\Http\Controllers\Api\V1\FolioController;
+use App\Http\Controllers\Api\V1\Guest\GuestAuthController;
+use App\Http\Controllers\Api\V1\Guest\GuestDiscoveryController;
 use App\Http\Controllers\Api\V1\HotelController;
 use App\Http\Controllers\Api\V1\HotelGroupController;
 use App\Http\Controllers\Api\V1\IdentityVerificationController;
@@ -27,6 +31,42 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     Route::post('/auth/login', [AuthController::class, 'login']);
+
+    /*
+     * Slice 0 — Guest authentication (phone + OTP). Separate Sanctum guard
+     * (`auth:guest`, provider `guests`) from the staff surface. OTP endpoints
+     * are unauthenticated (the code is the credential) and rate limited per
+     * Phase 0 §17. Wrong-code / lock-out are 200 outcomes, not errors.
+     */
+    Route::prefix('guest')->group(function () {
+        Route::prefix('auth')->group(function () {
+            Route::post('/otp/request', [GuestAuthController::class, 'requestOtp'])
+                ->middleware('throttle:guest.otp.request');
+            Route::post('/otp/resend', [GuestAuthController::class, 'resendOtp'])
+                ->middleware('throttle:guest.otp.request');
+            Route::post('/otp/verify', [GuestAuthController::class, 'verifyOtp'])
+                ->middleware('throttle:guest.otp.verify');
+
+            Route::middleware('auth:guest')->group(function () {
+                Route::get('/me', [GuestAuthController::class, 'me']);
+                Route::post('/logout', [GuestAuthController::class, 'logout']);
+            });
+        });
+
+        Route::middleware('auth:guest')->group(function () {
+            Route::match(['put', 'patch'], '/profile', [GuestAuthController::class, 'updateProfile']);
+        });
+
+        /*
+         * Slice 1 — anonymous discovery. Active hotels / active room types
+         * only; no caller identity, so no hotel scope. Availability reuses
+         * ReservationService's overlap math as a non-locking preview.
+         */
+        Route::get('/hotels', [GuestDiscoveryController::class, 'hotels']);
+        Route::get('/hotels/cities', [GuestDiscoveryController::class, 'cities']);
+        Route::get('/hotels/{hotel}', [GuestDiscoveryController::class, 'show'])->whereNumber('hotel');
+        Route::get('/hotels/{hotel}/availability', [GuestDiscoveryController::class, 'availability'])->whereNumber('hotel');
+    });
 
     // Provider webhook — machine-to-machine, unauthenticated: the HMAC
     // signature is the credential (Phase 5E). Rate limited per Phase 0 §17,
@@ -55,6 +95,29 @@ Route::prefix('v1')->group(function () {
         Route::post('/hotels', [HotelController::class, 'store']);
         Route::get('/hotels/{hotel}', [HotelController::class, 'show']);
         Route::put('/hotels/{hotel}', [HotelController::class, 'update']);
+
+        /*
+         * Country + City master data (global reference data — NOT
+         * hotel-scoped). Permission-driven: locations.view for read,
+         * locations.manage for every write. `/countries/{country}/cities`
+         * powers the dependent Country -> City select in the dashboard.
+         */
+        Route::get('/countries', [CountryController::class, 'index']);
+        Route::post('/countries', [CountryController::class, 'store']);
+        Route::get('/countries/{country}', [CountryController::class, 'show'])->whereNumber('country');
+        Route::match(['put', 'patch'], '/countries/{country}', [CountryController::class, 'update'])->whereNumber('country');
+        Route::delete('/countries/{country}', [CountryController::class, 'destroy'])->whereNumber('country');
+        Route::patch('/countries/{country}/activate', [CountryController::class, 'activate'])->whereNumber('country');
+        Route::patch('/countries/{country}/deactivate', [CountryController::class, 'deactivate'])->whereNumber('country');
+        Route::get('/countries/{country}/cities', [CityController::class, 'forCountry'])->whereNumber('country');
+
+        Route::get('/cities', [CityController::class, 'index']);
+        Route::post('/cities', [CityController::class, 'store']);
+        Route::get('/cities/{city}', [CityController::class, 'show'])->whereNumber('city');
+        Route::match(['put', 'patch'], '/cities/{city}', [CityController::class, 'update'])->whereNumber('city');
+        Route::delete('/cities/{city}', [CityController::class, 'destroy'])->whereNumber('city');
+        Route::patch('/cities/{city}/activate', [CityController::class, 'activate'])->whereNumber('city');
+        Route::patch('/cities/{city}/deactivate', [CityController::class, 'deactivate'])->whereNumber('city');
 
         Route::get('/users', [UserController::class, 'index']);
         Route::post('/users', [UserController::class, 'store']);

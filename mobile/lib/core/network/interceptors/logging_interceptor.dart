@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 /// Minimal request/response logging for debug builds only.
 ///
 /// Sensitive headers and bodies are redacted so tokens, identity documents and
-/// payment secrets never reach the console (md/mobile/architecture.md §8).
+/// payment secrets never reach the console (mobile/docs/architecture.md §8).
 class LoggingInterceptor extends Interceptor {
   static const Set<String> _redactedHeaders = <String>{
     'authorization',

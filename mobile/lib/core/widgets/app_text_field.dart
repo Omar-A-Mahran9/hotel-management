@@ -5,7 +5,7 @@ import '../theme/app_spacing.dart';
 /// Labelled text field wired to the design system's [InputDecorationTheme].
 ///
 /// Works in both text directions automatically — no hard-coded alignment
-/// (md/mobile/architecture.md §9). All copy is passed in by the caller.
+/// (mobile/docs/architecture.md §9). All copy is passed in by the caller.
 class AppTextField extends StatelessWidget {
   const AppTextField({
     super.key,

@@ -18,7 +18,7 @@ import '../../../reservation/domain/entities/reservation.dart';
 /// No card data, CVV, PIN or provider credential is ever part of this request:
 /// the MVP dummy provider needs none, and a real integration would collect
 /// those through the provider's own SDK/redirect, never through our API body
-/// (md/mobile/architecture.md §8).
+/// (mobile/docs/architecture.md §8).
 @immutable
 class PaymentHoldRequest {
   const PaymentHoldRequest({

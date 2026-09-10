@@ -33,5 +33,7 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="OTP_SENDER" value="dummy"/>
+        <env name="OTP_FIXED_CODE" value="123456"/>
     </php>
 </phpunit>

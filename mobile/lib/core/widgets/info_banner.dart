@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
+import '../theme/app_sizes.dart';
 import '../theme/app_spacing.dart';
 import 'app_icons.dart';
 
-/// Tone of an [InfoBanner], mapped to the design system's semantic containers.
+/// Tone of an [InfoBanner], mapped to the design system's `color/state/*` set.
 enum InfoBannerTone { info, success, warning, error }
 
 /// Tinted, rounded message block with a leading icon badge — the canonical
 /// Figma pattern for **success / error / warning / info** notices and for the
 /// header block on result screens (`تم التحقق وتأكيد حجزك`, `الرمز غير صحيح`,
-/// `تعذر رفع الصور`, …).
+/// `تعذر رفع الصور`, …). Also covers the `Toast` component's tones.
 ///
 /// Copy is passed in by the caller; the block lays out correctly in RTL and
 /// LTR. For a result screen, pass [child] (details) and/or use
@@ -37,45 +38,62 @@ class InfoBanner extends StatelessWidget {
   /// Tighter padding for inline use inside lists.
   final bool dense;
 
-  static ({Color fg, IconData icon}) _spec(
-    InfoBannerTone tone,
-    AppSemanticColors semantic,
-    ColorScheme scheme,
+  ({Color fg, Color bg, Color border, IconData icon}) _spec(
+    AppColorTokens c,
   ) {
     return switch (tone) {
-      InfoBannerTone.info => (fg: semantic.info, icon: AppIcons.info),
-      InfoBannerTone.success => (fg: semantic.success, icon: AppIcons.success),
-      InfoBannerTone.warning => (fg: semantic.warning, icon: AppIcons.warning),
-      InfoBannerTone.error => (fg: scheme.error, icon: AppIcons.error),
+      InfoBannerTone.info => (
+        fg: c.infoFg,
+        bg: c.infoBg,
+        border: c.infoBorder,
+        icon: AppIcons.info,
+      ),
+      InfoBannerTone.success => (
+        fg: c.successFg,
+        bg: c.successBg,
+        border: c.successBorder,
+        icon: AppIcons.success,
+      ),
+      InfoBannerTone.warning => (
+        fg: c.warningFg,
+        bg: c.warningBg,
+        border: c.warningBorder,
+        icon: AppIcons.warning,
+      ),
+      InfoBannerTone.error => (
+        fg: c.errorFg,
+        bg: c.errorBg,
+        border: c.errorBorder,
+        icon: AppIcons.error,
+      ),
     };
   }
-
-  Color _bg(AppSemanticColors semantic) => switch (tone) {
-    InfoBannerTone.info => semantic.infoContainer,
-    InfoBannerTone.success => semantic.successContainer,
-    InfoBannerTone.warning => semantic.warningContainer,
-    InfoBannerTone.error => AppColors.errorContainer,
-  };
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final AppSemanticColors semantic =
-        theme.extension<AppSemanticColors>() ?? AppSemanticColors.light;
-    final spec = _spec(tone, semantic, theme.colorScheme);
+    final AppColorTokens c = context.colors;
+    final spec = _spec(c);
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(dense ? AppSpacing.sm : AppSpacing.md),
+      padding: EdgeInsets.all(
+        dense ? AppSpacing.space3 : AppSpacing.space4,
+      ),
       decoration: BoxDecoration(
-        color: _bg(semantic),
+        color: spec.bg,
         borderRadius: AppRadius.allLg,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          _IconBadge(color: spec.fg, icon: spec.icon, dense: dense),
-          const SizedBox(width: AppSpacing.sm),
+          _IconBadge(
+            fill: spec.border,
+            iconColor: spec.fg,
+            icon: spec.icon,
+            dense: dense,
+          ),
+          const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,16 +103,16 @@ class InfoBanner extends StatelessWidget {
                   style: theme.textTheme.titleSmall?.copyWith(color: spec.fg),
                 ),
                 if (message != null) ...<Widget>[
-                  const SizedBox(height: AppSpacing.xxs),
+                  const SizedBox(height: AppSpacing.space1),
                   Text(
                     message!,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface,
+                      color: c.textPrimary,
                     ),
                   ),
                 ],
                 if (child != null) ...<Widget>[
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: AppSpacing.space3),
                   child!,
                 ],
               ],
@@ -108,26 +126,31 @@ class InfoBanner extends StatelessWidget {
 
 class _IconBadge extends StatelessWidget {
   const _IconBadge({
-    required this.color,
+    required this.fill,
+    required this.iconColor,
     required this.icon,
     required this.dense,
   });
 
-  final Color color;
+  final Color fill;
+  final Color iconColor;
   final IconData icon;
   final bool dense;
 
   @override
   Widget build(BuildContext context) {
-    final double size = dense ? 22 : 28;
+    final double size = dense
+        ? AppIconSizes.badgeDense
+        : AppIconSizes.badge;
     return Container(
       width: size,
       height: size,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.16),
-        shape: BoxShape.circle,
+      decoration: BoxDecoration(color: fill, shape: BoxShape.circle),
+      child: Icon(
+        icon,
+        size: dense ? AppIconSizes.iconSm : AppIconSizes.icon,
+        color: iconColor,
       ),
-      child: Icon(icon, size: dense ? 14 : 18, color: color),
     );
   }
 }

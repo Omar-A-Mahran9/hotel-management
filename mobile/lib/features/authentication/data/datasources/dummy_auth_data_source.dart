@@ -24,6 +24,21 @@ class DummyAuthDataSource implements AuthDataSource, DummyDataSource {
       );
 
   @override
+  Future<AuthSessionModel?> fetchCurrentSession(String accessToken) async {
+    // The dummy token encodes the phone: `dummy-token:+9665...`.
+    final int sep = accessToken.indexOf(':');
+    if (!accessToken.startsWith('dummy-token:') || sep < 0) return null;
+    final String phone = accessToken.substring(sep + 1);
+    final bool returning = AuthDemoConfig.returningGuests.contains(phone);
+    return AuthSessionModel(
+      accessToken: accessToken,
+      phoneE164: phone,
+      fullName: returning ? 'Returning Guest' : null,
+      email: returning ? 'returning.guest@example.com' : null,
+    );
+  }
+
+  @override
   Future<OtpChallengeModel> requestOtp(String phoneE164) async {
     _assertPlausible(phoneE164);
     return _challengeFor(phoneE164);
