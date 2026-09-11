@@ -12,10 +12,22 @@ class Permission extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
+        'name_en',
+        'name_ar',
         'slug',
-        'description',
+        'description_en',
+        'description_ar',
     ];
+
+    /**
+     * The permission's module/group, derived from the slug prefix before the
+     * first dot (e.g. "hotels.manage" -> "hotels"). Every seeded slug
+     * follows this convention, so no separate DB column is needed.
+     */
+    public function group(): string
+    {
+        return explode('.', $this->slug, 2)[0];
+    }
 
     public function roles(): BelongsToMany
     {

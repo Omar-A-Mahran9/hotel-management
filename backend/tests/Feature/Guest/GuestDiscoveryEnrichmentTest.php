@@ -3,6 +3,7 @@
 namespace Tests\Feature\Guest;
 
 use App\Domain\HotelGroup\Enums\HotelAmenity;
+use App\Domain\HotelGroup\Models\Facility;
 use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\HotelGroup\Models\HotelMedia;
 use App\Domain\Inventory\Models\RoomType;
@@ -17,15 +18,20 @@ class GuestDiscoveryEnrichmentTest extends TestCase
             'name_i18n' => ['en' => 'Nile View', 'ar' => 'إطلالة النيل'],
             'tagline_i18n' => ['en' => 'On the water', 'ar' => 'على ضفاف النهر'],
             'star_rating' => 5,
-            'amenities' => [HotelAmenity::Pool->value, HotelAmenity::Breakfast->value],
         ]);
+        // `amenities` is now sourced from the Facility relation (see the
+        // Hotel module's Facilities migration) — the guest JSON contract
+        // (a plain array of facility keys) is unchanged.
+        $hotel->facilities()->sync(
+            Facility::query()->whereIn('key', [HotelAmenity::Breakfast->value, HotelAmenity::Pool->value])->pluck('id')
+        );
 
         $this->getJson('/api/v1/guest/hotels', ['X-Locale' => 'ar'])
             ->assertOk()
             ->assertJsonPath('data.0.name', 'إطلالة النيل')
             ->assertJsonPath('data.0.tagline', 'على ضفاف النهر')
             ->assertJsonPath('data.0.star_rating', 5)
-            ->assertJsonPath('data.0.amenities', [HotelAmenity::Pool->value, HotelAmenity::Breakfast->value]);
+            ->assertJsonPath('data.0.amenities', [HotelAmenity::Breakfast->value, HotelAmenity::Pool->value]);
 
         $this->getJson('/api/v1/guest/hotels', ['X-Locale' => 'en'])
             ->assertOk()

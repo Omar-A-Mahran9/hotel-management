@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Domain\HotelGroup\Enums\HotelAmenity;
+use App\Domain\HotelGroup\Models\Facility;
 use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\Location\Models\City;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -38,7 +38,6 @@ class HotelFactory extends Factory
             'tagline_i18n' => null,
             'description_i18n' => null,
             'star_rating' => null,
-            'amenities' => null,
         ];
     }
 
@@ -62,8 +61,26 @@ class HotelFactory extends Factory
                     'ar' => 'غرف عصرية وخدمة مهتمة وقربٌ سهل من كل ما يهم.',
                 ],
                 'star_rating' => fake()->numberBetween(3, 5),
-                'amenities' => fake()->randomElements(HotelAmenity::values(), fake()->numberBetween(3, 6)),
             ];
+        });
+    }
+
+    /**
+     * Attaches a deterministic-count random subset of the Facility catalog
+     * (creating it via firstOrCreate if the seed migration hasn't run in
+     * this test's DB) — facilities is a relation, not a column, so this is
+     * an `afterCreating` hook rather than a state array.
+     */
+    public function withFacilities(int $count = 3): static
+    {
+        return $this->afterCreating(function (Hotel $hotel) use ($count): void {
+            $pool = Facility::query()->pluck('id');
+
+            if ($pool->isEmpty()) {
+                $pool = Facility::factory()->count(max($count, 3))->create()->pluck('id');
+            }
+
+            $hotel->facilities()->sync($pool->random(min($count, $pool->count()))->all());
         });
     }
 }

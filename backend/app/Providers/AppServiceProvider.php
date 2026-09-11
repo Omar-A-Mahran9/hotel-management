@@ -25,15 +25,21 @@ use App\Domain\GuestAccess\Otp\DummyOtpSender;
 use App\Domain\GuestAccess\Otp\Exceptions\UnsupportedOtpSenderException;
 use App\Domain\GuestAccess\Repositories\Contracts\GuestOtpChallengeRepositoryInterface;
 use App\Domain\GuestAccess\Repositories\EloquentGuestOtpChallengeRepository;
+use App\Domain\HotelGroup\Models\Facility;
 use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\HotelGroup\Models\HotelGroup;
+use App\Domain\HotelGroup\Policies\FacilityPolicy;
 use App\Domain\HotelGroup\Policies\HotelGroupPolicy;
 use App\Domain\HotelGroup\Policies\HotelPolicy;
+use App\Domain\HotelGroup\Repositories\Contracts\FacilityRepositoryInterface;
 use App\Domain\HotelGroup\Repositories\Contracts\HotelGroupRepositoryInterface;
 use App\Domain\HotelGroup\Repositories\Contracts\HotelRepositoryInterface;
+use App\Domain\HotelGroup\Repositories\EloquentFacilityRepository;
 use App\Domain\HotelGroup\Repositories\EloquentHotelGroupRepository;
 use App\Domain\HotelGroup\Repositories\EloquentHotelRepository;
+use App\Domain\IdentityAccess\Models\Role;
 use App\Domain\IdentityAccess\Models\User;
+use App\Domain\IdentityAccess\Policies\RolePolicy;
 use App\Domain\IdentityAccess\Policies\UserPolicy;
 use App\Domain\IdentityAccess\Repositories\Contracts\PermissionRepositoryInterface;
 use App\Domain\IdentityAccess\Repositories\Contracts\RoleRepositoryInterface;
@@ -134,6 +140,7 @@ class AppServiceProvider extends ServiceProvider
         PermissionRepositoryInterface::class => EloquentPermissionRepository::class,
         HotelGroupRepositoryInterface::class => EloquentHotelGroupRepository::class,
         HotelRepositoryInterface::class => EloquentHotelRepository::class,
+        FacilityRepositoryInterface::class => EloquentFacilityRepository::class,
         RoomTypeRepositoryInterface::class => EloquentRoomTypeRepository::class,
         RoomRepositoryInterface::class => EloquentRoomRepository::class,
         ReservationRepositoryInterface::class => EloquentReservationRepository::class,
@@ -167,9 +174,11 @@ class AppServiceProvider extends ServiceProvider
     public array $policies = [
         HotelGroup::class => HotelGroupPolicy::class,
         Hotel::class => HotelPolicy::class,
+        Facility::class => FacilityPolicy::class,
         Country::class => CountryPolicy::class,
         City::class => CityPolicy::class,
         User::class => UserPolicy::class,
+        Role::class => RolePolicy::class,
         RoomType::class => RoomTypePolicy::class,
         Room::class => RoomPolicy::class,
         Reservation::class => ReservationPolicy::class,
@@ -266,7 +275,6 @@ class AppServiceProvider extends ServiceProvider
             Gate::policy($model, $policy);
         }
 
-        Gate::define('roles.view', fn (User $user) => $user->hasPermission('roles.view'));
         Gate::define('permissions.view', fn (User $user) => $user->hasPermission('permissions.view'));
 
         $this->registerGuestAuthRateLimiters();

@@ -31,14 +31,6 @@ class SubmitIdentityDocumentRequest extends FormRequest
         ];
     }
 
-    public function messages(): array
-    {
-        return [
-            'document.mimes' => 'The identity document must be a JPG, PNG, or PDF file.',
-            'document_type.regex' => 'The document type may only contain letters, numbers, spaces, hyphens and underscores.',
-        ];
-    }
-
     public function documentType(): ?string
     {
         $value = $this->validated('document_type');

@@ -28,7 +28,6 @@ class Hotel extends Model
         'tagline_i18n',
         'description_i18n',
         'star_rating',
-        'amenities',
         'slug',
         'country_id',
         'city_id',
@@ -36,6 +35,9 @@ class Hotel extends Model
         'city',
         'timezone',
         'is_active',
+        'meta_title_i18n',
+        'meta_description_i18n',
+        'seo_indexable',
     ];
 
     protected function casts(): array
@@ -45,8 +47,10 @@ class Hotel extends Model
             'name_i18n' => 'array',
             'tagline_i18n' => 'array',
             'description_i18n' => 'array',
-            'amenities' => 'array',
             'star_rating' => 'integer',
+            'meta_title_i18n' => 'array',
+            'meta_description_i18n' => 'array',
+            'seo_indexable' => 'boolean',
         ];
     }
 
@@ -87,6 +91,17 @@ class Hotel extends Model
     public function roomTypes(): HasMany
     {
         return $this->hasMany(RoomType::class);
+    }
+
+    /**
+     * Facilities selected from the global Facility catalog — replaces the
+     * old free-text `amenities` JSON column. See `facility_hotel`.
+     */
+    public function facilities(): BelongsToMany
+    {
+        return $this->belongsToMany(Facility::class, 'facility_hotel')
+            ->withTimestamps()
+            ->orderBy('facilities.sort_order');
     }
 
     /**

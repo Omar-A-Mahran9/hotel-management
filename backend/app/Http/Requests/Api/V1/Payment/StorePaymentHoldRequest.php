@@ -75,16 +75,6 @@ class StorePaymentHoldRequest extends FormRequest
         ];
     }
 
-    public function messages(): array
-    {
-        return [
-            'amount.regex' => 'The amount must be a positive decimal with at most two fractional digits.',
-            'amount.gt' => 'The amount must be greater than zero.',
-            'currency.regex' => 'The currency must be a 3-letter ISO code.',
-            'idempotency_key.regex' => 'The Idempotency-Key header contains unsupported characters.',
-        ];
-    }
-
     public function idempotencyKey(): ?string
     {
         $key = $this->validated('idempotency_key');

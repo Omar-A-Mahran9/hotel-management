@@ -29,7 +29,7 @@ class HotelResource extends JsonResource
             'tagline_i18n' => $this->tagline_i18n,
             'description_i18n' => $this->description_i18n,
             'star_rating' => $this->star_rating,
-            'amenities' => $this->amenities ?? [],
+            'facilities' => FacilityResource::collection($this->whenLoaded('facilities')),
             'slug' => $this->slug,
             'country_id' => $this->country_id,
             'city_id' => $this->city_id,
@@ -39,6 +39,11 @@ class HotelResource extends JsonResource
             'city_summary' => $this->summaryFor('cityRef'),
             'timezone' => $this->timezone,
             'is_active' => $this->is_active,
+            // Raw locale maps, same reasoning as name/tagline/description —
+            // the dashboard SEO section edits every language.
+            'meta_title_i18n' => $this->meta_title_i18n,
+            'meta_description_i18n' => $this->meta_description_i18n,
+            'seo_indexable' => $this->seo_indexable,
             'logo' => $this->when(
                 $this->resource->relationLoaded('logo'),
                 fn () => $this->logo ? new HotelMediaResource($this->logo) : null,

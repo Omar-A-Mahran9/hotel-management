@@ -46,6 +46,13 @@ export const NAVIGATION: NavSection[] = [
         permission: 'hotels.view',
       },
       {
+        key: 'facilities',
+        labelKey: 'nav.facilities',
+        to: '/facilities',
+        icon: 'ki-abstract-39',
+        permission: ['facilities.view', 'facilities.manage'],
+      },
+      {
         key: 'room-types',
         labelKey: 'nav.roomTypes',
         to: '/room-types',

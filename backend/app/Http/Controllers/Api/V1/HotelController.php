@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\HotelGroup\Services\HotelService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Hotel\IndexHotelRequest;
 use App\Http\Requests\Api\V1\Hotel\StoreHotelRequest;
 use App\Http\Requests\Api\V1\Hotel\UpdateHotelRequest;
 use App\Http\Resources\V1\HotelResource;
@@ -18,14 +19,16 @@ class HotelController extends Controller
     /**
      * Hotels visible here are always resolved from the authenticated
      * user's own hotel access (or Group Owner bypass) — a client cannot
-     * widen this by passing any request parameter.
+     * widen this by passing any request parameter. `search`/`is_active`/
+     * `sort` are real server-side filters (IndexHotelRequest), applied on
+     * top of that scope.
      */
-    public function index(Request $request): JsonResponse
+    public function index(IndexHotelRequest $request): JsonResponse
     {
         $this->authorize('viewAny', Hotel::class);
 
         return $this->success(HotelResource::collection(
-            $this->hotels->listAccessibleBy($request->user())
+            $this->hotels->listAccessibleBy($request->user(), $request->filters(), $request->perPage())
         ));
     }
 
@@ -42,7 +45,7 @@ class HotelController extends Controller
     {
         $this->authorize('view', $hotel);
 
-        $hotel->load(['hotelGroup', 'countryRef', 'cityRef', 'logo', 'cover', 'galleryMedia']);
+        $hotel->load(['hotelGroup', 'countryRef', 'cityRef', 'logo', 'cover', 'galleryMedia', 'facilities']);
 
         return $this->success(new HotelResource($hotel));
     }

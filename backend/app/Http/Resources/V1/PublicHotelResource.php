@@ -38,10 +38,17 @@ class PublicHotelResource extends JsonResource
             'city_id' => $this->city_id,
             'timezone' => $this->timezone,
             'star_rating' => $this->star_rating,
-            'amenities' => $this->amenities ?? [],
+            // Contract-stable: still a plain array of facility keys (e.g.
+            // "free_wifi"), now sourced from the `facilities` relation
+            // instead of the old free-text JSON column — no guest/mobile
+            // consumer needs to change.
+            'amenities' => $this->whenLoaded('facilities', fn () => $this->facilities->pluck('key')->values(), []),
             'logo_url' => $this->whenLoaded('logo', fn () => $this->logo?->url()),
             'cover_url' => $this->whenLoaded('cover', fn () => $this->cover?->url()),
             'gallery' => HotelMediaResource::collection($this->whenLoaded('galleryMedia')),
+            'meta_title' => LocalizedContent::resolve($this->meta_title_i18n),
+            'meta_description' => LocalizedContent::resolve($this->meta_description_i18n),
+            'seo_indexable' => $this->seo_indexable,
             'price_from' => $this->when(
                 $this->price_from !== null,
                 fn () => number_format((float) $this->price_from, 2, '.', ''),

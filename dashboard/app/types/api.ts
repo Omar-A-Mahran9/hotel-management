@@ -31,17 +31,40 @@ export type ValidationErrors = Record<string, string[]>
 // ---- RBAC ---------------------------------------------------------------
 export interface Permission {
   id: number
-  name: string
+  name_en: string
+  name_ar: string
   slug: string
-  description: string | null
+  description_en: string | null
+  description_ar: string | null
+  /** Module the permission belongs to, derived from the slug prefix (e.g. "hotels"). */
+  group: string
+  group_label_en: string
+  group_label_ar: string
 }
 
 export interface Role {
   id: number
-  name: string
+  name_en: string
+  name_ar: string
   slug: string
-  description: string | null
+  description_en: string | null
+  description_ar: string | null
+  /** true for the four protected roles (Group Owner/Hotel Manager/Reception/Guest) — cannot be deleted. */
+  is_system: boolean
+  /** Present on list/show; the number of permissions attached to the role. */
+  permissions_count?: number
+  /** Present on list/show; the number of users currently assigned this role. */
+  users_count?: number
   permissions?: Permission[]
+}
+
+/** Body for POST/PUT /roles. */
+export interface RoleWriteBody {
+  name_en: string
+  name_ar: string
+  description_en?: string | null
+  description_ar?: string | null
+  permission_ids?: number[]
 }
 
 // ---- Locations (global reference data — CountryResource / CityResource) -
@@ -91,6 +114,19 @@ export interface HotelMedia {
   created_at: string
 }
 
+// ---- Facility catalog (global reference data — FacilityResource) --------
+export interface Facility {
+  id: number
+  key: string
+  name_i18n: LocalizedMap
+  icon: string | null
+  is_active: boolean
+  sort_order: number
+  hotels_count?: number
+  created_at?: string
+  updated_at?: string
+}
+
 export interface Hotel {
   id: number
   hotel_group_id: number
@@ -101,7 +137,9 @@ export interface Hotel {
   tagline_i18n: LocalizedMap | null
   description_i18n: LocalizedMap | null
   star_rating: number | null
-  amenities: string[]
+  // Selected from the Facility catalog — present when the backend
+  // eager-loads the relation (show / list / after write).
+  facilities?: Facility[]
   slug: string
   country_id: number | null
   city_id: number | null
@@ -113,6 +151,11 @@ export interface Hotel {
   city_summary?: LocationSummary | null
   timezone: string | null
   is_active: boolean
+  // Bilingual SEO metadata — raw i18n maps for editing, same pattern as
+  // tagline/description. seo_indexable is a robots index/noindex directive.
+  meta_title_i18n: LocalizedMap | null
+  meta_description_i18n: LocalizedMap | null
+  seo_indexable: boolean
   // Present when the backend eager-loads them (show / after write).
   logo?: HotelMedia | null
   cover?: HotelMedia | null

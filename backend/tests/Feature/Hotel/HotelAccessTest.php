@@ -4,7 +4,13 @@ namespace Tests\Feature\Hotel;
 
 use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\HotelGroup\Models\HotelGroup;
+use App\Domain\IdentityAccess\Models\Permission;
+use App\Domain\IdentityAccess\Models\Role;
 use App\Domain\IdentityAccess\Models\User;
+use App\Domain\Location\Models\City;
+use App\Domain\Location\Models\Country;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class HotelAccessTest extends TestCase
@@ -105,6 +111,76 @@ class HotelAccessTest extends TestCase
         $this->actingAs($manager, 'sanctum')
             ->putJson("/api/v1/hotels/{$hotel->id}", ['name' => 'Renamed'])
             ->assertStatus(403);
+    }
+
+    /**
+     * Regression test for the HotelPolicy::update() authorization gap found
+     * during Hotel module hardening: update() checked only `hotels.manage`,
+     * not the hotel-scope resolved from the user's own access records (view()
+     * and manageMedia() both already did). Today only Group Owner holds
+     * `hotels.manage`, so this constructs a non-Group-Owner role that holds
+     * it to actually exercise the scope check in isolation.
+     */
+    public function test_a_non_group_owner_with_hotels_manage_cannot_update_an_unassigned_hotel(): void
+    {
+        $role = Role::factory()->create(['slug' => 'test-hotel-editor']);
+        $role->permissions()->sync(Permission::query()->whereIn('slug', ['hotels.view', 'hotels.manage'])->pluck('id'));
+
+        $group = HotelGroup::factory()->create();
+        $hotelA = Hotel::factory()->create(['hotel_group_id' => $group->id]);
+        $hotelB = Hotel::factory()->create(['hotel_group_id' => $group->id]);
+
+        $editor = User::factory()->create(['role_id' => $role->id]);
+        $editor->hotels()->attach($hotelA);
+
+        $this->actingAs($editor, 'sanctum')
+            ->putJson("/api/v1/hotels/{$hotelA->id}", ['name' => 'Renamed A'])
+            ->assertOk();
+
+        $this->actingAs($editor, 'sanctum')
+            ->putJson("/api/v1/hotels/{$hotelB->id}", ['name' => 'Renamed B'])
+            ->assertStatus(403);
+    }
+
+    /**
+     * A creator without the Group Owner bypass must not be locked out of
+     * the hotel they just created — otherwise the Dashboard's "upload
+     * media right after create" flow (and simply reopening the hotel)
+     * would 403 immediately after a successful POST /hotels.
+     */
+    public function test_a_non_group_owner_creator_is_granted_access_to_the_hotel_they_just_created(): void
+    {
+        Storage::fake('public');
+
+        $role = Role::factory()->create(['slug' => 'test-hotel-creator']);
+        $role->permissions()->sync(Permission::query()->whereIn('slug', ['hotels.view', 'hotels.manage'])->pluck('id'));
+
+        $group = HotelGroup::factory()->create();
+        $country = Country::factory()->create();
+        $city = City::factory()->create(['country_id' => $country->id]);
+        $creator = User::factory()->create(['role_id' => $role->id]);
+
+        $created = $this->actingAs($creator, 'sanctum')
+            ->postJson('/api/v1/hotels', [
+                'hotel_group_id' => $group->id,
+                'name' => 'Creator Access Hotel',
+                'slug' => 'creator-access-hotel',
+                'country_id' => $country->id,
+                'city_id' => $city->id,
+            ])
+            ->assertCreated()
+            ->json('data.id');
+
+        $this->actingAs($creator, 'sanctum')
+            ->getJson("/api/v1/hotels/{$created}")
+            ->assertOk();
+
+        $this->actingAs($creator, 'sanctum')
+            ->postJson("/api/v1/hotels/{$created}/media", [
+                'collection' => 'logo',
+                'image' => UploadedFile::fake()->image('logo.jpg'),
+            ])
+            ->assertCreated();
     }
 
     public function test_reception_can_view_only_their_assigned_hotel(): void

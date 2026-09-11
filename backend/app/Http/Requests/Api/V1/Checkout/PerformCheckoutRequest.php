@@ -53,13 +53,6 @@ class PerformCheckoutRequest extends FormRequest
         ];
     }
 
-    public function messages(): array
-    {
-        return [
-            'idempotency_key.regex' => 'The Idempotency-Key header contains unsupported characters.',
-        ];
-    }
-
     public function idempotencyKey(): ?string
     {
         $key = $this->validated('idempotency_key');

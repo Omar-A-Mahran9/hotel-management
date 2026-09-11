@@ -23,10 +23,12 @@ class HotelService
     /**
      * Hotels visible to $user, resolved from their own stored hotel
      * access / Group Owner bypass — never from a request parameter.
+     *
+     * @param  array{search?: string|null, is_active?: bool|null, sort?: string|null}  $filters
      */
-    public function listAccessibleBy(User $user, int $perPage = 15): LengthAwarePaginator
+    public function listAccessibleBy(User $user, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        return $this->hotels->paginateAccessibleBy($user, $perPage);
+        return $this->hotels->paginateAccessibleBy($user, $filters, $this->clampPerPage($perPage));
     }
 
     public function find(int $id): ?Hotel
@@ -42,12 +44,27 @@ class HotelService
         return DB::transaction(function () use ($data, $actor) {
             $data = $this->normalizeLocation($data);
             $data = $this->syncLegacyName($data);
+            $facilityIds = $data['facility_ids'] ?? null;
+            unset($data['facility_ids']);
 
             $hotel = $this->hotels->create($data);
 
+            if ($facilityIds !== null) {
+                $hotel->facilities()->sync($facilityIds);
+            }
+
+            // A Group Owner already passes every hotel-scope check by
+            // bypass (HotelAccessService::canAccessHotel); anyone else who
+            // holds `hotels.manage` needs an explicit access row or they
+            // would be locked out — by view(), update() and manageMedia()
+            // alike — of the hotel they just created.
+            if ($actor !== null && ! $actor->isGroupOwner()) {
+                $actor->hotels()->syncWithoutDetaching([$hotel->id]);
+            }
+
             $this->auditLogger->record($actor, 'hotel.created', $hotel, after: $hotel->toArray(), hotelId: $hotel->id);
 
-            return $hotel->load('countryRef', 'cityRef', 'hotelGroup', 'logo', 'cover', 'galleryMedia');
+            return $hotel->load('countryRef', 'cityRef', 'hotelGroup', 'logo', 'cover', 'galleryMedia', 'facilities');
         });
     }
 
@@ -61,12 +78,18 @@ class HotelService
 
             $data = $this->normalizeLocation($data, $hotel);
             $data = $this->syncLegacyName($data);
+            $facilityIds = $data['facility_ids'] ?? null;
+            unset($data['facility_ids']);
 
             $this->hotels->update($hotel, $data);
 
+            if ($facilityIds !== null) {
+                $hotel->facilities()->sync($facilityIds);
+            }
+
             $this->auditLogger->record($actor, 'hotel.updated', $hotel, before: $before, after: $hotel->toArray(), hotelId: $hotel->id);
 
-            return $hotel->load('countryRef', 'cityRef', 'hotelGroup', 'logo', 'cover', 'galleryMedia');
+            return $hotel->load('countryRef', 'cityRef', 'hotelGroup', 'logo', 'cover', 'galleryMedia', 'facilities');
         });
     }
 
@@ -119,5 +142,10 @@ class HotelService
         }
 
         return $data;
+    }
+
+    private function clampPerPage(int $perPage): int
+    {
+        return min(max($perPage, 1), 100);
     }
 }

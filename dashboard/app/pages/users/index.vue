@@ -1,23 +1,27 @@
 <script setup lang="ts">
 import { hotelsService, rbacService, usersService } from '~/services'
 import type { Column } from '~/components/DataTable.vue'
-import type { StaffUser } from '~/types/api'
+import type { Role, StaffUser } from '~/types/api'
 import { ApiError } from '~/utils/apiError'
 
 definePageMeta({ permission: 'users.view' })
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { can } = useCan()
 const app = useAppStore()
 const canManage = can('users.manage')
 
 const page = ref(1)
 const list = useResource(() => usersService.list(page.value))
-const hotels = useResource(() => hotelsService.list(1), { immediate: canManage })
+const hotels = useResource(() => hotelsService.list({ page: 1 }), { immediate: canManage })
 
 // Role is a real entity relationship — options come from the RBAC API,
-// the form submits role_id (never a typed id).
+// the form submits role_id (never a typed id). The role's display name is
+// backend-authoritative and bilingual (name_en/name_ar); this app never
+// invents a static translation for it, it just picks the field for the
+// active locale — same pattern as Country/City.
 const fetchRoles = () => rbacService.roles()
+const roleName = (r?: Role | null) => (r ? (locale.value === 'ar' ? r.name_ar : r.name_en) : null)
 
 const search = ref('')
 const rows = computed<StaffUser[]>(() => {
@@ -150,7 +154,12 @@ async function confirmDelete() {
         <span class="font-medium text-foreground">{{ (row as StaffUser).name }}</span>
       </template>
       <template #cell-role="{ row }">
-        {{ (row as StaffUser).role?.name ?? t('common.notAvailable') }}
+        <StatusBadge
+          v-if="(row as StaffUser).role"
+          :label="roleName((row as StaffUser).role) ?? t('common.notAvailable')"
+          :tone="(row as StaffUser).role?.is_system ? 'primary' : 'info'"
+        />
+        <span v-else>{{ t('common.notAvailable') }}</span>
       </template>
       <template #cell-hotels="{ row }">
         <span v-if="(row as StaffUser).role?.slug === 'group_owner'" class="text-muted-foreground">
@@ -198,9 +207,9 @@ async function confirmDelete() {
           <EntitySelect
             v-model="form.role_id"
             :fetcher="fetchRoles"
-            label-key="name"
+            :label-fn="(r: Role) => roleName(r) ?? ''"
             :placeholder="t('users.role')"
-            :selected-label="editing?.role?.name ?? null"
+            :selected-label="roleName(editing?.role)"
             :invalid="!!fieldErrors.role_id"
             required
           />

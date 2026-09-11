@@ -8,7 +8,10 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface HotelRepositoryInterface
 {
-    public function paginateAccessibleBy(User $user, int $perPage = 15): LengthAwarePaginator;
+    /**
+     * @param  array{search?: string|null, is_active?: bool|null, sort?: string|null}  $filters
+     */
+    public function paginateAccessibleBy(User $user, array $filters = [], int $perPage = 15): LengthAwarePaginator;
 
     public function find(int $id): ?Hotel;
 

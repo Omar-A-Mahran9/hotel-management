@@ -12,8 +12,10 @@ use App\Domain\DigitalAccess\Exceptions\InvalidDigitalAccessStatusTransitionExce
 use App\Domain\GuestAccess\Exceptions\OtpChallengeExpiredException;
 use App\Domain\GuestAccess\Exceptions\OtpChallengeNotFoundException;
 use App\Domain\GuestAccess\Exceptions\OtpResendCooldownException;
+use App\Domain\HotelGroup\Exceptions\FacilityDeletionBlockedException;
 use App\Domain\IdentityAccess\Exceptions\AccountInactiveException;
 use App\Domain\IdentityAccess\Exceptions\InvalidCredentialsException;
+use App\Domain\IdentityAccess\Exceptions\RoleDeletionBlockedException;
 use App\Domain\IdentityVerification\Exceptions\IdentityVerificationActionNotAllowedException;
 use App\Domain\IdentityVerification\Exceptions\IdentityVerificationConfigurationMissingException;
 use App\Domain\IdentityVerification\Exceptions\IdentityVerificationIdempotencyKeyConflictException;
@@ -115,6 +117,15 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
+        // Dynamic role management (RBAC hardening) — a system role or a role
+        // still assigned to users cannot be deleted. Fixed, safe strings,
+        // 422 like every other domain exception in this handler.
+        $exceptions->renderable(function (RoleDeletionBlockedException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
         // Slice 0 — guest OTP business errors. Fixed, safe machine strings
         // (no code, no phone, no SQLSTATE). All 422, consistent with every
         // other domain exception. Wrong-code / lock-out never reach here —
@@ -152,6 +163,12 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->renderable(function (LocationDeletionBlockedException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (FacilityDeletionBlockedException $e, Request $request) use ($envelope) {
             if ($request->is('api/*')) {
                 return $envelope($e->getMessage(), 422);
             }

@@ -21,10 +21,20 @@ class Role extends Model
     public const GUEST = 'guest';
 
     protected $fillable = [
-        'name',
+        'name_en',
+        'name_ar',
         'slug',
-        'description',
+        'description_en',
+        'description_ar',
+        'is_system',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_system' => 'boolean',
+        ];
+    }
 
     public function permissions(): BelongsToMany
     {

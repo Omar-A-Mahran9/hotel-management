@@ -2,12 +2,10 @@
 
 namespace App\Http\Requests\Api\V1\Hotel;
 
-use App\Domain\HotelGroup\Enums\HotelAmenity;
 use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\Location\Models\City;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class StoreHotelRequest extends FormRequest
 {
@@ -32,6 +30,17 @@ class StoreHotelRequest extends FormRequest
             }
         }
 
+        // SEO metadata — bilingual, same `*_i18n` pattern, with the
+        // conventional search-engine snippet length limits.
+        $seo = [
+            'meta_title_i18n' => ['sometimes', 'nullable', 'array'],
+            'meta_description_i18n' => ['sometimes', 'nullable', 'array'],
+        ];
+        foreach ($locales as $locale) {
+            $seo["meta_title_i18n.{$locale}"] = ['nullable', 'string', 'max:60'];
+            $seo["meta_description_i18n.{$locale}"] = ['nullable', 'string', 'max:160'];
+        }
+
         return [
             'hotel_group_id' => ['required', 'integer', 'exists:hotel_groups,id'],
             // `name` stays the authoritative search/slug string; it may be
@@ -40,8 +49,12 @@ class StoreHotelRequest extends FormRequest
             'name' => ['required_without:name_i18n', 'string', 'max:255'],
             ...$i18n,
             'star_rating' => ['sometimes', 'nullable', 'integer', 'between:1,5'],
-            'amenities' => ['sometimes', 'nullable', 'array'],
-            'amenities.*' => [Rule::in(HotelAmenity::values())],
+            // Selected from the Facility catalog — replaces the old
+            // free-text `amenities` array.
+            'facility_ids' => ['sometimes', 'nullable', 'array'],
+            'facility_ids.*' => ['integer', 'exists:facilities,id'],
+            ...$seo,
+            'seo_indexable' => ['sometimes', 'boolean'],
             'slug' => ['required', 'string', 'max:255', 'alpha_dash', 'unique:hotels,slug'],
             // Normalized location. country_id is required; city_id is
             // required and must belong to that country (checked below).

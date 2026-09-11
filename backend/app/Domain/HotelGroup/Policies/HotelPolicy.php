@@ -32,9 +32,17 @@ class HotelPolicy
         return $user->hasPermission('hotels.manage');
     }
 
+    /**
+     * Same reasoning as view()/manageMedia(): the hotel-scope check is
+     * resolved from the authenticated user's own stored access records,
+     * never from the route-bound $hotel alone. Previously missing here
+     * (only the permission was checked) — a real authorization gap in the
+     * Hotel Edit path, fixed as part of Hotel module hardening.
+     */
     public function update(User $user, Hotel $hotel): bool
     {
-        return $user->hasPermission('hotels.manage');
+        return $user->hasPermission('hotels.manage')
+            && $this->hotelAccess->canAccessHotel($user, $hotel->id);
     }
 
     /**

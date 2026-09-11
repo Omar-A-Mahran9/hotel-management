@@ -9,6 +9,7 @@ import type {
   CheckoutResult,
   City,
   Country,
+  Facility,
   Folio,
   Hotel,
   HotelGroup,
@@ -24,6 +25,7 @@ import type {
   Reservation,
   ReservationStatus,
   Role,
+  RoleWriteBody,
   Room,
   RoomStatus,
   RoomType,
@@ -55,9 +57,21 @@ export const hotelGroupsService = {
 
 // ---- Hotels ----------------------------------------------------------
 // GET /hotels returns the caller's accessible hotels, paginated (per_page
-// fixed to 15 server-side; ?page works).
+// fixed to 15 server-side; ?page works). `search` / `is_active` / `sort`
+// are real server-side filters (IndexHotelRequest) layered on top of the
+// caller's server-resolved hotel scope.
+export interface HotelListParams {
+  page?: number
+  per_page?: number
+  search?: string
+  is_active?: boolean | 0 | 1
+  sort?: 'name' | '-name' | 'created_at' | '-created_at'
+  [key: string]: unknown
+}
+
 export const hotelsService = {
-  list: (page = 1) => api().withMeta<Hotel[]>('/hotels', { query: { page } }),
+  list: (params: HotelListParams = {}) =>
+    api().withMeta<Hotel[]>('/hotels', { query: cleanQuery(params) }),
   get: (id: number) => api()<Hotel>(`/hotels/${id}`),
   create: (body: Record<string, unknown>) => api()<Hotel>('/hotels', { method: 'POST', body }),
   update: (id: number, body: Record<string, unknown>) =>
@@ -123,6 +137,32 @@ export const citiesService = {
     api()<City[]>(`/countries/${countryId}/cities`, {
       query: cleanQuery({ search, is_active: 1, per_page: 100 }),
     }),
+}
+
+// ---- Facility catalog (global reference data) -------------------------
+// Real, paginated Laravel endpoints, same shape as countries/cities.
+// `all: 1` returns every active facility unpaginated (the Hotel create/edit
+// picker) — see `pickerOptions()`.
+export interface FacilityListParams {
+  page?: number
+  per_page?: number
+  search?: string
+  is_active?: boolean | 0 | 1
+  [key: string]: unknown
+}
+
+export const facilitiesService = {
+  list: (params: FacilityListParams = {}) =>
+    api().withMeta<Facility[]>('/facilities', { query: cleanQuery(params) }),
+  get: (id: number) => api()<Facility>(`/facilities/${id}`),
+  create: (body: Record<string, unknown>) => api()<Facility>('/facilities', { method: 'POST', body }),
+  update: (id: number, body: Record<string, unknown>) =>
+    api()<Facility>(`/facilities/${id}`, { method: 'PUT', body }),
+  activate: (id: number) => api()<Facility>(`/facilities/${id}/activate`, { method: 'PATCH' }),
+  deactivate: (id: number) => api()<Facility>(`/facilities/${id}/deactivate`, { method: 'PATCH' }),
+  remove: (id: number) => api()<null>(`/facilities/${id}`, { method: 'DELETE' }),
+  // For the Hotel create/edit facility picker — active only, unpaginated.
+  pickerOptions: () => api()<Facility[]>('/facilities', { query: { all: 1 } }),
 }
 
 function cleanQuery(params: Record<string, unknown>): Record<string, unknown> {
@@ -309,6 +349,10 @@ export const notificationsService = {
 // ---- RBAC reference --------------------------------------------------
 export const rbacService = {
   roles: () => api()<Role[]>('/roles'),
+  role: (id: number) => api()<Role>(`/roles/${id}`),
+  createRole: (body: RoleWriteBody) => api()<Role>('/roles', { method: 'POST', body }),
+  updateRole: (id: number, body: Partial<RoleWriteBody>) => api()<Role>(`/roles/${id}`, { method: 'PUT', body }),
+  deleteRole: (id: number) => api()<null>(`/roles/${id}`, { method: 'DELETE' }),
   permissions: () => api()<Permission[]>('/permissions'),
 }
 

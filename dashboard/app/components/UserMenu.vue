@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const auth = useAuthStore()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const router = useRouter()
 const app = useAppStore()
 
@@ -9,7 +9,11 @@ const initials = computed(() => {
   return n.split(/\s+/).slice(0, 2).map(p => p[0]?.toUpperCase()).join('')
 })
 
-const roleName = computed(() => auth.user?.role?.name ?? '')
+const roleName = computed(() => {
+  const role = auth.user?.role
+  if (!role) return ''
+  return locale.value === 'ar' ? role.name_ar : role.name_en
+})
 
 async function signOut() {
   await auth.logout()

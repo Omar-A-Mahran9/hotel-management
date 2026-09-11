@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\CheckoutController;
 use App\Http\Controllers\Api\V1\CityController;
 use App\Http\Controllers\Api\V1\CountryController;
 use App\Http\Controllers\Api\V1\DigitalAccessController;
+use App\Http\Controllers\Api\V1\FacilityController;
 use App\Http\Controllers\Api\V1\FolioController;
 use App\Http\Controllers\Api\V1\Guest\GuestAuthController;
 use App\Http\Controllers\Api\V1\Guest\GuestDiscoveryController;
@@ -109,6 +110,11 @@ Route::prefix('v1')->group(function () {
         Route::get('/auth/me', [AuthController::class, 'me']);
 
         Route::get('/roles', [RoleController::class, 'index']);
+        Route::post('/roles', [RoleController::class, 'store']);
+        Route::get('/roles/{role}', [RoleController::class, 'show']);
+        Route::match(['put', 'patch'], '/roles/{role}', [RoleController::class, 'update']);
+        Route::delete('/roles/{role}', [RoleController::class, 'destroy']);
+
         Route::get('/permissions', [PermissionController::class, 'index']);
 
         Route::get('/hotel-groups', [HotelGroupController::class, 'index']);
@@ -125,6 +131,21 @@ Route::prefix('v1')->group(function () {
         Route::post('/hotels', [HotelController::class, 'store']);
         Route::get('/hotels/{hotel}', [HotelController::class, 'show']);
         Route::put('/hotels/{hotel}', [HotelController::class, 'update']);
+
+        /*
+         * Facility catalog — global reference data (NOT hotel-scoped),
+         * mirrors the Country/City pattern. facilities.view for read,
+         * facilities.manage for every write. `GET /facilities?all=1`
+         * returns every active facility unpaginated for the Hotel
+         * create/edit picker.
+         */
+        Route::get('/facilities', [FacilityController::class, 'index']);
+        Route::post('/facilities', [FacilityController::class, 'store']);
+        Route::get('/facilities/{facility}', [FacilityController::class, 'show'])->whereNumber('facility');
+        Route::match(['put', 'patch'], '/facilities/{facility}', [FacilityController::class, 'update'])->whereNumber('facility');
+        Route::delete('/facilities/{facility}', [FacilityController::class, 'destroy'])->whereNumber('facility');
+        Route::patch('/facilities/{facility}/activate', [FacilityController::class, 'activate'])->whereNumber('facility');
+        Route::patch('/facilities/{facility}/deactivate', [FacilityController::class, 'deactivate'])->whereNumber('facility');
 
         /*
          * Country + City master data (global reference data — NOT

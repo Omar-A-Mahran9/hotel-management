@@ -3,10 +3,16 @@
 namespace App\Domain\HotelGroup\Enums;
 
 /**
- * The guest-facing hotel amenity vocabulary. A fixed set so the dashboard
- * multi-select and the guest Discovery contract stay stable — mirrors the
- * amenity chips the Figma hotel-detail screen renders. Stored as a JSON
- * array of these string values on `hotels.amenities`.
+ * The fixed amenity vocabulary, stored as a JSON array of these string
+ * values on `room_types.amenities` (RoomType's own, separate amenity list).
+ *
+ * Hotel-level facilities no longer use this enum — they were migrated to a
+ * real `Facility` catalog + `facility_hotel` pivot (see the
+ * `create_facilities_table` migration, which seeds the catalog from these
+ * same 12 values so no data/vocabulary was lost). This enum is kept only
+ * because RoomType still has its own separate, unmigrated `amenities`
+ * column (see the Hotel module plan — Room Type ↔ Facilities is a
+ * deliberately deferred decision, not built yet).
  */
 enum HotelAmenity: string
 {

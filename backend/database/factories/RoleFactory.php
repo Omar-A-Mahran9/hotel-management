@@ -17,9 +17,12 @@ class RoleFactory extends Factory
         $name = fake()->unique()->word();
 
         return [
-            'name' => ucfirst($name),
+            'name_en' => ucfirst($name),
+            'name_ar' => ucfirst($name),
             'slug' => $name,
-            'description' => null,
+            'description_en' => null,
+            'description_ar' => null,
+            'is_system' => false,
         ];
     }
 }

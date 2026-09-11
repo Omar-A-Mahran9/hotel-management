@@ -29,7 +29,7 @@ class RoomTypePolicyTest extends TestCase
 
     private function grant(User $user, string $slug): void
     {
-        $permission = Permission::firstOrCreate(['slug' => $slug], ['name' => $slug, 'description' => $slug]);
+        $permission = Permission::firstOrCreate(['slug' => $slug], ['name_en' => $slug, 'description_en' => $slug]);
         $user->role->permissions()->syncWithoutDetaching([$permission->id]);
         $user->unsetRelation('role');
     }

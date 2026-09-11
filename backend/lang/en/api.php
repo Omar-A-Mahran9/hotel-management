@@ -20,6 +20,10 @@ return [
         'city_delete_blocked' => 'This city is still referenced by one or more hotels and cannot be deleted. Deactivate it instead.',
     ],
 
+    'facility' => [
+        'delete_blocked' => 'This facility is still assigned to one or more hotels and cannot be deleted. Deactivate it instead.',
+    ],
+
     'hotel_media' => [
         'gallery_full' => 'This hotel already has the maximum of :max gallery images.',
         'reorder_mismatch' => 'The ids must be exactly the hotel gallery, in the desired order.',
@@ -102,5 +106,10 @@ return [
         'feed' => 'The reservation notification feed is returned.',
         'read' => 'The notification was marked as read.',
         'read_all' => 'The unread notifications were marked as read.',
+    ],
+
+    'role' => [
+        'system_delete_blocked' => 'This role is a protected system role and cannot be deleted.',
+        'assigned_delete_blocked' => 'This role is assigned to one or more users and cannot be deleted. Reassign those users to another role first.',
     ],
 ];

@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Api\V1\Hotel;
 
-use App\Domain\HotelGroup\Enums\HotelAmenity;
 use App\Domain\Location\Models\City;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -31,13 +30,28 @@ class UpdateHotelRequest extends FormRequest
             }
         }
 
+        // SEO metadata — bilingual, same `*_i18n` pattern, with the
+        // conventional search-engine snippet length limits.
+        $seo = [
+            'meta_title_i18n' => ['sometimes', 'nullable', 'array'],
+            'meta_description_i18n' => ['sometimes', 'nullable', 'array'],
+        ];
+        foreach ($locales as $locale) {
+            $seo["meta_title_i18n.{$locale}"] = ['nullable', 'string', 'max:60'];
+            $seo["meta_description_i18n.{$locale}"] = ['nullable', 'string', 'max:160'];
+        }
+
         return [
             'hotel_group_id' => ['sometimes', 'integer', 'exists:hotel_groups,id'],
             'name' => ['sometimes', 'string', 'max:255'],
             ...$i18n,
             'star_rating' => ['sometimes', 'nullable', 'integer', 'between:1,5'],
-            'amenities' => ['sometimes', 'nullable', 'array'],
-            'amenities.*' => [Rule::in(HotelAmenity::values())],
+            // Selected from the Facility catalog — replaces the old
+            // free-text `amenities` array.
+            'facility_ids' => ['sometimes', 'nullable', 'array'],
+            'facility_ids.*' => ['integer', 'exists:facilities,id'],
+            ...$seo,
+            'seo_indexable' => ['sometimes', 'boolean'],
             'slug' => ['sometimes', 'string', 'max:255', 'alpha_dash', Rule::unique('hotels', 'slug')->ignore($hotel)],
             'country_id' => ['sometimes', 'required', 'integer', 'exists:countries,id'],
             'city_id' => ['sometimes', 'required', 'integer', 'exists:cities,id'],

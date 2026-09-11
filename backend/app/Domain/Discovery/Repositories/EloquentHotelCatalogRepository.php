@@ -15,7 +15,7 @@ class EloquentHotelCatalogRepository implements HotelCatalogRepositoryInterface
     {
         return Hotel::query()
             ->where('is_active', true)
-            ->with(['logo', 'cover'])
+            ->with(['logo', 'cover', 'facilities'])
             ->withMin(
                 ['roomTypes as price_from' => fn (Builder $q) => $q->where('is_active', true)],
                 'base_price',
@@ -34,7 +34,7 @@ class EloquentHotelCatalogRepository implements HotelCatalogRepositoryInterface
     {
         return Hotel::query()
             ->where('is_active', true)
-            ->with(['logo', 'cover', 'galleryMedia'])
+            ->with(['logo', 'cover', 'galleryMedia', 'facilities'])
             ->find($id);
     }
 

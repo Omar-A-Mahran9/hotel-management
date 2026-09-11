@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Domain\HotelGroup\Enums\HotelAmenity;
+use App\Domain\HotelGroup\Models\Facility;
 use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\HotelGroup\Models\HotelGroup;
 use App\Domain\IdentityAccess\Models\Role;
@@ -100,7 +101,7 @@ class Phase1DemoSeeder extends Seeder
     {
         $city = City::query()->where('name_en', $cityName)->firstOrFail();
 
-        return Hotel::query()->updateOrCreate(
+        $hotel = Hotel::query()->updateOrCreate(
             ['slug' => $slug],
             [
                 'hotel_group_id' => $groupId,
@@ -117,13 +118,6 @@ class Phase1DemoSeeder extends Seeder
                     'ar' => 'غرف عصرية وخدمة مهتمة وقربٌ سهل من كل ما يهم.',
                 ],
                 'star_rating' => 4,
-                'amenities' => [
-                    HotelAmenity::FreeWifi->value,
-                    HotelAmenity::Breakfast->value,
-                    HotelAmenity::Pool->value,
-                    HotelAmenity::Parking->value,
-                    HotelAmenity::AirConditioning->value,
-                ],
                 'country_id' => $city->country_id,
                 'city_id' => $city->id,
                 'country' => 'Egypt',
@@ -132,6 +126,18 @@ class Phase1DemoSeeder extends Seeder
                 'is_active' => true,
             ]
         );
+
+        $hotel->facilities()->sync(
+            Facility::query()->whereIn('key', [
+                HotelAmenity::FreeWifi->value,
+                HotelAmenity::Breakfast->value,
+                HotelAmenity::Pool->value,
+                HotelAmenity::Parking->value,
+                HotelAmenity::AirConditioning->value,
+            ])->pluck('id')
+        );
+
+        return $hotel;
         // NOTE: no images are seeded — hotel media is real uploaded content
         // managed by staff through the dashboard, never a seeded placeholder.
     }

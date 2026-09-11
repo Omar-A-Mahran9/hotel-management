@@ -48,7 +48,7 @@ watch(inventoryHotelId, () => {
 }, { immediate: true })
 
 // --- Hotels count (real: GET /hotels meta.total) ----------------------
-const hotels = useResource(() => hotelsService.list(1), { immediate: can('hotels.view') })
+const hotels = useResource(() => hotelsService.list({ page: 1 }), { immediate: can('hotels.view') })
 const hotelsTotal = computed(() => hotels.data.value?.meta.total ?? hotelCtx.availableHotels.length)
 
 const currentHotelName = computed(() => hotelCtx.currentHotel?.name ?? '')

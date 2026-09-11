@@ -3,6 +3,7 @@
 namespace Tests\Feature\Hotel;
 
 use App\Domain\HotelGroup\Enums\HotelAmenity;
+use App\Domain\HotelGroup\Models\Facility;
 use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\HotelGroup\Models\HotelGroup;
 use App\Domain\IdentityAccess\Models\User;
@@ -25,9 +26,11 @@ class HotelDiscoveryFieldsTest extends TestCase
         return ['country_id' => $country->id, 'city_id' => $city->id];
     }
 
-    public function test_staff_can_create_a_hotel_with_i18n_copy_star_rating_and_amenities(): void
+    public function test_staff_can_create_a_hotel_with_i18n_copy_star_rating_and_facilities(): void
     {
         $group = HotelGroup::factory()->create();
+        $pool = Facility::query()->where('key', HotelAmenity::Pool->value)->firstOrFail();
+        $wifi = Facility::query()->where('key', HotelAmenity::FreeWifi->value)->firstOrFail();
 
         $res = $this->actingAs($this->owner(), 'sanctum')->postJson('/api/v1/hotels', [
             'hotel_group_id' => $group->id,
@@ -36,21 +39,22 @@ class HotelDiscoveryFieldsTest extends TestCase
             'tagline_i18n' => ['en' => 'On the water', 'ar' => 'على ضفاف النهر'],
             'description_i18n' => ['en' => 'A calm riverside stay.', 'ar' => 'إقامة هادئة على النهر.'],
             'star_rating' => 5,
-            'amenities' => [HotelAmenity::Pool->value, HotelAmenity::FreeWifi->value],
+            'facility_ids' => [$pool->id, $wifi->id],
             ...$this->locationPair(),
         ]);
 
         $res->assertCreated()
             ->assertJsonPath('data.name_i18n.ar', 'إطلالة النيل')
             ->assertJsonPath('data.star_rating', 5)
-            ->assertJsonPath('data.amenities', [HotelAmenity::Pool->value, HotelAmenity::FreeWifi->value])
+            ->assertJsonCount(2, 'data.facilities')
             // legacy `name` derived from the fallback-locale i18n value
             ->assertJsonPath('data.name', 'Nile View');
 
         $this->assertDatabaseHas('hotels', ['slug' => 'nile-view', 'name' => 'Nile View', 'star_rating' => 5]);
+        $this->assertDatabaseHas('facility_hotel', ['facility_id' => $pool->id]);
     }
 
-    public function test_star_rating_and_amenity_values_are_validated(): void
+    public function test_star_rating_and_facility_ids_are_validated(): void
     {
         $group = HotelGroup::factory()->create();
 
@@ -59,9 +63,9 @@ class HotelDiscoveryFieldsTest extends TestCase
             'name' => 'X',
             'slug' => 'x-hotel',
             'star_rating' => 9,
-            'amenities' => ['teleporter'],
+            'facility_ids' => [999999],
             ...$this->locationPair(),
-        ])->assertStatus(422)->assertJsonValidationErrors(['star_rating', 'amenities.0']);
+        ])->assertStatus(422)->assertJsonValidationErrors(['star_rating', 'facility_ids.0']);
     }
 
     public function test_staff_resource_exposes_raw_i18n_maps_for_editing(): void
@@ -77,7 +81,7 @@ class HotelDiscoveryFieldsTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.name_i18n.ar', 'الاسم القديم')
             ->assertJsonPath('data.star_rating', 3)
-            ->assertJsonStructure(['data' => ['name_i18n', 'tagline_i18n', 'description_i18n', 'amenities', 'gallery']]);
+            ->assertJsonStructure(['data' => ['name_i18n', 'tagline_i18n', 'description_i18n', 'facilities', 'gallery', 'meta_title_i18n', 'meta_description_i18n', 'seo_indexable']]);
     }
 
     public function test_updating_i18n_name_keeps_the_legacy_search_string_in_sync(): void

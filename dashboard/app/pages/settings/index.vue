@@ -11,7 +11,7 @@ const localeOptions = computed(() =>
 const facts = computed(() => [
   { label: t('settings.name'), value: auth.user?.name },
   { label: t('settings.email'), value: auth.user?.email },
-  { label: t('settings.role'), value: auth.user?.role?.name },
+  { label: t('settings.role'), value: auth.user?.role ? (locale.value === 'ar' ? auth.user.role.name_ar : auth.user.role.name_en) : undefined },
   {
     label: t('settings.assignedHotels'),
     value: auth.isGroupOwner

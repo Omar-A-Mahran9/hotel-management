@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { locale, locales, setLocale } = useI18n()
+const { t, locale, locales, setLocale } = useI18n()
 
 const options = computed(() =>
   (locales.value as Array<{ code: string, name: string }>).map(l => ({ code: l.code, name: l.name })),
@@ -13,7 +13,7 @@ function pick(code: string) {
 <template>
   <AppDropdown width="10rem">
     <template #trigger>
-      <button type="button" class="btn btn-ghost px-2 py-1.5" aria-label="Language">
+      <button type="button" class="btn btn-ghost px-2 py-1.5" :aria-label="t('settings.language')">
         <KtIcon name="flag" />
         <span class="text-2sm uppercase">{{ locale }}</span>
       </button>
