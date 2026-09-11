@@ -346,12 +346,18 @@
     "transitionSuccess": "Reservation moved to {status}.",
     "noTransitions": "No further transitions are available from this status.",
     "manageNote": "The backend re-validates every transition against the reservation state machine. Frontend only offers transitions valid from the current status.",
-    "guestGap": "Guest profile details are not available — the backend does not expose a guest resource yet (guest_id {id}).",
+    "viewGuestProfile": "View guest profile (#{id})",
     "filterStatus": "Status",
     "filterHotel": "Hotel",
     "new": "Walk-in reservation",
     "createGapTitle": "Walk-in creation needs the guests resource",
-    "createGapBody": "POST /reservations requires an existing guest_id, but the backend has no guest lookup or create endpoint yet. Once GET/POST /guests exists, this becomes a full walk-in booking form."
+    "createGapBody": "POST /reservations requires an existing guest_id, but the backend has no guest lookup or create endpoint yet. Once GET/POST /guests exists, this becomes a full walk-in booking form.",
+    "extendStay": "Extend stay",
+    "extendNewCheckOut": "New checkout date",
+    "extendCta": "Extend",
+    "extendNote": "Availability and the price are re-checked and calculated by the server from the room type's nightly rate. The amount is added to the folio and settled at checkout.",
+    "extendSuccess": "Stay extended to {date} (+{amount}).",
+    "extendUnavailable": "Extend stay is only available while the guest is checked in."
   },
   "workspace": {
     "payment": "Payment",
@@ -540,13 +546,11 @@
     "heading": "Awaiting a backend endpoint",
     "needed": "Backend endpoints needed",
     "noFake": "No placeholder or fabricated data is shown. This module activates automatically once the endpoint ships.",
-    "guestsBody": "There is no first-class guest resource. Guest records exist only inside the reservation domain, with no list, search, profile or history endpoint.",
     "digitalAccessBody": "Per-reservation check-in and access control work inside a reservation's workspace. A standalone desk view needs arrivals / departures / in-house list endpoints.",
     "paymentsBody": "Payment state is visible per reservation (folio, checkout). A payments section needs a hotel- or group-scoped payments ledger.",
     "invoicesBody": "An issued invoice is viewable inside its reservation's workspace. An invoices section needs a hotel- or group-scoped invoice ledger.",
     "settlementsBody": "Final settlement runs inside checkout. A settlements section needs a settlement ledger endpoint.",
     "loyaltyBody": "Loyalty balances and ledgers are reservation-scoped (guest identity is resolved server-side). A group loyalty dashboard needs a guest-scoped loyalty endpoint. The loyalty rule itself is configurable in the Hotel group section.",
-    "reviewsBody": "There is no reviews domain on the backend — no model, routes or controller for staff-side review management or moderation.",
     "notificationsBody": "The notification feed is reservation-scoped and shown inside a reservation's workspace. A staff-wide operational feed needs a dedicated endpoint.",
     "reportsBody": "There are no reporting endpoints (occupancy, revenue, hotel comparison, payments, checkout, services, loyalty).",
     "auditBody": "Every sensitive action is written to the audit log, but there is no read endpoint to list or filter those records.",
@@ -565,15 +569,22 @@
     "loyalty": "Loyalty & review"
   },
   "guestsPage": {
+    "subtitle": "Every guest who has ever booked, across all hotels.",
     "name": "Guest",
+    "unnamed": "Unnamed guest",
     "email": "Email",
     "phone": "Phone",
+    "phoneVerified": "Phone verified",
+    "profileComplete": "Profile complete",
+    "created": "Guest since",
     "reservations": "Reservations",
     "lastStay": "Last stay",
     "profile": "Profile",
     "history": "Stay history",
     "contact": "Contact information",
-    "searchPlaceholder": "Name, email or phone"
+    "searchPlaceholder": "Name, email or phone",
+    "empty": "No guests yet.",
+    "noReservations": "This guest has no reservations within your hotel access."
   },
   "digitalAccessPage": {
     "subtitle": "Arrivals desk — check-in and room-key issuance.",
@@ -643,16 +654,15 @@
     "guest": "Guest",
     "reservation": "Reservation",
     "rating": "Rating",
+    "ratingValue": "{count} / 5",
     "text": "Review",
     "moderation": "Moderation",
     "created": "Date",
-    "filterRating": "Rating",
-    "filterModeration": "Moderation status",
     "approve": "Approve",
     "reject": "Reject",
-    "pending": "Pending",
-    "approved": "Approved",
-    "rejected": "Rejected"
+    "approved": "Review published.",
+    "rejected": "Review rejected.",
+    "empty": "No reviews yet."
   },
   "notificationsPage": {
     "subtitle": "Operational notification feed.",
@@ -762,7 +772,9 @@
     "draft": "Draft",
     "issued": "Issued",
     "sending": "Sending",
-    "sent": "Sent"
+    "sent": "Sent",
+    "published": "Published",
+    "rejected": "Rejected"
   },
   "theme": {
     "light": "Light",

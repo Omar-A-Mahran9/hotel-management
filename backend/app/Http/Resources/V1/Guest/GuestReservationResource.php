@@ -17,7 +17,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * state-machine value — the client mirrors the enum and must render every
  * state.
  *
- * `hotel` / `room_type` light summaries appear only when eager-loaded.
+ * `hotel` / `room_type` / `room` light summaries appear only when
+ * eager-loaded. `room_type.base_price` is the authoritative nightly rate
+ * (Extend Stay prices from it; the Account screen's loyalty-card "per night"
+ * figure reads it too — see docs/mobile-phase-11-bookings-account.md). `room`
+ * is the physically allocated room (set once a room is assigned / at
+ * check-in) — absent for a reservation with no room assigned yet.
  * `currency` is the configured booking currency (same source the
  * availability endpoint uses) — not a stored column.
  */
@@ -48,12 +53,18 @@ class GuestReservationResource extends JsonResource
                 'id' => $this->hotel->id,
                 'name' => LocalizedContent::resolve($this->hotel->name_i18n, $this->hotel->name),
                 'city' => $this->hotel->city,
+                'cover_url' => $this->hotel->relationLoaded('cover') ? $this->hotel->cover?->url() : null,
             ]),
             'room_type' => $this->whenLoaded('roomType', fn () => [
                 'id' => $this->roomType->id,
                 'name' => $this->roomType->name,
                 'capacity' => $this->roomType->capacity,
+                'base_price' => $this->roomType->base_price,
             ]),
+            'room' => $this->whenLoaded('room', fn () => $this->room ? [
+                'id' => $this->room->id,
+                'room_number' => $this->room->room_number,
+            ] : null),
             'payment' => $this->whenLoaded('payment', fn () => $this->payment
                 ? new GuestPaymentResource($this->payment)
                 : null),

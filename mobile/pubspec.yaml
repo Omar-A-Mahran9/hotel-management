@@ -27,6 +27,11 @@ dependencies:
   # so it builds on every target while Android SDK / Xcode / CocoaPods are absent.
   dio: ^5.7.0
 
+  # MIME content-type for multipart uploads (identity document/selfie) — a
+  # transitive dio dependency already resolved; declared directly since
+  # `api_identity_verification_data_source.dart` imports it by name.
+  http_parser: ^4.0.2
+
   # Message formatting + locale utilities used by the generated localizations.
   intl: any
 

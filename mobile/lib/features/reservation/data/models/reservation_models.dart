@@ -11,6 +11,7 @@ import '../../../discovery/domain/entities/localized_text.dart';
 import '../../../discovery/domain/entities/money.dart';
 import '../../../discovery/domain/entities/stay_range.dart';
 import '../../domain/entities/create_reservation_request.dart';
+import '../../domain/entities/extend_stay.dart';
 import '../../domain/entities/reservation.dart';
 import '../../domain/entities/reservation_status.dart';
 
@@ -74,6 +75,11 @@ class ReservationModel {
     required this.createdAt,
     required this.hotelName,
     required this.roomName,
+    this.hotelCity,
+    this.hotelImageUrl,
+    this.roomNumber,
+    this.nightlyRate,
+    this.cancelledAt,
   });
 
   factory ReservationModel.fromJson(
@@ -82,6 +88,11 @@ class ReservationModel {
     required LocalizedText roomName,
     required GuestParty party,
   }) {
+    final Json? hotel = json['hotel'] as Json?;
+    final Json? roomType = json['room_type'] as Json?;
+    final Json? room = json['room'] as Json?;
+    final String currency = (json['currency'] as String?) ?? 'SAR';
+
     return ReservationModel(
       id: '${json['id']}',
       reference: (json['reference'] as String?) ?? 'RSV-${json['id']}',
@@ -95,7 +106,7 @@ class ReservationModel {
       status: ReservationStatus.fromWire((json['status'] as String?) ?? 'pending'),
       priceSnapshot: Money(
         amount: _priceAmount(json['price_snapshot']),
-        currency: (json['currency'] as String?) ?? 'SAR',
+        currency: currency,
       ),
       createdAt: DateTime.parse(
         (json['created_at'] as String?) ??
@@ -103,6 +114,15 @@ class ReservationModel {
       ),
       hotelName: hotelName,
       roomName: roomName,
+      hotelCity: hotel?['city'] as String?,
+      hotelImageUrl: hotel?['cover_url'] as String?,
+      roomNumber: room?['room_number'] as String?,
+      nightlyRate: roomType?['base_price'] == null
+          ? null
+          : Money(amount: _priceAmount(roomType!['base_price']), currency: currency),
+      cancelledAt: json['cancelled_at'] == null
+          ? null
+          : DateTime.parse(json['cancelled_at'] as String),
     );
   }
 
@@ -120,6 +140,11 @@ class ReservationModel {
   final DateTime createdAt;
   final LocalizedText hotelName;
   final LocalizedText roomName;
+  final String? hotelCity;
+  final String? hotelImageUrl;
+  final String? roomNumber;
+  final Money? nightlyRate;
+  final DateTime? cancelledAt;
 
   Reservation toEntity() => Reservation(
         id: id,
@@ -134,6 +159,11 @@ class ReservationModel {
         status: status,
         priceSnapshot: priceSnapshot,
         createdAt: createdAt,
+        hotelCity: hotelCity,
+        hotelImageUrl: hotelImageUrl,
+        roomNumber: roomNumber,
+        nightlyRate: nightlyRate,
+        cancelledAt: cancelledAt,
       );
 
   /// The Laravel resource serialises `price_snapshot` as a `decimal:2` string
@@ -143,4 +173,53 @@ class ReservationModel {
     if (raw is String) return (double.tryParse(raw) ?? 0).round();
     return 0;
   }
+}
+
+/// Parsed `{ reservation, extension, folio }` composite response from
+/// `POST .../extend`. Only the fields the UI needs are kept — the full
+/// [ReservationModel] is parsed separately by the caller from the same JSON.
+class ExtendStayResultModel {
+  const ExtendStayResultModel({
+    required this.reservationId,
+    required this.newCheckOut,
+    required this.nightsAdded,
+    required this.amount,
+    required this.outstandingTotal,
+  });
+
+  factory ExtendStayResultModel.fromJson(Json json) {
+    final Json extension = (json['extension'] as Json?) ?? const <String, Object?>{};
+    final Json folio = (json['folio'] as Json?) ?? const <String, Object?>{};
+    final Json totals = (folio['totals'] as Json?) ?? const <String, Object?>{};
+    final String currency =
+        (extension['currency'] as String?) ?? (folio['currency'] as String?) ?? 'SAR';
+
+    return ExtendStayResultModel(
+      reservationId: '${extension['reservation_id']}',
+      newCheckOut: DateTime.parse(extension['new_check_out'] as String),
+      nightsAdded: (extension['nights_added'] as num?)?.toInt() ?? 0,
+      amount: Money(
+        amount: ReservationModel._priceAmount(extension['amount']),
+        currency: currency,
+      ),
+      outstandingTotal: Money(
+        amount: ReservationModel._priceAmount(totals['outstanding_total']),
+        currency: currency,
+      ),
+    );
+  }
+
+  final String reservationId;
+  final DateTime newCheckOut;
+  final int nightsAdded;
+  final Money amount;
+  final Money outstandingTotal;
+
+  ExtendStayResult toEntity() => ExtendStayResult(
+        reservationId: reservationId,
+        newCheckOut: newCheckOut,
+        nightsAdded: nightsAdded,
+        amount: amount,
+        outstandingTotal: outstandingTotal,
+      );
 }

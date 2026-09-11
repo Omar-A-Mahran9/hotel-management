@@ -1,10 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hotel_guest_app/core/config/app_config.dart';
-import 'package:hotel_guest_app/core/config/app_environment.dart';
 import 'package:hotel_guest_app/core/errors/app_exception.dart';
-import 'package:hotel_guest_app/core/network/api_client.dart';
-import 'package:hotel_guest_app/core/security/in_memory_token_store.dart';
-import 'package:hotel_guest_app/features/payment/data/datasources/api_payment_data_source.dart';
 import 'package:hotel_guest_app/features/payment/data/datasources/dummy_payment_data_source.dart';
 import 'package:hotel_guest_app/features/payment/domain/entities/payment_status.dart';
 
@@ -71,24 +66,7 @@ void main() {
     });
   });
 
-  group('ApiPaymentDataSource', () {
-    final source = ApiPaymentDataSource(
-      ApiClient(
-        config: const AppConfig(
-          environment: AppEnvironment.development,
-          apiBaseUrl: 'http://localhost',
-          apiVersion: 'v1',
-          useDummyData: false,
-        ),
-        tokenStore: InMemoryTokenStore(),
-      ),
-    );
-
-    test('both methods are documented not-implemented stubs', () {
-      expect(source.fetchForReservation('1'),
-          throwsA(isA<NotImplementedInPhaseException>()));
-      expect(source.requestHold(fakeHoldRequest()),
-          throwsA(isA<NotImplementedInPhaseException>()));
-    });
-  });
+  // `ApiPaymentDataSource` is now a real implementation against the guest
+  // payment endpoints — see
+  // test/features/payment/api_payment_data_source_test.dart.
 }

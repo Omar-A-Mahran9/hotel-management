@@ -2,18 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/localization/l10n.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/app_icons.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/secondary_button.dart';
 import '../../domain/entities/city.dart';
+import '../../domain/entities/hotel.dart';
 import '../../domain/entities/hotel_filters.dart';
+import '../discovery_l10n.dart';
 import '../state/cities_provider.dart';
 import '../state/price_bounds_provider.dart';
 import 'sheet_scaffold.dart';
 
 /// `15 · Search, filters & sort` — "تصفية النتائج". Returns the composed
-/// [HotelFilters], or `null` if dismissed. Only the filters the design exposes:
-/// city (multi-select) and price range.
+/// [HotelFilters], or `null` if dismissed. City (multi-select), price range
+/// and facilities are real, server-applied filters. "التقييم" (rating) is
+/// rendered locked, matching the reference exactly — no approved threshold
+/// rule exists to filter by yet.
 Future<HotelFilters?> showFilterSheet(
   BuildContext context, {
   required HotelFilters current,
@@ -40,6 +46,7 @@ class _FilterSheet extends ConsumerStatefulWidget {
 
 class _FilterSheetState extends ConsumerState<_FilterSheet> {
   late Set<String> _cityIds = Set<String>.of(widget.current.cityIds);
+  late Set<HotelAmenity> _facilities = Set<HotelAmenity>.of(widget.current.facilities);
   RangeValues? _price;
 
   void _syncPrice(PriceRange bounds) {
@@ -59,6 +66,7 @@ class _FilterSheetState extends ConsumerState<_FilterSheet> {
       priceRange: priceTouched
           ? PriceRange(min: price.start.round(), max: price.end.round())
           : null,
+      facilities: _facilities,
     );
   }
 
@@ -152,6 +160,34 @@ class _FilterSheetState extends ConsumerState<_FilterSheet> {
             );
           },
         ),
+        const SizedBox(height: AppSpacing.lg),
+
+        // ── Facilities ───────────────────────────────────────────────────
+        Text(l10n.filterFacilitiesLabel, style: Theme.of(context).textTheme.titleSmall),
+        const SizedBox(height: AppSpacing.xs),
+        Wrap(
+          spacing: AppSpacing.xs,
+          runSpacing: AppSpacing.xs,
+          children: <Widget>[
+            for (final HotelAmenity amenity in HotelAmenity.values)
+              FilterChip(
+                label: Text(l10n.hotelAmenityLabel(amenity)),
+                selected: _facilities.contains(amenity),
+                onSelected: (bool value) => setState(() {
+                  if (value) {
+                    _facilities = <HotelAmenity>{..._facilities, amenity};
+                  } else {
+                    _facilities =
+                        _facilities.where((HotelAmenity a) => a != amenity).toSet();
+                  }
+                }),
+              ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.lg),
+
+        // ── Rating — locked (no approved threshold rule) ────────────────────
+        _LockedFilterRow(label: l10n.filterRatingLabel),
       ],
       footer: Column(
         mainAxisSize: MainAxisSize.min,
@@ -167,6 +203,31 @@ class _FilterSheetState extends ConsumerState<_FilterSheet> {
             label: l10n.filterClearAll,
             onPressed: () => Navigator.of(context).pop(HotelFilters.none),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A disabled filter row with a lock icon — matches `15 · Search, filters &
+/// sort`'s treatment of "التقييم" (rating): shown, not hidden, but
+/// non-interactive, since no approved rating-threshold rule exists yet.
+class _LockedFilterRow extends StatelessWidget {
+  const _LockedFilterRow({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppColorTokens c = context.colors;
+    return Opacity(
+      opacity: 0.5,
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Text(label, style: Theme.of(context).textTheme.titleSmall),
+          ),
+          Icon(AppIcons.locked, size: 18, color: c.textSecondary),
         ],
       ),
     );

@@ -8,6 +8,7 @@ import 'package:hotel_guest_app/features/digital_access/data/datasources/dummy_d
 import 'package:hotel_guest_app/features/digital_access/domain/entities/access_status.dart';
 import 'package:hotel_guest_app/features/digital_access/presentation/state/digital_access_providers.dart';
 import 'package:hotel_guest_app/features/reservation/domain/entities/create_reservation_request.dart';
+import 'package:hotel_guest_app/features/reservation/domain/entities/extend_stay.dart';
 import 'package:hotel_guest_app/features/reservation/domain/entities/reservation.dart';
 import 'package:hotel_guest_app/features/reservation/domain/entities/reservation_status.dart';
 import 'package:hotel_guest_app/features/reservation/domain/repositories/reservation_repository.dart';
@@ -28,6 +29,17 @@ class _ReservationRepo implements ReservationRepository {
   @override
   Future<Reservation> getById(String id) async =>
       fakeReservation(id: id, status: status);
+
+  @override
+  Future<List<Reservation>> list() async => <Reservation>[];
+
+  @override
+  Future<Reservation> cancel(String id) async => fakeReservation(id: id);
+
+  @override
+  Future<ExtendStayResult> extend(ExtendStayRequest request) async {
+    throw UnimplementedError('extend not used in this test');
+  }
 }
 
 Future<AppLocalizations> _l10n(String code) =>
@@ -74,7 +86,7 @@ void main() {
     await tester
         .tap(find.widgetWithText(FilledButton, en.accessBackToReservation));
     await tester.pumpAndSettle();
-    expect(find.text(en.reservationDetailTitle), findsWidgets);
+    expect(find.text(en.bookingDetailTitle), findsWidgets);
   });
 
   testWidgets('the CTA is disabled until the reservation is verified',

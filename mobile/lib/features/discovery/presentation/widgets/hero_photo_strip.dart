@@ -4,21 +4,25 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/widgets/app_image.dart';
 import 'hotel_thumbnail.dart';
 
 /// The overlapping thumbnail row that straddles the lower edge of a hero image
 /// (`HOTEL_Detail`, `08 · تفاصيل الغرفة`). The last tile shows `+N` for the
 /// remaining photos.
+///
+/// [galleryUrls] are the hotel's real gallery photo URLs
+/// (`PublicHotelResource.gallery[].url`), in display order. A tile beyond
+/// the number of real URLs on hand (fewer photos than [visible]) shows the
+/// branded placeholder — never a stock/seeded photo.
 class HeroPhotoStrip extends StatelessWidget {
   const HeroPhotoStrip({
     super.key,
-    required this.seed,
+    required this.galleryUrls,
     required this.totalPhotos,
     this.visible = 3,
   });
 
-  final String seed;
+  final List<String> galleryUrls;
   final int totalPhotos;
   final int visible;
 
@@ -52,8 +56,7 @@ class HeroPhotoStrip extends StatelessWidget {
           for (int i = 0; i < shown; i++) ...<Widget>[
             _Tile(
               child: HotelThumbnail(
-                seed: '$seed-photo-$i',
-                pool: AppImages.roomThumbs,
+                imageUrl: i < galleryUrls.length ? galleryUrls[i] : null,
                 width: 64,
                 height: 64,
                 borderRadius: AppRadius.allMd,

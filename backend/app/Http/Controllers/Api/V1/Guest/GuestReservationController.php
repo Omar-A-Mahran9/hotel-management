@@ -4,10 +4,16 @@ namespace App\Http\Controllers\Api\V1\Guest;
 
 use App\Domain\Reservation\Models\Guest;
 use App\Domain\Reservation\Models\Reservation;
+use App\Domain\Reservation\Services\ReservationExtensionService;
 use App\Domain\Reservation\Services\ReservationService;
+use App\Domain\StayServices\Services\FolioService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Guest\ExtendGuestReservationRequest;
 use App\Http\Requests\Api\V1\Guest\StoreGuestReservationRequest;
+use App\Http\Resources\V1\FolioResource;
 use App\Http\Resources\V1\Guest\GuestReservationResource;
+use App\Http\Resources\V1\ReservationExtensionResource;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -28,7 +34,11 @@ use Illuminate\Http\Request;
  */
 class GuestReservationController extends Controller
 {
-    public function __construct(private readonly ReservationService $reservations) {}
+    public function __construct(
+        private readonly ReservationService $reservations,
+        private readonly ReservationExtensionService $extensions,
+        private readonly FolioService $folios,
+    ) {}
 
     public function index(Request $request): JsonResponse
     {
@@ -57,7 +67,7 @@ class GuestReservationController extends Controller
             actor: null,
         );
 
-        $reservation->load(['hotel', 'roomType']);
+        $reservation->load(['hotel.cover', 'roomType']);
 
         return $this->success(
             new GuestReservationResource($reservation),
@@ -74,9 +84,46 @@ class GuestReservationController extends Controller
             abort(404);
         }
 
-        $found->load(['hotel', 'roomType', 'payment']);
+        $found->load(['hotel.cover', 'roomType', 'room', 'payment']);
 
         return $this->success(new GuestReservationResource($found));
+    }
+
+    /**
+     * Extend Stay — only while the reservation is `checked_in` / `in_stay`
+     * (the guest is actually occupying the room). Reuses
+     * ReservationExtensionService unchanged: it re-validates availability for
+     * the added nights, prices the addition from `room_types.base_price`,
+     * updates the reservation and posts the incremental amount as a folio
+     * charge that accrues to the account (settled at checkout, like every
+     * other folio charge — no separate payment call here).
+     *
+     * actor: null — a guest-initiated extension has no staff creator, same
+     * convention as store()/cancel().
+     */
+    public function extend(ExtendGuestReservationRequest $request, int $reservation): JsonResponse
+    {
+        $found = $this->reservations->findOwnedByGuest($this->guest($request), $reservation);
+
+        if (! $found) {
+            abort(404);
+        }
+
+        $extension = $this->extensions->extend(
+            $found,
+            CarbonImmutable::parse($request->newCheckOut()),
+            actor: null,
+            idempotencyKey: $request->idempotencyKey(),
+        );
+
+        $updated = $this->reservations->findOwnedByGuest($this->guest($request), $reservation);
+        $updated->load(['hotel.cover', 'roomType', 'room', 'payment']);
+
+        return $this->success([
+            'reservation' => new GuestReservationResource($updated),
+            'extension' => new ReservationExtensionResource($extension),
+            'folio' => new FolioResource($this->folios->folioFor($updated)),
+        ], __('api.updated'));
     }
 
     /**
@@ -99,7 +146,7 @@ class GuestReservationController extends Controller
             actor: null,
         );
 
-        $updated->load(['hotel', 'roomType', 'payment']);
+        $updated->load(['hotel.cover', 'roomType', 'room', 'payment']);
 
         return $this->success(
             new GuestReservationResource($updated),

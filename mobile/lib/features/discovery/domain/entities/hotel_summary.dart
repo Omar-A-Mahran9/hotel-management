@@ -17,6 +17,7 @@ class HotelSummary {
     required this.reviewCount,
     required this.nightlyRateFrom,
     required this.isAvailable,
+    this.coverUrl,
   });
 
   final String id;
@@ -36,6 +37,10 @@ class HotelSummary {
 
   final bool isAvailable;
 
+  /// The backend's real `cover_url` for this hotel, or `null` when none is on
+  /// file — the card then shows the branded placeholder, never a stock photo.
+  final String? coverUrl;
+
   @override
   bool operator ==(Object other) =>
       other is HotelSummary &&
@@ -47,7 +52,8 @@ class HotelSummary {
       other.rating == rating &&
       other.reviewCount == reviewCount &&
       other.nightlyRateFrom == nightlyRateFrom &&
-      other.isAvailable == isAvailable;
+      other.isAvailable == isAvailable &&
+      other.coverUrl == coverUrl;
 
   @override
   int get hashCode => Object.hash(
@@ -60,5 +66,6 @@ class HotelSummary {
         reviewCount,
         nightlyRateFrom,
         isAvailable,
+        coverUrl,
       );
 }

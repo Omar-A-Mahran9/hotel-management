@@ -116,6 +116,35 @@ async function doTransition() {
     transitioning.value = false
   }
 }
+
+// --- extend stay -------------------------------------------------------
+// Only while the guest is actually occupying the room — the backend
+// (ReservationExtensionService) enforces this independently; this is just
+// the UX gate that decides whether to offer the action at all.
+const canExtend = computed(() =>
+  reservation.data.value !== null
+  && ['checked_in', 'in_stay'].includes(reservation.data.value.status),
+)
+const newCheckOut = ref('')
+const extending = ref(false)
+
+async function doExtend() {
+  if (!newCheckOut.value || extending.value) return
+  extending.value = true
+  try {
+    const result = await reservationsService.extend(id, newCheckOut.value)
+    reservation.data.value = result.reservation
+    app.pushToast('success', t('reservations.extendSuccess', {
+      date: date(result.extension.new_check_out),
+      amount: money(result.extension.amount),
+    }))
+    newCheckOut.value = ''
+  } catch (e) {
+    app.pushToast('error', e instanceof ApiError ? e.message : t('errors.genericBody'))
+  } finally {
+    extending.value = false
+  }
+}
 </script>
 
 <template>
@@ -150,9 +179,18 @@ async function doTransition() {
                 {{ t('reservations.cancellationReason') }}: {{ reservation.data.value.cancellation_reason }}
               </p>
             </DataCard>
-            <InfoNote tone="warning" :title="t('reservations.guest')" class="mt-4">
-              {{ t('reservations.guestGap', { id: reservation.data.value.guest_id ?? '—' }) }}
-            </InfoNote>
+            <DataCard v-if="reservation.data.value.guest_id" :title="t('reservations.guest')" class="mt-4">
+              <NuxtLink
+                v-if="can('guests.view')"
+                :to="`/guests/${reservation.data.value.guest_id}`"
+                class="btn btn-secondary"
+              >
+                <KtIcon name="user" /> {{ t('reservations.viewGuestProfile', { id: reservation.data.value.guest_id }) }}
+              </NuxtLink>
+              <p v-else class="text-2sm text-muted-foreground">
+                #{{ reservation.data.value.guest_id }}
+              </p>
+            </DataCard>
           </template>
 
           <WorkspacePaymentPanel
@@ -225,6 +263,31 @@ async function doTransition() {
             <p class="mt-3 text-2xs text-muted-foreground">
               {{ t('reservations.manageNote') }}
             </p>
+          </DataCard>
+
+          <DataCard v-if="can('reservations.manage') && canExtend" :title="t('reservations.extendStay')">
+            <div class="space-y-3">
+              <label class="block text-sm">
+                <span class="text-muted-foreground">{{ t('reservations.extendNewCheckOut') }}</span>
+                <input
+                  v-model="newCheckOut"
+                  type="date"
+                  class="input mt-1 w-full"
+                  :min="reservation.data.value.check_out"
+                >
+              </label>
+              <button
+                type="button"
+                class="btn btn-primary w-full"
+                :disabled="!newCheckOut || extending"
+                @click="doExtend"
+              >
+                {{ t('reservations.extendCta') }}
+              </button>
+              <p class="text-2xs text-muted-foreground">
+                {{ t('reservations.extendNote') }}
+              </p>
+            </div>
           </DataCard>
         </div>
       </div>

@@ -7,6 +7,7 @@ import 'package:hotel_guest_app/features/loyalty/data/datasources/dummy_loyalty_
 import 'package:hotel_guest_app/features/loyalty/data/repositories/loyalty_repository_impl.dart';
 import 'package:hotel_guest_app/features/loyalty/presentation/state/loyalty_providers.dart';
 import 'package:hotel_guest_app/features/reservation/domain/entities/create_reservation_request.dart';
+import 'package:hotel_guest_app/features/reservation/domain/entities/extend_stay.dart';
 import 'package:hotel_guest_app/features/reservation/domain/entities/reservation.dart';
 import 'package:hotel_guest_app/features/reservation/domain/entities/reservation_status.dart';
 import 'package:hotel_guest_app/features/reservation/domain/repositories/reservation_repository.dart';
@@ -27,6 +28,16 @@ class _ReservationRepo implements ReservationRepository {
   @override
   Future<Reservation> getById(String id) async =>
       fakeReservation(id: id, status: status, amount: 900);
+  @override
+  Future<List<Reservation>> list() async => <Reservation>[];
+
+  @override
+  Future<Reservation> cancel(String id) async => fakeReservation(id: id);
+
+  @override
+  Future<ExtendStayResult> extend(ExtendStayRequest request) async {
+    throw UnimplementedError('extend not used in this test');
+  }
 }
 
 Future<AppLocalizations> _l10n(String code) =>

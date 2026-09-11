@@ -2,10 +2,13 @@
 
 namespace Tests\Feature\Guest;
 
+use App\Domain\HotelGroup\Enums\HotelAmenity;
+use App\Domain\HotelGroup\Models\Facility;
 use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\Inventory\Models\Room;
 use App\Domain\Inventory\Models\RoomType;
 use App\Domain\Reservation\Models\Reservation;
+use App\Domain\Review\Models\Review;
 use Tests\TestCase;
 
 class GuestDiscoveryTest extends TestCase
@@ -129,5 +132,140 @@ class GuestDiscoveryTest extends TestCase
         Hotel::factory()->create();
 
         $this->getJson('/api/v1/guest/hotels')->assertOk();
+    }
+
+    public function test_default_sort_is_recommended_by_booking_count(): void
+    {
+        $quiet = Hotel::factory()->create(['name' => 'Quiet Inn', 'city' => 'Sort City']);
+        $popular = Hotel::factory()->create(['name' => 'Popular Stay', 'city' => 'Sort City']);
+        $mid = Hotel::factory()->create(['name' => 'Mid Stay', 'city' => 'Sort City']);
+
+        Reservation::factory()->count(5)->create(['hotel_id' => $popular->id, 'status' => Reservation::STATUS_CHECKED_OUT]);
+        Reservation::factory()->count(2)->create(['hotel_id' => $mid->id, 'status' => Reservation::STATUS_PENDING]);
+        // A cancelled reservation is not a "booking" — must not count.
+        Reservation::factory()->count(9)->create(['hotel_id' => $quiet->id, 'status' => Reservation::STATUS_CANCELLED]);
+
+        $res = $this->getJson('/api/v1/guest/hotels?city=Sort+City')->assertOk();
+        $names = array_column($res->json('data'), 'name');
+
+        $this->assertSame(['Popular Stay', 'Mid Stay', 'Quiet Inn'], $names);
+
+        // Same ordering when `sort` is omitted vs explicit `recommended`.
+        $this->getJson('/api/v1/guest/hotels?city=Sort+City&sort=recommended')
+            ->assertOk()
+            ->assertJsonPath('data.0.name', 'Popular Stay');
+    }
+
+    public function test_sort_highest_rated_orders_by_average_published_rating(): void
+    {
+        $low = Hotel::factory()->create(['name' => 'Low Rated', 'city' => 'Rated City']);
+        $high = Hotel::factory()->create(['name' => 'High Rated', 'city' => 'Rated City']);
+        $none = Hotel::factory()->create(['name' => 'Unrated', 'city' => 'Rated City']);
+
+        Review::factory()->for($low)->create(['rating' => 2, 'status' => Review::STATUS_PUBLISHED]);
+        Review::factory()->for($high)->create(['rating' => 5, 'status' => Review::STATUS_PUBLISHED]);
+
+        $res = $this->getJson('/api/v1/guest/hotels?city=Rated+City&sort=highest_rated')->assertOk();
+        $names = array_column($res->json('data'), 'name');
+
+        // Unrated hotels sort after rated ones regardless of rating value.
+        $this->assertSame(['High Rated', 'Low Rated', 'Unrated'], $names);
+    }
+
+    public function test_sort_cheapest_orders_by_lowest_price_from(): void
+    {
+        $expensive = Hotel::factory()->create(['name' => 'Expensive', 'city' => 'Price City']);
+        $cheap = Hotel::factory()->create(['name' => 'Cheap', 'city' => 'Price City']);
+        $noRooms = Hotel::factory()->create(['name' => 'No Rooms', 'city' => 'Price City']);
+
+        RoomType::factory()->create(['hotel_id' => $expensive->id, 'base_price' => 900]);
+        RoomType::factory()->create(['hotel_id' => $cheap->id, 'base_price' => 200]);
+
+        $res = $this->getJson('/api/v1/guest/hotels?city=Price+City&sort=cheapest')->assertOk();
+        $names = array_column($res->json('data'), 'name');
+
+        // A hotel with no active room types (no price_from) sorts last.
+        $this->assertSame(['Cheap', 'Expensive', 'No Rooms'], $names);
+    }
+
+    public function test_price_range_filter_uses_the_price_from_aggregate(): void
+    {
+        $hotelA = Hotel::factory()->create(['city' => 'Range City']);
+        $hotelB = Hotel::factory()->create(['city' => 'Range City']);
+        RoomType::factory()->create(['hotel_id' => $hotelA->id, 'base_price' => 300]);
+        RoomType::factory()->create(['hotel_id' => $hotelB->id, 'base_price' => 800]);
+
+        $this->getJson('/api/v1/guest/hotels?city=Range+City&min_price=500')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $hotelB->id);
+
+        $this->getJson('/api/v1/guest/hotels?city=Range+City&max_price=500')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $hotelA->id);
+    }
+
+    public function test_facilities_filter_requires_all_requested_facilities(): void
+    {
+        $wifi = Facility::query()->where('key', HotelAmenity::FreeWifi->value)->firstOrFail();
+        $pool = Facility::query()->where('key', HotelAmenity::Pool->value)->firstOrFail();
+
+        $both = Hotel::factory()->create(['city' => 'Facility City']);
+        $both->facilities()->sync([$wifi->id, $pool->id]);
+
+        $wifiOnly = Hotel::factory()->create(['city' => 'Facility City']);
+        $wifiOnly->facilities()->sync([$wifi->id]);
+
+        $this->getJson('/api/v1/guest/hotels?city=Facility+City&facilities='.HotelAmenity::FreeWifi->value.','.HotelAmenity::Pool->value)
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $both->id);
+    }
+
+    public function test_combined_filter_and_sort_and_pagination_compose_correctly(): void
+    {
+        $wifi = Facility::query()->where('key', HotelAmenity::FreeWifi->value)->firstOrFail();
+
+        $matchHigh = Hotel::factory()->create(['name' => 'Match High', 'city' => 'Combo City']);
+        $matchLow = Hotel::factory()->create(['name' => 'Match Low', 'city' => 'Combo City']);
+        $noFacility = Hotel::factory()->create(['name' => 'No Facility', 'city' => 'Combo City']);
+
+        $matchHigh->facilities()->sync([$wifi->id]);
+        $matchLow->facilities()->sync([$wifi->id]);
+        RoomType::factory()->create(['hotel_id' => $matchHigh->id, 'base_price' => 500]);
+        RoomType::factory()->create(['hotel_id' => $matchLow->id, 'base_price' => 500]);
+        RoomType::factory()->create(['hotel_id' => $noFacility->id, 'base_price' => 500]);
+
+        Review::factory()->for($matchHigh)->create(['rating' => 5, 'status' => Review::STATUS_PUBLISHED]);
+        Review::factory()->for($matchLow)->create(['rating' => 2, 'status' => Review::STATUS_PUBLISHED]);
+        Review::factory()->for($noFacility)->create(['rating' => 5, 'status' => Review::STATUS_PUBLISHED]);
+
+        $res = $this->getJson(
+            '/api/v1/guest/hotels?city=Combo+City&facilities='.HotelAmenity::FreeWifi->value.'&sort=highest_rated&per_page=1'
+        )->assertOk();
+
+        // Facility filter excludes "No Facility" even though it rates highest;
+        // sort picks the higher-rated of the two matches; pagination caps at 1.
+        $res->assertJsonCount(1, 'data')->assertJsonPath('data.0.name', 'Match High');
+        $this->assertSame(2, $res->json('meta.total'));
+        $this->assertSame(2, $res->json('meta.last_page'));
+    }
+
+    public function test_guest_hotel_list_and_detail_never_leak_reservation_or_guest_identifiers(): void
+    {
+        $hotel = Hotel::factory()->create(['city' => 'Privacy City']);
+        Reservation::factory()->create(['hotel_id' => $hotel->id, 'status' => Reservation::STATUS_CHECKED_OUT]);
+
+        $forbiddenKeys = ['reservation_id', 'reservations', 'guest_id', 'bookings_count', 'reviews'];
+
+        foreach ([
+            $this->getJson('/api/v1/guest/hotels?city=Privacy+City')->assertOk()->json('data.0'),
+            $this->getJson("/api/v1/guest/hotels/{$hotel->id}")->assertOk()->json('data'),
+        ] as $hotelPayload) {
+            foreach ($forbiddenKeys as $key) {
+                $this->assertArrayNotHasKey($key, $hotelPayload, "Guest discovery leaked '{$key}'");
+            }
+        }
     }
 }

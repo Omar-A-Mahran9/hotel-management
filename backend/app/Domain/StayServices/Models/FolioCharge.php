@@ -35,6 +35,15 @@ class FolioCharge extends Model
      */
     public const SOURCE_ACCOMMODATION = 'accommodation';
 
+    /**
+     * Extend Stay — the incremental accommodation amount for one checkout
+     * extension (`nights_added * room_types.base_price`). `source_id` = the
+     * `reservation_extensions` row id, NOT the reservation id: a reservation
+     * may be extended more than once, each with its own charge, unlike the
+     * single [SOURCE_ACCOMMODATION] charge per reservation.
+     */
+    public const SOURCE_STAY_EXTENSION = 'stay_extension';
+
     public const STATUS_POSTED = 'posted';
 
     public const STATUS_CANCELLED = 'cancelled';

@@ -77,7 +77,10 @@ class UpcomingStayCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
-          HotelThumbnail(seed: stay.reservationId, width: 76, height: 76),
+          // No per-reservation image field exists on the guest reservation
+          // API yet — the placeholder renders honestly rather than reusing a
+          // stock/seeded photo.
+          const HotelThumbnail(imageUrl: null, width: 76, height: 76),
         ],
       ),
     );

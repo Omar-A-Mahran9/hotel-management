@@ -7,6 +7,7 @@ use App\Domain\IdentityAccess\Models\User;
 use App\Domain\StayServices\Models\ServiceCategory;
 use App\Domain\StayServices\Repositories\Contracts\ServiceCategoryRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class EloquentServiceCategoryRepository implements ServiceCategoryRepositoryInterface
 {
@@ -17,6 +18,15 @@ class EloquentServiceCategoryRepository implements ServiceCategoryRepositoryInte
             ->where('hotel_id', $hotel->id)
             ->orderBy('name')
             ->paginate($perPage);
+    }
+
+    public function activeForHotel(Hotel $hotel): Collection
+    {
+        return ServiceCategory::query()
+            ->where('hotel_id', $hotel->id)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
     }
 
     public function find(int $id): ?ServiceCategory

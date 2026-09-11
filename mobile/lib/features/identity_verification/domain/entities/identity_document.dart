@@ -33,6 +33,7 @@ class CapturedImage {
     required this.label,
     required this.sizeBytes,
     this.mimeType = 'image/jpeg',
+    this.filePath,
   });
 
   /// A deterministic placeholder capture for dummy mode — no real bytes exist.
@@ -49,15 +50,23 @@ class CapturedImage {
 
   final String mimeType;
 
+  /// The local, on-device path a real camera/file-picker capture wrote the
+  /// image to — the one piece of data the upload data source needs to stream
+  /// real bytes to the backend. `null` in dummy mode and whenever no real
+  /// capture flow has produced a file yet; never a remote URL, never held as
+  /// in-memory bytes here (mobile/docs/architecture.md §8).
+  final String? filePath;
+
   @override
   bool operator ==(Object other) =>
       other is CapturedImage &&
       other.label == label &&
       other.sizeBytes == sizeBytes &&
-      other.mimeType == mimeType;
+      other.mimeType == mimeType &&
+      other.filePath == filePath;
 
   @override
-  int get hashCode => Object.hash(label, sizeBytes, mimeType);
+  int get hashCode => Object.hash(label, sizeBytes, mimeType, filePath);
 
   @override
   String toString() => 'CapturedImage($label, $sizeBytes bytes)';

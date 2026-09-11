@@ -7,6 +7,7 @@ import 'package:hotel_guest_app/features/reviews/data/datasources/dummy_review_d
 import 'package:hotel_guest_app/features/reviews/data/repositories/review_repository_impl.dart';
 import 'package:hotel_guest_app/features/reviews/presentation/state/review_providers.dart';
 import 'package:hotel_guest_app/features/reservation/domain/entities/create_reservation_request.dart';
+import 'package:hotel_guest_app/features/reservation/domain/entities/extend_stay.dart';
 import 'package:hotel_guest_app/features/reservation/domain/entities/reservation.dart';
 import 'package:hotel_guest_app/features/reservation/domain/entities/reservation_status.dart';
 import 'package:hotel_guest_app/features/reservation/domain/repositories/reservation_repository.dart';
@@ -28,6 +29,16 @@ class _ReservationRepo implements ReservationRepository {
   @override
   Future<Reservation> getById(String id) async =>
       fakeReservation(id: id, status: status);
+  @override
+  Future<List<Reservation>> list() async => <Reservation>[];
+
+  @override
+  Future<Reservation> cancel(String id) async => fakeReservation(id: id);
+
+  @override
+  Future<ExtendStayResult> extend(ExtendStayRequest request) async {
+    throw UnimplementedError('extend not used in this test');
+  }
 }
 
 Future<AppLocalizations> _l10n(String code) =>
@@ -55,13 +66,15 @@ Future<void> _open(
 Future<void> _scrollToBottom(WidgetTester tester) async {
   for (int i = 0; i < 6; i++) {
     await tester.drag(
-        find.byType(Scrollable).first, const Offset(0, -600));
+        find.byType(Scrollable).first, const Offset(0, -600),
+        warnIfMissed: false);
     await tester.pumpAndSettle();
   }
 }
 
 void main() {
-  testWidgets('a completed stay shows the loyalty + review CTAs', (tester) async {
+  testWidgets('a completed stay shows the loyalty + review + invoice CTAs',
+      (tester) async {
     final en = await _l10n('en');
     final id = reviewScenarioId(DummyReviewScenario.noReviewThenPending);
     await _open(tester, id, status: ReservationStatus.checkedOut);
@@ -69,9 +82,11 @@ void main() {
 
     expect(find.text(en.reservationLoyaltyCta), findsOneWidget);
     expect(find.text(en.reservationReviewCta), findsOneWidget);
-    // The Phase 5–9 CTAs are still present.
-    expect(find.text(en.reservationPayCta), findsOneWidget);
-    expect(find.text(en.reservationCheckoutCta), findsOneWidget);
+    expect(find.text(en.bookingCtaViewInvoice), findsOneWidget);
+    expect(find.text(en.bookingCtaBookAgain), findsOneWidget);
+    // Statuses this reservation is no longer in don't offer their CTAs.
+    expect(find.text(en.bookingCtaContinuePayment), findsNothing);
+    expect(find.text(en.bookingCtaMyCurrentStay), findsNothing);
   });
 
   testWidgets('an in-progress stay shows none of the completed-stay CTAs',
@@ -83,8 +98,10 @@ void main() {
 
     expect(find.text(en.reservationLoyaltyCta), findsNothing);
     expect(find.text(en.reservationReviewCta), findsNothing);
-    // But the earlier CTAs remain.
-    expect(find.text(en.reservationCheckoutCta), findsOneWidget);
+    expect(find.text(en.bookingCtaViewInvoice), findsNothing);
+    // The currently-staying CTAs are shown instead.
+    expect(find.text(en.bookingCtaMyCurrentStay), findsOneWidget);
+    expect(find.text(en.bookingCtaShowAccessCode), findsOneWidget);
   });
 
   testWidgets('an already-reviewed completed stay shows "view your review"',

@@ -248,8 +248,8 @@ class _RoomCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
-          HotelThumbnail(
-            seed: selection.roomType.id,
+          const HotelThumbnail(
+            imageUrl: null,
             width: 76,
             height: 76,
             icon: AppIcons.bed,

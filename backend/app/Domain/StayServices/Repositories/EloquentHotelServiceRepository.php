@@ -7,6 +7,7 @@ use App\Domain\IdentityAccess\Models\User;
 use App\Domain\StayServices\Models\HotelService;
 use App\Domain\StayServices\Repositories\Contracts\HotelServiceRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class EloquentHotelServiceRepository implements HotelServiceRepositoryInterface
 {
@@ -18,6 +19,15 @@ class EloquentHotelServiceRepository implements HotelServiceRepositoryInterface
             ->when($onlyActive !== null, fn ($query) => $query->where('is_active', $onlyActive))
             ->orderBy('name')
             ->paginate($perPage);
+    }
+
+    public function activeForHotel(Hotel $hotel): Collection
+    {
+        return HotelService::query()
+            ->where('hotel_id', $hotel->id)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
     }
 
     public function find(int $id): ?HotelService

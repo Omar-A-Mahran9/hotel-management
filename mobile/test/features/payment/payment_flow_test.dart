@@ -7,6 +7,7 @@ import 'package:hotel_guest_app/features/payment/data/datasources/dummy_payment_
 import 'package:hotel_guest_app/features/payment/domain/entities/payment_request.dart';
 import 'package:hotel_guest_app/features/payment/presentation/state/payment_providers.dart';
 import 'package:hotel_guest_app/features/reservation/domain/entities/create_reservation_request.dart';
+import 'package:hotel_guest_app/features/reservation/domain/entities/extend_stay.dart';
 import 'package:hotel_guest_app/features/reservation/domain/entities/reservation.dart';
 import 'package:hotel_guest_app/features/reservation/domain/repositories/reservation_repository.dart';
 import 'package:hotel_guest_app/features/reservation/presentation/state/reservation_providers.dart';
@@ -22,6 +23,17 @@ class _StubReservationRepository implements ReservationRepository {
 
   @override
   Future<Reservation> getById(String id) async => fakeReservation(id: id);
+
+  @override
+  Future<List<Reservation>> list() async => <Reservation>[];
+
+  @override
+  Future<Reservation> cancel(String id) async => fakeReservation(id: id);
+
+  @override
+  Future<ExtendStayResult> extend(ExtendStayRequest request) async {
+    throw UnimplementedError('extend not used in this test');
+  }
 }
 
 Future<AppLocalizations> _l10n(String code) =>
@@ -69,7 +81,7 @@ void main() {
     await tester
         .tap(find.widgetWithText(FilledButton, en.paymentBackToReservation));
     await tester.pumpAndSettle();
-    expect(find.text(en.reservationDetailTitle), findsWidgets);
+    expect(find.text(en.bookingDetailTitle), findsWidgets);
   });
 
   testWidgets('a pending hold shows the processing result', (tester) async {

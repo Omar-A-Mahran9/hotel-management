@@ -441,6 +441,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get filterPriceLabel => 'Price range';
 
   @override
+  String get filterFacilitiesLabel => 'Facilities';
+
+  @override
+  String get filterRatingLabel => 'Rating';
+
+  @override
   String get filterApply => 'Apply filter';
 
   @override
@@ -963,39 +969,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'We couldn\'t confirm your reservation';
 
   @override
-  String get reservationDetailTitle => 'Reservation';
-
-  @override
-  String get reservationSuccessTitle => 'Your reservation is confirmed';
-
-  @override
-  String get reservationSuccessBody =>
-      'We\'ve saved your reservation. Keep your confirmation code handy.';
-
-  @override
-  String get reservationReferenceLabel => 'Confirmation code';
-
-  @override
   String get reservationStatusFieldLabel => 'Status';
-
-  @override
-  String get reservationBookedOnLabel => 'Booked on';
-
-  @override
-  String get reservationPendingNote =>
-      'This reservation is pending and not yet secured.';
-
-  @override
-  String get reservationDone => 'Done';
-
-  @override
-  String get reservationViewDetails => 'View reservation';
-
-  @override
-  String get reservationNotFoundTitle => 'Reservation not found';
-
-  @override
-  String get reservationNotFoundBody => 'We couldn\'t find that reservation.';
 
   @override
   String get reservationStatusPending => 'Pending';
@@ -1029,12 +1003,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reservationStatusCancelled => 'Cancelled';
-
-  @override
-  String get reservationPayCta => 'Continue to payment';
-
-  @override
-  String get reservationVerifyIdentityCta => 'Verify your identity';
 
   @override
   String moneyAmount(String currency, int amount) {
@@ -1305,12 +1273,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reservationCheckInCta => 'Check in';
-
-  @override
-  String get reservationServicesCta => 'Stay services';
-
-  @override
-  String get reservationCheckoutCta => 'Check out';
 
   @override
   String get checkInTitle => 'Check in';
@@ -2002,4 +1964,279 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reviewStatusRejected => 'Not published';
+
+  @override
+  String get bookingsPillCurrent => 'Current';
+
+  @override
+  String get bookingsPillUpcoming => 'Upcoming';
+
+  @override
+  String get bookingsPillPast => 'Past';
+
+  @override
+  String get bookingsPastTitle => 'Past stays';
+
+  @override
+  String get bookingsSectionOngoingStay => 'Ongoing stay';
+
+  @override
+  String get bookingsSectionUpcoming => 'Upcoming bookings';
+
+  @override
+  String get bookingsEmptyTitle => 'No bookings yet';
+
+  @override
+  String get bookingsEmptyBody =>
+      'Your bookings will appear here once you make one.';
+
+  @override
+  String get bookingStatusPending => 'Awaiting payment';
+
+  @override
+  String get bookingStatusConfirmed => 'Confirmed';
+
+  @override
+  String get bookingStatusCheckedIn => 'Checked in';
+
+  @override
+  String get bookingStatusCompleted => 'Completed';
+
+  @override
+  String get bookingStatusCancelled => 'Cancelled';
+
+  @override
+  String get bookingDetailTitle => 'Booking details';
+
+  @override
+  String get bookingPaymentStatusHeading => 'Payment status';
+
+  @override
+  String get bookingCancellationPolicyHeading => 'Cancellation policy';
+
+  @override
+  String get bookingCancellationPolicyBody =>
+      'Free cancellation up to 24 hours before arrival. After that, the deposit is deducted.';
+
+  @override
+  String get bookingPendingRowTitle => 'Awaiting payment';
+
+  @override
+  String get bookingPendingRowSubtitle => 'Not completed';
+
+  @override
+  String get bookingAutoCancelRowTitle =>
+      'The booking auto-cancels in 30 minutes';
+
+  @override
+  String get bookingRoomHeldRowTitle => 'The room is held temporarily';
+
+  @override
+  String get bookingRoomHeldRowSubtitle => 'Not confirmed';
+
+  @override
+  String get bookingDepositHeldRowTitle => 'The deposit has been held';
+
+  @override
+  String get bookingDepositHeldRowSubtitle => 'No charge has been made yet';
+
+  @override
+  String get bookingDeductedAtCheckinRowTitle => 'Deducted at check-in';
+
+  @override
+  String get bookingExtrasChargedOnceRowTitle =>
+      'Extra charges are collected on departure';
+
+  @override
+  String get bookingExtrasChargedOnceRowSubtitle => 'As a single payment';
+
+  @override
+  String get bookingIdentityVerifiedRowTitle =>
+      'Your identity has been verified';
+
+  @override
+  String get bookingIdentityVerifiedRowSubtitle => 'Complete';
+
+  @override
+  String get bookingCheckInAvailableRowTitle => 'Check-in available from';
+
+  @override
+  String get bookingDepositAmountHeldRowTitle => 'Deposit amount held';
+
+  @override
+  String get bookingOngoingStayRowTitle => 'Ongoing stay';
+
+  @override
+  String bookingRoomLabel(String number) {
+    return 'Room $number';
+  }
+
+  @override
+  String get bookingDepartureRowTitle => 'Departure';
+
+  @override
+  String get bookingExtraChargesRowTitle => 'Extra charges';
+
+  @override
+  String get bookingCancelledRowTitle => 'Booking cancelled';
+
+  @override
+  String get bookingDepositRefundRowTitle => 'Deposit refund';
+
+  @override
+  String get bookingDepositRefundRowSubtitle => 'Within 3 business days';
+
+  @override
+  String get bookingCancellationFeeRowTitle => 'Cancellation fee';
+
+  @override
+  String get bookingCancellationFeeNone => 'None';
+
+  @override
+  String get bookingStayEndedRowTitle => 'Stay ended';
+
+  @override
+  String get bookingTotalPaidRowTitle => 'Total paid';
+
+  @override
+  String get bookingInvoiceReadyRowTitle => 'E-invoice';
+
+  @override
+  String get bookingInvoiceReadyRowSubtitle => 'Ready';
+
+  @override
+  String get bookingCtaContinuePayment => 'Continue payment';
+
+  @override
+  String get bookingCtaCancelReservation => 'Cancel booking';
+
+  @override
+  String get bookingCtaVerifyIdentity => 'Verify identity';
+
+  @override
+  String get bookingCtaDigitalCheckIn => 'Digital check-in';
+
+  @override
+  String get bookingCtaMyCurrentStay => 'My current stay';
+
+  @override
+  String get bookingCtaShowAccessCode => 'Show access code';
+
+  @override
+  String get bookingCtaBookAgain => 'Book again';
+
+  @override
+  String get bookingCtaViewInvoice => 'View invoice';
+
+  @override
+  String get bookingCancelConfirmTitle => 'Cancel this booking?';
+
+  @override
+  String get bookingCancelConfirmBody =>
+      'This can\'t be undone. Any deposit will be refunded per the cancellation policy.';
+
+  @override
+  String get bookingCancelKeepCta => 'Keep booking';
+
+  @override
+  String get bookingCancelConfirmCta => 'Cancel booking';
+
+  @override
+  String get bookingNotFoundTitle => 'Booking not found';
+
+  @override
+  String get accountTitle => 'Account';
+
+  @override
+  String get accountLoyaltyProgramTitle => 'Loyalty program';
+
+  @override
+  String get accountLoyaltyPointsSuffix => 'points';
+
+  @override
+  String get accountLoyaltyDescription =>
+      'Your points build up across every hotel in the group and can be redeemed at any branch.';
+
+  @override
+  String get accountLoyaltyPerNightLabel => 'Per night';
+
+  @override
+  String get accountTrustedGuestTitle => 'Trusted guest';
+
+  @override
+  String get accountTrustedGuestBody =>
+      'You won\'t be asked to re-upload your ID at any other hotel in the group.';
+
+  @override
+  String get accountPreviousStaysLabel => 'Previous stays';
+
+  @override
+  String get accountPreferencesLabel => 'My preferences';
+
+  @override
+  String get accountPreferencesEmpty => 'Not set yet';
+
+  @override
+  String get accountPrivacyLabel => 'Privacy & data';
+
+  @override
+  String get accountHelpSupportLabel => 'Help & support';
+
+  @override
+  String get stayHomeTitle => 'Your current stay';
+
+  @override
+  String get stayHomeRoomLabel => 'Your room';
+
+  @override
+  String get stayHomeServicesHeading => 'Services';
+
+  @override
+  String get stayHomeRoomService => 'Room service';
+
+  @override
+  String get stayHomeRoomCleaning => 'Room cleaning';
+
+  @override
+  String get stayHomeExtendStay => 'Extend stay';
+
+  @override
+  String get stayHomeReportProblem => 'Report a problem';
+
+  @override
+  String get stayHomeExtraCharges => 'Extra charges';
+
+  @override
+  String get stayHomeExtraChargesNote => 'Deducted automatically on departure';
+
+  @override
+  String get stayHomeNoActiveStayTitle => 'No active stay';
+
+  @override
+  String get stayHomeNoActiveStayBody =>
+      'Once you check in, your room, key and services will show up here.';
+
+  @override
+  String get extendStayTitle => 'Extend stay';
+
+  @override
+  String get extendStayNewCheckOutLabel => 'New checkout date';
+
+  @override
+  String get extendStayNightsAddedLabel => 'Nights added';
+
+  @override
+  String get extendStayCta => 'Confirm extension';
+
+  @override
+  String get extendStaySuccessTitle => 'Stay extended';
+
+  @override
+  String extendStaySuccessBody(String date, String amount) {
+    return 'Your checkout date is now $date. $amount has been added to your folio.';
+  }
+
+  @override
+  String get extendStayNotEligible =>
+      'Extend stay is only available during your current stay.';
 }

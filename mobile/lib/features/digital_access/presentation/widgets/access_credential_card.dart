@@ -15,9 +15,15 @@ import '../../domain/entities/access_grant.dart';
 /// persisted. When the mode is not a PIN code, or no room number is available,
 /// the corresponding row is simply omitted rather than faked.
 class AccessCredentialCard extends StatelessWidget {
-  const AccessCredentialCard({super.key, required this.grant});
+  const AccessCredentialCard({super.key, required this.grant, this.roomNumber});
 
   final AccessGrant grant;
+
+  /// The reservation's authoritative allocated room number
+  /// (`Reservation.roomNumber`), when known — preferred over
+  /// [AccessGrant.roomNumber], which the API data source leaves `null`
+  /// (documented gap; the dummy source is the only one that ever sets it).
+  final String? roomNumber;
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +32,7 @@ class AccessCredentialCard extends StatelessWidget {
     final AppColorTokens c = context.colors;
     final MaterialLocalizations ml = MaterialLocalizations.of(context);
     final String? code = grant.visibleCredential;
+    final String? shownRoomNumber = roomNumber ?? grant.roomNumber;
 
     final TextStyle? labelStyle =
         theme.textTheme.bodySmall?.copyWith(color: c.accentWarm);
@@ -36,11 +43,11 @@ class AccessCredentialCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          if (grant.roomNumber != null) ...<Widget>[
+          if (shownRoomNumber != null) ...<Widget>[
             Text(l10n.accessRoomNumberLabel, style: labelStyle),
             const SizedBox(height: AppSpacing.space1),
             Text(
-              grant.roomNumber!,
+              shownRoomNumber,
               style: theme.textTheme.displaySmall?.copyWith(
                 color: c.textOnInverse,
                 fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],

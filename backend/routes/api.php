@@ -8,10 +8,22 @@ use App\Http\Controllers\Api\V1\CountryController;
 use App\Http\Controllers\Api\V1\DigitalAccessController;
 use App\Http\Controllers\Api\V1\FacilityController;
 use App\Http\Controllers\Api\V1\FolioController;
+use App\Http\Controllers\Api\V1\GuestController;
 use App\Http\Controllers\Api\V1\Guest\GuestAuthController;
+use App\Http\Controllers\Api\V1\Guest\GuestCheckInController;
+use App\Http\Controllers\Api\V1\Guest\GuestCheckoutController;
+use App\Http\Controllers\Api\V1\Guest\GuestDigitalAccessController;
 use App\Http\Controllers\Api\V1\Guest\GuestDiscoveryController;
+use App\Http\Controllers\Api\V1\Guest\GuestFolioController;
+use App\Http\Controllers\Api\V1\Guest\GuestIdentityVerificationController;
+use App\Http\Controllers\Api\V1\Guest\GuestInvoiceController;
+use App\Http\Controllers\Api\V1\Guest\GuestLoyaltyController;
+use App\Http\Controllers\Api\V1\Guest\GuestNotificationController;
 use App\Http\Controllers\Api\V1\Guest\GuestPaymentController;
 use App\Http\Controllers\Api\V1\Guest\GuestReservationController;
+use App\Http\Controllers\Api\V1\Guest\GuestReviewController;
+use App\Http\Controllers\Api\V1\Guest\GuestServiceCatalogController;
+use App\Http\Controllers\Api\V1\Guest\GuestServiceOrderController;
 use App\Http\Controllers\Api\V1\HotelController;
 use App\Http\Controllers\Api\V1\HotelGroupController;
 use App\Http\Controllers\Api\V1\HotelMediaController;
@@ -24,6 +36,7 @@ use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\PaymentWebhookController;
 use App\Http\Controllers\Api\V1\PermissionController;
 use App\Http\Controllers\Api\V1\ReservationController;
+use App\Http\Controllers\Api\V1\ReviewController;
 use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\RoomTypeController;
@@ -81,9 +94,93 @@ Route::prefix('v1')->group(function () {
                 ->whereNumber('reservation')
                 ->middleware('throttle:guest.booking.write');
 
+            // Extend Stay — only while checked_in/in_stay. Re-checks
+            // availability for the added nights and prices from
+            // room_types.base_price; the incremental amount accrues to the
+            // folio and is settled at checkout, same as a service order.
+            Route::post('/reservations/{reservation}/extend', [GuestReservationController::class, 'extend'])
+                ->whereNumber('reservation')
+                ->middleware('throttle:guest.booking.write');
+
             Route::get('/reservations/{reservation}/payment', [GuestPaymentController::class, 'show'])
                 ->whereNumber('reservation');
             Route::post('/reservations/{reservation}/payment/hold', [GuestPaymentController::class, 'hold'])
+                ->whereNumber('reservation')
+                ->middleware('throttle:guest.booking.write');
+
+            /*
+             * Identity verification — reuses IdentityVerificationService
+             * unchanged. No guest equivalent of the staff `review` action
+             * (manual approve/reject stays staff-only).
+             */
+            Route::prefix('/reservations/{reservation}/identity')->whereNumber('reservation')->group(function () {
+                Route::post('/documents', [GuestIdentityVerificationController::class, 'documents'])
+                    ->middleware('throttle:identity-verification.submit');
+                Route::post('/selfie', [GuestIdentityVerificationController::class, 'selfie'])
+                    ->middleware('throttle:identity-verification.submit');
+                Route::get('/', [GuestIdentityVerificationController::class, 'status']);
+            });
+
+            // Check-in — reuses DigitalAccessService::checkIn unchanged; the
+            // service independently re-verifies eligibility.
+            Route::post('/reservations/{reservation}/check-in', [GuestCheckInController::class, 'store'])
+                ->whereNumber('reservation')
+                ->middleware('throttle:check-in');
+
+            // Digital access — read-only; revoke stays staff-only.
+            Route::get('/reservations/{reservation}/access', [GuestDigitalAccessController::class, 'show'])
+                ->whereNumber('reservation');
+
+            // Stay services — the guest's own service orders. Client
+            // supplies only service_id/quantity/notes; price/total/status
+            // always derived server-side.
+            Route::prefix('/reservations/{reservation}/service-orders')->whereNumber('reservation')->group(function () {
+                Route::get('/', [GuestServiceOrderController::class, 'index']);
+                Route::post('/', [GuestServiceOrderController::class, 'store'])
+                    ->middleware('throttle:guest.booking.write');
+                Route::get('/{serviceOrder}', [GuestServiceOrderController::class, 'show'])->whereNumber('serviceOrder');
+            });
+
+            // Folio — read-only.
+            Route::get('/reservations/{reservation}/folio', [GuestFolioController::class, 'show'])
+                ->whereNumber('reservation');
+
+            // Checkout — settlement amount always computed server-side from
+            // the authoritative folio.
+            Route::post('/reservations/{reservation}/checkout', [GuestCheckoutController::class, 'store'])
+                ->whereNumber('reservation')
+                ->middleware('throttle:checkout.perform');
+
+            // Invoice — read-only.
+            Route::get('/reservations/{reservation}/invoice', [GuestInvoiceController::class, 'show'])
+                ->whereNumber('reservation');
+
+            // Loyalty — reservation-scoped so hotel scope + guest identity
+            // resolve server-side. Ledger-authoritative; no guest-triggerable
+            // `earn` (see GuestLoyaltyController).
+            Route::prefix('/reservations/{reservation}/loyalty')->whereNumber('reservation')->group(function () {
+                Route::get('/', [GuestLoyaltyController::class, 'show']);
+                Route::get('/transactions', [GuestLoyaltyController::class, 'transactions']);
+                Route::post('/redeem', [GuestLoyaltyController::class, 'redeem'])
+                    ->middleware('throttle:guest.booking.write');
+            });
+
+            // Notifications — reservation-scoped so the recipient (this
+            // reservation's own guest) resolves server-side; the feed shows
+            // the `in_app` channel only, never staff-wide notifications.
+            Route::prefix('/reservations/{reservation}/notifications')->whereNumber('reservation')->middleware('throttle:notifications.read')->group(function () {
+                Route::get('/', [GuestNotificationController::class, 'index']);
+                Route::patch('/{notification}/read', [GuestNotificationController::class, 'markRead'])->whereNumber('notification');
+                Route::post('/read-all', [GuestNotificationController::class, 'markAllRead']);
+            });
+
+            // Review — one per completed reservation. Eligibility (the same
+            // "completed/stayed" concept loyalty-earn uses), ownership, the
+            // one-review-per-stay rule and moderation are all resolved
+            // server-side.
+            Route::get('/reservations/{reservation}/review', [GuestReviewController::class, 'show'])
+                ->whereNumber('reservation');
+            Route::post('/reservations/{reservation}/review', [GuestReviewController::class, 'store'])
                 ->whereNumber('reservation')
                 ->middleware('throttle:guest.booking.write');
         });
@@ -97,6 +194,15 @@ Route::prefix('v1')->group(function () {
         Route::get('/hotels/cities', [GuestDiscoveryController::class, 'cities']);
         Route::get('/hotels/{hotel}', [GuestDiscoveryController::class, 'show'])->whereNumber('hotel');
         Route::get('/hotels/{hotel}/availability', [GuestDiscoveryController::class, 'availability'])->whereNumber('hotel');
+
+        // Hotel service catalog — anonymous, active-hotel/active-catalog
+        // only, mirrors the discovery routes above.
+        Route::get('/hotels/{hotel}/service-categories', [GuestServiceCatalogController::class, 'categories'])->whereNumber('hotel');
+        Route::get('/hotels/{hotel}/services', [GuestServiceCatalogController::class, 'services'])->whereNumber('hotel');
+
+        // Published reviews for a hotel — anonymous, matches the "browse
+        // without login" rule; pending/rejected reviews are never returned.
+        Route::get('/hotels/{hotel}/reviews', [GuestReviewController::class, 'forHotel'])->whereNumber('hotel');
     });
 
     // Provider webhook — machine-to-machine, unauthenticated: the HMAC
@@ -176,12 +282,28 @@ Route::prefix('v1')->group(function () {
         Route::put('/users/{user}', [UserController::class, 'update']);
         Route::delete('/users/{user}', [UserController::class, 'destroy']);
 
+        // Guests — staff-facing directory (read-only; a Guest's own data is
+        // only ever mutated through the guest app's own profile flow). Not
+        // hotel-scoped, matching Users; the reservations sub-list is still
+        // filtered through the caller's own hotel access.
+        Route::get('/guests', [GuestController::class, 'index']);
+        Route::get('/guests/{guest}', [GuestController::class, 'show']);
+        Route::get('/guests/{guest}/reservations', [GuestController::class, 'reservations']);
+
         Route::get('/reservations', [ReservationController::class, 'index']);
         Route::post('/reservations', [ReservationController::class, 'store']);
         Route::get('/reservations/{reservation}', [ReservationController::class, 'show']);
         Route::post('/reservations/{reservation}/transition', [ReservationController::class, 'transition']);
         Route::post('/reservations/{reservation}/payment/hold', [PaymentController::class, 'hold'])
             ->middleware('throttle:payments.hold');
+
+        // Extend Stay — dashboard equivalent of the guest
+        // /guest/reservations/{reservation}/extend endpoint below. Same
+        // ReservationExtensionService, same eligibility (checked_in/in_stay)
+        // and availability/pricing rules; `Idempotency-Key` header. No
+        // throttle — matches store()/transition() above, neither of which is
+        // rate limited on the staff surface.
+        Route::post('/reservations/{reservation}/extend', [ReservationController::class, 'extend']);
 
         // Phase 8 — Stay Services + Folio (Phase 0 §16). {reservation} is an
         // int id resolved through ReservationService (not route-model
@@ -252,6 +374,12 @@ Route::prefix('v1')->group(function () {
         Route::post('/access/{reservation}/revoke', [DigitalAccessController::class, 'revoke'])
             ->middleware('throttle:digital-access.revoke');
 
+        // Reviews — staff moderation decision. Listing a hotel's reviews
+        // (every moderation state) is registered in the /hotels/{hotel}
+        // group below, alongside the rest of the hotel-scoped staff reads.
+        Route::post('/reviews/{review}/moderate', [ReviewController::class, 'moderate'])
+            ->whereNumber('review');
+
         Route::prefix('/hotels/{hotel}')->group(function () {
             // Hotel media (logo / cover / gallery). Staff-only —
             // `hotels.manage` + hotel scope (HotelPolicy::manageMedia). The
@@ -292,6 +420,10 @@ Route::prefix('v1')->group(function () {
             Route::match(['put', 'patch'], '/services/{service}', [ServiceController::class, 'update']);
             Route::patch('/services/{service}/activate', [ServiceController::class, 'activate']);
             Route::patch('/services/{service}/deactivate', [ServiceController::class, 'deactivate']);
+
+            // Reviews — every moderation state (pending/published/rejected);
+            // the guest-facing published-only listing is under /guest above.
+            Route::get('/reviews', [ReviewController::class, 'index']);
         });
     });
 });

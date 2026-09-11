@@ -25,6 +25,15 @@ interface ReservationRepositoryInterface
     public function findOwnedByGuest(Guest $guest, int $id): ?Reservation;
 
     /**
+     * A guest's reservations, filtered through $user's own hotel access
+     * (Group Owner bypass or assigned hotels only) — the staff-facing
+     * counterpart to paginateOwnedByGuest, used by the Guests directory's
+     * per-guest reservation history so a Hotel Manager only ever sees the
+     * slice of a guest's history that belongs to their own hotel(s).
+     */
+    public function paginateForGuestAccessibleBy(User $user, Guest $guest, int $perPage = 15): LengthAwarePaginator;
+
+    /**
      * Reservations filtered through $user's own hotel access (Group Owner
      * bypass or assigned hotels only) — never from a client-supplied
      * hotel_id. Not nested under a single Hotel, unlike Phase 2's

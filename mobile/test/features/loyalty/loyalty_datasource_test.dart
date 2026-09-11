@@ -1,10 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hotel_guest_app/core/config/app_config.dart';
-import 'package:hotel_guest_app/core/config/app_environment.dart';
 import 'package:hotel_guest_app/core/errors/app_exception.dart';
-import 'package:hotel_guest_app/core/network/api_client.dart';
-import 'package:hotel_guest_app/core/security/in_memory_token_store.dart';
-import 'package:hotel_guest_app/features/loyalty/data/datasources/api_loyalty_data_source.dart';
 import 'package:hotel_guest_app/features/loyalty/data/datasources/dummy_loyalty_data_source.dart';
 import 'package:hotel_guest_app/features/loyalty/domain/entities/loyalty_operations.dart';
 import 'package:hotel_guest_app/features/loyalty/domain/entities/loyalty_transaction_type.dart';
@@ -222,34 +217,7 @@ void main() {
     });
   });
 
-  group('ApiLoyaltyDataSource', () {
-    final source = ApiLoyaltyDataSource(
-      ApiClient(
-        config: const AppConfig(
-          environment: AppEnvironment.development,
-          apiBaseUrl: 'http://localhost',
-          apiVersion: 'v1',
-          useDummyData: false,
-        ),
-        tokenStore: InMemoryTokenStore(),
-      ),
-    );
-
-    test('every method is a documented not-implemented stub', () {
-      expect(source.fetchAccount(fakeLoyaltyContext()),
-          throwsA(isA<NotImplementedInPhaseException>()));
-      expect(source.fetchTransactions(fakeLoyaltyContext()),
-          throwsA(isA<NotImplementedInPhaseException>()));
-      expect(
-        source.earn(
-            const EarnPointsRequest(reservationId: '1'), fakeLoyaltyContext()),
-        throwsA(isA<NotImplementedInPhaseException>()),
-      );
-      expect(
-        source.redeem(const RedeemPointsRequest(reservationId: '1', points: 1),
-            fakeLoyaltyContext()),
-        throwsA(isA<NotImplementedInPhaseException>()),
-      );
-    });
-  });
+  // `ApiLoyaltyDataSource` is now real for reads + redeem; `earn` stays
+  // unimplemented — there is no guest-triggerable earn endpoint — see
+  // test/features/loyalty/api_loyalty_data_source_test.dart.
 }

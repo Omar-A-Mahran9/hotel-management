@@ -4,11 +4,17 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Domain\Inventory\Services\RoomTypeService;
 use App\Domain\Reservation\Models\Reservation;
+use App\Domain\Reservation\Services\ReservationExtensionService;
 use App\Domain\Reservation\Services\ReservationService;
+use App\Domain\StayServices\Services\FolioService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Reservation\ExtendReservationRequest;
 use App\Http\Requests\Api\V1\Reservation\StoreReservationRequest;
 use App\Http\Requests\Api\V1\Reservation\TransitionReservationRequest;
+use App\Http\Resources\V1\FolioResource;
+use App\Http\Resources\V1\ReservationExtensionResource;
 use App\Http\Resources\V1\ReservationResource;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -17,6 +23,8 @@ class ReservationController extends Controller
     public function __construct(
         private readonly ReservationService $reservations,
         private readonly RoomTypeService $roomTypes,
+        private readonly ReservationExtensionService $extensions,
+        private readonly FolioService $folios,
     ) {}
 
     /**
@@ -104,5 +112,36 @@ class ReservationController extends Controller
         );
 
         return $this->success(new ReservationResource($updated), __('api.updated'));
+    }
+
+    /**
+     * Dashboard equivalent of the guest Extend Stay endpoint — same
+     * ReservationExtensionService, same eligibility/availability/pricing
+     * rules, the acting staff user recorded on the extension row.
+     */
+    public function extend(ExtendReservationRequest $request, int $reservation): JsonResponse
+    {
+        $found = $this->reservations->findAccessibleBy($request->user(), $reservation);
+
+        if (! $found) {
+            abort(404);
+        }
+
+        $this->authorize('extend', $found);
+
+        $extension = $this->extensions->extend(
+            $found,
+            CarbonImmutable::parse($request->newCheckOut()),
+            actor: $request->user(),
+            idempotencyKey: $request->idempotencyKey(),
+        );
+
+        $updated = $this->reservations->findAccessibleBy($request->user(), $reservation);
+
+        return $this->success([
+            'reservation' => new ReservationResource($updated),
+            'extension' => new ReservationExtensionResource($extension),
+            'folio' => new FolioResource($this->folios->folioFor($updated)),
+        ], __('api.updated'));
     }
 }

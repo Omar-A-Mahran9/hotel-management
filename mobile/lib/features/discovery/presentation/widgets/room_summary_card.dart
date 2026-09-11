@@ -117,8 +117,8 @@ class RoomSummaryCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
-                  HotelThumbnail(
-                    seed: room.roomType.id,
+                  const HotelThumbnail(
+                    imageUrl: null,
                     width: 84,
                     height: 84,
                     icon: AppIcons.bed,

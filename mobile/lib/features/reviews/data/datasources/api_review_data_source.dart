@@ -1,50 +1,48 @@
+import 'package:dio/dio.dart';
+
 import '../../../../core/data/data_source.dart';
-import '../../../../core/errors/app_exception.dart';
 import '../../../../core/network/api_client.dart';
 import '../../domain/entities/review.dart';
 import '../../domain/entities/review_draft.dart';
 import '../../domain/entities/submit_review.dart';
+import '../models/review_models.dart';
 import 'review_data_source.dart';
 
 /// API-backed reviews source.
 ///
-/// Kept a documented stub for Mobile Phase 10. Unlike loyalty (where the
-/// endpoints exist but are staff-scoped), **there is no backend review domain
-/// at all** — no `Review` model, migration, controller, resource or route in
-/// the Laravel app. The whole guest review surface is unbuilt.
+/// The Reviews domain now exists end-to-end on the backend (model,
+/// migration, service, policy, guest + staff controllers — see
+/// `App\Domain\Review`), built directly from
+/// `mobile/docs/mobile-phase-10-loyalty-reviews.md`:
 ///
-/// Expected future guest contract (see
-/// `mobile/docs/mobile-phase-10-loyalty-reviews.md`):
+/// `GET  /guest/reservations/{reservation}/review` → 200 `ReviewResource` |
+/// 404 (none yet)
+/// `POST /guest/reservations/{reservation}/review` (`{rating, text?}`) →
+/// 201 (new) | 200 (existing — the doc's "return the existing one" duplicate
+/// rule) `ReviewResource`
 ///
-/// * `GET  /api/v1/reservations/{reservation}/review`        → 200 ReviewResource | 404 (none yet)
-/// * `POST /api/v1/reservations/{reservation}/review`        (`{ rating: 1..5, text?: string }`)
-///        → 201 ReviewResource (status `pending` while moderation is on)
-///        → 409 / 422 when a review already exists (return the existing one)
-///        → 422 `reservation_not_completed:*` when not an eligible stay
-///
-/// One review per eligible reservation; eligibility + ownership + duplicate +
-/// moderation are all resolved server-side. The `status` field
-/// (`pending` / `published` / `rejected`) drives the client message — the app
-/// never claims a review is live unless `published`.
-///
-/// Until an approved contract lands each method raises
-/// [NotImplementedInPhaseException].
+/// Eligibility/ownership/duplicate/moderation are all resolved server-side.
+/// `ReviewNotAllowedException` (ineligible reservation) now carries a machine
+/// `errors.reason` (added alongside the loyalty one), so [submit] classifies
+/// the real outcome instead of guessing from localized text.
 class ApiReviewDataSource implements ReviewDataSource, RemoteDataSource {
   ApiReviewDataSource(this._client);
 
-  // Retained so wiring an approved endpoint stays a small change.
-  // ignore: unused_field
   final ApiClient _client;
-
-  static const String _reason =
-      'There is no guest (or any) review contract in the backend yet';
 
   @override
   Future<Review?> fetchReview(ReviewContext context) async {
-    // final json = await _client.getJson(
-    //   '/reservations/${context.reservationId}/review');
-    // return ReviewModel(json['data'] as Map<String, Object?>).toEntity();
-    throw const NotImplementedInPhaseException(_reason);
+    try {
+      final Map<String, dynamic> json = await _client.getJson(
+        '/guest/reservations/${context.reservationId}/review',
+      );
+      final Object? data = json['data'];
+      if (data is! Map<String, Object?>) return null;
+      return ReviewModel(data).toEntity();
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) return null;
+      rethrow;
+    }
   }
 
   @override
@@ -52,14 +50,34 @@ class ApiReviewDataSource implements ReviewDataSource, RemoteDataSource {
     SubmitReviewRequest request,
     ReviewContext context,
   ) async {
-    // final body = SubmitReviewPayload(
-    //   rating: request.rating, text: request.text).toJson();
-    // final json = await _client.postJson(
-    //   '/reservations/${request.reservationId}/review', body: body);
-    // return SubmitReviewResult(
-    //   outcome: ReviewSubmitOutcome.submitted,
-    //   review: ReviewModel(json['data'] as Map<String, Object?>).toEntity(),
-    // );
-    throw const NotImplementedInPhaseException(_reason);
+    try {
+      final (Map<String, dynamic> json, int? statusCode) =
+          await _client.postJsonWithStatus(
+        '/guest/reservations/${request.reservationId}/review',
+        body: SubmitReviewPayload(rating: request.rating, text: request.text).toJson(),
+      );
+      final Map<String, Object?> data = _dataOf(json);
+      return SubmitReviewResult(
+        outcome: statusCode == 201
+            ? ReviewSubmitOutcome.submitted
+            : ReviewSubmitOutcome.alreadyReviewed,
+        review: ReviewModel(data).toEntity(),
+      );
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 422) {
+        final Object? body = e.response?.data;
+        final Object? errors = body is Map ? body['errors'] : null;
+        if (errors is Map && errors['rating'] is List) {
+          return const SubmitReviewResult(outcome: ReviewSubmitOutcome.invalidRating);
+        }
+        // Any other 422 here is `ReviewNotAllowedException` — currently only
+        // `reservation_not_completed:*` (see ReviewNotAllowedException).
+        return const SubmitReviewResult(outcome: ReviewSubmitOutcome.notEligible);
+      }
+      rethrow;
+    }
   }
+
+  Map<String, Object?> _dataOf(Map<String, dynamic> json) =>
+      (json['data'] as Map<String, Object?>?) ?? const <String, Object?>{};
 }

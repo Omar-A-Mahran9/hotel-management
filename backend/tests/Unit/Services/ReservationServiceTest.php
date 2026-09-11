@@ -382,6 +382,11 @@ class ReservationServiceTest extends TestCase
             {
                 return $guest;
             }
+
+            public function paginate(array $filters = [], int $perPage = 15): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+            {
+                throw new \RuntimeException('not used by this test');
+            }
         };
 
         $service = new ReservationService(

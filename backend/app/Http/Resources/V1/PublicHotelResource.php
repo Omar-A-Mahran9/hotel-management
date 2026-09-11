@@ -54,6 +54,17 @@ class PublicHotelResource extends JsonResource
                 fn () => number_format((float) $this->price_from, 2, '.', ''),
             ),
             'room_types_count' => $this->whenNotNull($this->room_types_count ?? null),
+            // Authoritative rating: the average `rating` of this hotel's
+            // `published` reviews only (never pending/rejected) — see
+            // Review::STATUS_PUBLISHED. Present only when the aggregate was
+            // actually loaded (list/detail queries), same convention as
+            // `price_from` above. Never the raw booking count used to order
+            // "recommended" — that stays internal to the sort query.
+            'rating' => $this->when(
+                ($this->avg_rating ?? null) !== null,
+                fn () => number_format((float) $this->avg_rating, 2, '.', ''),
+            ),
+            'reviews_count' => $this->whenNotNull($this->reviews_count ?? null),
             'room_types' => PublicRoomTypeResource::collection($this->whenLoaded('roomTypes')),
         ];
     }

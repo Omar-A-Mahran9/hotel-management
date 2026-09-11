@@ -101,12 +101,20 @@ use App\Domain\Payment\Repositories\Contracts\PaymentWebhookEventRepositoryInter
 use App\Domain\Payment\Repositories\EloquentPaymentRepository;
 use App\Domain\Payment\Repositories\EloquentPaymentTransactionRepository;
 use App\Domain\Payment\Repositories\EloquentPaymentWebhookEventRepository;
+use App\Domain\Reservation\Models\Guest;
 use App\Domain\Reservation\Models\Reservation;
+use App\Domain\Reservation\Policies\GuestPolicy;
 use App\Domain\Reservation\Policies\ReservationPolicy;
 use App\Domain\Reservation\Repositories\Contracts\GuestRepositoryInterface;
+use App\Domain\Reservation\Repositories\Contracts\ReservationExtensionRepositoryInterface;
 use App\Domain\Reservation\Repositories\Contracts\ReservationRepositoryInterface;
 use App\Domain\Reservation\Repositories\EloquentGuestRepository;
+use App\Domain\Reservation\Repositories\EloquentReservationExtensionRepository;
 use App\Domain\Reservation\Repositories\EloquentReservationRepository;
+use App\Domain\Review\Models\Review;
+use App\Domain\Review\Policies\ReviewPolicy;
+use App\Domain\Review\Repositories\Contracts\ReviewRepositoryInterface;
+use App\Domain\Review\Repositories\EloquentReviewRepository;
 use App\Domain\StayServices\Models\HotelService;
 use App\Domain\StayServices\Models\ServiceCategory;
 use App\Domain\StayServices\Models\ServiceOrder;
@@ -144,6 +152,7 @@ class AppServiceProvider extends ServiceProvider
         RoomTypeRepositoryInterface::class => EloquentRoomTypeRepository::class,
         RoomRepositoryInterface::class => EloquentRoomRepository::class,
         ReservationRepositoryInterface::class => EloquentReservationRepository::class,
+        ReservationExtensionRepositoryInterface::class => EloquentReservationExtensionRepository::class,
         GuestRepositoryInterface::class => EloquentGuestRepository::class,
         GuestOtpChallengeRepositoryInterface::class => EloquentGuestOtpChallengeRepository::class,
         HotelCatalogRepositoryInterface::class => EloquentHotelCatalogRepository::class,
@@ -166,6 +175,7 @@ class AppServiceProvider extends ServiceProvider
         LoyaltyTransactionRepositoryInterface::class => EloquentLoyaltyTransactionRepository::class,
         LoyaltyRuleRepositoryInterface::class => EloquentLoyaltyRuleRepository::class,
         NotificationRepositoryInterface::class => EloquentNotificationRepository::class,
+        ReviewRepositoryInterface::class => EloquentReviewRepository::class,
     ];
 
     /**
@@ -194,6 +204,8 @@ class AppServiceProvider extends ServiceProvider
         LoyaltyAccount::class => LoyaltyPolicy::class,
         LoyaltyRule::class => LoyaltyRulePolicy::class,
         Notification::class => NotificationPolicy::class,
+        Review::class => ReviewPolicy::class,
+        Guest::class => GuestPolicy::class,
     ];
 
     public function register(): void

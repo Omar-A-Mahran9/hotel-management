@@ -1,10 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hotel_guest_app/core/config/app_config.dart';
-import 'package:hotel_guest_app/core/config/app_environment.dart';
 import 'package:hotel_guest_app/core/errors/app_exception.dart';
-import 'package:hotel_guest_app/core/network/api_client.dart';
-import 'package:hotel_guest_app/core/security/in_memory_token_store.dart';
-import 'package:hotel_guest_app/features/stay_services/data/datasources/api_stay_services_data_source.dart';
 import 'package:hotel_guest_app/features/stay_services/data/datasources/dummy_stay_services_data_source.dart';
 import 'package:hotel_guest_app/features/stay_services/domain/entities/service_order_status.dart';
 
@@ -105,30 +100,7 @@ void main() {
     });
   });
 
-  group('ApiStayServicesDataSource', () {
-    final source = ApiStayServicesDataSource(
-      ApiClient(
-        config: const AppConfig(
-          environment: AppEnvironment.development,
-          apiBaseUrl: 'http://localhost',
-          apiVersion: 'v1',
-          useDummyData: false,
-        ),
-        tokenStore: InMemoryTokenStore(),
-      ),
-    );
-
-    test('every method is a documented not-implemented stub', () {
-      expect(source.fetchCatalogue('1'),
-          throwsA(isA<NotImplementedInPhaseException>()));
-      expect(source.fetchOrders('1'),
-          throwsA(isA<NotImplementedInPhaseException>()));
-      expect(source.fetchOrder('1', '2'),
-          throwsA(isA<NotImplementedInPhaseException>()));
-      expect(source.createOrder(fakeServiceRequest()),
-          throwsA(isA<NotImplementedInPhaseException>()));
-      expect(source.cancelOrder('1', '2'),
-          throwsA(isA<NotImplementedInPhaseException>()));
-    });
-  });
+  // `ApiStayServicesDataSource` is now real except `cancelOrder` (no guest
+  // cancel endpoint exists) — see
+  // test/features/stay_services/api_stay_services_data_source_test.dart.
 }

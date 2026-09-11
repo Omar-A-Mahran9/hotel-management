@@ -8,6 +8,7 @@ use App\Domain\Location\Models\City;
 use App\Domain\Location\Models\Country;
 use App\Domain\Reservation\Models\HotelCancellationPolicy;
 use App\Domain\Reservation\Models\Reservation;
+use App\Domain\Review\Models\Review;
 use App\Domain\Shared\Concerns\HotelScoped;
 use Database\Factories\HotelFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -86,6 +87,11 @@ class Hotel extends Model
     public function reservations(): HasMany
     {
         return $this->hasMany(Reservation::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
     }
 
     public function roomTypes(): HasMany

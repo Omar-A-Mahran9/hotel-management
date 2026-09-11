@@ -108,7 +108,7 @@ class _Body extends StatelessWidget {
               clipBehavior: Clip.none,
               children: <Widget>[
                 HotelThumbnail(
-                  seed: hotel.id,
+                  imageUrl: hotel.coverUrl,
                   width: double.infinity,
                   height: 300,
                   borderRadius: BorderRadius.zero,
@@ -139,7 +139,7 @@ class _Body extends StatelessWidget {
                   start: AppSpacing.pageGutter,
                   bottom: -32,
                   child: HeroPhotoStrip(
-                    seed: hotel.id,
+                    galleryUrls: hotel.galleryUrls,
                     totalPhotos: hotel.photoCount,
                   ),
                 ),

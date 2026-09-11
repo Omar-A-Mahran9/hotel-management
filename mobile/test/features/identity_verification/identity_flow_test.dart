@@ -5,6 +5,7 @@ import 'package:hotel_guest_app/app/router/app_router.dart';
 import 'package:hotel_guest_app/core/localization/generated/app_localizations.dart';
 import 'package:hotel_guest_app/features/identity_verification/data/datasources/dummy_identity_verification_data_source.dart';
 import 'package:hotel_guest_app/features/reservation/domain/entities/create_reservation_request.dart';
+import 'package:hotel_guest_app/features/reservation/domain/entities/extend_stay.dart';
 import 'package:hotel_guest_app/features/reservation/domain/entities/reservation.dart';
 import 'package:hotel_guest_app/features/reservation/domain/repositories/reservation_repository.dart';
 import 'package:hotel_guest_app/features/reservation/presentation/state/reservation_providers.dart';
@@ -20,6 +21,16 @@ class _StubReservationRepository implements ReservationRepository {
       fakeReservation();
   @override
   Future<Reservation> getById(String id) async => fakeReservation(id: id);
+  @override
+  Future<List<Reservation>> list() async => <Reservation>[];
+
+  @override
+  Future<Reservation> cancel(String id) async => fakeReservation(id: id);
+
+  @override
+  Future<ExtendStayResult> extend(ExtendStayRequest request) async {
+    throw UnimplementedError('extend not used in this test');
+  }
 }
 
 Future<AppLocalizations> _l10n(String code) =>
@@ -72,7 +83,7 @@ void main() {
     await tester
         .tap(find.widgetWithText(FilledButton, en.identityBackToReservation));
     await tester.pumpAndSettle();
-    expect(find.text(en.reservationDetailTitle), findsWidgets);
+    expect(find.text(en.bookingDetailTitle), findsWidgets);
   });
 
   testWidgets('manual-review scenario shows the safe waiting state',

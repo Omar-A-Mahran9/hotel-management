@@ -1,88 +1,94 @@
+import 'package:dio/dio.dart';
+import 'package:http_parser/http_parser.dart';
+
 import '../../../../core/data/data_source.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../core/network/api_client.dart';
+import '../../domain/entities/identity_document.dart';
 import '../../domain/entities/identity_verification_request.dart';
 import '../models/identity_verification_models.dart';
 import 'identity_verification_data_source.dart';
 
 /// API-backed identity-verification source.
 ///
-/// Kept a documented stub for Mobile Phase 6 (same pattern as
-/// `ApiReservationDataSource` / `ApiPaymentDataSource`). Endpoints exist —
-/// `POST /api/v1/identity-verification/{reservation}/documents`,
-/// `.../selfie`, `GET .../status`, `POST .../review` — but they are
-/// **staff/dashboard-scoped**:
+/// Real, authenticated guest contract, reusing the shared
+/// `IdentityVerificationResource`:
+/// `POST /guest/reservations/{reservation}/identity/documents`,
+/// `POST .../identity/selfie`, `GET .../identity`. There is no guest
+/// equivalent of the staff `review` (manual approve/reject) action.
 ///
-/// * `IdentityVerificationController` resolves the reservation through
-///   `ReservationService::findAccessibleBy($request->user(), …)` and every
-///   action is authorised by `IdentityVerificationPolicy` against the acting
-///   user's hotel access;
-/// * the whole `/v1` surface sits behind `auth:sanctum` staff tokens — the
-///   mobile guest auth layer issues its own session those policies reject;
-/// * `.../review` is an explicitly staff-only decision endpoint;
-/// * uploads are multipart to a **private** disk and are never served back —
-///   the mobile app must only ever hold the safe `IdentityVerificationResource`
-///   status fields.
-///
-/// No guest-facing identity contract is approved. Wiring is sketched in
-/// comments so adopting one stays a small change; until then each method raises
-/// [NotImplementedInPhaseException] rather than guessing.
+/// KNOWN GAP: [CapturedImage] carries an optional [CapturedImage.filePath]
+/// that a real camera/file-picker capture flow would populate — no such flow
+/// is wired into the identity-verification UI yet (no image_picker/camera
+/// plugin dependency exists in this app). Until a capture screen produces a
+/// real file, [submitDocument]/[submitSelfie] throw
+/// [NotImplementedInPhaseException] rather than upload zero bytes or fabricate
+/// a fake success; [fetchStatus] is fully real.
 class ApiIdentityVerificationDataSource
     implements IdentityVerificationDataSource, RemoteDataSource {
   ApiIdentityVerificationDataSource(this._client);
 
-  // Retained so wiring an approved endpoint stays a small change.
-  // ignore: unused_field
   final ApiClient _client;
 
-  static const String _reason =
-      'A guest-facing identity-verification contract (guest identity + a guest '
-      'upload endpoint) is not approved yet';
+  static const String _noCaptureReason =
+      'No real camera/file-picker capture is wired yet — CapturedImage has no '
+      'file to upload';
 
   @override
   Future<IdentityVerificationSessionModel> fetchStatus(
     String reservationId,
   ) async {
-    // final json = await _client.getJson(
-    //   '/identity-verification/$reservationId/status');
-    // return IdentityVerificationSessionModel.fromJson(
-    //   json['data'] as Map<String, Object?>);
-    throw const NotImplementedInPhaseException(_reason);
+    final Map<String, dynamic> json = await _client.getJson(
+      '/guest/reservations/$reservationId/identity',
+    );
+    final Map<String, Object?> data =
+        (json['data'] as Map<String, Object?>?) ?? const <String, Object?>{};
+    return IdentityVerificationSessionModel.fromJson(data);
   }
 
   @override
   Future<IdentityVerificationSessionModel> submitDocument(
     SubmitIdentityDocumentRequest request,
   ) async {
-    // final fields = IdentityDocumentPayload.fromRequest(request).toFields();
-    // final form = FormData.fromMap({
-    //   ...fields,
-    //   'document': /* MultipartFile from the real capture bytes */,
-    // });
-    // final json = await _client.postJson(
-    //   '/identity-verification/${request.reservationId}/documents', body: form);
-    // return IdentityVerificationSessionModel.fromJson(
-    //   json['data'] as Map<String, Object?>);
-    throw const NotImplementedInPhaseException(_reason);
+    final String? path = request.image.filePath;
+    if (path == null) throw const NotImplementedInPhaseException(_noCaptureReason);
+
+    final Map<String, dynamic> json = await _client.postMultipart(
+      '/guest/reservations/${request.reservationId}/identity/documents',
+      files: <String, MultipartFile>{
+        'document': await MultipartFile.fromFile(
+          path,
+          filename: request.image.label,
+          contentType: MediaType.parse(request.image.mimeType),
+        ),
+      },
+      fields: <String, dynamic>{'document_type': request.type.wireValue},
+    );
+    final Map<String, Object?> data =
+        (json['data'] as Map<String, Object?>?) ?? const <String, Object?>{};
+    return IdentityVerificationSessionModel.fromJson(data);
   }
 
   @override
   Future<IdentityVerificationSessionModel> submitSelfie(
     SubmitSelfieRequest request,
   ) async {
-    // final form = FormData.fromMap({
-    //   'selfie': /* MultipartFile from the real capture bytes */,
-    // });
-    // final json = await _client.postJson(
-    //   '/identity-verification/${request.reservationId}/selfie',
-    //   body: form,
-    //   // headers: {'Idempotency-Key': request.idempotencyKey},
-    // );
-    // return IdentityVerificationSessionModel.fromJson(
-    //   json['data'] as Map<String, Object?>);
-    //
-    // NOTE: there is no dedicated "retry" endpoint — a retry is simply a new
-    // `documents` submission from a RETRY_ALLOWED / STAFF_REJECTED session.
-    throw const NotImplementedInPhaseException(_reason);
+    final String? path = request.image.filePath;
+    if (path == null) throw const NotImplementedInPhaseException(_noCaptureReason);
+
+    final Map<String, dynamic> json = await _client.postMultipart(
+      '/guest/reservations/${request.reservationId}/identity/selfie',
+      files: <String, MultipartFile>{
+        'selfie': await MultipartFile.fromFile(
+          path,
+          filename: request.image.label,
+          contentType: MediaType.parse(request.image.mimeType),
+        ),
+      },
+      headers: <String, String>{'Idempotency-Key': request.idempotencyKey},
+    );
+    final Map<String, Object?> data =
+        (json['data'] as Map<String, Object?>?) ?? const <String, Object?>{};
+    return IdentityVerificationSessionModel.fromJson(data);
   }
 }

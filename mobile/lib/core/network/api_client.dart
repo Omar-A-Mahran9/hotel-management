@@ -50,16 +50,43 @@ class ApiClient {
   Future<Map<String, dynamic>> postJson(
     String path, {
     Object? body,
+    Map<String, String>? headers,
   }) async {
-    final Response<dynamic> response = await _dio.post<dynamic>(path, data: body);
+    final Response<dynamic> response = await _dio.post<dynamic>(
+      path,
+      data: body,
+      options: headers == null ? null : Options(headers: headers),
+    );
     return _asJsonMap(response.data);
+  }
+
+  /// Same as [postJson] but also returns the HTTP status code — for the rare
+  /// caller that must distinguish e.g. 201 "created" from 200 "returned the
+  /// existing resource" on the same success envelope shape (the review
+  /// submit duplicate-returns-existing rule).
+  Future<(Map<String, dynamic> json, int? statusCode)> postJsonWithStatus(
+    String path, {
+    Object? body,
+    Map<String, String>? headers,
+  }) async {
+    final Response<dynamic> response = await _dio.post<dynamic>(
+      path,
+      data: body,
+      options: headers == null ? null : Options(headers: headers),
+    );
+    return (_asJsonMap(response.data), response.statusCode);
   }
 
   Future<Map<String, dynamic>> patchJson(
     String path, {
     Object? body,
+    Map<String, String>? headers,
   }) async {
-    final Response<dynamic> response = await _dio.patch<dynamic>(path, data: body);
+    final Response<dynamic> response = await _dio.patch<dynamic>(
+      path,
+      data: body,
+      options: headers == null ? null : Options(headers: headers),
+    );
     return _asJsonMap(response.data);
   }
 
@@ -69,9 +96,14 @@ class ApiClient {
     String path, {
     required Map<String, MultipartFile> files,
     Map<String, dynamic> fields = const <String, dynamic>{},
+    Map<String, String>? headers,
   }) async {
     final FormData form = FormData.fromMap(<String, dynamic>{...fields, ...files});
-    final Response<dynamic> response = await _dio.post<dynamic>(path, data: form);
+    final Response<dynamic> response = await _dio.post<dynamic>(
+      path,
+      data: form,
+      options: headers == null ? null : Options(headers: headers),
+    );
     return _asJsonMap(response.data);
   }
 

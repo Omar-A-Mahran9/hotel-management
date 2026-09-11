@@ -16,6 +16,13 @@ import 'reservation_status.dart';
 ///
 /// [hotelName] / [roomName] are display snapshots carried from the create
 /// request so the confirmation screen renders without another round-trip.
+///
+/// [hotelCity] / [hotelImageUrl] mirror the guest reservation resource's
+/// `hotel.city` / `hotel.cover_url` (present once the hotel is eager-loaded).
+/// [roomNumber] mirrors `room.room_number` — the physically allocated room,
+/// set once one is assigned / at check-in. [nightlyRate] mirrors
+/// `room_type.base_price` — the authoritative nightly rate Extend Stay prices
+/// from and the Account screen's loyalty-card "per night" figure reads.
 @immutable
 class Reservation {
   const Reservation({
@@ -31,6 +38,11 @@ class Reservation {
     required this.priceSnapshot,
     required this.createdAt,
     this.roomId,
+    this.hotelCity,
+    this.hotelImageUrl,
+    this.roomNumber,
+    this.nightlyRate,
+    this.cancelledAt,
   });
 
   /// The backend primary key (as a string at the mobile boundary).
@@ -52,6 +64,15 @@ class Reservation {
   final Money priceSnapshot;
   final DateTime createdAt;
 
+  final String? hotelCity;
+  final String? hotelImageUrl;
+  final String? roomNumber;
+  final Money? nightlyRate;
+
+  /// Mirrors the resource's `cancelled_at` — set only once the reservation is
+  /// actually cancelled.
+  final DateTime? cancelledAt;
+
   int get nights => stay.nights;
 
   @override
@@ -68,7 +89,12 @@ class Reservation {
       other.party == party &&
       other.status == status &&
       other.priceSnapshot == priceSnapshot &&
-      other.createdAt == createdAt;
+      other.createdAt == createdAt &&
+      other.hotelCity == hotelCity &&
+      other.hotelImageUrl == hotelImageUrl &&
+      other.roomNumber == roomNumber &&
+      other.nightlyRate == nightlyRate &&
+      other.cancelledAt == cancelledAt;
 
   @override
   int get hashCode => Object.hashAll(<Object?>[
@@ -84,6 +110,11 @@ class Reservation {
         status,
         priceSnapshot,
         createdAt,
+        hotelCity,
+        hotelImageUrl,
+        roomNumber,
+        nightlyRate,
+        cancelledAt,
       ]);
 
   @override

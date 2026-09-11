@@ -249,6 +249,41 @@ export interface Reservation {
   updated_at: string
 }
 
+// ---- Guests (GuestResource, staff directory) ----------------------
+export interface Guest {
+  id: number
+  name: string | null
+  email: string | null
+  phone: string
+  phone_verified_at: string | null
+  profile_completed_at: string | null
+  profile_complete: boolean
+  /** Present only on the staff directory listing (GET /guests, GET /guests/{id}). */
+  reservations_count?: number
+  created_at: string
+  updated_at: string
+}
+
+// ---- Extend Stay --------------------------------------------------
+export interface ReservationExtension {
+  id: number
+  reservation_id: number
+  previous_check_out: string
+  new_check_out: string
+  nights_added: number
+  unit_price: string
+  amount: string
+  currency: string | null
+  folio_posted: boolean
+  created_at: string
+}
+
+export interface ExtendReservationResult {
+  reservation: Reservation
+  extension: ReservationExtension
+  folio: { totals: { charges_total: string, payments_total: string, outstanding_total: string } }
+}
+
 // ---- Staff users ------------------------------------------------
 export interface StaffUser {
   id: number
@@ -517,6 +552,21 @@ export interface LoyaltyRule {
   eligible_source_types: string[]
   created_at: string
   updated_at: string
+}
+
+// ---- Reviews (ReviewResource, staff listing + moderation) -----
+export type ReviewStatus = 'pending' | 'published' | 'rejected'
+
+export interface Review {
+  id: number
+  reservation_id: number
+  rating: number
+  text: string | null
+  status: ReviewStatus
+  created_at: string
+  hotel_id?: number
+  guest_id?: number | null
+  moderated_at?: string | null
 }
 
 // ---- Notifications (NotificationResource) --------------------

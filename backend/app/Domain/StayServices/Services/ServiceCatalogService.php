@@ -10,6 +10,7 @@ use App\Domain\StayServices\Models\ServiceCategory;
 use App\Domain\StayServices\Repositories\Contracts\HotelServiceRepositoryInterface;
 use App\Domain\StayServices\Repositories\Contracts\ServiceCategoryRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -43,6 +44,16 @@ class ServiceCatalogService
     public function findCategory(int $id): ?ServiceCategory
     {
         return $this->categories->find($id);
+    }
+
+    /**
+     * Active categories for the anonymous/guest catalog read.
+     *
+     * @return Collection<int, ServiceCategory>
+     */
+    public function activeCategoriesForHotel(Hotel $hotel): Collection
+    {
+        return $this->categories->activeForHotel($hotel);
     }
 
     /**
@@ -131,6 +142,16 @@ class ServiceCatalogService
     public function findService(int $id): ?HotelService
     {
         return $this->services->find($id);
+    }
+
+    /**
+     * Active services for the anonymous/guest catalog read.
+     *
+     * @return Collection<int, HotelService>
+     */
+    public function activeServicesForHotel(Hotel $hotel): Collection
+    {
+        return $this->services->activeForHotel($hotel);
     }
 
     /**

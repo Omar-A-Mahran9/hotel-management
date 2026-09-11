@@ -433,6 +433,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get filterPriceLabel => 'نطاق السعر';
 
   @override
+  String get filterFacilitiesLabel => 'المرافق';
+
+  @override
+  String get filterRatingLabel => 'التقييم';
+
+  @override
   String get filterApply => 'تطبيق التصفية';
 
   @override
@@ -960,38 +966,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reservationCreateFailedTitle => 'تعذّر تأكيد حجزك';
 
   @override
-  String get reservationDetailTitle => 'الحجز';
-
-  @override
-  String get reservationSuccessTitle => 'تم تأكيد حجزك';
-
-  @override
-  String get reservationSuccessBody => 'حفظنا حجزك. احتفظ برقم التأكيد.';
-
-  @override
-  String get reservationReferenceLabel => 'رقم التأكيد';
-
-  @override
   String get reservationStatusFieldLabel => 'الحالة';
-
-  @override
-  String get reservationBookedOnLabel => 'تاريخ الحجز';
-
-  @override
-  String get reservationPendingNote =>
-      'هذا الحجز قيد الانتظار ولم يُؤمَّن بعد.';
-
-  @override
-  String get reservationDone => 'تم';
-
-  @override
-  String get reservationViewDetails => 'عرض الحجز';
-
-  @override
-  String get reservationNotFoundTitle => 'الحجز غير موجود';
-
-  @override
-  String get reservationNotFoundBody => 'تعذّر العثور على هذا الحجز.';
 
   @override
   String get reservationStatusPending => 'قيد الانتظار';
@@ -1025,12 +1000,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get reservationStatusCancelled => 'ملغى';
-
-  @override
-  String get reservationPayCta => 'المتابعة إلى الدفع';
-
-  @override
-  String get reservationVerifyIdentityCta => 'التحقق من هويتك';
 
   @override
   String moneyAmount(String currency, int amount) {
@@ -1299,12 +1268,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get reservationCheckInCta => 'تسجيل الدخول';
-
-  @override
-  String get reservationServicesCta => 'خدمات الإقامة';
-
-  @override
-  String get reservationCheckoutCta => 'تسجيل المغادرة';
 
   @override
   String get checkInTitle => 'تسجيل الدخول';
@@ -1983,4 +1946,276 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get reviewStatusRejected => 'غير منشور';
+
+  @override
+  String get bookingsPillCurrent => 'الحالية';
+
+  @override
+  String get bookingsPillUpcoming => 'القادمة';
+
+  @override
+  String get bookingsPillPast => 'السابقة';
+
+  @override
+  String get bookingsPastTitle => 'إقامات سابقة';
+
+  @override
+  String get bookingsSectionOngoingStay => 'إقامة جارية';
+
+  @override
+  String get bookingsSectionUpcoming => 'حجوزات قادمة';
+
+  @override
+  String get bookingsEmptyTitle => 'لا توجد حجوزات';
+
+  @override
+  String get bookingsEmptyBody => 'ستظهر حجوزاتك هنا بمجرد إتمام أول حجز.';
+
+  @override
+  String get bookingStatusPending => 'قيد الانتظار';
+
+  @override
+  String get bookingStatusConfirmed => 'مؤكد';
+
+  @override
+  String get bookingStatusCheckedIn => 'تم تسجيل الدخول';
+
+  @override
+  String get bookingStatusCompleted => 'مكتملة';
+
+  @override
+  String get bookingStatusCancelled => 'ملغاة';
+
+  @override
+  String get bookingDetailTitle => 'تفاصيل الحجز';
+
+  @override
+  String get bookingPaymentStatusHeading => 'حالة الدفع';
+
+  @override
+  String get bookingCancellationPolicyHeading => 'سياسة الإلغاء';
+
+  @override
+  String get bookingCancellationPolicyBody =>
+      'إلغاء مجاني حتى 24 ساعة قبل الوصول. بعدها يُخصم مبلغ التأمين.';
+
+  @override
+  String get bookingPendingRowTitle => 'بانتظار إتمام الدفع';
+
+  @override
+  String get bookingPendingRowSubtitle => 'لم يكتمل';
+
+  @override
+  String get bookingAutoCancelRowTitle => 'يُلغى الحجز تلقائياً خلال 30 دقيقة';
+
+  @override
+  String get bookingRoomHeldRowTitle => 'الغرفة محجوزة مؤقتاً';
+
+  @override
+  String get bookingRoomHeldRowSubtitle => 'غير مؤكدة';
+
+  @override
+  String get bookingDepositHeldRowTitle => 'تم حجز مبلغ التأمين';
+
+  @override
+  String get bookingDepositHeldRowSubtitle => 'دون خصم فعلي';
+
+  @override
+  String get bookingDeductedAtCheckinRowTitle => 'يُخصم عند تسجيل الدخول';
+
+  @override
+  String get bookingExtrasChargedOnceRowTitle =>
+      'تُجمع المصاريف الإضافية عند المغادرة';
+
+  @override
+  String get bookingExtrasChargedOnceRowSubtitle => 'دفعة واحدة';
+
+  @override
+  String get bookingIdentityVerifiedRowTitle => 'تم التحقق من هويتك';
+
+  @override
+  String get bookingIdentityVerifiedRowSubtitle => 'مكتمل';
+
+  @override
+  String get bookingCheckInAvailableRowTitle => 'تسجيل الدخول متاح من';
+
+  @override
+  String get bookingDepositAmountHeldRowTitle => 'مبلغ التأمين محجوز';
+
+  @override
+  String get bookingOngoingStayRowTitle => 'إقامة جارية';
+
+  @override
+  String bookingRoomLabel(String number) {
+    return 'غرفة $number';
+  }
+
+  @override
+  String get bookingDepartureRowTitle => 'المغادرة';
+
+  @override
+  String get bookingExtraChargesRowTitle => 'المصاريف الإضافية';
+
+  @override
+  String get bookingCancelledRowTitle => 'ألغي الحجز';
+
+  @override
+  String get bookingDepositRefundRowTitle => 'استرداد مبلغ التأمين';
+
+  @override
+  String get bookingDepositRefundRowSubtitle => 'خلال 3 أيام عمل';
+
+  @override
+  String get bookingCancellationFeeRowTitle => 'رسوم الإلغاء';
+
+  @override
+  String get bookingCancellationFeeNone => 'لا توجد';
+
+  @override
+  String get bookingStayEndedRowTitle => 'انتهت الإقامة';
+
+  @override
+  String get bookingTotalPaidRowTitle => 'الإجمالي المدفوع';
+
+  @override
+  String get bookingInvoiceReadyRowTitle => 'الفاتورة الإلكترونية';
+
+  @override
+  String get bookingInvoiceReadyRowSubtitle => 'جاهزة';
+
+  @override
+  String get bookingCtaContinuePayment => 'متابعة الدفع';
+
+  @override
+  String get bookingCtaCancelReservation => 'إلغاء الحجز';
+
+  @override
+  String get bookingCtaVerifyIdentity => 'التحقق من الهوية';
+
+  @override
+  String get bookingCtaDigitalCheckIn => 'تسجيل الدخول الرقمي';
+
+  @override
+  String get bookingCtaMyCurrentStay => 'إقامتي الحالية';
+
+  @override
+  String get bookingCtaShowAccessCode => 'عرض رمز الدخول';
+
+  @override
+  String get bookingCtaBookAgain => 'احجز مرة أخرى';
+
+  @override
+  String get bookingCtaViewInvoice => 'عرض الفاتورة';
+
+  @override
+  String get bookingCancelConfirmTitle => 'إلغاء هذا الحجز؟';
+
+  @override
+  String get bookingCancelConfirmBody =>
+      'لا يمكن التراجع عن هذا الإجراء. سيُسترد مبلغ التأمين وفق سياسة الإلغاء.';
+
+  @override
+  String get bookingCancelKeepCta => 'الاحتفاظ بالحجز';
+
+  @override
+  String get bookingCancelConfirmCta => 'إلغاء الحجز';
+
+  @override
+  String get bookingNotFoundTitle => 'الحجز غير موجود';
+
+  @override
+  String get accountTitle => 'حسابي';
+
+  @override
+  String get accountLoyaltyProgramTitle => 'برنامج الولاء';
+
+  @override
+  String get accountLoyaltyPointsSuffix => 'نقطة';
+
+  @override
+  String get accountLoyaltyDescription =>
+      'نقاطك تُجمع من كل فنادق المجموعة وتُصرف في أي فرع.';
+
+  @override
+  String get accountLoyaltyPerNightLabel => 'لكل ليلة';
+
+  @override
+  String get accountTrustedGuestTitle => 'نزيل موثوق';
+
+  @override
+  String get accountTrustedGuestBody =>
+      'لن يُطلب منك رفع صور الهوية مرة أخرى في أي فندق آخر بالمجموعة.';
+
+  @override
+  String get accountPreviousStaysLabel => 'إقامات سابقة';
+
+  @override
+  String get accountPreferencesLabel => 'تفضيلاتي';
+
+  @override
+  String get accountPreferencesEmpty => 'لم تُحدد بعد';
+
+  @override
+  String get accountPrivacyLabel => 'الخصوصية وبياناتي';
+
+  @override
+  String get accountHelpSupportLabel => 'المساعدة والدعم';
+
+  @override
+  String get stayHomeTitle => 'إقامتك الحالية';
+
+  @override
+  String get stayHomeRoomLabel => 'غرفتك';
+
+  @override
+  String get stayHomeServicesHeading => 'الخدمات';
+
+  @override
+  String get stayHomeRoomService => 'خدمة الغرف';
+
+  @override
+  String get stayHomeRoomCleaning => 'تنظيف الغرفة';
+
+  @override
+  String get stayHomeExtendStay => 'تمديد الإقامة';
+
+  @override
+  String get stayHomeReportProblem => 'الإبلاغ عن مشكلة';
+
+  @override
+  String get stayHomeExtraCharges => 'مصاريف إضافية';
+
+  @override
+  String get stayHomeExtraChargesNote => 'تُخصم تلقائياً عند المغادرة';
+
+  @override
+  String get stayHomeNoActiveStayTitle => 'لا توجد إقامة حالية';
+
+  @override
+  String get stayHomeNoActiveStayBody =>
+      'بمجرد تسجيل دخولك، ستظهر هنا غرفتك ورمز الدخول والخدمات.';
+
+  @override
+  String get extendStayTitle => 'تمديد الإقامة';
+
+  @override
+  String get extendStayNewCheckOutLabel => 'تاريخ المغادرة الجديد';
+
+  @override
+  String get extendStayNightsAddedLabel => 'عدد الليالي المضافة';
+
+  @override
+  String get extendStayCta => 'تأكيد التمديد';
+
+  @override
+  String get extendStaySuccessTitle => 'تم تمديد الإقامة';
+
+  @override
+  String extendStaySuccessBody(String date, String amount) {
+    return 'تاريخ مغادرتك الآن $date. تمت إضافة $amount إلى فاتورتك.';
+  }
+
+  @override
+  String get extendStayNotEligible =>
+      'تمديد الإقامة متاح فقط أثناء إقامتك الحالية.';
 }

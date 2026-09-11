@@ -5,15 +5,27 @@ namespace App\Domain\Discovery\Repositories;
 use App\Domain\Discovery\Repositories\Contracts\HotelCatalogRepositoryInterface;
 use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\Inventory\Models\RoomType;
+use App\Domain\Reservation\Models\Reservation;
+use App\Domain\Review\Models\Review;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class EloquentHotelCatalogRepository implements HotelCatalogRepositoryInterface
 {
-    public function paginateActiveHotels(?string $city, ?string $search, int $perPage): LengthAwarePaginator
-    {
-        return Hotel::query()
+    /**
+     * @param  array<int, string>  $facilities
+     */
+    public function paginateActiveHotels(
+        ?string $city,
+        ?string $search,
+        int $perPage,
+        string $sort = 'recommended',
+        ?float $minPrice = null,
+        ?float $maxPrice = null,
+        array $facilities = [],
+    ): LengthAwarePaginator {
+        $query = Hotel::query()
             ->where('is_active', true)
             ->with(['logo', 'cover', 'facilities'])
             ->withMin(
@@ -21,13 +33,34 @@ class EloquentHotelCatalogRepository implements HotelCatalogRepositoryInterface
                 'base_price',
             )
             ->withCount(['roomTypes as room_types_count' => fn (Builder $q) => $q->where('is_active', true)])
+            ->withAvg(
+                ['reviews as avg_rating' => fn (Builder $q) => $q->where('status', Review::STATUS_PUBLISHED)],
+                'rating',
+            )
+            ->withCount(['reviews as reviews_count' => fn (Builder $q) => $q->where('status', Review::STATUS_PUBLISHED)])
             ->when($city !== null && $city !== '', fn (Builder $q) => $q->where('city', $city))
             ->when($search !== null && $search !== '', fn (Builder $q) => $q->where(function (Builder $inner) use ($search): void {
                 $inner->where('name', 'like', '%'.$search.'%')
                     ->orWhere('city', 'like', '%'.$search.'%');
             }))
-            ->orderBy('name')
-            ->paginate($perPage);
+            ->when($minPrice !== null, fn (Builder $q) => $q->having('price_from', '>=', $minPrice))
+            ->when($maxPrice !== null, fn (Builder $q) => $q->having('price_from', '<=', $maxPrice))
+            ->when(count($facilities) > 0, fn (Builder $q) => $q->whereHas(
+                'facilities',
+                fn (Builder $inner) => $inner->whereIn('facilities.key', $facilities),
+                '=',
+                count($facilities),
+            ));
+
+        $query = match ($sort) {
+            'highest_rated' => $query->orderByRaw('avg_rating IS NULL')->orderByDesc('avg_rating'),
+            'cheapest' => $query->orderByRaw('price_from IS NULL')->orderBy('price_from'),
+            default => $query->withCount([
+                'reservations as bookings_count' => fn (Builder $q) => $q->where('status', '!=', Reservation::STATUS_CANCELLED),
+            ])->orderByDesc('bookings_count'),
+        };
+
+        return $query->orderBy('name')->paginate($perPage);
     }
 
     public function findActiveHotel(int $id): ?Hotel
@@ -35,6 +68,11 @@ class EloquentHotelCatalogRepository implements HotelCatalogRepositoryInterface
         return Hotel::query()
             ->where('is_active', true)
             ->with(['logo', 'cover', 'galleryMedia', 'facilities'])
+            ->withAvg(
+                ['reviews as avg_rating' => fn (Builder $q) => $q->where('status', Review::STATUS_PUBLISHED)],
+                'rating',
+            )
+            ->withCount(['reviews as reviews_count' => fn (Builder $q) => $q->where('status', Review::STATUS_PUBLISHED)])
             ->find($id);
     }
 

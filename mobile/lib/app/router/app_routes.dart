@@ -179,6 +179,24 @@ abstract final class AppRoutes {
       '/reservation/:reservationId/review/result';
   static const String reviewResultName = 'reviewResult';
 
+  /// `06 · Bookings & Account` — the bookings list (الحالية/القادمة/السابقة
+  /// pills), Mobile Phase 11.
+  static const String bookings = '/bookings';
+  static const String bookingsName = 'bookings';
+
+  /// `06 · Bookings & Account` — the account/profile home, Mobile Phase 11.
+  static const String account = '/account';
+  static const String accountName = 'account';
+
+  /// `04 · Check in & Stay` (STAY_Home) — the "الخدمات" tab's current-stay
+  /// hub, Mobile Phase 11.
+  static const String stayHome = '/services';
+  static const String stayHomeName = 'stayHome';
+
+  /// `04 · Check in & Stay` — the Extend Stay flow from the current-stay hub.
+  static const String extendStay = '/reservation/:reservationId/extend';
+  static const String extendStayName = 'extendStay';
+
   /// The authenticated landing route.
   static const String authenticatedHome = discover;
 

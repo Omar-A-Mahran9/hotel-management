@@ -108,6 +108,15 @@ return [
         'read_all' => 'The unread notifications were marked as read.',
     ],
 
+    'reviews' => [
+        'list' => 'The reviews are returned.',
+        'status' => 'The review is returned.',
+        'submitted' => 'The review was submitted.',
+        'already_reviewed' => 'A review already exists for this reservation.',
+        'published' => 'The review was published.',
+        'rejected' => 'The review was rejected.',
+    ],
+
     'role' => [
         'system_delete_blocked' => 'This role is a protected system role and cannot be deleted.',
         'assigned_delete_blocked' => 'This role is assigned to one or more users and cannot be deleted. Reassign those users to another role first.',

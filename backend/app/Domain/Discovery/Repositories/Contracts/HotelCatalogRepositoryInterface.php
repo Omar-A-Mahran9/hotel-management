@@ -14,7 +14,18 @@ use Illuminate\Support\Collection;
  */
 interface HotelCatalogRepositoryInterface
 {
-    public function paginateActiveHotels(?string $city, ?string $search, int $perPage): LengthAwarePaginator;
+    /**
+     * @param  array<int, string>  $facilities  facility keys a hotel must have ALL of
+     */
+    public function paginateActiveHotels(
+        ?string $city,
+        ?string $search,
+        int $perPage,
+        string $sort = 'recommended',
+        ?float $minPrice = null,
+        ?float $maxPrice = null,
+        array $facilities = [],
+    ): LengthAwarePaginator;
 
     public function findActiveHotel(int $id): ?Hotel;
 

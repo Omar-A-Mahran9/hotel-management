@@ -38,9 +38,12 @@ use App\Domain\Payment\Exceptions\PaymentAlreadyInitiatedException;
 use App\Domain\Payment\Exceptions\PaymentHoldNotAllowedException;
 use App\Domain\Payment\Exceptions\PaymentSettlementNotAllowedException;
 use App\Domain\Reservation\Exceptions\InvalidReservationStatusTransitionException;
+use App\Domain\Reservation\Exceptions\ReservationExtensionIdempotencyKeyConflictException;
+use App\Domain\Reservation\Exceptions\ReservationExtensionNotAllowedException;
 use App\Domain\Reservation\Exceptions\ReservationNotAvailableException;
 use App\Domain\Reservation\Exceptions\RoomHotelMismatchException;
 use App\Domain\Reservation\Exceptions\RoomTypeMismatchException;
+use App\Domain\Review\Exceptions\ReviewNotAllowedException;
 use App\Domain\StayServices\Exceptions\FolioChargeAmountException;
 use App\Domain\StayServices\Exceptions\InvalidServiceOrderStatusTransitionException;
 use App\Domain\StayServices\Exceptions\ServiceOrderNotAllowedException;
@@ -199,6 +202,20 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->renderable(function (InvalidReservationStatusTransitionException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        // Extend Stay — reservation-domain business errors, same 422
+        // convention as every sibling above.
+        $exceptions->renderable(function (ReservationExtensionNotAllowedException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        $exceptions->renderable(function (ReservationExtensionIdempotencyKeyConflictException $e, Request $request) use ($envelope) {
             if ($request->is('api/*')) {
                 return $envelope($e->getMessage(), 422);
             }
@@ -383,7 +400,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // consistent with every other domain exception above.
         $exceptions->renderable(function (LoyaltyNotAllowedException $e, Request $request) use ($envelope) {
             if ($request->is('api/*')) {
-                return $envelope($e->getMessage(), 422);
+                return $envelope($e->getMessage(), 422, ['reason' => $e->reason]);
             }
         });
 
@@ -406,6 +423,16 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->renderable(function (InvalidNotificationStatusTransitionException $e, Request $request) use ($envelope) {
             if ($request->is('api/*')) {
                 return $envelope($e->getMessage(), 422);
+            }
+        });
+
+        // Review workflow business errors. Fixed, safe machine strings
+        // (no secret, no guest-identifying content beyond what the reason
+        // already exposes). 422, consistent with every other domain
+        // exception above.
+        $exceptions->renderable(function (ReviewNotAllowedException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422, ['reason' => $e->reason]);
             }
         });
 

@@ -8,6 +8,7 @@ import 'package:hotel_guest_app/features/checkout/domain/entities/checkout_statu
 import 'package:hotel_guest_app/features/checkout/presentation/state/checkout_controller.dart';
 import 'package:hotel_guest_app/features/checkout/presentation/state/checkout_providers.dart';
 import 'package:hotel_guest_app/features/reservation/domain/entities/create_reservation_request.dart';
+import 'package:hotel_guest_app/features/reservation/domain/entities/extend_stay.dart';
 import 'package:hotel_guest_app/features/reservation/domain/entities/reservation.dart';
 import 'package:hotel_guest_app/features/reservation/domain/repositories/reservation_repository.dart';
 import 'package:hotel_guest_app/features/reservation/presentation/state/reservation_providers.dart';
@@ -22,6 +23,16 @@ class _ReservationRepo implements ReservationRepository {
       fakeReservation();
   @override
   Future<Reservation> getById(String id) async => fakeReservation(id: id);
+  @override
+  Future<List<Reservation>> list() async => <Reservation>[];
+
+  @override
+  Future<Reservation> cancel(String id) async => fakeReservation(id: id);
+
+  @override
+  Future<ExtendStayResult> extend(ExtendStayRequest request) async {
+    throw UnimplementedError('extend not used in this test');
+  }
 }
 
 ProviderContainer _container({DummyCheckoutDataSource? source}) {

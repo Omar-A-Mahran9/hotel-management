@@ -7,6 +7,7 @@ use App\Domain\HotelGroup\Models\Facility;
 use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\HotelGroup\Models\HotelMedia;
 use App\Domain\Inventory\Models\RoomType;
+use App\Domain\Review\Models\Review;
 use Tests\TestCase;
 
 class GuestDiscoveryEnrichmentTest extends TestCase
@@ -74,14 +75,45 @@ class GuestDiscoveryEnrichmentTest extends TestCase
             ->assertJsonCount(2, 'data.gallery');
     }
 
-    public function test_guest_discovery_never_exposes_review_aggregates(): void
+    public function test_guest_discovery_never_exposes_raw_review_rows_or_booking_counts(): void
     {
         Hotel::factory()->create();
 
         $this->getJson('/api/v1/guest/hotels')
             ->assertOk()
-            ->assertJsonMissingPath('data.0.rating')
-            ->assertJsonMissingPath('data.0.review_count')
-            ->assertJsonMissingPath('data.0.reviews');
+            ->assertJsonMissingPath('data.0.reviews')
+            ->assertJsonMissingPath('data.0.bookings_count');
+    }
+
+    public function test_hotel_rating_is_the_average_of_published_reviews_only(): void
+    {
+        $hotel = Hotel::factory()->create(['city' => 'Rating City']);
+
+        Review::factory()->for($hotel)->create(['rating' => 5, 'status' => Review::STATUS_PUBLISHED]);
+        Review::factory()->for($hotel)->create(['rating' => 3, 'status' => Review::STATUS_PUBLISHED]);
+        // Must not move the average: pending/rejected are excluded.
+        Review::factory()->for($hotel)->create(['rating' => 1, 'status' => Review::STATUS_PENDING]);
+        Review::factory()->for($hotel)->create(['rating' => 1, 'status' => Review::STATUS_REJECTED]);
+
+        $this->getJson('/api/v1/guest/hotels?city=Rating+City')
+            ->assertOk()
+            ->assertJsonPath('data.0.rating', '4.00')
+            ->assertJsonPath('data.0.reviews_count', 2);
+
+        $this->getJson("/api/v1/guest/hotels/{$hotel->id}")
+            ->assertOk()
+            ->assertJsonPath('data.rating', '4.00')
+            ->assertJsonPath('data.reviews_count', 2);
+    }
+
+    public function test_hotel_with_no_published_reviews_has_a_null_rating(): void
+    {
+        $hotel = Hotel::factory()->create(['city' => 'No Reviews City']);
+        Review::factory()->for($hotel)->create(['status' => Review::STATUS_PENDING]);
+
+        $this->getJson('/api/v1/guest/hotels?city=No+Reviews+City')
+            ->assertOk()
+            ->assertJsonPath('data.0.rating', null)
+            ->assertJsonPath('data.0.reviews_count', 0);
     }
 }

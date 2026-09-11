@@ -339,24 +339,23 @@ The Figma's persistent four-tab bar (`الرئيسية / حجوزاتي / الخ
 styled via `navigationBarTheme` (64 tall, transparent indicator, always-show
 labels, primary tint when selected).
 
-**Foundation only.** Three destinations don't exist as screens yet:
+**Built as of Mobile Phase 11** (`docs/mobile-phase-11-bookings-account.md`) — all four
+destinations are real screens:
 
 | Tab | Destination screen | Status |
 |---|---|---|
 | الرئيسية (Home) | `DiscoverPage` | exists |
-| حجوزاتي (Bookings) | a bookings list with الحالية/القادمة/السابقة tabs | **missing** |
-| الخدمات (Services) | a *global* services hub (current one is reservation-scoped) | **missing** |
-| حسابي (Account) | account + sub-pages (بياناتي / تفضيلاتي / الخصوصية / المساعدة / تسجيل الخروج) | **missing** |
+| حجوزاتي (Bookings) | `BookingsListPage` — الحالية/القادمة/السابقة pills | exists |
+| الخدمات (Services) | `StayHomePage` — the current-stay hub (`STAY_Home.png`) | exists |
+| حسابي (Account) | `AccountHomePage` — loyalty, trusted-guest, preferences, privacy/support, sign-out | exists |
 
-Because the router is a flat `GoRouter` and the other pages don't exist, no
-`StatefulShellRoute` is wired yet. `AppBottomNav` is mounted on `DiscoverPage`
-in display-only mode: "Home" is current; tapping another tab shows a
-"coming in a later update" snackbar (`navComingSoon`) rather than routing to a
-placeholder. Sign-out temporarily stays in the Discover app bar until the
-account screen exists.
-
-Next phase: build the three screens, then adopt `StatefulShellRoute` with
-`AppBottomNav` and move sign-out into `حسابي`.
+The router is still a flat `GoRouter` — each tab is its own top-level
+`GoRoute` (`/discover`, `/bookings`, `/services`, `/account`), and every root
+page mounts `AppBottomNav` with `goToNavTab()` (`app/router/bottom_nav_navigation.dart`)
+switching between them. No `StatefulShellRoute`: revisit only if tab-state
+preservation becomes a real requirement (see the phase-11 doc's "Not built").
+`navComingSoon` is retired from the bottom nav. Sign-out moved from the
+Discover app bar into `حسابي` as planned.
 
 ---
 

@@ -61,6 +61,7 @@ class Hotel {
     required this.roomTypeCount,
     required this.photoCount,
     this.entryRoom,
+    this.galleryUrls = const <String>[],
   });
 
   final HotelSummary summary;
@@ -78,8 +79,14 @@ class Hotel {
   /// no room offerings.
   final RoomTypeSummary? entryRoom;
 
+  /// Real gallery photo URLs (`gallery[].url` on the backend hotel resource),
+  /// in display order — backs the hero photo strip. Empty when the hotel has
+  /// no gallery media on file; never padded with stock photos.
+  final List<String> galleryUrls;
+
   String get id => summary.id;
   LocalizedText get name => summary.name;
+  String? get coverUrl => summary.coverUrl;
 
   @override
   bool operator ==(Object other) =>
@@ -90,7 +97,8 @@ class Hotel {
       other.reviewScores == reviewScores &&
       other.roomTypeCount == roomTypeCount &&
       other.photoCount == photoCount &&
-      other.entryRoom == entryRoom;
+      other.entryRoom == entryRoom &&
+      listEquals(other.galleryUrls, galleryUrls);
 
   @override
   int get hashCode => Object.hash(
@@ -101,5 +109,6 @@ class Hotel {
         roomTypeCount,
         photoCount,
         entryRoom,
+        Object.hashAll(galleryUrls),
       );
 }

@@ -1,10 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hotel_guest_app/core/config/app_config.dart';
-import 'package:hotel_guest_app/core/config/app_environment.dart';
 import 'package:hotel_guest_app/core/errors/app_exception.dart';
-import 'package:hotel_guest_app/core/network/api_client.dart';
-import 'package:hotel_guest_app/core/security/in_memory_token_store.dart';
-import 'package:hotel_guest_app/features/digital_access/data/datasources/api_digital_access_data_source.dart';
 import 'package:hotel_guest_app/features/digital_access/data/datasources/dummy_digital_access_data_source.dart';
 import 'package:hotel_guest_app/features/digital_access/domain/entities/access_status.dart';
 
@@ -91,24 +86,7 @@ void main() {
     });
   });
 
-  group('ApiDigitalAccessDataSource', () {
-    final source = ApiDigitalAccessDataSource(
-      ApiClient(
-        config: const AppConfig(
-          environment: AppEnvironment.development,
-          apiBaseUrl: 'http://localhost',
-          apiVersion: 'v1',
-          useDummyData: false,
-        ),
-        tokenStore: InMemoryTokenStore(),
-      ),
-    );
-
-    test('both methods are documented not-implemented stubs', () {
-      expect(source.fetchGrant('1'),
-          throwsA(isA<NotImplementedInPhaseException>()));
-      expect(source.checkIn(fakeCheckInRequest()),
-          throwsA(isA<NotImplementedInPhaseException>()));
-    });
-  });
+  // `ApiDigitalAccessDataSource` is now a real implementation against the
+  // guest check-in/access endpoints — see
+  // test/features/digital_access/api_digital_access_data_source_test.dart.
 }

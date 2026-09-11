@@ -7,6 +7,7 @@ import type {
   IdentityVerificationStatus,
   NotificationDeliveryStatus,
   PaymentStatus,
+  ReviewStatus,
   ServiceOrderStatus,
 } from '~/types/api'
 
@@ -85,6 +86,12 @@ export const NOTIFICATION_STATUS_TONE: Record<NotificationDeliveryStatus, BadgeT
 export const INVOICE_STATUS_TONE: Record<string, BadgeTone> = {
   draft: 'neutral',
   issued: 'success',
+}
+
+export const REVIEW_STATUS_TONE: Record<ReviewStatus, BadgeTone> = {
+  pending: 'warning',
+  published: 'success',
+  rejected: 'destructive',
 }
 
 /** A pending-manual-review session is the only state a staff review acts on. */

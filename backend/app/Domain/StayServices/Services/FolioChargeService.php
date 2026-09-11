@@ -98,4 +98,78 @@ class FolioChargeService
 
         return $charge;
     }
+
+    /**
+     * Post (once) the incremental accommodation charge for one Extend Stay
+     * extension. `source_id` is the `reservation_extensions` row id (not the
+     * reservation id — see [FolioCharge::SOURCE_STAY_EXTENSION]), so a
+     * reservation extended twice gets two independent charges, each still
+     * idempotent under the `(source_type, source_id)` UNIQUE exactly like
+     * [postAccommodationCharge].
+     *
+     * $unitAmount / $totalAmount are decimal strings the caller has already
+     * computed from `room_types.base_price` — no pricing decision is made
+     * here.
+     *
+     * MUST be called from within the caller's DB transaction (the
+     * reservation row is already locked).
+     */
+    public function postStayExtensionCharge(
+        Reservation $reservation,
+        int $extensionId,
+        int $nightsAdded,
+        string $unitAmount,
+        string $totalAmount,
+        ?string $currency,
+        ?User $actor,
+    ): FolioCharge {
+        $existing = $this->charges->findBySourceForUpdate(
+            FolioCharge::SOURCE_STAY_EXTENSION,
+            $extensionId,
+        );
+
+        if ($existing !== null) {
+            return $existing;
+        }
+
+        try {
+            $charge = $this->charges->create([
+                'reservation_id' => $reservation->id,
+                'hotel_id' => $reservation->hotel_id,
+                'source_type' => FolioCharge::SOURCE_STAY_EXTENSION,
+                'source_id' => $extensionId,
+                'description' => "Stay extension +{$nightsAdded} night(s)",
+                'quantity' => $nightsAdded,
+                'unit_amount' => $unitAmount,
+                'total_amount' => $totalAmount,
+                'currency' => $currency,
+                'status' => FolioCharge::STATUS_POSTED,
+                'charged_at' => now(),
+                'created_by_user_id' => $actor?->id,
+            ]);
+        } catch (UniqueConstraintViolationException) {
+            // A concurrent replay posted it first — the UNIQUE constraint is
+            // authoritative. Re-read and return the winner (guaranteed to
+            // exist: the constraint only fires because that row is there).
+            return $this->charges->findBySource(FolioCharge::SOURCE_STAY_EXTENSION, $extensionId)
+                ?? throw new \RuntimeException('Stay extension folio charge disappeared after a unique-constraint conflict.');
+        }
+
+        $this->auditLogger->record(
+            $actor,
+            'folio_charge.created',
+            $charge,
+            after: array_filter([
+                'folio_charge_status' => $charge->status,
+                'source_type' => $charge->source_type,
+                'source_id' => $charge->source_id,
+                'total_amount' => $charge->total_amount,
+                'currency' => $charge->currency,
+                'charged_at' => $charge->charged_at?->toIso8601String(),
+            ], fn ($value) => $value !== null),
+            hotelId: $charge->hotel_id,
+        );
+
+        return $charge;
+    }
 }

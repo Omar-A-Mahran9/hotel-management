@@ -24,9 +24,27 @@ class HotelDiscoveryService
         private readonly RoomRepositoryInterface $rooms,
     ) {}
 
-    public function listHotels(?string $city, ?string $search, int $perPage = 15): LengthAwarePaginator
-    {
-        return $this->catalog->paginateActiveHotels($city, $search, min(max($perPage, 1), 50));
+    /**
+     * @param  array<int, string>  $facilities
+     */
+    public function listHotels(
+        ?string $city,
+        ?string $search,
+        int $perPage = 15,
+        string $sort = 'recommended',
+        ?float $minPrice = null,
+        ?float $maxPrice = null,
+        array $facilities = [],
+    ): LengthAwarePaginator {
+        return $this->catalog->paginateActiveHotels(
+            $city,
+            $search,
+            min(max($perPage, 1), 50),
+            $sort,
+            $minPrice,
+            $maxPrice,
+            $facilities,
+        );
     }
 
     /**

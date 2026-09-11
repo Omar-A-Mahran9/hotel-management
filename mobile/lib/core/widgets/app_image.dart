@@ -94,7 +94,7 @@ class AppImage extends StatelessWidget {
     this.fit = BoxFit.cover,
     this.borderRadius = AppRadius.allMd,
     this.fallbackIcon = AppIcons.hotel,
-  });
+  }) : url = null;
 
   AppImage.seeded({
     super.key,
@@ -105,9 +105,29 @@ class AppImage extends StatelessWidget {
     this.fit = BoxFit.cover,
     this.borderRadius = AppRadius.allMd,
     this.fallbackIcon = AppIcons.hotel,
-  }) : asset = AppImages.forSeed(seed, pool: pool);
+  })  : asset = AppImages.forSeed(seed, pool: pool),
+        url = null;
 
-  final String asset;
+  /// Renders a **real, per-entity image URL** returned by the backend (a
+  /// `logo_url` / `cover_url` / gallery `url`), never a local/Figma asset.
+  ///
+  /// `null`/empty [url] → the branded placeholder (no photograph). A
+  /// non-empty [url] is shown via `Image.network` with a loading placeholder
+  /// and, on any decode/network failure, the same branded placeholder — never
+  /// a fake local asset. This is the only constructor real-API screens
+  /// (hotel/room cards, hero, gallery) may use for per-entity imagery.
+  const AppImage.network({
+    super.key,
+    required this.url,
+    this.width,
+    this.height,
+    this.fit = BoxFit.cover,
+    this.borderRadius = AppRadius.allMd,
+    this.fallbackIcon = AppIcons.hotel,
+  }) : asset = null;
+
+  final String? asset;
+  final String? url;
   final double? width;
   final double? height;
   final BoxFit fit;
@@ -116,10 +136,38 @@ class AppImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String? networkUrl = url;
+    if (asset == null) {
+      if (networkUrl == null || networkUrl.isEmpty) {
+        return ClipRRect(
+          borderRadius: borderRadius,
+          child: _Fallback(width: width, height: height, icon: fallbackIcon),
+        );
+      }
+      return ClipRRect(
+        borderRadius: borderRadius,
+        child: Image.network(
+          networkUrl,
+          width: width,
+          height: height,
+          fit: fit,
+          loadingBuilder: (
+            BuildContext context,
+            Widget child,
+            ImageChunkEvent? progress,
+          ) {
+            if (progress == null) return child;
+            return _Skeleton(width: width, height: height);
+          },
+          errorBuilder: (BuildContext context, Object error, StackTrace? stack) =>
+              _Fallback(width: width, height: height, icon: fallbackIcon),
+        ),
+      );
+    }
     return ClipRRect(
       borderRadius: borderRadius,
       child: Image.asset(
-        asset,
+        asset!,
         width: width,
         height: height,
         fit: fit,
@@ -127,6 +175,21 @@ class AppImage extends StatelessWidget {
             _Fallback(width: width, height: height, icon: fallbackIcon),
       ),
     );
+  }
+}
+
+/// A neutral shimmer-less loading box shown while a network image decodes —
+/// the Figma-appropriate placeholder for imagery, not a full-screen spinner.
+class _Skeleton extends StatelessWidget {
+  const _Skeleton({this.width, this.height});
+
+  final double? width;
+  final double? height;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppColorTokens c = context.colors;
+    return Container(width: width, height: height, color: c.bgSubtle);
   }
 }
 

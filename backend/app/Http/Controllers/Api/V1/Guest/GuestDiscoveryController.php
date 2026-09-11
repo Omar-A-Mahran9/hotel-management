@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Api\V1\Guest;
 use App\Domain\Discovery\Services\HotelDiscoveryService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Guest\AvailabilityQueryRequest;
+use App\Http\Requests\Api\V1\Guest\HotelListQueryRequest;
 use App\Http\Resources\V1\PublicHotelResource;
 use App\Http\Resources\V1\RoomAvailabilityResource;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 /**
  * Slice 1 — anonymous guest discovery. No auth, no hotel scope (there is no
@@ -21,12 +21,16 @@ class GuestDiscoveryController extends Controller
 {
     public function __construct(private readonly HotelDiscoveryService $discovery) {}
 
-    public function hotels(Request $request): JsonResponse
+    public function hotels(HotelListQueryRequest $request): JsonResponse
     {
         $hotels = $this->discovery->listHotels(
-            city: $request->query('city'),
-            search: $request->query('q'),
-            perPage: (int) $request->query('per_page', 15),
+            city: $request->validated('city'),
+            search: $request->validated('q'),
+            perPage: (int) ($request->validated('per_page') ?? 15),
+            sort: $request->sort(),
+            minPrice: $request->minPrice(),
+            maxPrice: $request->maxPrice(),
+            facilities: $request->facilities(),
         );
 
         return $this->success(PublicHotelResource::collection($hotels));

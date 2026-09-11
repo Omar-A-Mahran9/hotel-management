@@ -53,5 +53,12 @@ abstract interface class DiscoveryRepository {
 
   /// The signed-in guest's next confirmed stay, or `null` — the Home
   /// `إقامتك القادمة` card.
+  ///
+  /// Superseded for real-API mode: discovery has no reservation access, so
+  /// [DiscoverController] composes this itself from `ReservationRepository`
+  /// (list → detail) + this repository's [hotel] instead of calling this
+  /// method. Kept for the dummy source's design-only fixture; a real
+  /// implementation should not be added here — see
+  /// `DiscoverController._resolveUpcomingStay`.
   Future<UpcomingStay?> upcomingStay();
 }

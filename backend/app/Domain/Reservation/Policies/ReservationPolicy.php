@@ -70,4 +70,16 @@ class ReservationPolicy
         return $user->hasPermission('reservations.manage')
             && $this->hotelAccess->canAccessHotel($user, $reservation->hotel_id);
     }
+
+    /**
+     * Extend Stay is a Reservation mutation like a status transition, so it
+     * takes the same permission + hotel-scope shape as transition().
+     * Eligibility (checked_in/in_stay only) and availability are business
+     * checks owned by ReservationExtensionService, not authorization.
+     */
+    public function extend(User $user, Reservation $reservation): bool
+    {
+        return $user->hasPermission('reservations.manage')
+            && $this->hotelAccess->canAccessHotel($user, $reservation->hotel_id);
+    }
 }

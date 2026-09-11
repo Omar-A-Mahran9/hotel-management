@@ -55,15 +55,7 @@ void main() {
     expect(_location(c), '/discover/hotel/oasis');
   });
 
-  testWidgets('signing out from discover drops to guest discover, not welcome',
-      (WidgetTester tester) async {
-    final ProviderContainer c =
-        await pumpApp(tester, bootSession: completeSession());
-    final en = await tester.l10n();
-
-    await tester.tap(find.byTooltip(en.authSignOut));
-    await tester.pumpAndSettle();
-
-    expect(_location(c), AppRoutes.discover);
-  });
+  // Sign-out moved from Discover's app bar to the Account tab in Mobile
+  // Phase 11 (mobile/docs/design-system.md) — its redirect behavior is
+  // covered by auth_routing_test.dart now.
 }

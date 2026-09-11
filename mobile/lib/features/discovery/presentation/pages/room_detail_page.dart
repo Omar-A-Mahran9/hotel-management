@@ -173,7 +173,10 @@ class _Body extends StatelessWidget {
               clipBehavior: Clip.none,
               children: <Widget>[
                 HotelThumbnail(
-                  seed: type.id,
+                  // Room types carry no media field in the guest API yet
+                  // (`PublicRoomTypeResource`) — the placeholder is the
+                  // honest state, never a stock/seeded photo.
+                  imageUrl: null,
                   width: double.infinity,
                   height: 280,
                   borderRadius: BorderRadius.zero,
@@ -198,7 +201,12 @@ class _Body extends StatelessWidget {
                 PositionedDirectional(
                   start: AppSpacing.pageGutter,
                   bottom: -32,
-                  child: HeroPhotoStrip(seed: type.id, totalPhotos: 12),
+                  // No real room-photo data exists server-side — 0 rather
+                  // than a fabricated count.
+                  child: const HeroPhotoStrip(
+                    galleryUrls: <String>[],
+                    totalPhotos: 0,
+                  ),
                 ),
               ],
             ),

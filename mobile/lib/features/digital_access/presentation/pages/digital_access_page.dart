@@ -14,6 +14,7 @@ import '../../../../core/widgets/message_view.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/result_view.dart';
 import '../../../../core/widgets/secondary_button.dart';
+import '../../../reservation/presentation/state/reservation_detail_provider.dart';
 import '../../domain/entities/access_grant.dart';
 import '../../domain/entities/access_status.dart';
 import '../../domain/entities/check_in.dart';
@@ -89,6 +90,10 @@ class _Body extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
     final ThemeData theme = Theme.of(context);
+    final String? roomNumber = ref
+        .watch(reservationDetailProvider(reservationId))
+        .valueOrNull
+        ?.roomNumber;
 
     void backToReservation() => context.goNamed(
       AppRoutes.reservationDetailName,
@@ -129,7 +134,7 @@ class _Body extends ConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: AppSpacing.md),
-                AccessCredentialCard(grant: grant),
+                AccessCredentialCard(grant: grant, roomNumber: roomNumber),
                 const SizedBox(height: AppSpacing.md),
                 InfoBanner(
                   tone: InfoBannerTone.info,

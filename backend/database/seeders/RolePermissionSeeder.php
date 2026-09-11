@@ -58,6 +58,9 @@ class RolePermissionSeeder extends Seeder
             'loyalty.manage' => ['Manage loyalty', 'إدارة الولاء', 'Accrue and redeem loyalty points against a reservation within authorized scope', 'استحقاق واسترداد نقاط الولاء مقابل حجز ضمن النطاق المصرح به'],
             'loyalty.rules.manage' => ['Manage loyalty rules', 'إدارة قواعد الولاء', 'Configure a hotel group loyalty rule', 'ضبط قاعدة الولاء الخاصة بمجموعة الفنادق'],
             'notifications.view' => ['View notifications', 'عرض الإشعارات', 'View and mark read a reservation notification feed within authorized scope', 'عرض قائمة إشعارات الحجز وتحديدها كمقروءة ضمن النطاق المصرح به'],
+            'reviews.view' => ['View reviews', 'عرض التقييمات', 'View a hotel\'s guest reviews, including pending/rejected, within authorized scope', 'عرض تقييمات نزلاء الفندق، بما في ذلك المعلّقة/المرفوضة، ضمن النطاق المصرح به'],
+            'reviews.moderate' => ['Moderate reviews', 'مراجعة التقييمات', 'Approve or reject a submitted guest review within authorized scope', 'الموافقة على تقييم نزيل مُرسل أو رفضه ضمن النطاق المصرح به'],
+            'guests.view' => ['View guests', 'عرض النزلاء', 'View the staff-facing guest directory and a guest\'s reservation history', 'عرض دليل النزلاء وسجل حجوزات النزيل'],
         ];
 
         // A single bulk upsert instead of one firstOrCreate() round trip per
@@ -98,7 +101,7 @@ class RolePermissionSeeder extends Seeder
                 'name_ar' => 'مدير الفندق',
                 'description_en' => 'Manages one or more assigned hotels.',
                 'description_ar' => 'يدير فندقًا واحدًا أو أكثر من الفنادق المسندة إليه.',
-                'permissions' => ['hotels.view', 'locations.view', 'inventory.view', 'inventory.manage', 'reservations.view', 'reservations.manage', 'payments.manage', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke', 'services.view', 'services.manage', 'service-orders.view', 'service-orders.manage', 'folio.view', 'checkout.perform', 'invoice.view', 'loyalty.view', 'loyalty.manage', 'notifications.view'],
+                'permissions' => ['hotels.view', 'locations.view', 'inventory.view', 'inventory.manage', 'reservations.view', 'reservations.manage', 'payments.manage', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke', 'services.view', 'services.manage', 'service-orders.view', 'service-orders.manage', 'folio.view', 'checkout.perform', 'invoice.view', 'loyalty.view', 'loyalty.manage', 'notifications.view', 'reviews.view', 'reviews.moderate', 'guests.view'],
             ],
             Role::RECEPTION => [
                 'name_en' => 'Reception',
@@ -120,8 +123,12 @@ class RolePermissionSeeder extends Seeder
                 // effect on a booking — §32 "no financial edit"). Phase 11:
                 // Reception may read a reservation's notification feed and
                 // clear its unread markers (operational, R7 — no financial
-                // effect).
-                'permissions' => ['hotels.view', 'locations.view', 'inventory.view', 'reservations.view', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke', 'services.view', 'service-orders.view', 'service-orders.manage', 'folio.view', 'checkout.perform', 'invoice.view', 'loyalty.view', 'notifications.view'],
+                // effect). Reception may view a hotel's reviews (guests ask
+                // at the desk) but NOT moderate (reputational judgment call,
+                // reserved for Group Owner / Hotel Manager — same split as
+                // loyalty.manage). Reception may look up the guest directory
+                // (front-desk operational need — read only, guests.view).
+                'permissions' => ['hotels.view', 'locations.view', 'inventory.view', 'reservations.view', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke', 'services.view', 'service-orders.view', 'service-orders.manage', 'folio.view', 'checkout.perform', 'invoice.view', 'loyalty.view', 'notifications.view', 'reviews.view', 'guests.view'],
             ],
             Role::GUEST => [
                 'name_en' => 'Guest',

@@ -1,10 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hotel_guest_app/core/config/app_config.dart';
-import 'package:hotel_guest_app/core/config/app_environment.dart';
 import 'package:hotel_guest_app/core/errors/app_exception.dart';
-import 'package:hotel_guest_app/core/network/api_client.dart';
-import 'package:hotel_guest_app/core/security/in_memory_token_store.dart';
-import 'package:hotel_guest_app/features/checkout/data/datasources/api_checkout_data_source.dart';
 import 'package:hotel_guest_app/features/checkout/data/datasources/dummy_checkout_data_source.dart';
 import 'package:hotel_guest_app/features/checkout/domain/entities/checkout.dart';
 import 'package:hotel_guest_app/features/checkout/domain/entities/checkout_status.dart';
@@ -129,29 +124,7 @@ void main() {
     });
   });
 
-  group('ApiCheckoutDataSource', () {
-    final source = ApiCheckoutDataSource(
-      ApiClient(
-        config: const AppConfig(
-          environment: AppEnvironment.development,
-          apiBaseUrl: 'http://localhost',
-          apiVersion: 'v1',
-          useDummyData: false,
-        ),
-        tokenStore: InMemoryTokenStore(),
-      ),
-    );
-
-    test('every method is a documented not-implemented stub', () {
-      expect(source.fetchFolio(fakeFolioContext()),
-          throwsA(isA<NotImplementedInPhaseException>()));
-      expect(
-        source.performCheckout(
-            const CheckoutRequest(reservationId: '1'), fakeFolioContext()),
-        throwsA(isA<NotImplementedInPhaseException>()),
-      );
-      expect(source.fetchInvoice('1'),
-          throwsA(isA<NotImplementedInPhaseException>()));
-    });
-  });
+  // `ApiCheckoutDataSource` is now a real implementation against the guest
+  // checkout/invoice endpoints — see
+  // test/features/checkout/api_checkout_data_source_test.dart.
 }

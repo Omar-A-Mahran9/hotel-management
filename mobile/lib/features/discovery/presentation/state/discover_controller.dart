@@ -1,14 +1,32 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/di/core_providers.dart';
 import '../../../../core/errors/error_mapper.dart';
 import '../../../../core/presentation/ui_state.dart';
 import '../../../authentication/presentation/state/auth_controller.dart';
 import '../../../authentication/presentation/state/auth_state.dart';
+import '../../../reservation/domain/entities/reservation.dart';
+import '../../../reservation/domain/entities/reservation_status.dart';
+import '../../../reservation/presentation/state/reservation_providers.dart';
 import '../../domain/entities/available_room.dart';
 import '../../domain/entities/hotel_summary.dart';
+import '../../domain/entities/money.dart';
 import '../../domain/entities/upcoming_stay.dart';
+import '../../domain/repositories/discovery_repository.dart';
 import 'discovery_providers.dart';
+
+/// Reservation states still "ahead of or during" the stay — the candidate
+/// pool for the Home `إقامتك القادمة` card. Terminal states (checked out,
+/// invoiced, cancelled) are excluded, mirroring the backend state machine
+/// (mobile/docs/architecture.md §6 — mirror Laravel, never invent a state).
+const Set<ReservationStatus> _upcomingStayStatuses = <ReservationStatus>{
+  ReservationStatus.pending,
+  ReservationStatus.depositHeld,
+  ReservationStatus.verified,
+  ReservationStatus.checkedIn,
+  ReservationStatus.inStay,
+};
 
 /// Everything the Home screen (`HOME_Default` / `HOME_if One hotel`) needs in one
 /// value: the greeting name, the guest's upcoming stay, and either the group
@@ -76,7 +94,50 @@ class DiscoverController extends AutoDisposeAsyncNotifier<DiscoverView> {
       isSingleHotel: single,
       soleHotelRooms:
           single ? await repo.hotelRooms(hotels.first.id) : const <AvailableRoom>[],
-      upcomingStay: _isSignedIn(auth) ? await repo.upcomingStay() : null,
+      upcomingStay: _isSignedIn(auth) ? await _resolveUpcomingStay(ref, repo) : null,
+    );
+  }
+
+  /// The guest's next confirmed stay for the Home `إقامتك القادمة` card.
+  ///
+  /// Dummy mode keeps its existing design-only fixture
+  /// (`DiscoveryRepository.upcomingStay`) — offline/demo mode is unaffected.
+  /// Real-API mode composes it itself, since discovery has no reservation
+  /// access by design (see the doc-comment on `DiscoveryRepository
+  /// .upcomingStay`): read the guest's own reservations, pick the soonest one
+  /// still ahead of/during its stay, then fetch its full detail (for the real
+  /// hotel/room names) and the hotel's own city name. `null` when there is
+  /// none — the Home card section simply doesn't render, never a fabricated
+  /// stand-in.
+  Future<UpcomingStay?> _resolveUpcomingStay(Ref ref, DiscoveryRepository repo) async {
+    if (ref.watch(appConfigProvider).useDummyData) {
+      return repo.upcomingStay();
+    }
+
+    final List<Reservation> reservations =
+        await ref.watch(reservationRepositoryProvider).list();
+    final List<Reservation> candidates = reservations
+        .where((Reservation r) => _upcomingStayStatuses.contains(r.status))
+        .toList()
+      ..sort((Reservation a, Reservation b) =>
+          a.stay.checkIn.compareTo(b.stay.checkIn));
+    if (candidates.isEmpty) return null;
+
+    final Reservation full =
+        await ref.watch(reservationRepositoryProvider).getById(candidates.first.id);
+    final hotel = await ref.watch(discoveryRepositoryProvider).hotel(full.hotelId);
+
+    final int nights = full.nights > 0 ? full.nights : 1;
+    return UpcomingStay(
+      reservationId: full.id,
+      roomName: full.roomName,
+      hotelName: full.hotelName,
+      cityName: hotel.summary.cityName,
+      nightlyRate: Money(
+        amount: (full.priceSnapshot.amount / nights).round(),
+        currency: full.priceSnapshot.currency,
+      ),
+      isAvailable: !full.status.isCancelled,
     );
   }
 

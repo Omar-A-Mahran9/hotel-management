@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/app_routes.dart';
+import '../../../../app/router/bottom_nav_navigation.dart';
 import '../../../../core/localization/l10n.dart';
 import '../../../../core/presentation/ui_state.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -88,13 +89,6 @@ class DiscoverPage extends ConsumerWidget {
             tooltip: l10n.discoverNotificationsTooltip,
             onPressed: () {},
           ),
-          if (isSignedIn)
-            IconButton(
-              icon: const Icon(AppIcons.checkout),
-              tooltip: l10n.authSignOut,
-              onPressed: () =>
-                  ref.read(authControllerProvider.notifier).signOut(),
-            ),
           const SizedBox(width: AppSpacing.xs),
         ],
       ),
@@ -152,12 +146,7 @@ class DiscoverPage extends ConsumerWidget {
       ),
       bottomNavigationBar: AppBottomNav(
         current: AppNavTab.home,
-        onSelected: (AppNavTab tab) {
-          if (tab == AppNavTab.home) return;
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(SnackBar(content: Text(l10n.navComingSoon)));
-        },
+        onSelected: (AppNavTab tab) => goToNavTab(context, tab),
       ),
     );
   }

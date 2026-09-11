@@ -11,6 +11,10 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *
  * The authoritative guest shape for the mobile app. Field name is `name`
  * (not `full_name`) — consistent with UserResource / ReservationResource.
+ *
+ * `reservations_count` only appears when the caller eager-loaded it via
+ * `withCount('reservations')` (the staff directory listing) — the guest
+ * app's own profile view never loads that count.
  */
 class GuestResource extends JsonResource
 {
@@ -24,6 +28,7 @@ class GuestResource extends JsonResource
             'phone_verified_at' => $this->phone_verified_at,
             'profile_completed_at' => $this->profile_completed_at,
             'profile_complete' => $this->isProfileComplete(),
+            'reservations_count' => $this->whenCounted('reservations'),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

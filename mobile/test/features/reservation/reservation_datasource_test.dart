@@ -1,10 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hotel_guest_app/core/config/app_config.dart';
-import 'package:hotel_guest_app/core/config/app_environment.dart';
 import 'package:hotel_guest_app/core/errors/app_exception.dart';
-import 'package:hotel_guest_app/core/network/api_client.dart';
-import 'package:hotel_guest_app/core/security/in_memory_token_store.dart';
-import 'package:hotel_guest_app/features/reservation/data/datasources/api_reservation_data_source.dart';
 import 'package:hotel_guest_app/features/reservation/data/datasources/dummy_reservation_data_source.dart';
 import 'package:hotel_guest_app/features/reservation/domain/entities/reservation_status.dart';
 
@@ -70,28 +65,7 @@ void main() {
     });
   });
 
-  group('ApiReservationDataSource', () {
-    final ApiReservationDataSource source = ApiReservationDataSource(
-      ApiClient(
-        config: const AppConfig(
-          environment: AppEnvironment.development,
-          apiBaseUrl: 'http://localhost',
-          apiVersion: 'v1',
-          useDummyData: false,
-        ),
-        tokenStore: InMemoryTokenStore(),
-      ),
-    );
-
-    test('both methods are documented not-implemented stubs', () {
-      expect(
-        source.create(fakeRequest()),
-        throwsA(isA<NotImplementedInPhaseException>()),
-      );
-      expect(
-        source.fetchById('1'),
-        throwsA(isA<NotImplementedInPhaseException>()),
-      );
-    });
-  });
+  // `ApiReservationDataSource` is now a real implementation against the
+  // guest reservation endpoints — see
+  // test/features/reservation/api_reservation_data_source_test.dart.
 }

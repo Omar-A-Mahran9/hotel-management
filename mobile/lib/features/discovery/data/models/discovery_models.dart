@@ -73,6 +73,7 @@ class HotelSummaryModel {
     required this.reviewCount,
     required this.nightlyRateFrom,
     required this.isAvailable,
+    this.coverUrl,
   });
 
   factory HotelSummaryModel.fromJson(Json json) => HotelSummaryModel(
@@ -85,6 +86,7 @@ class HotelSummaryModel {
         reviewCount: (json['review_count'] as num?)?.toInt(),
         nightlyRateFrom: _money(json['nightly_rate_from']),
         isAvailable: (json['is_available'] as bool?) ?? true,
+        coverUrl: json['cover_url'] as String?,
       );
 
   final String id;
@@ -96,6 +98,7 @@ class HotelSummaryModel {
   final int? reviewCount;
   final Money nightlyRateFrom;
   final bool isAvailable;
+  final String? coverUrl;
 
   HotelSummary toEntity() => HotelSummary(
         id: id,
@@ -107,6 +110,7 @@ class HotelSummaryModel {
         reviewCount: reviewCount,
         nightlyRateFrom: nightlyRateFrom,
         isAvailable: isAvailable,
+        coverUrl: coverUrl,
       );
 }
 
@@ -119,6 +123,7 @@ class HotelModel {
     required this.roomTypeCount,
     required this.photoCount,
     this.entryRoom,
+    this.galleryUrls = const <String>[],
   });
 
   factory HotelModel.fromJson(Json json) => HotelModel(
@@ -143,6 +148,7 @@ class HotelModel {
   final int roomTypeCount;
   final int photoCount;
   final RoomTypeSummaryModel? entryRoom;
+  final List<String> galleryUrls;
 
   Hotel toEntity() => Hotel(
         summary: summary.toEntity(),
@@ -152,6 +158,7 @@ class HotelModel {
         roomTypeCount: roomTypeCount,
         photoCount: photoCount,
         entryRoom: entryRoom?.toEntity(),
+        galleryUrls: galleryUrls,
       );
 
   static RoomTypeSummaryModel? _entryRoom(Object? value) {

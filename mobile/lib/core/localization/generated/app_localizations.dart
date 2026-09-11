@@ -848,6 +848,18 @@ abstract class AppLocalizations {
   /// **'Price range'**
   String get filterPriceLabel;
 
+  /// No description provided for @filterFacilitiesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Facilities'**
+  String get filterFacilitiesLabel;
+
+  /// No description provided for @filterRatingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get filterRatingLabel;
+
   /// No description provided for @filterApply.
   ///
   /// In en, this message translates to:
@@ -1634,71 +1646,11 @@ abstract class AppLocalizations {
   /// **'We couldn\'t confirm your reservation'**
   String get reservationCreateFailedTitle;
 
-  /// No description provided for @reservationDetailTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Reservation'**
-  String get reservationDetailTitle;
-
-  /// No description provided for @reservationSuccessTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Your reservation is confirmed'**
-  String get reservationSuccessTitle;
-
-  /// No description provided for @reservationSuccessBody.
-  ///
-  /// In en, this message translates to:
-  /// **'We\'ve saved your reservation. Keep your confirmation code handy.'**
-  String get reservationSuccessBody;
-
-  /// No description provided for @reservationReferenceLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Confirmation code'**
-  String get reservationReferenceLabel;
-
   /// No description provided for @reservationStatusFieldLabel.
   ///
   /// In en, this message translates to:
   /// **'Status'**
   String get reservationStatusFieldLabel;
-
-  /// No description provided for @reservationBookedOnLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Booked on'**
-  String get reservationBookedOnLabel;
-
-  /// No description provided for @reservationPendingNote.
-  ///
-  /// In en, this message translates to:
-  /// **'This reservation is pending and not yet secured.'**
-  String get reservationPendingNote;
-
-  /// No description provided for @reservationDone.
-  ///
-  /// In en, this message translates to:
-  /// **'Done'**
-  String get reservationDone;
-
-  /// No description provided for @reservationViewDetails.
-  ///
-  /// In en, this message translates to:
-  /// **'View reservation'**
-  String get reservationViewDetails;
-
-  /// No description provided for @reservationNotFoundTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Reservation not found'**
-  String get reservationNotFoundTitle;
-
-  /// No description provided for @reservationNotFoundBody.
-  ///
-  /// In en, this message translates to:
-  /// **'We couldn\'t find that reservation.'**
-  String get reservationNotFoundBody;
 
   /// No description provided for @reservationStatusPending.
   ///
@@ -1765,18 +1717,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancelled'**
   String get reservationStatusCancelled;
-
-  /// No description provided for @reservationPayCta.
-  ///
-  /// In en, this message translates to:
-  /// **'Continue to payment'**
-  String get reservationPayCta;
-
-  /// No description provided for @reservationVerifyIdentityCta.
-  ///
-  /// In en, this message translates to:
-  /// **'Verify your identity'**
-  String get reservationVerifyIdentityCta;
 
   /// A currency amount, e.g. 'SAR 900'.
   ///
@@ -2287,18 +2227,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Check in'**
   String get reservationCheckInCta;
-
-  /// No description provided for @reservationServicesCta.
-  ///
-  /// In en, this message translates to:
-  /// **'Stay services'**
-  String get reservationServicesCta;
-
-  /// No description provided for @reservationCheckoutCta.
-  ///
-  /// In en, this message translates to:
-  /// **'Check out'**
-  String get reservationCheckoutCta;
 
   /// No description provided for @checkInTitle.
   ///
@@ -3493,6 +3421,528 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not published'**
   String get reviewStatusRejected;
+
+  /// No description provided for @bookingsPillCurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get bookingsPillCurrent;
+
+  /// No description provided for @bookingsPillUpcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get bookingsPillUpcoming;
+
+  /// No description provided for @bookingsPillPast.
+  ///
+  /// In en, this message translates to:
+  /// **'Past'**
+  String get bookingsPillPast;
+
+  /// No description provided for @bookingsPastTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Past stays'**
+  String get bookingsPastTitle;
+
+  /// No description provided for @bookingsSectionOngoingStay.
+  ///
+  /// In en, this message translates to:
+  /// **'Ongoing stay'**
+  String get bookingsSectionOngoingStay;
+
+  /// No description provided for @bookingsSectionUpcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming bookings'**
+  String get bookingsSectionUpcoming;
+
+  /// No description provided for @bookingsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No bookings yet'**
+  String get bookingsEmptyTitle;
+
+  /// No description provided for @bookingsEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your bookings will appear here once you make one.'**
+  String get bookingsEmptyBody;
+
+  /// No description provided for @bookingStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting payment'**
+  String get bookingStatusPending;
+
+  /// No description provided for @bookingStatusConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get bookingStatusConfirmed;
+
+  /// No description provided for @bookingStatusCheckedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Checked in'**
+  String get bookingStatusCheckedIn;
+
+  /// No description provided for @bookingStatusCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get bookingStatusCompleted;
+
+  /// No description provided for @bookingStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get bookingStatusCancelled;
+
+  /// No description provided for @bookingDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking details'**
+  String get bookingDetailTitle;
+
+  /// No description provided for @bookingPaymentStatusHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment status'**
+  String get bookingPaymentStatusHeading;
+
+  /// No description provided for @bookingCancellationPolicyHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation policy'**
+  String get bookingCancellationPolicyHeading;
+
+  /// No description provided for @bookingCancellationPolicyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Free cancellation up to 24 hours before arrival. After that, the deposit is deducted.'**
+  String get bookingCancellationPolicyBody;
+
+  /// No description provided for @bookingPendingRowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting payment'**
+  String get bookingPendingRowTitle;
+
+  /// No description provided for @bookingPendingRowSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not completed'**
+  String get bookingPendingRowSubtitle;
+
+  /// No description provided for @bookingAutoCancelRowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The booking auto-cancels in 30 minutes'**
+  String get bookingAutoCancelRowTitle;
+
+  /// No description provided for @bookingRoomHeldRowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The room is held temporarily'**
+  String get bookingRoomHeldRowTitle;
+
+  /// No description provided for @bookingRoomHeldRowSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not confirmed'**
+  String get bookingRoomHeldRowSubtitle;
+
+  /// No description provided for @bookingDepositHeldRowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The deposit has been held'**
+  String get bookingDepositHeldRowTitle;
+
+  /// No description provided for @bookingDepositHeldRowSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No charge has been made yet'**
+  String get bookingDepositHeldRowSubtitle;
+
+  /// No description provided for @bookingDeductedAtCheckinRowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Deducted at check-in'**
+  String get bookingDeductedAtCheckinRowTitle;
+
+  /// No description provided for @bookingExtrasChargedOnceRowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra charges are collected on departure'**
+  String get bookingExtrasChargedOnceRowTitle;
+
+  /// No description provided for @bookingExtrasChargedOnceRowSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'As a single payment'**
+  String get bookingExtrasChargedOnceRowSubtitle;
+
+  /// No description provided for @bookingIdentityVerifiedRowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your identity has been verified'**
+  String get bookingIdentityVerifiedRowTitle;
+
+  /// No description provided for @bookingIdentityVerifiedRowSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete'**
+  String get bookingIdentityVerifiedRowSubtitle;
+
+  /// No description provided for @bookingCheckInAvailableRowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in available from'**
+  String get bookingCheckInAvailableRowTitle;
+
+  /// No description provided for @bookingDepositAmountHeldRowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Deposit amount held'**
+  String get bookingDepositAmountHeldRowTitle;
+
+  /// No description provided for @bookingOngoingStayRowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ongoing stay'**
+  String get bookingOngoingStayRowTitle;
+
+  /// No description provided for @bookingRoomLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Room {number}'**
+  String bookingRoomLabel(String number);
+
+  /// No description provided for @bookingDepartureRowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Departure'**
+  String get bookingDepartureRowTitle;
+
+  /// No description provided for @bookingExtraChargesRowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra charges'**
+  String get bookingExtraChargesRowTitle;
+
+  /// No description provided for @bookingCancelledRowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking cancelled'**
+  String get bookingCancelledRowTitle;
+
+  /// No description provided for @bookingDepositRefundRowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Deposit refund'**
+  String get bookingDepositRefundRowTitle;
+
+  /// No description provided for @bookingDepositRefundRowSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Within 3 business days'**
+  String get bookingDepositRefundRowSubtitle;
+
+  /// No description provided for @bookingCancellationFeeRowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation fee'**
+  String get bookingCancellationFeeRowTitle;
+
+  /// No description provided for @bookingCancellationFeeNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get bookingCancellationFeeNone;
+
+  /// No description provided for @bookingStayEndedRowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay ended'**
+  String get bookingStayEndedRowTitle;
+
+  /// No description provided for @bookingTotalPaidRowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Total paid'**
+  String get bookingTotalPaidRowTitle;
+
+  /// No description provided for @bookingInvoiceReadyRowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'E-invoice'**
+  String get bookingInvoiceReadyRowTitle;
+
+  /// No description provided for @bookingInvoiceReadyRowSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready'**
+  String get bookingInvoiceReadyRowSubtitle;
+
+  /// No description provided for @bookingCtaContinuePayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue payment'**
+  String get bookingCtaContinuePayment;
+
+  /// No description provided for @bookingCtaCancelReservation.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel booking'**
+  String get bookingCtaCancelReservation;
+
+  /// No description provided for @bookingCtaVerifyIdentity.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify identity'**
+  String get bookingCtaVerifyIdentity;
+
+  /// No description provided for @bookingCtaDigitalCheckIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Digital check-in'**
+  String get bookingCtaDigitalCheckIn;
+
+  /// No description provided for @bookingCtaMyCurrentStay.
+  ///
+  /// In en, this message translates to:
+  /// **'My current stay'**
+  String get bookingCtaMyCurrentStay;
+
+  /// No description provided for @bookingCtaShowAccessCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Show access code'**
+  String get bookingCtaShowAccessCode;
+
+  /// No description provided for @bookingCtaBookAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Book again'**
+  String get bookingCtaBookAgain;
+
+  /// No description provided for @bookingCtaViewInvoice.
+  ///
+  /// In en, this message translates to:
+  /// **'View invoice'**
+  String get bookingCtaViewInvoice;
+
+  /// No description provided for @bookingCancelConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel this booking?'**
+  String get bookingCancelConfirmTitle;
+
+  /// No description provided for @bookingCancelConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This can\'t be undone. Any deposit will be refunded per the cancellation policy.'**
+  String get bookingCancelConfirmBody;
+
+  /// No description provided for @bookingCancelKeepCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep booking'**
+  String get bookingCancelKeepCta;
+
+  /// No description provided for @bookingCancelConfirmCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel booking'**
+  String get bookingCancelConfirmCta;
+
+  /// No description provided for @bookingNotFoundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking not found'**
+  String get bookingNotFoundTitle;
+
+  /// No description provided for @accountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get accountTitle;
+
+  /// No description provided for @accountLoyaltyProgramTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Loyalty program'**
+  String get accountLoyaltyProgramTitle;
+
+  /// No description provided for @accountLoyaltyPointsSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'points'**
+  String get accountLoyaltyPointsSuffix;
+
+  /// No description provided for @accountLoyaltyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Your points build up across every hotel in the group and can be redeemed at any branch.'**
+  String get accountLoyaltyDescription;
+
+  /// No description provided for @accountLoyaltyPerNightLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Per night'**
+  String get accountLoyaltyPerNightLabel;
+
+  /// No description provided for @accountTrustedGuestTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trusted guest'**
+  String get accountTrustedGuestTitle;
+
+  /// No description provided for @accountTrustedGuestBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You won\'t be asked to re-upload your ID at any other hotel in the group.'**
+  String get accountTrustedGuestBody;
+
+  /// No description provided for @accountPreviousStaysLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous stays'**
+  String get accountPreviousStaysLabel;
+
+  /// No description provided for @accountPreferencesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'My preferences'**
+  String get accountPreferencesLabel;
+
+  /// No description provided for @accountPreferencesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set yet'**
+  String get accountPreferencesEmpty;
+
+  /// No description provided for @accountPrivacyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy & data'**
+  String get accountPrivacyLabel;
+
+  /// No description provided for @accountHelpSupportLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Help & support'**
+  String get accountHelpSupportLabel;
+
+  /// No description provided for @stayHomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your current stay'**
+  String get stayHomeTitle;
+
+  /// No description provided for @stayHomeRoomLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your room'**
+  String get stayHomeRoomLabel;
+
+  /// No description provided for @stayHomeServicesHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Services'**
+  String get stayHomeServicesHeading;
+
+  /// No description provided for @stayHomeRoomService.
+  ///
+  /// In en, this message translates to:
+  /// **'Room service'**
+  String get stayHomeRoomService;
+
+  /// No description provided for @stayHomeRoomCleaning.
+  ///
+  /// In en, this message translates to:
+  /// **'Room cleaning'**
+  String get stayHomeRoomCleaning;
+
+  /// No description provided for @stayHomeExtendStay.
+  ///
+  /// In en, this message translates to:
+  /// **'Extend stay'**
+  String get stayHomeExtendStay;
+
+  /// No description provided for @stayHomeReportProblem.
+  ///
+  /// In en, this message translates to:
+  /// **'Report a problem'**
+  String get stayHomeReportProblem;
+
+  /// No description provided for @stayHomeExtraCharges.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra charges'**
+  String get stayHomeExtraCharges;
+
+  /// No description provided for @stayHomeExtraChargesNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Deducted automatically on departure'**
+  String get stayHomeExtraChargesNote;
+
+  /// No description provided for @stayHomeNoActiveStayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No active stay'**
+  String get stayHomeNoActiveStayTitle;
+
+  /// No description provided for @stayHomeNoActiveStayBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Once you check in, your room, key and services will show up here.'**
+  String get stayHomeNoActiveStayBody;
+
+  /// No description provided for @extendStayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Extend stay'**
+  String get extendStayTitle;
+
+  /// No description provided for @extendStayNewCheckOutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New checkout date'**
+  String get extendStayNewCheckOutLabel;
+
+  /// No description provided for @extendStayNightsAddedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Nights added'**
+  String get extendStayNightsAddedLabel;
+
+  /// No description provided for @extendStayCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm extension'**
+  String get extendStayCta;
+
+  /// No description provided for @extendStaySuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay extended'**
+  String get extendStaySuccessTitle;
+
+  /// No description provided for @extendStaySuccessBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your checkout date is now {date}. {amount} has been added to your folio.'**
+  String extendStaySuccessBody(String date, String amount);
+
+  /// No description provided for @extendStayNotEligible.
+  ///
+  /// In en, this message translates to:
+  /// **'Extend stay is only available during your current stay.'**
+  String get extendStayNotEligible;
 }
 
 class _AppLocalizationsDelegate

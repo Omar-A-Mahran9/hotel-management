@@ -16,6 +16,10 @@ import '../../features/authentication/presentation/state/auth_controller.dart';
 import '../../features/authentication/presentation/state/auth_state.dart';
 import '../../features/authentication/presentation/state/language_selection_controller.dart';
 import '../../features/authentication/presentation/state/post_auth_redirect_controller.dart';
+import '../../features/bookings/presentation/pages/bookings_list_page.dart';
+import '../../features/profile/presentation/pages/account_home_page.dart';
+import '../../features/stay_home/presentation/pages/extend_stay_page.dart';
+import '../../features/stay_home/presentation/pages/stay_home_page.dart';
 import '../../features/discovery/presentation/pages/available_rooms_page.dart';
 import '../../features/discovery/presentation/pages/discover_page.dart';
 import '../../features/discovery/presentation/pages/hotel_detail_page.dart';
@@ -371,6 +375,28 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
         path: AppRoutes.reviewResult,
         name: AppRoutes.reviewResultName,
         builder: (BuildContext context, GoRouterState state) => ReviewResultPage(
+          reservationId: state.pathParameters['reservationId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.bookings,
+        name: AppRoutes.bookingsName,
+        builder: (_, _) => const BookingsListPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.account,
+        name: AppRoutes.accountName,
+        builder: (_, _) => const AccountHomePage(),
+      ),
+      GoRoute(
+        path: AppRoutes.stayHome,
+        name: AppRoutes.stayHomeName,
+        builder: (_, _) => const StayHomePage(),
+      ),
+      GoRoute(
+        path: AppRoutes.extendStay,
+        name: AppRoutes.extendStayName,
+        builder: (BuildContext context, GoRouterState state) => ExtendStayPage(
           reservationId: state.pathParameters['reservationId']!,
         ),
       ),

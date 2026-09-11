@@ -8,76 +8,91 @@ import 'stay_services_data_source.dart';
 
 /// API-backed stay-services source.
 ///
-/// Kept a documented stub for Mobile Phase 8 (same pattern as
-/// `ApiPaymentDataSource`). Endpoints exist —
-/// `GET /api/v1/hotels/{hotel}/service-categories`,
-/// `GET /api/v1/hotels/{hotel}/services`,
-/// `GET|POST /api/v1/reservations/{reservation}/service-orders`,
-/// `GET /api/v1/reservations/{reservation}/service-orders/{serviceOrder}`,
-/// `POST .../service-orders/{serviceOrder}/transition` — but all are
-/// **staff/dashboard-scoped**:
-///
-/// * the catalogue endpoints require `auth:sanctum` staff tokens + hotel access
-///   via `HotelServicePolicy` / `ServiceCategoryPolicy`;
-/// * `POST .../service-orders` resolves the reservation through
-///   `ReservationService::findAccessibleBy($request->user(), …)` and authorises
-///   with `ServiceOrderPolicy`;
-/// * cancellation is `POST .../transition` — a staff-only state-machine
-///   operation; there is no guest cancel endpoint.
-///
-/// No guest-facing stay-services contract is approved. Also missing from
-/// `ServiceResource`: an `estimated_minutes` field (documented gap). Wiring is
-/// sketched in comments; until then each method raises
-/// [NotImplementedInPhaseException].
+/// Real, authenticated/public guest contract:
+/// `GET /guest/hotels/{hotel}/service-categories` and `.../services` (public,
+/// active-only, mirrors `GuestDiscoveryController`), and
+/// `GET|POST /guest/reservations/{reservation}/service-orders`,
+/// `GET .../service-orders/{serviceOrder}` (`auth:guest`, reuses
+/// `ServiceOrderService`). There is no guest cancel/transition endpoint —
+/// [cancelOrder] stays unimplemented pending an approved guest-cancellation
+/// rule (`GuestServiceOrderController`'s docblock).
 class ApiStayServicesDataSource
     implements StayServicesDataSource, RemoteDataSource {
   ApiStayServicesDataSource(this._client);
 
-  // Retained so wiring approved endpoints stays a small change.
-  // ignore: unused_field
   final ApiClient _client;
-
-  static const String _reason =
-      'A guest-facing stay-services contract (guest identity + a guest cancel '
-      'endpoint) is not approved yet';
 
   @override
   Future<ServiceCatalogue> fetchCatalogue(String hotelId) async {
-    // final categories = await _client.getJson('/hotels/$hotelId/service-categories');
-    // final services = await _client.getJson('/hotels/$hotelId/services');
-    // return ServiceCatalogue(
-    //   categories: [...map ServiceCategoryModel.fromJson().toEntity()],
-    //   services: [...map HotelServiceModel.fromJson().toEntity()],
-    // );
-    throw const NotImplementedInPhaseException(_reason);
+    final Map<String, dynamic> categoriesJson = await _client.getJson(
+      '/guest/hotels/$hotelId/service-categories',
+    );
+    final Map<String, dynamic> servicesJson = await _client.getJson(
+      '/guest/hotels/$hotelId/services',
+    );
+    final List<Object?> categories =
+        (categoriesJson['data'] as List<Object?>?) ?? const <Object?>[];
+    final List<Object?> services =
+        (servicesJson['data'] as List<Object?>?) ?? const <Object?>[];
+    return ServiceCatalogue(
+      categories: categories
+          .whereType<Map<String, Object?>>()
+          .map((Map<String, Object?> j) => ServiceCategoryModel.fromJson(j).toEntity())
+          .toList(growable: false),
+      services: services
+          .whereType<Map<String, Object?>>()
+          .map((Map<String, Object?> j) => HotelServiceModel.fromJson(j).toEntity())
+          .toList(growable: false),
+    );
   }
 
   @override
   Future<List<ServiceOrderModel>> fetchOrders(String reservationId) async {
-    // final json = await _client.getJson('/reservations/$reservationId/service-orders');
-    throw const NotImplementedInPhaseException(_reason);
+    final Map<String, dynamic> json = await _client.getJson(
+      '/guest/reservations/$reservationId/service-orders',
+    );
+    final List<Object?> data = (json['data'] as List<Object?>?) ?? const <Object?>[];
+    return data
+        .whereType<Map<String, Object?>>()
+        .map(ServiceOrderModel.fromJson)
+        .toList(growable: false);
   }
 
   @override
   Future<ServiceOrderModel> fetchOrder(
-      String reservationId, String orderId) async {
-    // final json = await _client.getJson(
-    //   '/reservations/$reservationId/service-orders/$orderId');
-    throw const NotImplementedInPhaseException(_reason);
+    String reservationId,
+    String orderId,
+  ) async {
+    final Map<String, dynamic> json = await _client.getJson(
+      '/guest/reservations/$reservationId/service-orders/$orderId',
+    );
+    final Map<String, Object?> data =
+        (json['data'] as Map<String, Object?>?) ?? const <String, Object?>{};
+    return ServiceOrderModel.fromJson(data);
   }
 
   @override
   Future<ServiceOrderModel> createOrder(CreateServiceRequest request) async {
-    // final body = ServiceOrderCreatePayload.fromRequest(request).toJson();
-    // final json = await _client.postJson(
-    //   '/reservations/${request.reservationId}/service-orders', body: body);
-    throw const NotImplementedInPhaseException(_reason);
+    final Map<String, dynamic> json = await _client.postJson(
+      '/guest/reservations/${request.reservationId}/service-orders',
+      body: ServiceOrderCreatePayload.fromRequest(request).toJson(),
+      headers: <String, String>{'Idempotency-Key': request.idempotencyKey},
+    );
+    final Map<String, Object?> data =
+        (json['data'] as Map<String, Object?>?) ?? const <String, Object?>{};
+    return ServiceOrderModel.fromJson(data);
   }
 
   @override
   Future<ServiceOrderModel> cancelOrder(
-      String reservationId, String orderId) async {
-    // No guest cancel endpoint — cancellation is a staff `transition` call.
-    throw const NotImplementedInPhaseException(_reason);
+    String reservationId,
+    String orderId,
+  ) async {
+    // No guest cancel endpoint exists — cancellation is a staff `transition`
+    // call (GuestServiceOrderController docblock). Not invented here.
+    throw const NotImplementedInPhaseException(
+      'There is no guest-facing service-order cancel endpoint — cancellation '
+      'is staff-only pending an approved guest-cancellation rule',
+    );
   }
 }

@@ -7,6 +7,7 @@ import '../../data/datasources/api_identity_verification_data_source.dart';
 import '../../data/datasources/dummy_identity_verification_data_source.dart';
 import '../../data/datasources/identity_verification_data_source.dart';
 import '../../data/repositories/identity_verification_repository_impl.dart';
+import '../../domain/entities/identity_verification_session.dart';
 import '../../domain/repositories/identity_verification_repository.dart';
 
 /// Selects the identity-verification data source by configuration — the UI
@@ -28,3 +29,11 @@ final identityVerificationRepositoryProvider =
     ref.watch(identityVerificationDataSourceProvider),
   ),
 );
+
+/// The current identity-verification session for a reservation — for the
+/// booking-detail screen's status timeline. `autoDispose` so leaving the
+/// screen drops the fetch.
+final identityStatusProvider = FutureProvider.autoDispose
+    .family<IdentityVerificationSession, String>((Ref ref, String reservationId) {
+  return ref.watch(identityVerificationRepositoryProvider).statusFor(reservationId);
+});

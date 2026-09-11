@@ -34,10 +34,18 @@ class AppConfig {
       'API_BASE_URL',
       defaultValue: 'http://10.0.2.2:8000',
     );
-    // Real integration: --dart-define=USE_DUMMY_DATA=false. As of the
-    // integration pass only the authentication feature has its API data
-    // source wired end-to-end; the remaining features still fall back to
-    // their dummy source until their slice lands (see
+    // Real integration: --dart-define=USE_DUMMY_DATA=false. As of the final
+    // mobile↔backend integration pass, every feature's `Api*DataSource` is a
+    // real implementation against the guest API (auth, discovery,
+    // reservations, payment reads, identity status, check-in/access, service
+    // catalogue/orders, folio/checkout/invoice, loyalty reads/redeem,
+    // reviews). Documented, narrower gaps remain and throw
+    // `NotImplementedInPhaseException` rather than guessing: payment `hold`
+    // is backend-blocked pending an approved deposit-amount rule; identity
+    // document/selfie upload needs a real camera/file-picker capture flow
+    // (`CapturedImage.filePath`); loyalty has no guest-triggerable `earn`;
+    // stay-services has no guest cancel; discovery has no "featured hotels"
+    // or "upcoming stay" concept server-side (see
     // md/integration-contract-matrix.md).
     const bool useDummy = bool.fromEnvironment('USE_DUMMY_DATA', defaultValue: true);
     // Demo/QA flag: render the single-hotel Home variant (`اكتشف {hotel}` +

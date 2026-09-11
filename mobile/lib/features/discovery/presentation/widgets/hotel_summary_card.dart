@@ -115,7 +115,7 @@ class _RowCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
-          HotelThumbnail(seed: hotel.id, width: 92, height: 92),
+          HotelThumbnail(imageUrl: hotel.coverUrl, width: 92, height: 92),
         ],
       ),
     );
@@ -144,7 +144,7 @@ class _TileCard extends StatelessWidget {
           Stack(
             children: <Widget>[
               HotelThumbnail(
-                seed: hotel.id,
+                imageUrl: hotel.coverUrl,
                 height: 116,
                 width: double.infinity,
                 borderRadius: AppRadius.allMd,

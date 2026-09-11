@@ -1,10 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hotel_guest_app/core/config/app_config.dart';
-import 'package:hotel_guest_app/core/config/app_environment.dart';
 import 'package:hotel_guest_app/core/errors/app_exception.dart';
-import 'package:hotel_guest_app/core/network/api_client.dart';
-import 'package:hotel_guest_app/core/security/in_memory_token_store.dart';
-import 'package:hotel_guest_app/features/identity_verification/data/datasources/api_identity_verification_data_source.dart';
 import 'package:hotel_guest_app/features/identity_verification/data/datasources/dummy_identity_verification_data_source.dart';
 import 'package:hotel_guest_app/features/identity_verification/domain/entities/identity_document.dart';
 import 'package:hotel_guest_app/features/identity_verification/domain/entities/identity_verification_request.dart';
@@ -121,26 +116,8 @@ void main() {
     });
   });
 
-  group('ApiIdentityVerificationDataSource', () {
-    final source = ApiIdentityVerificationDataSource(
-      ApiClient(
-        config: const AppConfig(
-          environment: AppEnvironment.development,
-          apiBaseUrl: 'http://localhost',
-          apiVersion: 'v1',
-          useDummyData: false,
-        ),
-        tokenStore: InMemoryTokenStore(),
-      ),
-    );
-
-    test('every method is a documented not-implemented stub', () {
-      expect(source.fetchStatus('1'),
-          throwsA(isA<NotImplementedInPhaseException>()));
-      expect(source.submitDocument(doc('1')),
-          throwsA(isA<NotImplementedInPhaseException>()));
-      expect(source.submitSelfie(selfie('1')),
-          throwsA(isA<NotImplementedInPhaseException>()));
-    });
-  });
+  // `ApiIdentityVerificationDataSource` is now real for `fetchStatus`; the
+  // upload methods still refuse without a real camera/file-picker capture
+  // (no `CapturedImage.filePath`) — see
+  // test/features/identity_verification/api_identity_verification_data_source_test.dart.
 }

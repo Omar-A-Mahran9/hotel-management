@@ -65,16 +65,24 @@ void main() {
     expect(_location(container), AppRoutes.completeProfile);
   });
 
-  testWidgets('signing out drops to guest discover, not the entry screen',
+  testWidgets(
+      'signing out from the account tab (not public) lands on the entry screen',
       (WidgetTester tester) async {
     final ProviderContainer container =
         await pumpApp(tester, bootSession: completeSession());
     final AppLocalizations en = await tester.l10n();
 
-    await tester.tap(find.byTooltip(en.authSignOut));
+    // Sign-out lives on the Account tab (mobile/docs/design-system.md), which
+    // — unlike `/discover` — is not part of the deferred-auth public surface,
+    // so signing out from it redirects to `/welcome` like any other
+    // authenticated-only route would once the session drops.
+    container.read(appRouterProvider).goNamed(AppRoutes.accountName);
     await tester.pumpAndSettle();
 
-    expect(_location(container), AppRoutes.discover);
+    await tester.tap(find.text(en.authSignOut));
+    await tester.pumpAndSettle();
+
+    expect(_location(container), AppRoutes.welcome);
   });
 
   testWidgets('an expired session is forced onto the session-expired route',

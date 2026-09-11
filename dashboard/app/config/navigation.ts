@@ -94,8 +94,7 @@ export const NAVIGATION: NavSection[] = [
         labelKey: 'nav.guests',
         to: '/guests',
         icon: 'ki-people',
-        permission: 'reservations.view',
-        backendGap: true, // no GET /guests resource
+        permission: 'guests.view',
       },
       {
         key: 'digital-access',
@@ -170,8 +169,8 @@ export const NAVIGATION: NavSection[] = [
         labelKey: 'nav.reviews',
         to: '/reviews',
         icon: 'ki-star',
-        permission: 'hotels.view',
-        backendGap: true, // no reviews domain on the backend
+        permission: 'reviews.view',
+        scope: 'hotel',
       },
       {
         key: 'notifications',

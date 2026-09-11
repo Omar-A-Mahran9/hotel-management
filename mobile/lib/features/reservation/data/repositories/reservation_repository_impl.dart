@@ -1,5 +1,6 @@
 import '../../../../core/errors/error_mapper.dart';
 import '../../domain/entities/create_reservation_request.dart';
+import '../../domain/entities/extend_stay.dart';
 import '../../domain/entities/reservation.dart';
 import '../../domain/repositories/reservation_repository.dart';
 import '../datasources/reservation_data_source.dart';
@@ -21,6 +22,20 @@ class ReservationRepositoryImpl implements ReservationRepository {
   @override
   Future<Reservation> getById(String id) =>
       _guard(() async => (await _dataSource.fetchById(id)).toEntity());
+
+  @override
+  Future<List<Reservation>> list() => _guard(() async {
+        final result = await _dataSource.fetchList();
+        return result.map((m) => m.toEntity()).toList(growable: false);
+      });
+
+  @override
+  Future<Reservation> cancel(String id) =>
+      _guard(() async => (await _dataSource.cancel(id)).toEntity());
+
+  @override
+  Future<ExtendStayResult> extend(ExtendStayRequest request) =>
+      _guard(() async => (await _dataSource.extend(request)).toEntity());
 
   Future<T> _guard<T>(Future<T> Function() body) async {
     try {

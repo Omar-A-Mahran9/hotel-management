@@ -9,8 +9,10 @@ import type {
   CheckoutResult,
   City,
   Country,
+  ExtendReservationResult,
   Facility,
   Folio,
+  Guest,
   Hotel,
   HotelGroup,
   HotelMedia,
@@ -24,6 +26,8 @@ import type {
   Permission,
   Reservation,
   ReservationStatus,
+  Review,
+  ReviewStatus,
   Role,
   RoleWriteBody,
   Room,
@@ -228,6 +232,15 @@ export const servicesService = {
     api()<HotelService>(`/hotels/${hotelId}/services/${id}/deactivate`, { method: 'PATCH' }),
 }
 
+// ---- Reviews (hotel-scoped, every moderation state) ------------------
+export const reviewsService = {
+  list: (hotelId: number, params: { status?: ReviewStatus, page?: number, per_page?: number } = {}) =>
+    api().withMeta<Review[]>(`/hotels/${hotelId}/reviews`, { query: cleanQuery(params) }),
+  // decision is 'published' or 'rejected' — no other state is accepted.
+  moderate: (reviewId: number, decision: Extract<ReviewStatus, 'published' | 'rejected'>) =>
+    api()<Review>(`/reviews/${reviewId}/moderate`, { method: 'POST', body: { decision } }),
+}
+
 // ---- Reservations ---------------------------------------------------
 // GET /reservations is scoped to the caller's hotels, paginated (per_page 15
 // fixed; ?page works). There is NO status / hotel / date filter server-side
@@ -248,6 +261,23 @@ export const reservationsService = {
       method: 'POST',
       body: { target_status: targetStatus },
     }),
+  // Extend Stay — only while checked_in/in_stay. The backend re-checks
+  // availability and prices the addition from room_types.base_price; the
+  // amount accrues to the folio, settled at checkout like a service order.
+  extend: (id: number, newCheckOut: string) =>
+    api()<ExtendReservationResult>(`/reservations/${id}/extend`, {
+      method: 'POST',
+      body: { new_check_out: newCheckOut },
+    }),
+}
+
+// ---- Guests (staff directory, not hotel-scoped) -----------------------
+export const guestsService = {
+  list: (params: { search?: string, page?: number, per_page?: number } = {}) =>
+    api().withMeta<Guest[]>('/guests', { query: cleanQuery(params) }),
+  get: (id: number) => api()<Guest>(`/guests/${id}`),
+  reservations: (id: number, page = 1) =>
+    api().withMeta<Reservation[]>(`/guests/${id}/reservations`, { query: { page } }),
 }
 
 // ---- Reservation workspace: payment ------------------------------

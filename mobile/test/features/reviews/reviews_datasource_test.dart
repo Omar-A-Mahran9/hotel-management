@@ -1,10 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hotel_guest_app/core/config/app_config.dart';
-import 'package:hotel_guest_app/core/config/app_environment.dart';
 import 'package:hotel_guest_app/core/errors/app_exception.dart';
-import 'package:hotel_guest_app/core/network/api_client.dart';
-import 'package:hotel_guest_app/core/security/in_memory_token_store.dart';
-import 'package:hotel_guest_app/features/reviews/data/datasources/api_review_data_source.dart';
 import 'package:hotel_guest_app/features/reviews/data/datasources/dummy_review_data_source.dart';
 import 'package:hotel_guest_app/features/reviews/domain/entities/review.dart';
 import 'package:hotel_guest_app/features/reviews/domain/entities/review_draft.dart';
@@ -125,29 +120,9 @@ void main() {
     });
   });
 
-  group('ApiReviewDataSource', () {
-    final source = ApiReviewDataSource(
-      ApiClient(
-        config: const AppConfig(
-          environment: AppEnvironment.development,
-          apiBaseUrl: 'http://localhost',
-          apiVersion: 'v1',
-          useDummyData: false,
-        ),
-        tokenStore: InMemoryTokenStore(),
-      ),
-    );
-
-    test('every method is a documented not-implemented stub', () {
-      expect(source.fetchReview(fakeReviewContext()),
-          throwsA(isA<NotImplementedInPhaseException>()));
-      expect(
-        source.submit(const SubmitReviewRequest(reservationId: '1', rating: 4),
-            fakeReviewContext()),
-        throwsA(isA<NotImplementedInPhaseException>()),
-      );
-    });
-  });
+  // `ApiReviewDataSource` is now a real implementation against the new
+  // Reviews domain — see
+  // test/features/reviews/api_review_data_source_test.dart.
 
   group('ReviewDraft constants', () {
     test('match the documented 1–5 range', () {

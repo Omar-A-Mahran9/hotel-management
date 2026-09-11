@@ -25,6 +25,7 @@ class EloquentReservationRepository implements ReservationRepositoryInterface
     {
         return Reservation::query()
             ->where('guest_id', $guest->id)
+            ->with(['hotel.cover', 'roomType', 'room', 'payment'])
             ->latest('id')
             ->paginate($perPage);
     }
@@ -34,6 +35,13 @@ class EloquentReservationRepository implements ReservationRepositoryInterface
         return Reservation::query()
             ->where('guest_id', $guest->id)
             ->find($id);
+    }
+
+    public function paginateForGuestAccessibleBy(User $user, Guest $guest, int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->scopeToAccess(Reservation::query()->where('guest_id', $guest->id), $user)
+            ->latest('id')
+            ->paginate($perPage);
     }
 
     public function create(array $data): Reservation

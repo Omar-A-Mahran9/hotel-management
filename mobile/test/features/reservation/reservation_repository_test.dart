@@ -6,6 +6,7 @@ import 'package:hotel_guest_app/features/reservation/data/datasources/reservatio
 import 'package:hotel_guest_app/features/reservation/data/models/reservation_models.dart';
 import 'package:hotel_guest_app/features/reservation/data/repositories/reservation_repository_impl.dart';
 import 'package:hotel_guest_app/features/reservation/domain/entities/create_reservation_request.dart';
+import 'package:hotel_guest_app/features/reservation/domain/entities/extend_stay.dart';
 import 'package:hotel_guest_app/features/reservation/domain/entities/reservation.dart';
 import 'package:hotel_guest_app/features/reservation/domain/entities/reservation_status.dart';
 
@@ -21,6 +22,16 @@ class _ThrowingDataSource implements ReservationDataSource {
 
   @override
   Future<ReservationModel> fetchById(String id) async => throw error;
+
+  @override
+  Future<List<ReservationModel>> fetchList() async => throw error;
+
+  @override
+  Future<ReservationModel> cancel(String id) async => throw error;
+
+  @override
+  Future<ExtendStayResultModel> extend(ExtendStayRequest request) async =>
+      throw error;
 }
 
 void main() {
