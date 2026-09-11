@@ -28,4 +28,17 @@ abstract interface class DiscoveryDataSource {
     required int adults,
     required int children,
   });
+
+  /// How many hotels the group operates — the Home screen switches to its
+  /// single-hotel layout when this is 1.
+  Future<int> fetchGroupHotelCount();
+
+  /// A hotel's room types with their list ("from") prices and current
+  /// sold-out flags, **without** a stay filter — for the single-hotel Home
+  /// "استكشف الغرف" list.
+  Future<List<AvailableRoomModel>> fetchHotelRooms(String hotelId);
+
+  /// The signed-in guest's next confirmed stay, or `null` when there is none.
+  /// The Home `إقامتك القادمة` card renders it.
+  Future<UpcomingStayModel?> fetchUpcomingStay();
 }

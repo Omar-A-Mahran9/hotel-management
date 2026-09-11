@@ -7,7 +7,10 @@ import 'package:hotel_guest_app/features/authentication/domain/entities/guest_ph
 import 'package:hotel_guest_app/features/authentication/domain/entities/guest_profile.dart';
 import 'package:hotel_guest_app/features/authentication/domain/entities/otp_challenge.dart';
 import 'package:hotel_guest_app/features/authentication/domain/repositories/auth_repository.dart';
+import 'package:flutter/widgets.dart';
+import 'package:hotel_guest_app/core/localization/locale_controller.dart';
 import 'package:hotel_guest_app/features/authentication/presentation/state/auth_controller.dart';
+import 'package:hotel_guest_app/features/authentication/presentation/state/language_selection_controller.dart';
 import 'package:hotel_guest_app/features/authentication/presentation/state/login_flow_controller.dart';
 import 'package:hotel_guest_app/core/security/in_memory_token_store.dart';
 
@@ -78,12 +81,36 @@ class TestAuthRepository implements AuthRepository {
   }
 }
 
+/// A [LanguageSelectionController] seeded to a fixed value so tests can skip (or
+/// exercise) the first-run language screen.
+class SeededLanguageSelection extends LanguageSelectionController {
+  SeededLanguageSelection({required this.chosen});
+
+  final bool chosen;
+
+  @override
+  bool build() => chosen;
+}
+
+/// A [LocaleController] that starts on the device locale instead of the app's
+/// Arabic default, so the test suite asserts against English copy unless a test
+/// opts into Arabic (`pumpApp(locale: arabic)`).
+class DeviceLocaleController extends LocaleController {
+  @override
+  Locale? build() => null;
+}
+
 /// Base overrides for an authentication test: deterministic config + a
 /// [TestAuthRepository]. Pass a [bootSession] to start signed in.
+///
+/// [languageChosen] defaults to `true` so tests boot straight past the first-run
+/// language screen onto the entry / auth / app surface; set it `false` to land
+/// on `/welcome/language`.
 List<Override> authOverrides({
   AppConfig config = testConfig,
   AuthSession? bootSession,
   Duration resendCooldown = Duration.zero,
+  bool languageChosen = true,
 }) {
   return <Override>[
     appConfigProvider.overrideWithValue(config),
@@ -91,5 +118,10 @@ List<Override> authOverrides({
       TestAuthRepository(bootSession: bootSession),
     ),
     otpResendCooldownProvider.overrideWithValue(resendCooldown),
+    splashMinDurationProvider.overrideWithValue(Duration.zero),
+    localeControllerProvider.overrideWith(DeviceLocaleController.new),
+    languageSelectedProvider.overrideWith(
+      () => SeededLanguageSelection(chosen: languageChosen),
+    ),
   ];
 }

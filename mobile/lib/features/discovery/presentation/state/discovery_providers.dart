@@ -13,7 +13,7 @@ import '../../domain/repositories/discovery_repository.dart';
 final discoveryDataSourceProvider = Provider<DiscoveryDataSource>((Ref ref) {
   final AppConfig config = ref.watch(appConfigProvider);
   return config.useDummyData
-      ? const DummyDiscoveryDataSource()
+      ? DummyDiscoveryDataSource(singleHotelGroup: config.singleHotelGroup)
       : ApiDiscoveryDataSource(ref.watch(apiClientProvider));
 });
 

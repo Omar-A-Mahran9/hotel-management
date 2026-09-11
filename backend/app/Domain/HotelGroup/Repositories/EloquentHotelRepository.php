@@ -13,13 +13,15 @@ class EloquentHotelRepository implements HotelRepositoryInterface
     {
         return Hotel::query()
             ->accessibleBy($user)
-            ->with(['hotelGroup', 'countryRef', 'cityRef'])
+            ->with(['hotelGroup', 'countryRef', 'cityRef', 'logo', 'cover'])
             ->paginate($perPage);
     }
 
     public function find(int $id): ?Hotel
     {
-        return Hotel::query()->with(['hotelGroup', 'countryRef', 'cityRef'])->find($id);
+        return Hotel::query()
+            ->with(['hotelGroup', 'countryRef', 'cityRef', 'logo', 'cover', 'galleryMedia'])
+            ->find($id);
     }
 
     public function create(array $data): Hotel

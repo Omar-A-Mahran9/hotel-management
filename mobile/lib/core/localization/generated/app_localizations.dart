@@ -338,6 +338,30 @@ abstract class AppLocalizations {
   /// **'Language'**
   String get entryLanguageSwitchLabel;
 
+  /// App-bar title of the first-run language selection screen (01 · Entry).
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get languageScreenTitle;
+
+  /// No description provided for @languageScreenHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the app language'**
+  String get languageScreenHeading;
+
+  /// No description provided for @languageScreenBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You can change it later from Account. The interface is designed in Arabic first.'**
+  String get languageScreenBody;
+
+  /// Small marker on the language that is pre-selected on first run (Arabic).
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get languageDefaultTag;
+
   /// No description provided for @authPhoneTitle.
   ///
   /// In en, this message translates to:
@@ -662,11 +686,35 @@ abstract class AppLocalizations {
   /// **'Notifications'**
   String get discoverNotificationsTooltip;
 
+  /// App-bar action shown to a guest browsing without an account.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get discoverSignIn;
+
   /// No description provided for @discoverFeaturedSection.
   ///
   /// In en, this message translates to:
   /// **'Group hotels'**
   String get discoverFeaturedSection;
+
+  /// No description provided for @discoverExploreRooms.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore rooms'**
+  String get discoverExploreRooms;
+
+  /// No description provided for @discoverUpcomingStay.
+  ///
+  /// In en, this message translates to:
+  /// **'Your upcoming stay'**
+  String get discoverUpcomingStay;
+
+  /// No description provided for @discoverSubtitleHotel.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover {hotel}'**
+  String discoverSubtitleHotel(String hotel);
 
   /// No description provided for @discoverEmptyTitle.
   ///
@@ -914,6 +962,12 @@ abstract class AppLocalizations {
   /// **'Communication'**
   String get hotelReviewCommunication;
 
+  /// No description provided for @hotelReviewLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get hotelReviewLocation;
+
   /// No description provided for @hotelDetailAmenities.
   ///
   /// In en, this message translates to:
@@ -937,6 +991,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select dates'**
   String get hotelSelectDates;
+
+  /// No description provided for @hotelBookNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Book now'**
+  String get hotelBookNow;
+
+  /// No description provided for @hotelGuestCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 guest} other{{count} guests}}'**
+  String hotelGuestCount(int count);
+
+  /// No description provided for @roomAreaSqm.
+  ///
+  /// In en, this message translates to:
+  /// **'{area} m²'**
+  String roomAreaSqm(int area);
 
   /// No description provided for @amenityFreeWifi.
   ///
@@ -1477,6 +1549,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Back to rooms'**
   String get reviewBackToRooms;
+
+  /// Primary CTA on the review screen for a guest who has not signed in yet.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to confirm'**
+  String get reviewSignInToConfirm;
+
+  /// Helper line under the review summary explaining why sign-in is required at this step.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ll need an account to confirm this booking. Browsing stays free.'**
+  String get reviewSignInHint;
+
+  /// No description provided for @bookingDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking details'**
+  String get bookingDetailsTitle;
+
+  /// No description provided for @bookingDatesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay dates'**
+  String get bookingDatesLabel;
+
+  /// No description provided for @bookingRoomSubtotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay subtotal'**
+  String get bookingRoomSubtotal;
+
+  /// No description provided for @bookingServiceFee.
+  ///
+  /// In en, this message translates to:
+  /// **'Service fee'**
+  String get bookingServiceFee;
+
+  /// Shown under a design-only mock service fee; the real amount comes from the backend.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimate for display — the hotel confirms the final amount.'**
+  String get bookingServiceFeeNote;
+
+  /// No description provided for @bookingTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get bookingTotal;
+
+  /// No description provided for @bookingProceedToPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Proceed to payment'**
+  String get bookingProceedToPayment;
+
+  /// No description provided for @bookingRoomAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get bookingRoomAvailable;
 
   /// No description provided for @reservationConfirmCta.
   ///

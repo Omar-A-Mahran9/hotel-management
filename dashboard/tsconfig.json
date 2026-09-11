@@ -3,5 +3,5 @@
   "compilerOptions": {
     "types": ["vitest/globals"]
   },
-  "exclude": ["metronic-v9.4.12", "node_modules", "dist", ".output"]
+  "exclude": ["**/metronic-v9.4.12", "docs", "node_modules", "dist", ".output"]
 }

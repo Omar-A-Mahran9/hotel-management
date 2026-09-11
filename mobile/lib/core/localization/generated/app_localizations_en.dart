@@ -144,6 +144,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get entryLanguageSwitchLabel => 'Language';
 
   @override
+  String get languageScreenTitle => 'Language';
+
+  @override
+  String get languageScreenHeading => 'Choose the app language';
+
+  @override
+  String get languageScreenBody =>
+      'You can change it later from Account. The interface is designed in Arabic first.';
+
+  @override
+  String get languageDefaultTag => 'Default';
+
+  @override
   String get authPhoneTitle => 'Sign in';
 
   @override
@@ -323,7 +336,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get discoverNotificationsTooltip => 'Notifications';
 
   @override
+  String get discoverSignIn => 'Sign in';
+
+  @override
   String get discoverFeaturedSection => 'Group hotels';
+
+  @override
+  String get discoverExploreRooms => 'Explore rooms';
+
+  @override
+  String get discoverUpcomingStay => 'Your upcoming stay';
+
+  @override
+  String discoverSubtitleHotel(String hotel) {
+    return 'Discover $hotel';
+  }
 
   @override
   String get discoverEmptyTitle => 'No hotels to show yet';
@@ -502,6 +529,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hotelReviewCommunication => 'Communication';
 
   @override
+  String get hotelReviewLocation => 'Location';
+
+  @override
   String get hotelDetailAmenities => 'What this hotel offers';
 
   @override
@@ -527,6 +557,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hotelSelectDates => 'Select dates';
+
+  @override
+  String get hotelBookNow => 'Book now';
+
+  @override
+  String hotelGuestCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count guests',
+      one: '1 guest',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String roomAreaSqm(int area) {
+    return '$area m²';
+  }
 
   @override
   String get amenityFreeWifi => 'Free Wi-Fi';
@@ -866,6 +915,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reviewBackToRooms => 'Back to rooms';
+
+  @override
+  String get reviewSignInToConfirm => 'Sign in to confirm';
+
+  @override
+  String get reviewSignInHint =>
+      'You\'ll need an account to confirm this booking. Browsing stays free.';
+
+  @override
+  String get bookingDetailsTitle => 'Booking details';
+
+  @override
+  String get bookingDatesLabel => 'Stay dates';
+
+  @override
+  String get bookingRoomSubtotal => 'Stay subtotal';
+
+  @override
+  String get bookingServiceFee => 'Service fee';
+
+  @override
+  String get bookingServiceFeeNote =>
+      'Estimate for display — the hotel confirms the final amount.';
+
+  @override
+  String get bookingTotal => 'Total';
+
+  @override
+  String get bookingProceedToPayment => 'Proceed to payment';
+
+  @override
+  String get bookingRoomAvailable => 'Available';
 
   @override
   String get reservationConfirmCta => 'Confirm reservation';

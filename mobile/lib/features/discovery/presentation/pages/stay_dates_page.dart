@@ -8,14 +8,10 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/time/clock.dart';
 import '../../../../core/widgets/hotel_app_bar.dart';
 import '../../../../core/widgets/primary_button.dart';
-import '../../domain/entities/guest_party.dart';
 import '../../domain/entities/stay_range.dart';
 import '../discovery_l10n.dart';
-import '../state/guest_party_controller.dart';
 import '../state/stay_dates_controller.dart';
-import '../widgets/guest_party_sheet.dart';
 import '../widgets/stay_range_calendar.dart';
-import '../../../../core/widgets/app_icons.dart';
 
 /// `16 · Stay dates & available rooms` — the check-in / check-out picker.
 ///
@@ -35,7 +31,6 @@ class StayDatesPage extends ConsumerWidget {
 
     final DateTime today = ref.today();
     final StayDatesDraft draft = ref.watch(stayDatesControllerProvider);
-    final GuestParty party = ref.watch(guestPartyControllerProvider);
     final StayDatesController dates = ref.read(
       stayDatesControllerProvider.notifier,
     );
@@ -129,30 +124,8 @@ class StayDatesPage extends ConsumerWidget {
                 ),
               ),
             ),
-            const SizedBox(height: AppSpacing.xs),
-            InkWell(
-              onTap: () => showGuestPartySheet(context),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.pageGutter,
-                  vertical: AppSpacing.xs,
-                ),
-                child: Row(
-                  children: <Widget>[
-                    const Icon(AppIcons.guests, size: 18),
-                    const SizedBox(width: AppSpacing.xs),
-                    Expanded(
-                      child: Text(
-                        guestPartySummaryText(l10n, party),
-                        style: theme.textTheme.bodyMedium,
-                      ),
-                    ),
-                    Text(l10n.commonEdit, style: theme.textTheme.labelMedium),
-                  ],
-                ),
-              ),
-            ),
-            const Divider(height: AppSpacing.md),
+            const SizedBox(height: AppSpacing.sm),
+            const Divider(height: 1),
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(

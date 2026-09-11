@@ -9,7 +9,7 @@ import '../../support/calendar_test_support.dart';
 import '../../support/pump_app.dart';
 
 void main() {
-  testWidgets('confirm + confirmation screens render right-to-left in Arabic',
+  testWidgets('booking summary + payment screens render right-to-left in Arabic',
       (WidgetTester tester) async {
     await pumpApp(
       tester,
@@ -24,7 +24,7 @@ void main() {
 
     await tester.tap(find.text('فندق الواحة').first);
     await tester.pumpAndSettle();
-    await tester.tap(find.text(ar.hotelSelectDates));
+    await tester.tap(find.text(ar.hotelBookNow));
     await tester.pumpAndSettle();
     await tapCalendarDay(tester, '٦');
     await tapCalendarDay(tester, '٨');
@@ -38,22 +38,21 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, ar.roomsContinue));
     await tester.pumpAndSettle();
 
-    // Review screen with the Arabic confirm CTA.
-    expect(find.text(ar.reservationConfirmCta), findsOneWidget);
+    // Booking summary with the Arabic "proceed to payment" CTA.
+    expect(find.text(ar.bookingProceedToPayment), findsOneWidget);
     expect(
-      Directionality.of(tester.element(find.text(ar.reviewTitle))),
+      Directionality.of(tester.element(find.text(ar.bookingDetailsTitle))),
       TextDirection.rtl,
     );
 
     await tester
-        .tap(find.widgetWithText(FilledButton, ar.reservationConfirmCta));
+        .tap(find.widgetWithText(FilledButton, ar.bookingProceedToPayment));
     await tester.pumpAndSettle();
 
-    expect(find.text(ar.reservationSuccessTitle), findsOneWidget);
+    expect(find.text(ar.paymentReviewTitle), findsOneWidget);
     expect(
-      Directionality.of(tester.element(find.text(ar.reservationSuccessTitle))),
+      Directionality.of(tester.element(find.text(ar.paymentReviewTitle))),
       TextDirection.rtl,
     );
-    expect(find.text('فندق الواحة'), findsWidgets);
   });
 }

@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/app_routes.dart';
 import '../../../../core/localization/l10n.dart';
+import '../../../../core/presentation/ui_state.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../../core/widgets/app_icons.dart';
@@ -14,14 +16,15 @@ import '../state/discover_controller.dart';
 import '../state/hotel_search_controller.dart';
 import '../widgets/hotel_search_field.dart';
 import '../widgets/hotel_summary_card.dart';
+import '../widgets/room_summary_card.dart';
+import '../widgets/section_header.dart';
 import '../widgets/sort_chip_bar.dart';
+import '../widgets/upcoming_stay_card.dart';
 
-/// `02 · Discover & Book` — the authenticated landing. Greeting, a read-only
-/// search entry, the quick-sort chips and the curated hotel list. Tapping a
-/// card opens the hotel detail; the search field opens the search screen.
-///
-/// The reference's "upcoming stay" block and bottom navigation belong to later
-/// phases (reservations / account) and are intentionally not built here.
+/// `HOME_Default` / `HOME_if One hotel` — the authenticated **and** guest
+/// landing. Greeting header + a read-only search entry + quick-sort chips, then
+/// (signed in) the `إقامتك القادمة` card and either the group hotel grid or,
+/// for a single-hotel group, the `استكشف الغرف` room list.
 class DiscoverPage extends ConsumerWidget {
   const DiscoverPage({super.key});
 
@@ -40,6 +43,17 @@ class DiscoverPage extends ConsumerWidget {
     final HotelSort chipSort = ref.watch(
       hotelSearchControllerProvider.select((HotelSearchState s) => s.sort),
     );
+    final bool isSignedIn = ref.watch(authControllerProvider).map(
+          unknown: () => false,
+          unauthenticated: () => false,
+          awaitingProfile: (_) => true,
+          authenticated: (_) => true,
+          sessionExpired: () => false,
+        );
+
+    final DiscoverView? view = discover.valueOrNull;
+    final String? soleHotelName =
+        view?.soleHotel?.name.resolve(Localizations.localeOf(context));
 
     return Scaffold(
       appBar: AppBar(
@@ -50,27 +64,38 @@ class DiscoverPage extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Text(
-              discover.valueOrNull?.greetingName == null
+              view?.greetingName == null
                   ? l10n.discoverGreeting
-                  : l10n.discoverGreetingNamed(discover.value!.greetingName!),
+                  : l10n.discoverGreetingNamed(view!.greetingName!),
               style: Theme.of(context).textTheme.titleLarge,
             ),
-            Text(l10n.discoverSubtitle, style: Theme.of(context).textTheme.bodySmall),
+            Text(
+              soleHotelName == null
+                  ? l10n.discoverSubtitle
+                  : l10n.discoverSubtitleHotel(soleHotelName),
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
           ],
         ),
         actions: <Widget>[
-          IconButton(
-            icon: const Icon(AppIcons.notifications),
+          if (!isSignedIn)
+            TextButton(
+              onPressed: () => context.goNamed(AppRoutes.signInName),
+              child: Text(l10n.discoverSignIn),
+            ),
+          _CircleAction(
+            icon: AppIcons.notifications,
             tooltip: l10n.discoverNotificationsTooltip,
             onPressed: () {},
           ),
-          // Sign-out stays here until the "حسابي" account screen exists
-          // (see mobile/docs/design-system.md §"Bottom navigation").
-          IconButton(
-            icon: const Icon(AppIcons.checkout),
-            tooltip: l10n.authSignOut,
-            onPressed: () => ref.read(authControllerProvider.notifier).signOut(),
-          ),
+          if (isSignedIn)
+            IconButton(
+              icon: const Icon(AppIcons.checkout),
+              tooltip: l10n.authSignOut,
+              onPressed: () =>
+                  ref.read(authControllerProvider.notifier).signOut(),
+            ),
+          const SizedBox(width: AppSpacing.xs),
         ],
       ),
       body: SafeArea(
@@ -93,56 +118,38 @@ class DiscoverPage extends ConsumerWidget {
                 },
               ),
               const SizedBox(height: AppSpacing.lg),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      l10n.discoverFeaturedSection,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
+              if (view?.upcomingStay != null) ...<Widget>[
+                SectionHeader(
+                  title: l10n.discoverUpcomingStay,
+                  onSeeAll: () => context.pushNamed(
+                    AppRoutes.reservationDetailName,
+                    pathParameters: <String, String>{
+                      'reservationId': view!.upcomingStay!.reservationId,
+                    },
                   ),
-                  TextButton(
-                    onPressed: () => context.pushNamed(AppRoutes.hotelSearchName),
-                    child: Text(l10n.commonSeeAll),
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                UpcomingStayCard(
+                  stay: view!.upcomingStay!,
+                  onTap: () => context.pushNamed(
+                    AppRoutes.reservationDetailName,
+                    pathParameters: <String, String>{
+                      'reservationId': view.upcomingStay!.reservationId,
+                    },
                   ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              UiStateView<DiscoverView>(
+                ),
+                const SizedBox(height: AppSpacing.lg),
+              ],
+              _Listings(
                 state: discoverUiState(discover),
                 onRetry: () =>
                     ref.read(discoverControllerProvider.notifier).refresh(),
-                emptyTitle: l10n.discoverEmptyTitle,
-                emptyMessage: l10n.discoverEmptyBody,
-                onSuccess: (DiscoverView view) => LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints c) {
-                    final double w = (c.maxWidth - AppSpacing.md) / 2;
-                    return Wrap(
-                      spacing: AppSpacing.md,
-                      runSpacing: AppSpacing.md,
-                      children: <Widget>[
-                        for (final hotel in view.featuredHotels)
-                          SizedBox(
-                            width: w,
-                            child: HotelSummaryCard(
-                              hotel: hotel,
-                              layout: HotelCardLayout.tile,
-                              onTap: () => _openHotel(context, hotel.id),
-                            ),
-                          ),
-                      ],
-                    );
-                  },
-                ),
+                onOpenHotel: (String id) => _openHotel(context, id),
               ),
             ],
           ),
         ),
       ),
-      // Foundation: the persistent Figma bottom nav. "Home" is this screen; the
-      // other three destinations are not built yet (see
-      // mobile/docs/design-system.md) — tapping them explains that rather than
-      // routing to a placeholder.
       bottomNavigationBar: AppBottomNav(
         current: AppNavTab.home,
         onSelected: (AppNavTab tab) {
@@ -151,6 +158,114 @@ class DiscoverPage extends ConsumerWidget {
             ..hideCurrentSnackBar()
             ..showSnackBar(SnackBar(content: Text(l10n.navComingSoon)));
         },
+      ),
+    );
+  }
+}
+
+class _Listings extends StatelessWidget {
+  const _Listings({
+    required this.state,
+    required this.onRetry,
+    required this.onOpenHotel,
+  });
+
+  final UiState<DiscoverView> state;
+  final VoidCallback onRetry;
+  final ValueChanged<String> onOpenHotel;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
+    return UiStateView<DiscoverView>(
+      state: state,
+      onRetry: onRetry,
+      emptyTitle: l10n.discoverEmptyTitle,
+      emptyMessage: l10n.discoverEmptyBody,
+      onSuccess: (DiscoverView view) {
+        if (view.isSingleHotel) {
+          final String hotelId = view.soleHotel!.id;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              SectionHeader(
+                title: l10n.discoverExploreRooms,
+                onSeeAll: () => onOpenHotel(hotelId),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              for (final room in view.soleHotelRooms) ...<Widget>[
+                RoomSummaryCard(
+                  room: room,
+                  nights: 1,
+                  selected: false,
+                  showStayTotal: false,
+                  onViewDetails: () => onOpenHotel(hotelId),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+              ],
+            ],
+          );
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            SectionHeader(
+              title: l10n.discoverFeaturedSection,
+              onSeeAll: () => context.pushNamed(AppRoutes.hotelSearchName),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints c) {
+                final double w = (c.maxWidth - AppSpacing.md) / 2;
+                return Wrap(
+                  spacing: AppSpacing.md,
+                  runSpacing: AppSpacing.md,
+                  children: <Widget>[
+                    for (final hotel in view.featuredHotels)
+                      SizedBox(
+                        width: w,
+                        child: HotelSummaryCard(
+                          hotel: hotel,
+                          layout: HotelCardLayout.tile,
+                          onTap: () => onOpenHotel(hotel.id),
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _CircleAction extends StatelessWidget {
+  const _CircleAction({
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppColorTokens c = context.colors;
+    return Center(
+      child: Material(
+        color: c.bgSurface,
+        shape: CircleBorder(side: BorderSide(color: c.borderDefault)),
+        clipBehavior: Clip.antiAlias,
+        child: IconButton(
+          icon: Icon(icon, size: 20),
+          tooltip: tooltip,
+          onPressed: onPressed,
+          visualDensity: VisualDensity.compact,
+        ),
       ),
     );
   }

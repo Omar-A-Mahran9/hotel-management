@@ -54,6 +54,9 @@ flutter:
   # AppImages (lib/core/widgets/app_image.dart) — never referenced by path.
   assets:
     - assets/images/
+    # Brand mark (the three-tower logo with the gold spire). White-on-transparent,
+    # made for the warm-brown splash. Consumed only through AppImages.brandMark.
+    - assets/brand/
 
   # Tajawal — the Figma-specified Arabic family (font/family/arabic = Tajawal).
   # A humanist Arabic sans with a full Latin set, so the same family renders the

@@ -33,7 +33,7 @@ class AuthSplashPage extends StatelessWidget {
             alignment: Alignment(0, -0.12),
             child: BrandLogo(
               variant: BrandLogoVariant.stacked,
-              markColor: AppPrimitives.white,
+              assetMark: true,
               wordmarkColor: AppPrimitives.white,
               taglineColor: AppPrimitives.gold200,
               markSize: 34,

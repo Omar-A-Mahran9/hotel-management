@@ -47,15 +47,15 @@ void main() {
     expect(_location(c), AppRoutes.discover);
   });
 
-  testWidgets('an unauthenticated deep link into discovery is bounced to welcome',
+  testWidgets('a guest may browse discovery without an account (deferred auth)',
       (WidgetTester tester) async {
     final ProviderContainer c = await pumpApp(tester);
     c.read(appRouterProvider).go('/discover/hotel/oasis');
     await tester.pumpAndSettle();
-    expect(_location(c), AppRoutes.welcome);
+    expect(_location(c), '/discover/hotel/oasis');
   });
 
-  testWidgets('signing out from discover returns to welcome',
+  testWidgets('signing out from discover drops to guest discover, not welcome',
       (WidgetTester tester) async {
     final ProviderContainer c =
         await pumpApp(tester, bootSession: completeSession());
@@ -64,6 +64,6 @@ void main() {
     await tester.tap(find.byTooltip(en.authSignOut));
     await tester.pumpAndSettle();
 
-    expect(_location(c), AppRoutes.welcome);
+    expect(_location(c), AppRoutes.discover);
   });
 }

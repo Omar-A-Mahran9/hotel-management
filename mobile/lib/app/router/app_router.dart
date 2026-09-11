@@ -8,11 +8,14 @@ import '../../core/widgets/message_view.dart';
 import '../../features/authentication/presentation/pages/auth_splash_page.dart';
 import '../../features/authentication/presentation/pages/complete_profile_page.dart';
 import '../../features/authentication/presentation/pages/entry_welcome_page.dart';
+import '../../features/authentication/presentation/pages/language_selection_page.dart';
 import '../../features/authentication/presentation/pages/otp_verification_page.dart';
 import '../../features/authentication/presentation/pages/phone_login_page.dart';
 import '../../features/authentication/presentation/pages/session_expired_page.dart';
 import '../../features/authentication/presentation/state/auth_controller.dart';
 import '../../features/authentication/presentation/state/auth_state.dart';
+import '../../features/authentication/presentation/state/language_selection_controller.dart';
+import '../../features/authentication/presentation/state/post_auth_redirect_controller.dart';
 import '../../features/discovery/presentation/pages/available_rooms_page.dart';
 import '../../features/discovery/presentation/pages/discover_page.dart';
 import '../../features/discovery/presentation/pages/hotel_detail_page.dart';
@@ -80,22 +83,43 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
     redirect: (BuildContext context, GoRouterState state) {
       final AuthState auth = ref.read(authControllerProvider);
       final String loc = state.matchedLocation;
+      // The route *pattern* (e.g. `/discover/hotel/:hotelId`), for matching
+      // parametrised routes against the public/auth route sets.
+      final String pattern = state.fullPath ?? loc;
       final bool onAuthSurface = AppRoutes.authSurface.contains(loc);
       final bool onProfile = loc == AppRoutes.completeProfile;
       final bool onSplash = loc == AppRoutes.splash;
 
+      final bool languageChosen = ref.read(languageSelectedProvider);
+
       return auth.map(
         unknown: () => onSplash ? null : AppRoutes.splash,
         unauthenticated: () {
+          // First run: the language screen sits before everything else on the
+          // unauthenticated surface.
+          if (loc == AppRoutes.language) {
+            return languageChosen ? AppRoutes.welcome : null;
+          }
+          if (!languageChosen) return AppRoutes.language;
           if (onSplash) return AppRoutes.welcome;
           if (loc == AppRoutes.sessionExpired) return AppRoutes.welcome;
           if (onAuthSurface) return null;
+          // Deferred auth: a guest may browse discovery + the booking review
+          // without an account (docs/mobile-deferred-auth.md). Sign-in is
+          // requested from the "confirm" action, not the router.
+          if (AppRoutes.isPublic(pattern)) return null;
           return AppRoutes.welcome;
         },
         awaitingProfile: (_) => onProfile ? null : AppRoutes.completeProfile,
-        authenticated: (_) => (onSplash || onAuthSurface || onProfile)
-            ? AppRoutes.authenticatedHome
-            : null,
+        authenticated: (_) {
+          if (onSplash || onAuthSurface || onProfile) {
+            // If the guest signed in mid-booking, return them to where they
+            // were (the review screen); otherwise land on the app home.
+            return ref.read(postAuthRedirectProvider.notifier).consume() ??
+                AppRoutes.authenticatedHome;
+          }
+          return null;
+        },
         sessionExpired: () =>
             loc == AppRoutes.sessionExpired ? null : AppRoutes.sessionExpired,
       );
@@ -105,6 +129,11 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
         path: AppRoutes.splash,
         name: AppRoutes.splashName,
         builder: (_, _) => const AuthSplashPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.language,
+        name: AppRoutes.languageName,
+        builder: (_, _) => const LanguageSelectionPage(),
       ),
       GoRoute(
         path: AppRoutes.welcome,

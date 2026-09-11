@@ -9,8 +9,11 @@ use App\Http\Controllers\Api\V1\DigitalAccessController;
 use App\Http\Controllers\Api\V1\FolioController;
 use App\Http\Controllers\Api\V1\Guest\GuestAuthController;
 use App\Http\Controllers\Api\V1\Guest\GuestDiscoveryController;
+use App\Http\Controllers\Api\V1\Guest\GuestPaymentController;
+use App\Http\Controllers\Api\V1\Guest\GuestReservationController;
 use App\Http\Controllers\Api\V1\HotelController;
 use App\Http\Controllers\Api\V1\HotelGroupController;
+use App\Http\Controllers\Api\V1\HotelMediaController;
 use App\Http\Controllers\Api\V1\IdentityVerificationController;
 use App\Http\Controllers\Api\V1\InvoiceController;
 use App\Http\Controllers\Api\V1\LoyaltyController;
@@ -55,6 +58,33 @@ Route::prefix('v1')->group(function () {
 
         Route::middleware('auth:guest')->group(function () {
             Route::match(['put', 'patch'], '/profile', [GuestAuthController::class, 'updateProfile']);
+
+            /*
+             * Booking funnel — the guest's own reservations + the read view
+             * of their deposit payment. Dedicated guest controllers/resources
+             * that reuse the shared ReservationService / PaymentWorkflowService
+             * (no business logic here). Every row is scoped to the token
+             * guest's ownership: a non-owned or missing id is an identical
+             * plain 404. Writes are rate limited (guest.booking.write).
+             *
+             * POST /reservations/{id}/payment/hold is registered for contract
+             * completeness but currently refuses (no approved deposit-amount
+             * rule — see GuestPaymentController).
+             */
+            Route::get('/reservations', [GuestReservationController::class, 'index']);
+            Route::post('/reservations', [GuestReservationController::class, 'store'])
+                ->middleware('throttle:guest.booking.write');
+            Route::get('/reservations/{reservation}', [GuestReservationController::class, 'show'])
+                ->whereNumber('reservation');
+            Route::post('/reservations/{reservation}/cancel', [GuestReservationController::class, 'cancel'])
+                ->whereNumber('reservation')
+                ->middleware('throttle:guest.booking.write');
+
+            Route::get('/reservations/{reservation}/payment', [GuestPaymentController::class, 'show'])
+                ->whereNumber('reservation');
+            Route::post('/reservations/{reservation}/payment/hold', [GuestPaymentController::class, 'hold'])
+                ->whereNumber('reservation')
+                ->middleware('throttle:guest.booking.write');
         });
 
         /*
@@ -202,6 +232,17 @@ Route::prefix('v1')->group(function () {
             ->middleware('throttle:digital-access.revoke');
 
         Route::prefix('/hotels/{hotel}')->group(function () {
+            // Hotel media (logo / cover / gallery). Staff-only —
+            // `hotels.manage` + hotel scope (HotelPolicy::manageMedia). The
+            // guest app never calls these; it reads the resolved URLs off
+            // the public hotel resource. `reorder` is declared before the
+            // `{media}` param route so it is not shadowed.
+            Route::patch('/media/reorder', [HotelMediaController::class, 'reorder']);
+            Route::post('/media', [HotelMediaController::class, 'store'])
+                ->middleware('throttle:hotel-media.upload');
+            Route::delete('/media/{media}', [HotelMediaController::class, 'destroy'])
+                ->whereNumber('media');
+
             Route::get('/room-types', [RoomTypeController::class, 'index']);
             Route::post('/room-types', [RoomTypeController::class, 'store']);
             Route::get('/room-types/{roomType}', [RoomTypeController::class, 'show']);

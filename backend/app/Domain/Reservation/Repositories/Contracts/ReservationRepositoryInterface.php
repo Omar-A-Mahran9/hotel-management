@@ -3,11 +3,27 @@
 namespace App\Domain\Reservation\Repositories\Contracts;
 
 use App\Domain\IdentityAccess\Models\User;
+use App\Domain\Reservation\Models\Guest;
 use App\Domain\Reservation\Models\Reservation;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface ReservationRepositoryInterface
 {
+    /**
+     * Reservations belonging to $guest (guest_id === $guest->id), newest
+     * first. The guest booking API's ownership boundary — a guest can only
+     * ever see their own reservations. Data access only; no business rule.
+     */
+    public function paginateOwnedByGuest(Guest $guest, int $perPage = 15): LengthAwarePaginator;
+
+    /**
+     * Lookup by id scoped to $guest's ownership — returns null both when the
+     * reservation does not exist and when it exists but belongs to another
+     * guest, so the guest API answers an identical plain 404 for both and
+     * never leaks existence.
+     */
+    public function findOwnedByGuest(Guest $guest, int $id): ?Reservation;
+
     /**
      * Reservations filtered through $user's own hotel access (Group Owner
      * bypass or assigned hotels only) — never from a client-supplied

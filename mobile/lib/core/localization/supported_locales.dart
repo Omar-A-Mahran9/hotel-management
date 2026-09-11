@@ -10,16 +10,18 @@ abstract final class SupportedLocales {
 
   static bool isRtl(Locale locale) => locale.languageCode == 'ar';
 
-  /// Chooses a supported locale for a device preference list, falling back to
-  /// English when nothing matches.
+  /// Chooses a supported locale for a device preference list. Arabic is the
+  /// primary market locale, so it is also the fallback when the device
+  /// preference matches nothing the app ships (the guest can still switch on the
+  /// first-run language screen or from Account).
   static Locale resolveLocale(
     Locale? deviceLocale,
     Iterable<Locale> supported,
   ) {
-    if (deviceLocale == null) return english;
+    if (deviceLocale == null) return arabic;
     for (final Locale locale in supported) {
       if (locale.languageCode == deviceLocale.languageCode) return locale;
     }
-    return english;
+    return arabic;
   }
 }

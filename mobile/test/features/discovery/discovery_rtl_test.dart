@@ -32,9 +32,12 @@ void main() {
     await tester.tap(find.byType(TextField).first);
     await tester.pumpAndSettle();
 
-    expect(find.text(ar.searchTitle), findsOneWidget);
+    // The search screen's app-bar title (Home also shows it as a section header).
+    expect(find.text(ar.discoverFeaturedSection), findsWidgets);
     expect(
-      Directionality.of(tester.element(find.text(ar.searchTitle))),
+      Directionality.of(
+        tester.element(find.text(ar.discoverFeaturedSection).last),
+      ),
       TextDirection.rtl,
     );
   });
@@ -53,7 +56,7 @@ void main() {
 
     await tester.tap(find.text('فندق الواحة').first);
     await tester.pumpAndSettle();
-    await tester.tap(find.text(ar.hotelSelectDates));
+    await tester.tap(find.text(ar.hotelBookNow));
     await tester.pumpAndSettle();
 
     expect(find.byType(StayRangeCalendar), findsOneWidget);
@@ -83,7 +86,7 @@ void main() {
 
     await tester.tap(find.text('فندق الواحة').first);
     await tester.pumpAndSettle();
-    await tester.tap(find.text(ar.hotelSelectDates));
+    await tester.tap(find.text(ar.hotelBookNow));
     await tester.pumpAndSettle();
     // Calendar day cells render Arabic-Indic digits for `ar`.
     await tapCalendarDay(tester, '٦');
@@ -105,9 +108,9 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, ar.roomsContinue));
     await tester.pumpAndSettle();
 
-    expect(find.text(ar.reviewTitle), findsOneWidget);
+    expect(find.text(ar.bookingDetailsTitle), findsOneWidget);
     expect(
-      Directionality.of(tester.element(find.text(ar.reviewTitle))),
+      Directionality.of(tester.element(find.text(ar.bookingDetailsTitle))),
       TextDirection.rtl,
     );
     expect(find.text('فندق الواحة'), findsWidgets);

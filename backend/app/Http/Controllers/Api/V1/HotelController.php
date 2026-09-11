@@ -42,7 +42,7 @@ class HotelController extends Controller
     {
         $this->authorize('view', $hotel);
 
-        $hotel->load(['hotelGroup', 'countryRef', 'cityRef']);
+        $hotel->load(['hotelGroup', 'countryRef', 'cityRef', 'logo', 'cover', 'galleryMedia']);
 
         return $this->success(new HotelResource($hotel));
     }

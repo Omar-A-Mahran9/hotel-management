@@ -12,6 +12,7 @@ import type {
   Folio,
   Hotel,
   HotelGroup,
+  HotelMedia,
   HotelService,
   IdentityVerification,
   Invoice,
@@ -61,6 +62,22 @@ export const hotelsService = {
   create: (body: Record<string, unknown>) => api()<Hotel>('/hotels', { method: 'POST', body }),
   update: (id: number, body: Record<string, unknown>) =>
     api()<Hotel>(`/hotels/${id}`, { method: 'PUT', body }),
+}
+
+// ---- Hotel media (logo / cover / gallery, hotel-scoped) --------------
+// Real Laravel endpoints (POST/DELETE/PATCH /hotels/{id}/media...). Upload
+// is multipart — ofetch sets the boundary from the FormData automatically.
+export const hotelMediaService = {
+  upload: (hotelId: number, collection: HotelMedia['collection'], file: File) => {
+    const body = new FormData()
+    body.append('collection', collection)
+    body.append('image', file)
+    return api()<HotelMedia>(`/hotels/${hotelId}/media`, { method: 'POST', body })
+  },
+  remove: (hotelId: number, mediaId: number) =>
+    api()<null>(`/hotels/${hotelId}/media/${mediaId}`, { method: 'DELETE' }),
+  reorderGallery: (hotelId: number, ids: number[]) =>
+    api()<HotelMedia[]>(`/hotels/${hotelId}/media/reorder`, { method: 'PATCH', body: { ids } }),
 }
 
 // ---- Locations: countries + cities (global reference data) ----------

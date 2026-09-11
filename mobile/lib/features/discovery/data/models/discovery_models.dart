@@ -17,6 +17,7 @@ import '../../domain/entities/localized_text.dart';
 import '../../domain/entities/money.dart';
 import '../../domain/entities/room_type_summary.dart';
 import '../../domain/entities/stay_range.dart';
+import '../../domain/entities/upcoming_stay.dart';
 
 typedef Json = Map<String, Object?>;
 
@@ -117,6 +118,7 @@ class HotelModel {
     required this.reviewScores,
     required this.roomTypeCount,
     required this.photoCount,
+    this.entryRoom,
   });
 
   factory HotelModel.fromJson(Json json) => HotelModel(
@@ -131,6 +133,7 @@ class HotelModel {
             : _reviewScores(json['review_scores'] as Json),
         roomTypeCount: (json['room_type_count'] as num?)?.toInt() ?? 0,
         photoCount: (json['photo_count'] as num?)?.toInt() ?? 0,
+        entryRoom: _entryRoom(json['entry_room']),
       );
 
   final HotelSummaryModel summary;
@@ -139,6 +142,7 @@ class HotelModel {
   final ReviewScores? reviewScores;
   final int roomTypeCount;
   final int photoCount;
+  final RoomTypeSummaryModel? entryRoom;
 
   Hotel toEntity() => Hotel(
         summary: summary.toEntity(),
@@ -147,7 +151,13 @@ class HotelModel {
         reviewScores: reviewScores,
         roomTypeCount: roomTypeCount,
         photoCount: photoCount,
+        entryRoom: entryRoom?.toEntity(),
       );
+
+  static RoomTypeSummaryModel? _entryRoom(Object? value) {
+    if (value == null) return null;
+    return RoomTypeSummaryModel.fromJson(value as Json);
+  }
 
   static const Map<String?, HotelAmenity> _amenityByName = <String?, HotelAmenity>{
     'free_wifi': HotelAmenity.freeWifi,
@@ -165,6 +175,8 @@ class HotelModel {
         count: (json['count'] as num).toInt(),
         cleanliness: (json['cleanliness'] as num).toDouble(),
         communication: (json['communication'] as num).toDouble(),
+        location: (json['location'] as num?)?.toDouble() ??
+            (json['overall'] as num).toDouble(),
       );
 }
 
@@ -199,6 +211,7 @@ class RoomTypeSummaryModel {
     required this.nightlyRate,
     required this.breakfastIncluded,
     required this.refundable,
+    this.areaSqm,
   });
 
   factory RoomTypeSummaryModel.fromJson(Json json) => RoomTypeSummaryModel(
@@ -214,6 +227,7 @@ class RoomTypeSummaryModel {
         nightlyRate: _money(json['nightly_rate']),
         breakfastIncluded: (json['breakfast_included'] as bool?) ?? false,
         refundable: (json['refundable'] as bool?) ?? false,
+        areaSqm: (json['area_sqm'] as num?)?.toInt(),
       );
 
   final String id;
@@ -225,6 +239,7 @@ class RoomTypeSummaryModel {
   final Money nightlyRate;
   final bool breakfastIncluded;
   final bool refundable;
+  final int? areaSqm;
 
   RoomTypeSummary toEntity() => RoomTypeSummary(
         id: id,
@@ -236,6 +251,7 @@ class RoomTypeSummaryModel {
         nightlyRate: nightlyRate,
         breakfastIncluded: breakfastIncluded,
         refundable: refundable,
+        areaSqm: areaSqm,
       );
 
   static const Map<String?, RoomAmenity> _amenityByName = <String?, RoomAmenity>{
@@ -298,6 +314,42 @@ class AvailabilityResultModel {
         stay: StayRange(checkIn: checkIn, checkOut: checkOut),
         party: GuestParty(adults: adults, children: children),
         rooms: rooms.map((AvailableRoomModel m) => m.toEntity()).toList(growable: false),
+      );
+}
+
+class UpcomingStayModel {
+  const UpcomingStayModel({
+    required this.reservationId,
+    required this.roomName,
+    required this.hotelName,
+    required this.cityName,
+    required this.nightlyRate,
+    required this.isAvailable,
+  });
+
+  factory UpcomingStayModel.fromJson(Json json) => UpcomingStayModel(
+        reservationId: json['reservation_id'] as String,
+        roomName: _text(json['room_name']),
+        hotelName: _text(json['hotel_name']),
+        cityName: _text(json['city_name']),
+        nightlyRate: _money(json['nightly_rate']),
+        isAvailable: (json['is_available'] as bool?) ?? true,
+      );
+
+  final String reservationId;
+  final LocalizedText roomName;
+  final LocalizedText hotelName;
+  final LocalizedText cityName;
+  final Money nightlyRate;
+  final bool isAvailable;
+
+  UpcomingStay toEntity() => UpcomingStay(
+        reservationId: reservationId,
+        roomName: roomName,
+        hotelName: hotelName,
+        cityName: cityName,
+        nightlyRate: nightlyRate,
+        isAvailable: isAvailable,
       );
 }
 

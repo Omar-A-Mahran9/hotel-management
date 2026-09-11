@@ -12,6 +12,11 @@ abstract final class AppRoutes {
   static const String welcome = '/welcome';
   static const String welcomeName = 'welcome';
 
+  /// `01 · Entry` — first-run language selection, shown after the splash and
+  /// before [welcome]. Arabic is the pre-selected default.
+  static const String language = '/welcome/language';
+  static const String languageName = 'language';
+
   /// `09 · Authentication` — phone-number entry.
   static const String signIn = '/auth/phone';
   static const String signInName = 'signIn';
@@ -179,9 +184,28 @@ abstract final class AppRoutes {
 
   /// Routes that make up the unauthenticated entry + auth surface.
   static const Set<String> authSurface = <String>{
+    language,
     welcome,
     signIn,
     otp,
     sessionExpired,
   };
+
+  /// Discovery + booking-review routes a guest may browse **without an account**.
+  /// Authentication is deferred to the "confirm" action on [roomSelectionReview]
+  /// (see `docs/mobile-deferred-auth.md`). Values are route patterns, matched
+  /// against `GoRouterState.matchedLocation`.
+  static const Set<String> publicSurface = <String>{
+    discover,
+    hotelSearch,
+    hotelDetail,
+    stayDates,
+    availableRooms,
+    roomDetail,
+    roomSelectionReview,
+  };
+
+  /// Whether [loc] (a `GoRouterState.matchedLocation`) is browsable by a guest
+  /// who has not signed in yet.
+  static bool isPublic(String loc) => publicSurface.contains(loc);
 }

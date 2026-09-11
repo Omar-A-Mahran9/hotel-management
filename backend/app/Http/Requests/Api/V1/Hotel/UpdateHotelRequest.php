@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\V1\Hotel;
 
+use App\Domain\HotelGroup\Enums\HotelAmenity;
 use App\Domain\Location\Models\City;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -20,9 +21,23 @@ class UpdateHotelRequest extends FormRequest
     {
         $hotel = $this->route('hotel');
 
+        $locales = (array) config('app.available_locales', ['en']);
+
+        $i18n = [];
+        foreach (['name_i18n', 'tagline_i18n', 'description_i18n'] as $field) {
+            $i18n[$field] = ['sometimes', 'nullable', 'array'];
+            foreach ($locales as $locale) {
+                $i18n["{$field}.{$locale}"] = ['nullable', 'string', 'max:2000'];
+            }
+        }
+
         return [
             'hotel_group_id' => ['sometimes', 'integer', 'exists:hotel_groups,id'],
             'name' => ['sometimes', 'string', 'max:255'],
+            ...$i18n,
+            'star_rating' => ['sometimes', 'nullable', 'integer', 'between:1,5'],
+            'amenities' => ['sometimes', 'nullable', 'array'],
+            'amenities.*' => [Rule::in(HotelAmenity::values())],
             'slug' => ['sometimes', 'string', 'max:255', 'alpha_dash', Rule::unique('hotels', 'slug')->ignore($hotel)],
             'country_id' => ['sometimes', 'required', 'integer', 'exists:countries,id'],
             'city_id' => ['sometimes', 'required', 'integer', 'exists:cities,id'],

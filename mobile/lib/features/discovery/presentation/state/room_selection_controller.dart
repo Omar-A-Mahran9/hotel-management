@@ -33,7 +33,14 @@ class RoomSelectionController extends Notifier<RoomSelection?> {
 
   void clear() => state = null;
 
-  /// Drops the selection if the current dates/party no longer match it.
+  /// Reconciles the selection with the current dates + party.
+  ///
+  /// * A **date** change (or cleared/invalid dates) drops the selection — a room
+  ///   priced for one stay can't carry over to another.
+  /// * A **party** change keeps the selection and updates its party in place as
+  ///   long as the new party still fits the room type (occupancy). This lets the
+  ///   booking-summary steppers re-price without re-picking a room. A party that
+  ///   no longer fits drops the selection.
   void _revalidate() {
     final RoomSelection? selection = state;
     if (selection == null) return;
@@ -41,12 +48,16 @@ class RoomSelectionController extends Notifier<RoomSelection?> {
     final DateTime today = _today();
     final StayRange? currentStay =
         ref.read(stayDatesControllerProvider).rangeAgainst(today);
-    final GuestParty currentParty = ref.read(guestPartyControllerProvider);
+    if (currentStay == null || currentStay != selection.stay) {
+      state = null;
+      return;
+    }
 
-    final bool stillValid = currentStay != null &&
-        currentStay == selection.stay &&
-        currentParty == selection.party;
-    if (!stillValid) state = null;
+    final GuestParty currentParty = ref.read(guestPartyControllerProvider);
+    if (currentParty == selection.party) return;
+    state = selection.fits(currentParty)
+        ? selection.copyWith(party: currentParty)
+        : null;
   }
 
   DateTime _today() {

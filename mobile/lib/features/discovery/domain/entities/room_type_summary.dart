@@ -24,6 +24,7 @@ class RoomTypeSummary {
     required this.nightlyRate,
     required this.breakfastIncluded,
     required this.refundable,
+    this.areaSqm,
   });
 
   final String id;
@@ -36,6 +37,10 @@ class RoomTypeSummary {
   final bool breakfastIncluded;
   final bool refundable;
 
+  /// Room floor area in square metres, shown as a spec chip on the room / hotel
+  /// detail screens (`32 م²`). `null` when the source does not provide it.
+  final int? areaSqm;
+
   @override
   bool operator ==(Object other) =>
       other is RoomTypeSummary &&
@@ -47,7 +52,8 @@ class RoomTypeSummary {
       listEquals(other.amenities, amenities) &&
       other.nightlyRate == nightlyRate &&
       other.breakfastIncluded == breakfastIncluded &&
-      other.refundable == refundable;
+      other.refundable == refundable &&
+      other.areaSqm == areaSqm;
 
   @override
   int get hashCode => Object.hash(
@@ -60,5 +66,6 @@ class RoomTypeSummary {
         nightlyRate,
         breakfastIncluded,
         refundable,
+        areaSqm,
       );
 }

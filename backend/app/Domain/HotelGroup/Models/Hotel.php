@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Hotel extends Model
 {
@@ -23,6 +24,11 @@ class Hotel extends Model
     protected $fillable = [
         'hotel_group_id',
         'name',
+        'name_i18n',
+        'tagline_i18n',
+        'description_i18n',
+        'star_rating',
+        'amenities',
         'slug',
         'country_id',
         'city_id',
@@ -36,6 +42,11 @@ class Hotel extends Model
     {
         return [
             'is_active' => 'boolean',
+            'name_i18n' => 'array',
+            'tagline_i18n' => 'array',
+            'description_i18n' => 'array',
+            'amenities' => 'array',
+            'star_rating' => 'integer',
         ];
     }
 
@@ -76,6 +87,33 @@ class Hotel extends Model
     public function roomTypes(): HasMany
     {
         return $this->hasMany(RoomType::class);
+    }
+
+    /**
+     * All media rows, in display order. Filtered per-collection by the
+     * dedicated accessors below.
+     */
+    public function media(): HasMany
+    {
+        return $this->hasMany(HotelMedia::class)->orderBy('sort_order')->orderBy('id');
+    }
+
+    public function logo(): HasOne
+    {
+        return $this->hasOne(HotelMedia::class)->where('collection', HotelMedia::COLLECTION_LOGO);
+    }
+
+    public function cover(): HasOne
+    {
+        return $this->hasOne(HotelMedia::class)->where('collection', HotelMedia::COLLECTION_COVER);
+    }
+
+    public function galleryMedia(): HasMany
+    {
+        return $this->hasMany(HotelMedia::class)
+            ->where('collection', HotelMedia::COLLECTION_GALLERY)
+            ->orderBy('sort_order')
+            ->orderBy('id');
     }
 
     /**

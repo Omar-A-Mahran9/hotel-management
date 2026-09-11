@@ -58,6 +58,26 @@ class ReservationService
     }
 
     /**
+     * The guest booking API's read scope: a guest sees only their own
+     * reservations (guest_id === $guest->id). Same thin delegation as
+     * listAccessibleBy() — the ownership filter is the whole authorization.
+     */
+    public function listOwnedByGuest(Guest $guest, int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->reservations->paginateOwnedByGuest($guest, $perPage);
+    }
+
+    /**
+     * Guest-scoped single lookup — null both when the reservation does not
+     * exist and when it belongs to another guest, so the API answers an
+     * identical plain 404 for both.
+     */
+    public function findOwnedByGuest(Guest $guest, int $id): ?Reservation
+    {
+        return $this->reservations->findOwnedByGuest($guest, $id);
+    }
+
+    /**
      * Creates a Reservation in PENDING with a price snapshot taken from
      * the Room Type's current base_price, protected by the approved
      * Phase 3D availability/concurrency design.

@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hotel_guest_app/app/app.dart';
-import 'package:hotel_guest_app/core/di/core_providers.dart';
 import 'package:hotel_guest_app/core/localization/generated/app_localizations.dart';
 import 'package:hotel_guest_app/core/localization/locale_controller.dart';
 import 'package:hotel_guest_app/core/localization/supported_locales.dart';
 
-import '../support/test_config.dart';
+import '../support/auth_test_support.dart';
 
 void main() {
   test('every English key has an Arabic translation', () async {
@@ -32,9 +31,7 @@ void main() {
   });
 
   testWidgets('switching to Arabic flips the app to RTL', (WidgetTester tester) async {
-    final container = ProviderContainer(
-      overrides: <Override>[appConfigProvider.overrideWithValue(testConfig)],
-    );
+    final container = ProviderContainer(overrides: authOverrides());
     addTearDown(container.dispose);
 
     await tester.pumpWidget(

@@ -15,6 +15,12 @@ class EloquentHotelCatalogRepository implements HotelCatalogRepositoryInterface
     {
         return Hotel::query()
             ->where('is_active', true)
+            ->with(['logo', 'cover'])
+            ->withMin(
+                ['roomTypes as price_from' => fn (Builder $q) => $q->where('is_active', true)],
+                'base_price',
+            )
+            ->withCount(['roomTypes as room_types_count' => fn (Builder $q) => $q->where('is_active', true)])
             ->when($city !== null && $city !== '', fn (Builder $q) => $q->where('city', $city))
             ->when($search !== null && $search !== '', fn (Builder $q) => $q->where(function (Builder $inner) use ($search): void {
                 $inner->where('name', 'like', '%'.$search.'%')
@@ -26,7 +32,10 @@ class EloquentHotelCatalogRepository implements HotelCatalogRepositoryInterface
 
     public function findActiveHotel(int $id): ?Hotel
     {
-        return Hotel::query()->where('is_active', true)->find($id);
+        return Hotel::query()
+            ->where('is_active', true)
+            ->with(['logo', 'cover', 'galleryMedia'])
+            ->find($id);
     }
 
     public function activeHotelCities(): array

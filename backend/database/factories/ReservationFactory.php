@@ -30,6 +30,8 @@ class ReservationFactory extends Factory
             'guest_id' => Guest::factory(),
             'check_in' => $checkIn->format('Y-m-d'),
             'check_out' => $checkOut->format('Y-m-d'),
+            'adults' => fake()->numberBetween(1, 2),
+            'children' => 0,
             'status' => Reservation::STATUS_PENDING,
             'price_snapshot' => fake()->randomFloat(2, 50, 5000),
             'created_by_staff_id' => null,

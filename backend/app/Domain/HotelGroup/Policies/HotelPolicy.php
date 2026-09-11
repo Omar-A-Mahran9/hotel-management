@@ -36,4 +36,16 @@ class HotelPolicy
     {
         return $user->hasPermission('hotels.manage');
     }
+
+    /**
+     * Managing a hotel's images is a hotel-edit action: the same
+     * `hotels.manage` permission as update, plus the hotel-scope check
+     * resolved from the user's own stored access records (a Group Owner
+     * passes it by bypass) — never a client-supplied hotel_id.
+     */
+    public function manageMedia(User $user, Hotel $hotel): bool
+    {
+        return $user->hasPermission('hotels.manage')
+            && $this->hotelAccess->canAccessHotel($user, $hotel->id);
+    }
 }

@@ -5,15 +5,16 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_card.dart';
+import '../../../../core/widgets/app_icons.dart';
 import '../../../../core/widgets/money_text.dart';
 import '../../../../core/widgets/status_pill.dart';
 import '../../domain/entities/hotel_summary.dart';
 import 'hotel_thumbnail.dart';
-import 'rating_pill.dart';
-import '../../../../core/widgets/app_icons.dart';
+import 'rating_badge.dart';
 
-/// A hotel card for the discover grid and the search-result list
-/// (`02 · Discover & Book`). Lays out correctly in both text directions.
+/// A hotel card for the discover grid (`tile`, `HOME_Default`) and the
+/// search-result list (`row`, `SEARCH_Results_Default`). Lays out in both text
+/// directions.
 class HotelSummaryCard extends StatelessWidget {
   const HotelSummaryCard({
     super.key,
@@ -37,45 +38,26 @@ class HotelSummaryCard extends StatelessWidget {
 
 enum HotelCardLayout { row, tile }
 
-class _AvailabilityBadge extends StatelessWidget {
-  const _AvailabilityBadge({required this.isAvailable});
+class _AvailabilityPill extends StatelessWidget {
+  const _AvailabilityPill({required this.isAvailable});
 
   final bool isAvailable;
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final AppSemanticColors semantic =
-        Theme.of(context).extension<AppSemanticColors>() ??
-        AppSemanticColors.light;
+    final AppColorTokens c = context.colors;
     return StatusPill(
       label: isAvailable ? l10n.hotelAvailable : l10n.hotelUnavailable,
-      foreground: isAvailable
-          ? semantic.success
-          : Theme.of(context).colorScheme.error,
-      background: isAvailable
-          ? semantic.successContainer
-          : AppColors.errorContainer,
+      foreground: isAvailable ? c.successFg : c.errorFg,
+      background: isAvailable ? c.successBg : c.errorBg,
       icon: isAvailable ? AppIcons.shieldCheck : AppIcons.close,
     );
   }
 }
 
-class _PriceFrom extends StatelessWidget {
-  const _PriceFrom({required this.hotel});
-
-  final HotelSummary hotel;
-
-  @override
-  Widget build(BuildContext context) {
-    return MoneyText(
-      hotel.nightlyRateFrom.amount,
-      markSize: 13,
-      semanticsLabel: context.l10n.priceFrom(hotel.nightlyRateFrom.amount),
-    );
-  }
-}
-
+/// `SEARCH_Results_Default` row: name, city with a pin, price and the `متاحة`
+/// pill, with the image on the trailing edge.
 class _RowCard extends StatelessWidget {
   const _RowCard({required this.hotel, required this.onTap});
 
@@ -86,6 +68,7 @@ class _RowCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final Locale locale = Localizations.localeOf(context);
+    final AppColorTokens c = context.colors;
 
     return AppCard(
       onTap: onTap,
@@ -93,8 +76,6 @@ class _RowCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          HotelThumbnail(seed: hotel.id, width: 84, height: 84),
-          const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,35 +86,44 @@ class _RowCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: AppSpacing.xxs),
-                Text(
-                  hotel.cityName.resolve(locale),
-                  style: theme.textTheme.bodySmall,
-                ),
-                const SizedBox(height: AppSpacing.xs),
+                const SizedBox(height: 2),
                 Row(
                   children: <Widget>[
-                    _AvailabilityBadge(isAvailable: hotel.isAvailable),
-                    const Spacer(),
-                    _PriceFrom(hotel: hotel),
+                    Icon(AppIcons.location, size: 13, color: c.textSecondary),
+                    const SizedBox(width: 2),
+                    Flexible(
+                      child: Text(
+                        hotel.cityName.resolve(locale),
+                        style: theme.textTheme.bodySmall,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ],
                 ),
-                if (hotel.rating != null) ...<Widget>[
-                  const SizedBox(height: AppSpacing.xs),
-                  RatingPill(
-                    rating: hotel.rating!,
-                    reviewCount: hotel.reviewCount,
+                const SizedBox(height: AppSpacing.xs),
+                MoneyText(
+                  hotel.nightlyRateFrom.amount,
+                  markSize: 13,
+                  semanticsLabel: context.l10n.priceFrom(
+                    hotel.nightlyRateFrom.amount,
                   ),
-                ],
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                _AvailabilityPill(isAvailable: hotel.isAvailable),
               ],
             ),
           ),
+          const SizedBox(width: AppSpacing.sm),
+          HotelThumbnail(seed: hotel.id, width: 92, height: 92),
         ],
       ),
     );
   }
 }
 
+/// `HOME_Default` grid tile: photo with the rating badge overlaid, then the
+/// name and city. No price / availability — the mockup keeps the tile clean.
 class _TileCard extends StatelessWidget {
   const _TileCard({required this.hotel, required this.onTap});
 
@@ -151,15 +141,25 @@ class _TileCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          HotelThumbnail(
-            seed: hotel.id,
-            height: 104,
-            width: double.infinity,
-            borderRadius: AppRadius.allMd,
+          Stack(
+            children: <Widget>[
+              HotelThumbnail(
+                seed: hotel.id,
+                height: 116,
+                width: double.infinity,
+                borderRadius: AppRadius.allMd,
+              ),
+              if (hotel.rating != null)
+                PositionedDirectional(
+                  top: AppSpacing.xs,
+                  start: AppSpacing.xs,
+                  child: RatingBadge(rating: hotel.rating!),
+                ),
+            ],
           ),
           const SizedBox(height: AppSpacing.xs),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
+            padding: const EdgeInsets.symmetric(horizontal: 2),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -169,26 +169,14 @@ class _TileCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: AppSpacing.xxs),
+                const SizedBox(height: 2),
                 Text(
                   hotel.cityName.resolve(locale),
                   style: theme.textTheme.bodySmall,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: AppSpacing.xs),
-                if (hotel.rating != null)
-                  RatingPill(
-                    rating: hotel.rating!,
-                    reviewCount: hotel.reviewCount,
-                  ),
-                const SizedBox(height: AppSpacing.xs),
-                Row(
-                  children: <Widget>[
-                    _AvailabilityBadge(isAvailable: hotel.isAvailable),
-                    const Spacer(),
-                    _PriceFrom(hotel: hotel),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.xxs),
+                const SizedBox(height: 2),
               ],
             ),
           ),

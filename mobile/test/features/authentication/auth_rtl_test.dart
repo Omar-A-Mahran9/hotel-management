@@ -9,11 +9,8 @@ import '../../support/pump_app.dart';
 void main() {
   testWidgets('the sign-in screen renders right-to-left in Arabic',
       (WidgetTester tester) async {
-    await pumpApp(tester, locale: arabic);
+    await pumpSignIn(tester, locale: arabic);
     final AppLocalizations ar = await tester.l10n('ar');
-
-    await tester.tap(find.text(ar.entryStartAction));
-    await tester.pumpAndSettle();
 
     expect(find.text(ar.authPhoneHeading), findsOneWidget);
     expect(
@@ -29,11 +26,9 @@ void main() {
 
   testWidgets('the OTP boxes stay left-to-right in an Arabic layout',
       (WidgetTester tester) async {
-    await pumpApp(tester, locale: arabic);
+    await pumpSignIn(tester, locale: arabic);
     final AppLocalizations ar = await tester.l10n('ar');
 
-    await tester.tap(find.text(ar.entryStartAction));
-    await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), '512345678');
     await tester.pump();
     await tester.tap(find.text(ar.authPhoneSubmit));

@@ -24,6 +24,12 @@ class HotelResource extends JsonResource
             'id' => $this->id,
             'hotel_group_id' => $this->hotel_group_id,
             'name' => $this->name,
+            // Raw locale maps — the dashboard form edits every language.
+            'name_i18n' => $this->name_i18n,
+            'tagline_i18n' => $this->tagline_i18n,
+            'description_i18n' => $this->description_i18n,
+            'star_rating' => $this->star_rating,
+            'amenities' => $this->amenities ?? [],
             'slug' => $this->slug,
             'country_id' => $this->country_id,
             'city_id' => $this->city_id,
@@ -33,6 +39,15 @@ class HotelResource extends JsonResource
             'city_summary' => $this->summaryFor('cityRef'),
             'timezone' => $this->timezone,
             'is_active' => $this->is_active,
+            'logo' => $this->when(
+                $this->resource->relationLoaded('logo'),
+                fn () => $this->logo ? new HotelMediaResource($this->logo) : null,
+            ),
+            'cover' => $this->when(
+                $this->resource->relationLoaded('cover'),
+                fn () => $this->cover ? new HotelMediaResource($this->cover) : null,
+            ),
+            'gallery' => HotelMediaResource::collection($this->whenLoaded('galleryMedia')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

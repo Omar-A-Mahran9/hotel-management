@@ -41,6 +41,16 @@ class _ThrowingDataSource implements DiscoveryDataSource {
     required HotelSort sort,
   }) async =>
       throw error;
+
+  @override
+  Future<int> fetchGroupHotelCount() async => throw error;
+
+  @override
+  Future<List<AvailableRoomModel>> fetchHotelRooms(String hotelId) async =>
+      throw error;
+
+  @override
+  Future<UpcomingStayModel?> fetchUpcomingStay() async => throw error;
 }
 
 void main() {

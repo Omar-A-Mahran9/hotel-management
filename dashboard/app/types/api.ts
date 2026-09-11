@@ -75,10 +75,33 @@ export interface LocationSummary {
 }
 
 // ---- Hotels / groups --------------------------------------------------
+
+// A locale-keyed content map, e.g. { en: 'Nile View', ar: 'إطلالة النيل' }.
+// The staff API returns the raw map so the form can edit every language;
+// the guest API resolves it to one string per request locale.
+export type LocalizedMap = Partial<Record<'en' | 'ar', string | null>>
+
+export interface HotelMedia {
+  id: number
+  collection: 'logo' | 'cover' | 'gallery'
+  url: string
+  sort_order: number
+  mime_type: string | null
+  size: number | null
+  created_at: string
+}
+
 export interface Hotel {
   id: number
   hotel_group_id: number
   name: string
+  // Discovery enrichment — raw i18n maps for editing; null on hotels not
+  // yet localized (the `name` string is the fallback).
+  name_i18n: LocalizedMap | null
+  tagline_i18n: LocalizedMap | null
+  description_i18n: LocalizedMap | null
+  star_rating: number | null
+  amenities: string[]
   slug: string
   country_id: number | null
   city_id: number | null
@@ -90,6 +113,10 @@ export interface Hotel {
   city_summary?: LocationSummary | null
   timezone: string | null
   is_active: boolean
+  // Present when the backend eager-loads them (show / after write).
+  logo?: HotelMedia | null
+  cover?: HotelMedia | null
+  gallery?: HotelMedia[]
   created_at: string
   updated_at: string
 }

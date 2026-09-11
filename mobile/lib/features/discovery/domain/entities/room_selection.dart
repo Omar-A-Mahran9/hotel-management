@@ -84,15 +84,20 @@ class RoomSelection {
       request.stay == stay &&
       request.party == party;
 
-  RoomSelection copyWith({String? roomId}) => RoomSelection(
+  RoomSelection copyWith({String? roomId, GuestParty? party}) => RoomSelection(
         hotelId: hotelId,
         hotelName: hotelName,
         roomType: roomType,
         stay: stay,
-        party: party,
+        party: party ?? this.party,
         nightlyRate: nightlyRate,
         roomId: roomId ?? this.roomId,
       );
+
+  /// Whether [party] can be booked into this room type (occupancy check only —
+  /// Laravel stays authoritative).
+  bool fits(GuestParty party) =>
+      party.adults + party.children <= roomType.maxOccupancy;
 
   @override
   bool operator ==(Object other) =>

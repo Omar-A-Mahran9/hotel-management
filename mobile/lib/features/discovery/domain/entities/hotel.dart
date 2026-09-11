@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import 'hotel_summary.dart';
 import 'localized_text.dart';
+import 'room_type_summary.dart';
 
 /// A guest-facing hotel amenity shown as a chip on the detail screen
 /// (`02 · Discover & Book`, screen 3). Only the values the design represents.
@@ -25,12 +26,14 @@ class ReviewScores {
     required this.count,
     required this.cleanliness,
     required this.communication,
+    required this.location,
   });
 
   final double overall;
   final int count;
   final double cleanliness;
   final double communication;
+  final double location;
 
   @override
   bool operator ==(Object other) =>
@@ -38,10 +41,12 @@ class ReviewScores {
       other.overall == overall &&
       other.count == count &&
       other.cleanliness == cleanliness &&
-      other.communication == communication;
+      other.communication == communication &&
+      other.location == location;
 
   @override
-  int get hashCode => Object.hash(overall, count, cleanliness, communication);
+  int get hashCode =>
+      Object.hash(overall, count, cleanliness, communication, location);
 }
 
 /// The full hotel, backing the detail screen. Composes [summary] so lists and
@@ -55,6 +60,7 @@ class Hotel {
     required this.reviewScores,
     required this.roomTypeCount,
     required this.photoCount,
+    this.entryRoom,
   });
 
   final HotelSummary summary;
@@ -67,6 +73,11 @@ class Hotel {
   final int roomTypeCount;
   final int photoCount;
 
+  /// The hotel's entry-level (cheapest bookable) room type — the detail screen
+  /// shows its area / occupancy / bed as spec chips. `null` when the source has
+  /// no room offerings.
+  final RoomTypeSummary? entryRoom;
+
   String get id => summary.id;
   LocalizedText get name => summary.name;
 
@@ -78,7 +89,8 @@ class Hotel {
       listEquals(other.amenities, amenities) &&
       other.reviewScores == reviewScores &&
       other.roomTypeCount == roomTypeCount &&
-      other.photoCount == photoCount;
+      other.photoCount == photoCount &&
+      other.entryRoom == entryRoom;
 
   @override
   int get hashCode => Object.hash(
@@ -88,5 +100,6 @@ class Hotel {
         reviewScores,
         roomTypeCount,
         photoCount,
+        entryRoom,
       );
 }

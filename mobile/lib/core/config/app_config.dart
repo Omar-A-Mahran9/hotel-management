@@ -12,6 +12,7 @@ class AppConfig {
     required this.apiBaseUrl,
     required this.apiVersion,
     required this.useDummyData,
+    this.singleHotelGroup = false,
   });
 
   /// Reads configuration from compile-time defines, with development defaults:
@@ -39,12 +40,18 @@ class AppConfig {
     // their dummy source until their slice lands (see
     // md/integration-contract-matrix.md).
     const bool useDummy = bool.fromEnvironment('USE_DUMMY_DATA', defaultValue: true);
+    // Demo/QA flag: render the single-hotel Home variant (`اكتشف {hotel}` +
+    // `استكشف الغرف`). The real group size comes from the backend catalogue;
+    // this just lets the variant be walked with dummy data.
+    const bool singleHotel =
+        bool.fromEnvironment('SINGLE_HOTEL', defaultValue: false);
 
     return AppConfig(
       environment: AppEnvironment.fromName(env),
       apiBaseUrl: baseUrl,
       apiVersion: 'v1',
       useDummyData: useDummy,
+      singleHotelGroup: singleHotel,
     );
   }
 
@@ -52,6 +59,10 @@ class AppConfig {
   final String apiBaseUrl;
   final String apiVersion;
   final bool useDummyData;
+
+  /// When `true` the group operates one hotel — the Home screen shows the
+  /// single-hotel layout (`docs/mobile-discover-book.md`).
+  final bool singleHotelGroup;
 
   /// Fully-qualified API root, e.g. `https://api.example.com/api/v1`
   /// (mobile/docs/architecture.md §5).

@@ -41,6 +41,9 @@ feature.
 
 ### Phase specs
 
+- `docs/mobile-entry-language-selection.md` — entry splash → language screen → welcome (`01 · Entry`)
+- `docs/mobile-deferred-auth.md` — browse without an account; sign in at the booking "confirm" step (`09 · Authentication`)
+- `docs/mobile-discover-book.md` — Home / search / hotel detail / booking summary + intermediate screens (`02 · Discover & Book`, boards 16 & 08)
 - `docs/mobile-phase-5-payment.md` — deposit-hold payment flow
 - `docs/mobile-phase-6-identity-verification.md` — document → selfie → result
 - `docs/mobile-phase-7-checkin-digital-access.md` — check-in + room key

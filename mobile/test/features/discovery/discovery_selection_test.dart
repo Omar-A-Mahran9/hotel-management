@@ -29,7 +29,7 @@ Future<AppLocalizations> _openRooms(WidgetTester tester) async {
 
   await tester.tap(find.text('The Oasis Hotel').first);
   await tester.pumpAndSettle();
-  await tester.tap(find.text(en.hotelSelectDates));
+  await tester.tap(find.text(en.hotelBookNow));
   await tester.pumpAndSettle();
   await tapCalendarDay(tester, '6');
   await tapCalendarDay(tester, '8');
@@ -65,12 +65,12 @@ void main() {
     await tester.tap(continueBtn);
     await tester.pumpAndSettle();
 
-    expect(find.text(en.reviewTitle), findsOneWidget);
-    expect(find.text(en.reviewNotBookedNotice), findsOneWidget);
+    expect(find.text(en.bookingDetailsTitle), findsOneWidget);
     expect(find.text('The Oasis Hotel'), findsWidgets);
     expect(find.text('Standard Room'), findsWidgets);
-    // 320 / night × 2 nights = 640 total.
-    expect(find.text(en.priceStayTotal(640)), findsWidgets);
+    // 320 / night × 2 nights = 640 subtotal.
+    expect(find.text(en.bookingRoomSubtotal), findsOneWidget);
+    expect(find.text(en.bookingTotal), findsOneWidget);
   });
 
   testWidgets('changing the guest party clears a room selection with a notice',

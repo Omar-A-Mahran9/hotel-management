@@ -140,6 +140,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get entryLanguageSwitchLabel => 'اللغة';
 
   @override
+  String get languageScreenTitle => 'اللغة';
+
+  @override
+  String get languageScreenHeading => 'اختر لغة التطبيق';
+
+  @override
+  String get languageScreenBody =>
+      'يمكنك تغييرها لاحقاً من «حسابي». الواجهة مصمّمة بالعربية أولاً.';
+
+  @override
+  String get languageDefaultTag => 'افتراضي';
+
+  @override
   String get authPhoneTitle => 'تسجيل الدخول';
 
   @override
@@ -317,7 +330,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get discoverNotificationsTooltip => 'الإشعارات';
 
   @override
+  String get discoverSignIn => 'تسجيل الدخول';
+
+  @override
   String get discoverFeaturedSection => 'فنادق المجموعة';
+
+  @override
+  String get discoverExploreRooms => 'استكشف الغرف';
+
+  @override
+  String get discoverUpcomingStay => 'إقامتك القادمة';
+
+  @override
+  String discoverSubtitleHotel(String hotel) {
+    return 'اكتشف $hotel';
+  }
 
   @override
   String get discoverEmptyTitle => 'لا توجد فنادق للعرض بعد';
@@ -494,6 +521,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get hotelReviewCommunication => 'التواصل';
 
   @override
+  String get hotelReviewLocation => 'الموقع';
+
+  @override
   String get hotelDetailAmenities => 'ما يقدّمه هذا الفندق';
 
   @override
@@ -519,6 +549,26 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get hotelSelectDates => 'اختيار التواريخ';
+
+  @override
+  String get hotelBookNow => 'احجز الآن';
+
+  @override
+  String hotelGuestCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count نزلاء',
+      two: 'نزيلان',
+      one: 'نزيل واحد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String roomAreaSqm(int area) {
+    return '$area م²';
+  }
 
   @override
   String get amenityFreeWifi => 'واي فاي مجاني';
@@ -863,6 +913,38 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get reviewBackToRooms => 'العودة إلى الغرف';
+
+  @override
+  String get reviewSignInToConfirm => 'سجّل الدخول لتأكيد الحجز';
+
+  @override
+  String get reviewSignInHint =>
+      'تحتاج حساباً لتأكيد هذا الحجز. التصفّح يبقى بلا تسجيل.';
+
+  @override
+  String get bookingDetailsTitle => 'تفاصيل الحجز';
+
+  @override
+  String get bookingDatesLabel => 'تواريخ الإقامة';
+
+  @override
+  String get bookingRoomSubtotal => 'قيمة الإقامة';
+
+  @override
+  String get bookingServiceFee => 'رسوم الخدمة';
+
+  @override
+  String get bookingServiceFeeNote =>
+      'قيمة تقديرية للعرض — يؤكّد الفندق المبلغ النهائي.';
+
+  @override
+  String get bookingTotal => 'الإجمالي';
+
+  @override
+  String get bookingProceedToPayment => 'المتابعة للدفع';
+
+  @override
+  String get bookingRoomAvailable => 'متاحة';
 
   @override
   String get reservationConfirmCta => 'تأكيد الحجز';

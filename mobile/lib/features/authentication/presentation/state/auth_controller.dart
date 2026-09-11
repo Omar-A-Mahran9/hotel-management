@@ -26,6 +26,13 @@ final authRepositoryProvider = Provider<AuthRepository>((Ref ref) {
   );
 });
 
+/// Minimum time the branded splash (`AuthSplashPage`) stays on screen before the
+/// router moves on. Session restore is usually instant (in-memory token store),
+/// so without a floor the splash would flash by unseen. Overridden to
+/// [Duration.zero] in tests.
+final splashMinDurationProvider =
+    Provider<Duration>((Ref ref) => const Duration(milliseconds: 1800));
+
 /// Owns [AuthState] and the transitions between its cases. Feature screens call
 /// these methods; the router redirects on the resulting state.
 class AuthController extends Notifier<AuthState> {
@@ -34,15 +41,28 @@ class AuthController extends Notifier<AuthState> {
   @override
   AuthState build() {
     // Kick off session restore; until it resolves the router shows a splash.
+    // Hold it for at least [splashMinDurationProvider] so the brand screen is
+    // actually seen even when restore returns immediately. Read dependencies
+    // synchronously here — the container may be gone by the time the future runs.
+    final AuthRepository repository = _repository;
+    final Duration minSplash = ref.read(splashMinDurationProvider);
+    bool disposed = false;
+    ref.onDispose(() => disposed = true);
+
     Future<void>(() async {
+      final Future<void> minimumSplash = Future<void>.delayed(minSplash);
+      AuthState next;
       try {
-        final AuthSession? restored = await _repository.restoreSession();
-        state = restored == null
+        final AuthSession? restored = await repository.restoreSession();
+        next = restored == null
             ? const AuthState.unauthenticated()
             : _fromSession(restored);
       } catch (_) {
-        state = const AuthState.unauthenticated();
+        next = const AuthState.unauthenticated();
       }
+      await minimumSplash;
+      if (disposed) return;
+      state = next;
     });
     return const AuthState.unknown();
   }

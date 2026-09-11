@@ -7,10 +7,8 @@ import 'package:hotel_guest_app/features/authentication/presentation/widgets/otp
 import '../../support/pump_app.dart';
 
 Future<AppLocalizations> _openOtp(WidgetTester tester) async {
-  await pumpApp(tester);
+  await pumpSignIn(tester);
   final AppLocalizations en = await tester.l10n();
-  await tester.tap(find.text(en.entryStartAction));
-  await tester.pumpAndSettle();
   await tester.enterText(find.byType(TextField), '512345678');
   await tester.pump();
   await tester.tap(find.text(en.authPhoneSubmit));

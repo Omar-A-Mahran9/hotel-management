@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../localization/l10n.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
+import 'app_image.dart';
 
 /// How the brand lock-up is arranged.
 enum BrandLogoVariant {
@@ -35,11 +36,13 @@ class BrandLogo extends StatelessWidget {
     this.markSize = 30,
     this.showTagline = false,
     this.taglineColor,
+    this.assetMark = false,
   });
 
   final BrandLogoVariant variant;
 
-  /// Mark colour. Defaults to the bronze accent.
+  /// Mark colour. Defaults to the bronze accent. Ignored when [assetMark] is set
+  /// (the raster carries its own colours).
   final Color? markColor;
 
   /// Wordmark colour. Defaults to [markColor].
@@ -49,6 +52,22 @@ class BrandLogo extends StatelessWidget {
   final bool showTagline;
   final Color? taglineColor;
 
+  /// Render the real brand raster ([AppImages.brandMark]) instead of the vector
+  /// reconstruction. The raster is white-on-transparent, so only use it on a
+  /// dark ground (the splash). Falls back to the vector if the asset is missing.
+  final bool assetMark;
+
+  Widget _mark(double size, Color color) {
+    if (!assetMark) return _BuildingMark(size: size, color: color);
+    return Image.asset(
+      AppImages.brandMark,
+      height: size,
+      fit: BoxFit.contain,
+      errorBuilder: (BuildContext context, Object error, StackTrace? stack) =>
+          _BuildingMark(size: size, color: color),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
@@ -56,7 +75,7 @@ class BrandLogo extends StatelessWidget {
     final Color wc = wordmarkColor ?? mc;
     final Color tc = taglineColor ?? wc.withValues(alpha: 0.7);
 
-    final Widget mark = _BuildingMark(size: markSize, color: mc);
+    final Widget mark = _mark(markSize, mc);
 
     switch (variant) {
       case BrandLogoVariant.markOnly:
@@ -79,7 +98,7 @@ class BrandLogo extends StatelessWidget {
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            _BuildingMark(size: markSize * 1.7, color: mc),
+            _mark(markSize * 1.7, mc),
             SizedBox(height: markSize * 0.55),
             Text(
               l10n.appName,

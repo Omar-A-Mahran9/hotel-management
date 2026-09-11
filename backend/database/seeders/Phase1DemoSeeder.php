@@ -2,10 +2,13 @@
 
 namespace Database\Seeders;
 
+use App\Domain\HotelGroup\Enums\HotelAmenity;
 use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\HotelGroup\Models\HotelGroup;
 use App\Domain\IdentityAccess\Models\Role;
 use App\Domain\IdentityAccess\Models\User;
+use App\Domain\Inventory\Models\Room;
+use App\Domain\Inventory\Models\RoomType;
 use App\Domain\Location\Models\City;
 use Illuminate\Database\Seeder;
 
@@ -54,9 +57,15 @@ class Phase1DemoSeeder extends Seeder
             ]
         );
 
-        $cairo = $this->demoHotel($group->id, 'demo-cairo-hotel', 'Cairo Hotel', 'Cairo');
-        $hurghada = $this->demoHotel($group->id, 'demo-hurghada-hotel', 'Hurghada Hotel', 'Hurghada');
-        $this->demoHotel($group->id, 'demo-luxor-hotel', 'Luxor Hotel', 'Luxor');
+        $cairo = $this->demoHotel($group->id, 'demo-cairo-hotel', 'Cairo Hotel', 'Cairo', 'فندق القاهرة');
+        $hurghada = $this->demoHotel($group->id, 'demo-hurghada-hotel', 'Hurghada Hotel', 'Hurghada', 'فندق الغردقة');
+        $luxor = $this->demoHotel($group->id, 'demo-luxor-hotel', 'Luxor Hotel', 'Luxor', 'فندق الأقصر');
+
+        // Room types + physical rooms so the guest discovery/availability
+        // and booking funnel can be walked end-to-end with demo data.
+        foreach ([$cairo, $hurghada, $luxor] as $hotel) {
+            $this->demoInventory($hotel);
+        }
 
         $roleIdBySlug = Role::query()->pluck('id', 'slug');
 
@@ -87,7 +96,7 @@ class Phase1DemoSeeder extends Seeder
      * data (all demo hotels are Egyptian). Backfills the FK columns on an
      * already-existing row too.
      */
-    private function demoHotel(int $groupId, string $slug, string $name, string $cityName): Hotel
+    private function demoHotel(int $groupId, string $slug, string $name, string $cityName, string $nameAr): Hotel
     {
         $city = City::query()->where('name_en', $cityName)->firstOrFail();
 
@@ -96,6 +105,25 @@ class Phase1DemoSeeder extends Seeder
             [
                 'hotel_group_id' => $groupId,
                 'name' => $name,
+                // Deterministic bilingual demo content — real (non-duplicated)
+                // ar/en strings, not fabricated translations of each other.
+                'name_i18n' => ['en' => $name, 'ar' => $nameAr],
+                'tagline_i18n' => [
+                    'en' => 'A calm stay in the heart of '.$cityName,
+                    'ar' => 'إقامة هادئة في قلب '.$cityName,
+                ],
+                'description_i18n' => [
+                    'en' => 'Contemporary rooms, attentive service and an easy walk to everything that matters.',
+                    'ar' => 'غرف عصرية وخدمة مهتمة وقربٌ سهل من كل ما يهم.',
+                ],
+                'star_rating' => 4,
+                'amenities' => [
+                    HotelAmenity::FreeWifi->value,
+                    HotelAmenity::Breakfast->value,
+                    HotelAmenity::Pool->value,
+                    HotelAmenity::Parking->value,
+                    HotelAmenity::AirConditioning->value,
+                ],
                 'country_id' => $city->country_id,
                 'city_id' => $city->id,
                 'country' => 'Egypt',
@@ -104,6 +132,43 @@ class Phase1DemoSeeder extends Seeder
                 'is_active' => true,
             ]
         );
+        // NOTE: no images are seeded — hotel media is real uploaded content
+        // managed by staff through the dashboard, never a seeded placeholder.
+    }
+
+    /**
+     * Idempotent demo room types (Standard / Deluxe) + physical rooms for a
+     * hotel. Priced/sized deterministically so availability + the stay total
+     * are predictable when walking the booking funnel.
+     */
+    private function demoInventory(Hotel $hotel): void
+    {
+        $types = [
+            ['name' => 'Standard Room', 'base_price' => '480.00', 'capacity' => 2, 'rooms' => 6],
+            ['name' => 'Deluxe Suite', 'base_price' => '920.00', 'capacity' => 4, 'rooms' => 3],
+        ];
+
+        foreach ($types as $spec) {
+            $roomType = RoomType::query()->updateOrCreate(
+                ['hotel_id' => $hotel->id, 'name' => $spec['name']],
+                [
+                    'base_price' => $spec['base_price'],
+                    'capacity' => $spec['capacity'],
+                    'amenities' => [HotelAmenity::FreeWifi->value, HotelAmenity::AirConditioning->value],
+                    'description' => 'Demo room type for exercising the guest booking funnel.',
+                    'is_active' => true,
+                ]
+            );
+
+            for ($i = 1; $i <= $spec['rooms']; $i++) {
+                $number = ($spec['name'] === 'Deluxe Suite' ? 'S' : 'R').str_pad((string) $i, 2, '0', STR_PAD_LEFT);
+
+                Room::query()->updateOrCreate(
+                    ['hotel_id' => $hotel->id, 'room_number' => $number],
+                    ['room_type_id' => $roomType->id, 'status' => 'available']
+                );
+            }
+        }
     }
 
     private function demoUser(string $email, string $name, int $roleId): User

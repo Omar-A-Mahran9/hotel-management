@@ -20,6 +20,18 @@ return [
         'city_delete_blocked' => 'This city is still referenced by one or more hotels and cannot be deleted. Deactivate it instead.',
     ],
 
+    'hotel_media' => [
+        'gallery_full' => 'This hotel already has the maximum of :max gallery images.',
+        'reorder_mismatch' => 'The ids must be exactly the hotel gallery, in the desired order.',
+    ],
+
+    'guest_booking' => [
+        'room_type_unavailable' => 'This room type is not available for booking.',
+        'party_exceeds_capacity' => 'This room type seats up to :capacity guests.',
+        'no_payment' => 'No deposit payment has been started for this reservation.',
+        'deposit_rule_undefined' => 'Online deposit payment is not available yet.',
+    ],
+
     'guest_auth' => [
         'otp_sent' => 'A verification code has been sent.',
         'verified' => 'Your phone number has been verified.',

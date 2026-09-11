@@ -65,7 +65,7 @@ void main() {
     expect(_location(container), AppRoutes.completeProfile);
   });
 
-  testWidgets('signing out from home returns to the entry screen',
+  testWidgets('signing out drops to guest discover, not the entry screen',
       (WidgetTester tester) async {
     final ProviderContainer container =
         await pumpApp(tester, bootSession: completeSession());
@@ -74,7 +74,7 @@ void main() {
     await tester.tap(find.byTooltip(en.authSignOut));
     await tester.pumpAndSettle();
 
-    expect(_location(container), AppRoutes.welcome);
+    expect(_location(container), AppRoutes.discover);
   });
 
   testWidgets('an expired session is forced onto the session-expired route',

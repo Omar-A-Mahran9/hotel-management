@@ -2,6 +2,9 @@
 import type { Hotel, HotelGroup } from '~/types/api'
 import { citiesService, countriesService, hotelsService } from '~/services'
 import { ApiError } from '~/utils/apiError'
+import { amenityLabelKey, HOTEL_AMENITIES } from '~/utils/hotelAmenities'
+
+const STAR_RATINGS = [1, 2, 3, 4, 5] as const
 
 const props = defineProps<{
   hotel?: Hotel | null
@@ -19,6 +22,13 @@ const isEdit = computed(() => !!props.hotel)
 interface FormState {
   hotel_group_id: number | null
   name: string
+  name_ar: string
+  tagline_en: string
+  tagline_ar: string
+  description_en: string
+  description_ar: string
+  star_rating: number | null
+  amenities: string[]
   slug: string
   country_id: number | null
   city_id: number | null
@@ -29,13 +39,29 @@ interface FormState {
 function snapshot(h?: Hotel | null): FormState {
   return {
     hotel_group_id: h?.hotel_group_id ?? props.groups[0]?.id ?? null,
-    name: h?.name ?? '',
+    // `name` is the English display name (feeds the slug); the backend keeps
+    // the legacy `name` column in sync from name_i18n.en.
+    name: h?.name_i18n?.en ?? h?.name ?? '',
+    name_ar: h?.name_i18n?.ar ?? '',
+    tagline_en: h?.tagline_i18n?.en ?? '',
+    tagline_ar: h?.tagline_i18n?.ar ?? '',
+    description_en: h?.description_i18n?.en ?? '',
+    description_ar: h?.description_i18n?.ar ?? '',
+    star_rating: h?.star_rating ?? null,
+    amenities: [...(h?.amenities ?? [])],
     slug: h?.slug ?? '',
     country_id: h?.country_id ?? null,
     city_id: h?.city_id ?? null,
     timezone: h?.timezone ?? 'UTC',
     is_active: h?.is_active ?? true,
   }
+}
+
+function i18nMap(en: string, ar: string): Record<string, string> | undefined {
+  const map: Record<string, string> = {}
+  if (en.trim()) map.en = en.trim()
+  if (ar.trim()) map.ar = ar.trim()
+  return Object.keys(map).length ? map : undefined
 }
 
 const form = reactive<FormState>(snapshot(props.hotel))
@@ -79,6 +105,12 @@ watch(() => form.country_id, (next, prev) => {
   }
 })
 
+function toggleAmenity(slug: string) {
+  const i = form.amenities.indexOf(slug)
+  if (i === -1) form.amenities.push(slug)
+  else form.amenities.splice(i, 1)
+}
+
 const dirty = computed(() => JSON.stringify(form) !== initial)
 
 const saving = ref(false)
@@ -104,6 +136,11 @@ async function save() {
   const body = {
     hotel_group_id: form.hotel_group_id,
     name: form.name,
+    name_i18n: i18nMap(form.name, form.name_ar) ?? { en: form.name },
+    tagline_i18n: i18nMap(form.tagline_en, form.tagline_ar) ?? null,
+    description_i18n: i18nMap(form.description_en, form.description_ar) ?? null,
+    star_rating: form.star_rating,
+    amenities: form.amenities,
     slug: form.slug,
     country_id: form.country_id,
     city_id: form.city_id,
@@ -127,6 +164,21 @@ async function save() {
   } finally {
     saving.value = false
   }
+}
+
+// A local copy of the hotel used only for the embedded media relations, so
+// an upload/delete/reorder refreshes the thumbnails in place. Media is
+// persisted server-side by its own endpoint immediately — it is NOT part of
+// the form's Save, so this never navigates or touches the dirty state.
+const liveHotel = ref<Hotel | null>(props.hotel ?? null)
+watch(() => props.hotel, h => (liveHotel.value = h ?? null))
+
+async function reloadMedia() {
+  if (!props.hotel) return
+  try {
+    liveHotel.value = await hotelsService.get(props.hotel.id)
+  }
+  catch { /* toast already shown by the uploader */ }
 }
 
 function cancel() {
@@ -153,9 +205,14 @@ onBeforeRouteLeave(() => {
 <template>
   <form class="pb-24" novalidate @submit.prevent="save">
     <FormSection :title="t('hotels.sectionBasic')" :description="t('hotels.sectionBasicDesc')">
-      <FormField for-id="hotel-name" :label="t('hotels.name')" :error="fieldErrors.name" required>
-        <input id="hotel-name" v-model="form.name" class="input" autocomplete="off" required>
-      </FormField>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <FormField for-id="hotel-name" :label="t('hotels.nameEn')" :error="fieldErrors.name || fieldErrors['name_i18n.en']" required>
+          <input id="hotel-name" v-model="form.name" class="input" autocomplete="off" required>
+        </FormField>
+        <FormField for-id="hotel-name-ar" :label="t('hotels.nameAr')" :error="fieldErrors['name_i18n.ar']" :hint="t('hotels.nameArHint')">
+          <input id="hotel-name-ar" v-model="form.name_ar" class="input" dir="rtl" autocomplete="off">
+        </FormField>
+      </div>
       <FormField
         for-id="hotel-slug"
         :label="t('hotels.slug')"
@@ -245,22 +302,67 @@ onBeforeRouteLeave(() => {
       </FormField>
     </FormSection>
 
-    <FormSection :title="t('hotels.sectionBranding')" :description="t('hotels.sectionBrandingDesc')">
-      <div class="rounded-lg border border-dashed border-border bg-secondary/40 p-5">
-        <div class="flex items-start gap-3">
-          <div class="flex size-10 items-center justify-center rounded-lg bg-warning/15 text-warning">
-            <KtIcon name="picture" />
-          </div>
-          <div class="text-2sm">
-            <p class="font-semibold text-foreground">
-              {{ t('hotels.imagesGapTitle') }}
-            </p>
-            <p class="mt-0.5 text-muted-foreground">
-              {{ t('hotels.imagesGapBody') }}
-            </p>
-          </div>
-        </div>
+    <FormSection :title="t('hotels.sectionContent')" :description="t('hotels.sectionContentDesc')">
+      <div class="grid gap-4 sm:grid-cols-2">
+        <FormField for-id="hotel-tagline-en" :label="t('hotels.taglineEn')" :error="fieldErrors['tagline_i18n.en']">
+          <input id="hotel-tagline-en" v-model="form.tagline_en" class="input" autocomplete="off">
+        </FormField>
+        <FormField for-id="hotel-tagline-ar" :label="t('hotels.taglineAr')" :error="fieldErrors['tagline_i18n.ar']">
+          <input id="hotel-tagline-ar" v-model="form.tagline_ar" class="input" dir="rtl" autocomplete="off">
+        </FormField>
       </div>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <FormField for-id="hotel-desc-en" :label="t('hotels.descriptionEn')" :error="fieldErrors['description_i18n.en']">
+          <textarea id="hotel-desc-en" v-model="form.description_en" class="input min-h-24" rows="3" />
+        </FormField>
+        <FormField for-id="hotel-desc-ar" :label="t('hotels.descriptionAr')" :error="fieldErrors['description_i18n.ar']">
+          <textarea id="hotel-desc-ar" v-model="form.description_ar" class="input min-h-24" rows="3" dir="rtl" />
+        </FormField>
+      </div>
+    </FormSection>
+
+    <FormSection :title="t('hotels.sectionClassification')" :description="t('hotels.sectionClassificationDesc')">
+      <FormField for-id="hotel-stars" :label="t('hotels.starRating')" :error="fieldErrors.star_rating">
+        <select id="hotel-stars" v-model.number="form.star_rating" class="input max-w-40">
+          <option :value="null">
+            {{ t('hotels.starRatingNone') }}
+          </option>
+          <option v-for="s in STAR_RATINGS" :key="s" :value="s">
+            {{ t('hotels.starRatingValue', { count: s }) }}
+          </option>
+        </select>
+      </FormField>
+      <FormField :label="t('hotels.amenitiesLabel')" :error="fieldErrors.amenities">
+        <div class="flex flex-wrap gap-2">
+          <button
+            v-for="a in HOTEL_AMENITIES"
+            :key="a"
+            type="button"
+            class="rounded-full border px-3 py-1.5 text-2sm transition-colors"
+            :class="form.amenities.includes(a)
+              ? 'border-primary bg-primary/10 text-primary'
+              : 'border-border text-muted-foreground hover:bg-secondary'"
+            :aria-pressed="form.amenities.includes(a)"
+            @click="toggleAmenity(a)"
+          >
+            {{ t(amenityLabelKey(a)) }}
+          </button>
+        </div>
+      </FormField>
+    </FormSection>
+
+    <FormSection :title="t('hotels.sectionBranding')" :description="t('hotels.sectionBrandingDesc')">
+      <HotelMediaUploader
+        v-if="isEdit && liveHotel"
+        :hotel-id="liveHotel.id"
+        :logo="liveHotel.logo"
+        :cover="liveHotel.cover"
+        :gallery="liveHotel.gallery"
+        @changed="reloadMedia"
+      />
+      <InfoNote v-else>
+        {{ t('hotels.mediaAfterCreate') }}
+      </InfoNote>
     </FormSection>
 
     <FormSection :title="t('hotels.sectionStatus')" :description="t('hotels.sectionStatusDesc')">

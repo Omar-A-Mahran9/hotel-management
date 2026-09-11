@@ -1,5 +1,6 @@
 import '../../../../core/errors/error_mapper.dart';
 import '../../domain/entities/availability_result.dart';
+import '../../domain/entities/available_room.dart';
 import '../../domain/entities/city.dart';
 import '../../domain/entities/guest_party.dart';
 import '../../domain/entities/hotel.dart';
@@ -8,6 +9,7 @@ import '../../domain/entities/hotel_search_result.dart';
 import '../../domain/entities/hotel_sort.dart';
 import '../../domain/entities/hotel_summary.dart';
 import '../../domain/entities/stay_range.dart';
+import '../../domain/entities/upcoming_stay.dart';
 import '../../domain/repositories/discovery_repository.dart';
 import '../datasources/discovery_data_source.dart';
 
@@ -68,6 +70,22 @@ class DiscoveryRepositoryImpl implements DiscoveryRepository {
           children: party.children,
         );
         return result.toEntity();
+      });
+
+  @override
+  Future<int> groupHotelCount() =>
+      _guard(() => _dataSource.fetchGroupHotelCount());
+
+  @override
+  Future<List<AvailableRoom>> hotelRooms(String hotelId) => _guard(() async {
+        final result = await _dataSource.fetchHotelRooms(hotelId);
+        return result.map((m) => m.toEntity()).toList(growable: false);
+      });
+
+  @override
+  Future<UpcomingStay?> upcomingStay() => _guard(() async {
+        final result = await _dataSource.fetchUpcomingStay();
+        return result?.toEntity();
       });
 
   Future<T> _guard<T>(Future<T> Function() body) async {

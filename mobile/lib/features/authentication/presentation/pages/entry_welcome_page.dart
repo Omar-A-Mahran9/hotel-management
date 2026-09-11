@@ -6,11 +6,11 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/router/app_routes.dart';
 import '../../../../core/localization/l10n.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_image.dart';
 import '../../../../core/widgets/brand_logo.dart';
 import '../../../../core/widgets/primary_button.dart';
-import '../state/login_flow_controller.dart';
 
 /// `01 · Entry` — first run. A single full-bleed hero photo fills the whole
 /// screen; its lower third fades into the paper ground so the brand mark, the
@@ -73,12 +73,23 @@ class EntryWelcomePage extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                      const Align(
+                      Align(
                         alignment: AlignmentDirectional.centerStart,
-                        child: BrandLogo(
-                          variant: BrandLogoVariant.markOnly,
-                          markColor: AppColors.bronze500,
-                          markSize: 30,
+                        child: Container(
+                          padding: const EdgeInsets.all(AppSpacing.sm),
+                          decoration: const BoxDecoration(
+                            // The brand raster is a knockout (paper-toned towers
+                            // + gold spire) built for a dark ground, so it sits
+                            // on an "app-icon" brown chip here on the light entry
+                            // screen — same warm brown as the splash.
+                            color: AppColors.brown700,
+                            borderRadius: AppRadius.allMd,
+                          ),
+                          child: const BrandLogo(
+                            variant: BrandLogoVariant.markOnly,
+                            assetMark: true,
+                            markSize: 30,
+                          ),
                         ),
                       ),
                       const SizedBox(height: AppSpacing.lg),
@@ -96,12 +107,10 @@ class EntryWelcomePage extends ConsumerWidget {
                       const SizedBox(height: AppSpacing.xl),
                       PrimaryButton(
                         label: l10n.entryStartAction,
-                        onPressed: () {
-                          ref
-                              .read(loginFlowControllerProvider.notifier)
-                              .reset();
-                          context.goNamed(AppRoutes.signInName);
-                        },
+                        // Deferred auth: browsing is open. Sign-in is requested
+                        // later, when the guest confirms a booking.
+                        onPressed: () =>
+                            context.goNamed(AppRoutes.discoverName),
                       ),
                     ],
                   ),

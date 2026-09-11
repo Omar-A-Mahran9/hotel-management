@@ -26,7 +26,7 @@ void main() {
     expect(find.text(en.languageEnglish), findsNothing);
   });
 
-  testWidgets('the call to action opens the phone sign-in screen',
+  testWidgets('the call to action opens discovery, not sign-in (deferred auth)',
       (WidgetTester tester) async {
     await pumpApp(tester);
     final AppLocalizations en = await tester.l10n();
@@ -34,7 +34,10 @@ void main() {
     await tester.tap(find.text(en.entryStartAction));
     await tester.pumpAndSettle();
 
-    expect(find.text(en.authPhoneHeading), findsOneWidget);
+    expect(find.text(en.authPhoneHeading), findsNothing);
+    expect(find.text(en.discoverSubtitle), findsOneWidget);
+    // A guest gets a sign-in entry point in the discover app bar.
+    expect(find.widgetWithText(TextButton, en.discoverSignIn), findsOneWidget);
   });
 
   testWidgets('the entry headline follows the active locale direction',

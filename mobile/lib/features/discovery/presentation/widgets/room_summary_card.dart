@@ -25,12 +25,17 @@ class RoomSummaryCard extends StatelessWidget {
     required this.nights,
     required this.selected,
     required this.onViewDetails,
+    this.showStayTotal = true,
   });
 
   final AvailableRoom room;
   final int nights;
   final bool selected;
   final VoidCallback onViewDetails;
+
+  /// Whether to show the "× N nights" stay total under the nightly rate. Off on
+  /// the single-hotel Home list where no dates are chosen yet.
+  final bool showStayTotal;
 
   @override
   Widget build(BuildContext context) {
@@ -164,12 +169,13 @@ class RoomSummaryCard extends StatelessWidget {
                             room.nightlyRate.amount,
                           ),
                         ),
-                        Text(
-                          '${l10n.priceStayTotal(room.stayTotal(nights).amount)} ${l10n.roomStayTotalLabel(nights)}',
-                          style: theme.textTheme.bodySmall,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        if (showStayTotal)
+                          Text(
+                            '${l10n.priceStayTotal(room.stayTotal(nights).amount)} ${l10n.roomStayTotalLabel(nights)}',
+                            style: theme.textTheme.bodySmall,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                       ],
                     ),
                   ),

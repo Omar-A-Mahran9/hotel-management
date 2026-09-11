@@ -8,6 +8,7 @@ use App\Domain\HotelGroup\Repositories\Contracts\HotelRepositoryInterface;
 use App\Domain\IdentityAccess\Models\User;
 use App\Domain\Location\Models\City;
 use App\Domain\Location\Services\CityService;
+use App\Support\LocalizedContent;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
@@ -40,12 +41,13 @@ class HotelService
     {
         return DB::transaction(function () use ($data, $actor) {
             $data = $this->normalizeLocation($data);
+            $data = $this->syncLegacyName($data);
 
             $hotel = $this->hotels->create($data);
 
             $this->auditLogger->record($actor, 'hotel.created', $hotel, after: $hotel->toArray(), hotelId: $hotel->id);
 
-            return $hotel->load('countryRef', 'cityRef', 'hotelGroup');
+            return $hotel->load('countryRef', 'cityRef', 'hotelGroup', 'logo', 'cover', 'galleryMedia');
         });
     }
 
@@ -58,12 +60,13 @@ class HotelService
             $before = $hotel->toArray();
 
             $data = $this->normalizeLocation($data, $hotel);
+            $data = $this->syncLegacyName($data);
 
             $this->hotels->update($hotel, $data);
 
             $this->auditLogger->record($actor, 'hotel.updated', $hotel, before: $before, after: $hotel->toArray(), hotelId: $hotel->id);
 
-            return $hotel->load('countryRef', 'cityRef', 'hotelGroup');
+            return $hotel->load('countryRef', 'cityRef', 'hotelGroup', 'logo', 'cover', 'galleryMedia');
         });
     }
 
@@ -90,6 +93,28 @@ class HotelService
             if ($city) {
                 $data['city'] = $city->name_en;
                 $data['country'] = $city->country?->name_en;
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Keep the legacy `name` string column in sync with `name_i18n`: it is
+     * what Discovery search and the unique slug derivation still use. When
+     * `name_i18n` is provided and `name` is not, derive `name` from the
+     * fallback-locale entry (never a fabricated translation).
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function syncLegacyName(array $data): array
+    {
+        if (array_key_exists('name_i18n', $data) && ! array_key_exists('name', $data)) {
+            $primary = LocalizedContent::primary($data['name_i18n']);
+
+            if ($primary !== null) {
+                $data['name'] = $primary;
             }
         }
 

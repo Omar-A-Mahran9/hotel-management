@@ -12,6 +12,12 @@ import 'app_icons.dart';
 abstract final class AppImages {
   static const String _dir = 'assets/images';
 
+  /// The project brand mark — the three-tower logo with the gold spire, as a
+  /// white-on-transparent raster made for the warm-brown splash. Rendered by
+  /// [BrandLogo] when `assetMark` is set; elsewhere the mark is the recolourable
+  /// vector reconstruction.
+  static const String brandMark = 'assets/brand/logo.png';
+
   // ── Named slots (mapped from the Figma frames) ───────────────────────────
 
   /// Warm hotel exterior at golden hour — the entry / welcome hero

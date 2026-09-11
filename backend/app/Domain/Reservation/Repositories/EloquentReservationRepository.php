@@ -3,6 +3,7 @@
 namespace App\Domain\Reservation\Repositories;
 
 use App\Domain\IdentityAccess\Models\User;
+use App\Domain\Reservation\Models\Guest;
 use App\Domain\Reservation\Models\Reservation;
 use App\Domain\Reservation\Repositories\Contracts\ReservationRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -18,6 +19,21 @@ class EloquentReservationRepository implements ReservationRepositoryInterface
     public function findAccessibleBy(User $user, int $id): ?Reservation
     {
         return $this->scopeToAccess(Reservation::query(), $user)->find($id);
+    }
+
+    public function paginateOwnedByGuest(Guest $guest, int $perPage = 15): LengthAwarePaginator
+    {
+        return Reservation::query()
+            ->where('guest_id', $guest->id)
+            ->latest('id')
+            ->paginate($perPage);
+    }
+
+    public function findOwnedByGuest(Guest $guest, int $id): ?Reservation
+    {
+        return Reservation::query()
+            ->where('guest_id', $guest->id)
+            ->find($id);
     }
 
     public function create(array $data): Reservation

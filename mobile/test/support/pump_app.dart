@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hotel_guest_app/app/app.dart';
+import 'package:hotel_guest_app/app/router/app_router.dart';
+import 'package:hotel_guest_app/app/router/app_routes.dart';
 import 'package:hotel_guest_app/core/localization/generated/app_localizations.dart';
 import 'package:hotel_guest_app/core/localization/locale_controller.dart';
 import 'package:hotel_guest_app/core/localization/supported_locales.dart';
@@ -16,6 +18,7 @@ Future<ProviderContainer> pumpApp(
   AuthSession? bootSession,
   Locale? locale,
   Duration resendCooldown = Duration.zero,
+  bool languageChosen = true,
   List<Override> extraOverrides = const <Override>[],
 }) async {
   final ProviderContainer container = ProviderContainer(
@@ -23,6 +26,7 @@ Future<ProviderContainer> pumpApp(
       ...authOverrides(
         bootSession: bootSession,
         resendCooldown: resendCooldown,
+        languageChosen: languageChosen,
       ),
       ...extraOverrides,
     ],
@@ -48,6 +52,28 @@ Future<ProviderContainer> pumpApp(
       child: const HotelGuestApp(),
     ),
   );
+  await tester.pumpAndSettle();
+  return container;
+}
+
+/// Pumps the app and navigates straight to the phone sign-in screen.
+///
+/// Since deferred auth landed (docs/mobile-deferred-auth.md) `/welcome` opens
+/// discovery, not sign-in, so auth-screen tests jump to the auth surface
+/// directly instead of tapping through the entry CTA.
+Future<ProviderContainer> pumpSignIn(
+  WidgetTester tester, {
+  Locale? locale,
+  Duration resendCooldown = Duration.zero,
+  List<Override> extraOverrides = const <Override>[],
+}) async {
+  final ProviderContainer container = await pumpApp(
+    tester,
+    locale: locale,
+    resendCooldown: resendCooldown,
+    extraOverrides: extraOverrides,
+  );
+  container.read(appRouterProvider).goNamed(AppRoutes.signInName);
   await tester.pumpAndSettle();
   return container;
 }

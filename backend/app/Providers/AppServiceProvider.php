@@ -275,6 +275,32 @@ class AppServiceProvider extends ServiceProvider
         $this->registerDigitalAccessRateLimiters();
         $this->registerCheckoutRateLimiters();
         $this->registerNotificationRateLimiters();
+        $this->registerHotelMediaRateLimiters();
+        $this->registerGuestBookingRateLimiters();
+    }
+
+    /**
+     * Rate limiting on the staff hotel-media upload endpoint. Config-driven
+     * (config/hotel_media.php), keyed by authenticated user id (IP fallback).
+     */
+    private function registerHotelMediaRateLimiters(): void
+    {
+        RateLimiter::for('hotel-media.upload', fn (Request $request) => Limit::perMinute(
+            (int) config('hotel_media.rate_limits.upload.per_minute'),
+        )->by((string) ($request->user()?->id ?? $request->ip())));
+    }
+
+    /**
+     * Rate limiting on the authenticated guest booking write endpoints
+     * (reservation create / cancel, payment hold). Config-driven
+     * (config/guest_booking.php), keyed by authenticated guest id
+     * (IP fallback).
+     */
+    private function registerGuestBookingRateLimiters(): void
+    {
+        RateLimiter::for('guest.booking.write', fn (Request $request) => Limit::perMinute(
+            (int) config('guest_booking.rate_limits.write.per_minute'),
+        )->by((string) ($request->user()?->id ?? $request->ip())));
     }
 
     /**

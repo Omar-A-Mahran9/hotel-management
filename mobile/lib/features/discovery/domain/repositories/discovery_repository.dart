@@ -1,4 +1,5 @@
 import '../entities/availability_result.dart';
+import '../entities/available_room.dart';
 import '../entities/city.dart';
 import '../entities/guest_party.dart';
 import '../entities/hotel.dart';
@@ -7,6 +8,7 @@ import '../entities/hotel_search_result.dart';
 import '../entities/hotel_sort.dart';
 import '../entities/hotel_summary.dart';
 import '../entities/stay_range.dart';
+import '../entities/upcoming_stay.dart';
 
 /// The discover / search / availability contract the presentation layer depends
 /// on. Which data source fulfils it (dummy vs the future Laravel API) is a DI
@@ -40,4 +42,16 @@ abstract interface class DiscoveryRepository {
     required StayRange stay,
     required GuestParty party,
   });
+
+  /// How many hotels the group operates. The Home screen switches to its
+  /// single-hotel layout when this is 1.
+  Future<int> groupHotelCount();
+
+  /// A hotel's room types with list prices, without a stay filter — the
+  /// single-hotel Home "استكشف الغرف" list.
+  Future<List<AvailableRoom>> hotelRooms(String hotelId);
+
+  /// The signed-in guest's next confirmed stay, or `null` — the Home
+  /// `إقامتك القادمة` card.
+  Future<UpcomingStay?> upcomingStay();
 }

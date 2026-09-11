@@ -61,4 +61,19 @@ class ApiDiscoveryDataSource implements DiscoveryDataSource, RemoteDataSource {
   }) async {
     throw const NotImplementedInPhaseException(_reason);
   }
+
+  @override
+  Future<int> fetchGroupHotelCount() async {
+    throw const NotImplementedInPhaseException(_reason);
+  }
+
+  @override
+  Future<List<AvailableRoomModel>> fetchHotelRooms(String hotelId) async {
+    throw const NotImplementedInPhaseException(_reason);
+  }
+
+  @override
+  Future<UpcomingStayModel?> fetchUpcomingStay() async {
+    throw const NotImplementedInPhaseException(_reason);
+  }
 }

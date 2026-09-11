@@ -25,7 +25,10 @@ import '../state/hotel_detail_provider.dart';
 import '../state/room_availability_controller.dart';
 import '../state/room_selection_controller.dart';
 import '../state/stay_dates_controller.dart';
+import '../widgets/hero_circle_button.dart';
+import '../widgets/hero_photo_strip.dart';
 import '../widgets/hotel_thumbnail.dart';
+import '../widgets/property_chip.dart';
 import '../../../../core/widgets/app_icons.dart';
 
 /// `08 · Room selection & stay actions` (screen 1) — one room type in full, with
@@ -153,66 +156,106 @@ class _Body extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     final Locale locale = Localizations.localeOf(context);
     final MaterialLocalizations ml = MaterialLocalizations.of(context);
-    final AppSemanticColors semantic =
-        theme.extension<AppSemanticColors>() ?? AppSemanticColors.light;
+    final AppColorTokens c = context.colors;
     final type = room.roomType;
+
+    final List<String> amenities = <String>[
+      if (type.breakfastIncluded) l10n.roomBreakfastIncluded,
+      for (final amenity in type.amenities) l10n.roomAmenityLabel(amenity),
+    ];
 
     return CustomScrollView(
       slivers: <Widget>[
-        SliverAppBar(
-          pinned: true,
-          expandedHeight: 200,
-          flexibleSpace: FlexibleSpaceBar(
-            background: HotelThumbnail(
-              seed: type.id,
-              width: double.infinity,
-              height: 220,
-              borderRadius: BorderRadius.zero,
-              icon: AppIcons.bed,
+        SliverToBoxAdapter(
+          child: SizedBox(
+            height: 280,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: <Widget>[
+                HotelThumbnail(
+                  seed: type.id,
+                  width: double.infinity,
+                  height: 280,
+                  borderRadius: BorderRadius.zero,
+                  icon: AppIcons.bed,
+                ),
+                SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.xs,
+                    ),
+                    child: Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: HeroCircleButton(
+                        icon: AppIcons.backRtl,
+                        tooltip: l10n.commonBack,
+                        onPressed: () => Navigator.of(context).maybePop(),
+                      ),
+                    ),
+                  ),
+                ),
+                PositionedDirectional(
+                  start: AppSpacing.pageGutter,
+                  bottom: -32,
+                  child: HeroPhotoStrip(seed: type.id, totalPhotos: 12),
+                ),
+              ],
             ),
           ),
         ),
         SliverPadding(
-          padding: const EdgeInsets.all(AppSpacing.pageGutter),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.pageGutter,
+            48,
+            AppSpacing.pageGutter,
+            AppSpacing.xxl,
+          ),
           sliver: SliverList.list(
             children: <Widget>[
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      type.name.resolve(locale),
-                      style: theme.textTheme.headlineSmall,
-                    ),
-                  ),
                   MoneyText(
                     room.nightlyRate.amount,
                     suffix: l10n.priceNightSuffix,
                     semanticsLabel: l10n.pricePerNight(room.nightlyRate.amount),
                   ),
+                  const Spacer(),
+                  Flexible(
+                    child: Text(
+                      type.name.resolve(locale),
+                      style: theme.textTheme.headlineSmall,
+                      textAlign: TextAlign.end,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: AppSpacing.sm),
               Wrap(
-                spacing: AppSpacing.sm,
+                spacing: AppSpacing.xs,
                 runSpacing: AppSpacing.xs,
                 children: <Widget>[
-                  _Spec(
+                  if (type.areaSqm != null)
+                    PropertyChip(
+                      icon: AppIcons.area,
+                      label: l10n.roomAreaSqm(type.areaSqm!),
+                    ),
+                  PropertyChip(
                     icon: AppIcons.guests,
-                    label: l10n.roomOccupancy(type.maxOccupancy),
+                    label: l10n.hotelGuestCount(type.maxOccupancy),
                   ),
-                  _Spec(
+                  PropertyChip(
                     icon: AppIcons.bed,
                     label: type.bedType.resolve(locale),
                   ),
                 ],
               ),
               const SizedBox(height: AppSpacing.md),
-              // Stay context + simple total.
               Container(
                 padding: const EdgeInsets.all(AppSpacing.sm),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest,
+                  color: c.bgSubtle,
                   borderRadius: AppRadius.allMd,
                 ),
                 child: Row(
@@ -223,11 +266,11 @@ class _Body extends StatelessWidget {
                         style: theme.textTheme.bodyMedium,
                       ),
                     ),
+                    const SizedBox(width: AppSpacing.xs),
                     Text(
                       l10n.priceStayTotal(room.stayTotal(stay.nights).amount),
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        color: semantic.accent,
-                      ),
+                      style: theme.textTheme.titleSmall
+                          ?.copyWith(color: c.textAccent),
                     ),
                   ],
                 ),
@@ -242,17 +285,14 @@ class _Body extends StatelessWidget {
                 type.description.resolve(locale),
                 style: theme.textTheme.bodyMedium,
               ),
-              const SizedBox(height: AppSpacing.xs),
-              Wrap(
-                spacing: AppSpacing.xs,
-                runSpacing: AppSpacing.xs,
-                children: <Widget>[
-                  if (type.breakfastIncluded)
-                    Chip(label: Text(l10n.roomBreakfastIncluded)),
-                  for (final amenity in type.amenities)
-                    Chip(label: Text(l10n.roomAmenityLabel(amenity))),
-                ],
-              ),
+              if (amenities.isNotEmpty) ...<Widget>[
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  amenities.join('  ·  '),
+                  style: theme.textTheme.bodyMedium
+                      ?.copyWith(color: c.textSecondary),
+                ),
+              ],
               const SizedBox(height: AppSpacing.lg),
               Text(
                 l10n.roomDetailCancellationHeading,
@@ -265,30 +305,9 @@ class _Body extends StatelessWidget {
                     : l10n.roomPolicyNonRefundable,
                 style: theme.textTheme.bodyMedium,
               ),
-              const SizedBox(height: AppSpacing.xxl),
             ],
           ),
         ),
-      ],
-    );
-  }
-}
-
-class _Spec extends StatelessWidget {
-  const _Spec({required this.icon, required this.label});
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Icon(icon, size: 15, color: theme.colorScheme.outline),
-        const SizedBox(width: AppSpacing.xxs),
-        Text(label, style: theme.textTheme.bodyMedium),
       ],
     );
   }

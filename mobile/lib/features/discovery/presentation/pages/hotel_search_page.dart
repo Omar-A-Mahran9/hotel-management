@@ -14,8 +14,7 @@ import '../widgets/filter_sheet.dart';
 import '../widgets/hotel_search_field.dart';
 import '../widgets/hotel_summary_card.dart';
 import '../widgets/sort_chip_bar.dart';
-import '../widgets/sort_sheet.dart';
-import '../../../../core/widgets/app_icons.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
 
 /// `15 · Search, filters & sort` — the search screen: a live search field, the
 /// quick-sort chips, a filter button, the result count and the hotel list with
@@ -62,26 +61,24 @@ class _HotelSearchPageState extends ConsumerState<HotelSearchPage> {
     if (result != null) _controllerNotifier.applyFilters(result);
   }
 
-  Future<void> _openSort(HotelSearchState state) async {
-    final result = await showSortSheet(context, current: state.sort);
-    if (result != null) _controllerNotifier.setSort(result);
-  }
-
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final HotelSearchState state = ref.watch(hotelSearchControllerProvider);
 
     return Scaffold(
-      appBar: HotelAppBar(
-        title: l10n.searchTitle,
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(AppIcons.sort),
-            tooltip: l10n.sortTitle,
-            onPressed: () => _openSort(state),
-          ),
-        ],
+      appBar: HotelAppBar(title: l10n.discoverFeaturedSection),
+      bottomNavigationBar: AppBottomNav(
+        current: AppNavTab.home,
+        onSelected: (AppNavTab tab) {
+          if (tab == AppNavTab.home) {
+            context.go(AppRoutes.discover);
+            return;
+          }
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(SnackBar(content: Text(l10n.navComingSoon)));
+        },
       ),
       body: SafeArea(
         child: Column(

@@ -5,11 +5,8 @@ import 'package:hotel_guest_app/core/localization/generated/app_localizations.da
 import '../../support/pump_app.dart';
 
 Future<AppLocalizations> _openPhone(WidgetTester tester) async {
-  await pumpApp(tester);
-  final AppLocalizations en = await tester.l10n();
-  await tester.tap(find.text(en.entryStartAction));
-  await tester.pumpAndSettle();
-  return en;
+  await pumpSignIn(tester);
+  return tester.l10n();
 }
 
 void main() {

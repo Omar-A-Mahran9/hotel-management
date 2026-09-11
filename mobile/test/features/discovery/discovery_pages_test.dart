@@ -33,13 +33,11 @@ void main() {
   testWidgets('tapping the search field opens the search screen',
       (WidgetTester tester) async {
     await pumpApp(tester, bootSession: completeSession());
-    final AppLocalizations en = await _en();
 
     await tester.tap(find.byType(TextField).first);
     await tester.pumpAndSettle();
 
-    expect(find.text(en.searchTitle), findsOneWidget);
-    // The initial load shows every hotel.
+    // The initial load shows every hotel (a search-only count line).
     expect(find.textContaining('hotels available'), findsOneWidget);
   });
 
@@ -85,19 +83,14 @@ void main() {
     expect(find.text('The Palm Hotel'), findsNothing);
   });
 
-  testWidgets('the sort sheet changes the order', (WidgetTester tester) async {
+  testWidgets('the sort chips reorder the results', (WidgetTester tester) async {
     await pumpApp(tester, bootSession: completeSession());
     final AppLocalizations en = await _en();
 
     await tester.tap(find.byType(TextField).first);
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byTooltip(en.sortTitle));
-    await tester.pumpAndSettle();
-    expect(find.text(en.sortTitle), findsOneWidget);
-    await tester.tap(find.text(en.sortLowestPrice).last);
-    await tester.pumpAndSettle();
-    await tester.tap(find.text(en.sortApply));
+    await tester.tap(find.text(en.sortLowestPrice));
     await tester.pumpAndSettle();
 
     expect(find.byType(HotelSummaryCard), findsWidgets);
@@ -114,9 +107,9 @@ void main() {
 
     await tester.tap(find.text('The Oasis Hotel').first);
     await tester.pumpAndSettle();
-    expect(find.text(en.hotelSelectDates), findsOneWidget);
+    expect(find.text(en.hotelBookNow), findsOneWidget);
 
-    await tester.tap(find.text(en.hotelSelectDates));
+    await tester.tap(find.text(en.hotelBookNow));
     await tester.pumpAndSettle();
     expect(find.text(en.stayDatesTitle), findsOneWidget);
     expect(find.byType(StayRangeCalendar), findsOneWidget);
@@ -166,7 +159,7 @@ void main() {
 
     await tester.tap(find.text('The Oasis Hotel').first);
     await tester.pumpAndSettle();
-    await tester.tap(find.text(en.hotelSelectDates));
+    await tester.tap(find.text(en.hotelBookNow));
     await tester.pumpAndSettle();
     await tapCalendarDay(tester, '6');
     await tapCalendarDay(tester, '8');

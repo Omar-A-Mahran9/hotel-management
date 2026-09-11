@@ -2,10 +2,12 @@
 
 namespace App\Http\Requests\Api\V1\Hotel;
 
+use App\Domain\HotelGroup\Enums\HotelAmenity;
 use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\Location\Models\City;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreHotelRequest extends FormRequest
 {
@@ -20,9 +22,26 @@ class StoreHotelRequest extends FormRequest
 
     public function rules(): array
     {
+        $locales = (array) config('app.available_locales', ['en']);
+
+        $i18n = [];
+        foreach (['name_i18n', 'tagline_i18n', 'description_i18n'] as $field) {
+            $i18n[$field] = ['sometimes', 'nullable', 'array'];
+            foreach ($locales as $locale) {
+                $i18n["{$field}.{$locale}"] = ['nullable', 'string', 'max:2000'];
+            }
+        }
+
         return [
             'hotel_group_id' => ['required', 'integer', 'exists:hotel_groups,id'],
-            'name' => ['required', 'string', 'max:255'],
+            // `name` stays the authoritative search/slug string; it may be
+            // omitted only when name_i18n carries a fallback-locale value
+            // (HotelService::syncLegacyName derives it).
+            'name' => ['required_without:name_i18n', 'string', 'max:255'],
+            ...$i18n,
+            'star_rating' => ['sometimes', 'nullable', 'integer', 'between:1,5'],
+            'amenities' => ['sometimes', 'nullable', 'array'],
+            'amenities.*' => [Rule::in(HotelAmenity::values())],
             'slug' => ['required', 'string', 'max:255', 'alpha_dash', 'unique:hotels,slug'],
             // Normalized location. country_id is required; city_id is
             // required and must belong to that country (checked below).

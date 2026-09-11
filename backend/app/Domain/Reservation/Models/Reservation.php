@@ -73,6 +73,8 @@ class Reservation extends Model
         'guest_id',
         'check_in',
         'check_out',
+        'adults',
+        'children',
         'status',
         'price_snapshot',
         'created_by_staff_id',
@@ -85,6 +87,8 @@ class Reservation extends Model
         return [
             'check_in' => 'date',
             'check_out' => 'date',
+            'adults' => 'integer',
+            'children' => 'integer',
             'price_snapshot' => 'decimal:2',
             'cancelled_at' => 'datetime',
         ];

@@ -68,6 +68,13 @@
   "entryStartAction": "Start now",
   "entryLanguageSwitchLabel": "Language",
 
+  "languageScreenTitle": "Language",
+  "@languageScreenTitle": { "description": "App-bar title of the first-run language selection screen (01 · Entry)." },
+  "languageScreenHeading": "Choose the app language",
+  "languageScreenBody": "You can change it later from Account. The interface is designed in Arabic first.",
+  "languageDefaultTag": "Default",
+  "@languageDefaultTag": { "description": "Small marker on the language that is pre-selected on first run (Arabic)." },
+
   "authPhoneTitle": "Sign in",
   "authPhoneHeading": "Enter your mobile number",
   "authPhoneBody": "We use it to confirm your booking and send your room entry code. We will not use it for anything else.",
@@ -145,7 +152,15 @@
   "discoverSubtitle": "Discover the group's hotels",
   "discoverSearchHint": "Search for a hotel or city",
   "discoverNotificationsTooltip": "Notifications",
+  "discoverSignIn": "Sign in",
+  "@discoverSignIn": { "description": "App-bar action shown to a guest browsing without an account." },
   "discoverFeaturedSection": "Group hotels",
+  "discoverExploreRooms": "Explore rooms",
+  "discoverUpcomingStay": "Your upcoming stay",
+  "discoverSubtitleHotel": "Discover {hotel}",
+  "@discoverSubtitleHotel": {
+    "placeholders": { "hotel": { "type": "String" } }
+  },
   "discoverEmptyTitle": "No hotels to show yet",
   "discoverEmptyBody": "The group's hotels will appear here once they are published.",
 
@@ -228,6 +243,7 @@
   "hotelDetailReviews": "Ratings & reviews",
   "hotelReviewCleanliness": "Cleanliness",
   "hotelReviewCommunication": "Communication",
+  "hotelReviewLocation": "Location",
   "hotelDetailAmenities": "What this hotel offers",
   "hotelRoomTypeCount": "{count, plural, =1{1 room type} other{{count} room types}}",
   "@hotelRoomTypeCount": {
@@ -238,6 +254,15 @@
     "placeholders": { "count": { "type": "int" } }
   },
   "hotelSelectDates": "Select dates",
+  "hotelBookNow": "Book now",
+  "hotelGuestCount": "{count, plural, =1{1 guest} other{{count} guests}}",
+  "@hotelGuestCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "roomAreaSqm": "{area} m²",
+  "@roomAreaSqm": {
+    "placeholders": { "area": { "type": "int" } }
+  },
 
   "amenityFreeWifi": "Free Wi-Fi",
   "amenityBreakfast": "Breakfast",
@@ -375,6 +400,19 @@
   "reviewNoSelectionTitle": "No room selected",
   "reviewNoSelectionBody": "Go back and choose a room to see your selection here.",
   "reviewBackToRooms": "Back to rooms",
+  "reviewSignInToConfirm": "Sign in to confirm",
+  "@reviewSignInToConfirm": { "description": "Primary CTA on the review screen for a guest who has not signed in yet." },
+  "reviewSignInHint": "You'll need an account to confirm this booking. Browsing stays free.",
+  "@reviewSignInHint": { "description": "Helper line under the review summary explaining why sign-in is required at this step." },
+  "bookingDetailsTitle": "Booking details",
+  "bookingDatesLabel": "Stay dates",
+  "bookingRoomSubtotal": "Stay subtotal",
+  "bookingServiceFee": "Service fee",
+  "bookingServiceFeeNote": "Estimate for display — the hotel confirms the final amount.",
+  "@bookingServiceFeeNote": { "description": "Shown under a design-only mock service fee; the real amount comes from the backend." },
+  "bookingTotal": "Total",
+  "bookingProceedToPayment": "Proceed to payment",
+  "bookingRoomAvailable": "Available",
 
   "reservationConfirmCta": "Confirm reservation",
   "reservationConfirming": "Confirming…",
