@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { roomsService, roomTypesService } from "~/services";
+import { roomMediaService, roomsService, roomTypesService } from "~/services";
 import type { Column } from "~/components/DataTable.vue";
 import type { Room, RoomStatus } from "~/types/api";
 import { ROOM_STATUS_TONE } from "~/utils/reservationStateMachine";
@@ -157,6 +157,29 @@ const form = reactive({
   room_type_id: null as number | null,
 });
 
+// Photos: create-flow stages files locally until the room has an id (see
+// RoomMediaUploader); edit-flow uploads immediately. `formInstanceKey`
+// forces a fresh uploader instance per modal open, so staged files never
+// leak between a cancelled create and the next one.
+interface MediaUploaderHandle {
+  commitStaged: (ownerId: number) => Promise<boolean>;
+  hasStaged: boolean;
+}
+const mediaUploaderRef = ref<MediaUploaderHandle | null>(null);
+const formInstanceKey = ref(0);
+
+async function reloadEditingPhotos() {
+  if (!editing.value || hotelId.value == null) return;
+
+  try {
+    const fresh = await roomsService.get(hotelId.value, editing.value.id);
+    editing.value = fresh;
+    list.reload();
+  } catch {
+    // Best effort — the media itself already changed on the server.
+  }
+}
+
 function openCreate() {
   editing.value = null;
 
@@ -166,6 +189,7 @@ function openCreate() {
   });
 
   fieldErrors.value = {};
+  formInstanceKey.value++;
   formOpen.value = true;
 }
 
@@ -178,6 +202,7 @@ function openEdit(room: Room) {
   });
 
   fieldErrors.value = {};
+  formInstanceKey.value++;
   formOpen.value = true;
 }
 
@@ -198,10 +223,15 @@ async function submitForm() {
 
       app.pushToast("success", t("rooms.updated"));
     } else {
-      await roomsService.create(hotelId.value, {
+      const created = await roomsService.create(hotelId.value, {
         room_number: form.room_number,
         room_type_id: form.room_type_id,
       });
+
+      if (mediaUploaderRef.value?.hasStaged) {
+        const allOk = await mediaUploaderRef.value.commitStaged(created.id);
+        if (!allOk) app.pushToast("error", t("media.someUploadsFailed"));
+      }
 
       app.pushToast("success", t("rooms.created"));
     }
@@ -506,6 +536,28 @@ async function saveStatus() {
             required
           />
         </FormField>
+
+        <!-- Photos -->
+        <div class="border-t border-border pt-4">
+          <RoomMediaUploader
+            :key="formInstanceKey"
+            ref="mediaUploaderRef"
+            :owner-id="editing?.id ?? null"
+            :gallery="editing?.photos"
+            :upload="
+              (id: number, file: File) => roomMediaService.upload(hotelId!, id, file)
+            "
+            :remove="
+              (id: number, mediaId: number) =>
+                roomMediaService.remove(hotelId!, id, mediaId)
+            "
+            :reorder="
+              (id: number, ids: number[]) =>
+                roomMediaService.reorderGallery(hotelId!, id, ids)
+            "
+            @changed="reloadEditingPhotos"
+          />
+        </div>
       </form>
 
       <template #footer>

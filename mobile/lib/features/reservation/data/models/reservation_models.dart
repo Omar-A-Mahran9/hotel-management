@@ -91,7 +91,7 @@ class ReservationModel {
     final Json? hotel = json['hotel'] as Json?;
     final Json? roomType = json['room_type'] as Json?;
     final Json? room = json['room'] as Json?;
-    final String currency = (json['currency'] as String?) ?? 'SAR';
+    final String currency = (json['currency'] as String?) ?? Money.fallbackCurrency;
 
     return ReservationModel(
       id: '${json['id']}',
@@ -191,8 +191,9 @@ class ExtendStayResultModel {
     final Json extension = (json['extension'] as Json?) ?? const <String, Object?>{};
     final Json folio = (json['folio'] as Json?) ?? const <String, Object?>{};
     final Json totals = (folio['totals'] as Json?) ?? const <String, Object?>{};
-    final String currency =
-        (extension['currency'] as String?) ?? (folio['currency'] as String?) ?? 'SAR';
+    final String currency = (extension['currency'] as String?) ??
+        (folio['currency'] as String?) ??
+        Money.fallbackCurrency;
 
     return ExtendStayResultModel(
       reservationId: '${extension['reservation_id']}',

@@ -247,7 +247,7 @@ class DummyReservationDataSource
         'children': 0,
         'status': status.wireValue,
         'price_snapshot': priceAmount,
-        'currency': 'SAR',
+        'currency': Money.fallbackCurrency,
         'created_at': days(createdOffsetDays).toIso8601String(),
         'cancelled_at':
             cancelledOffsetDays == null ? null : days(cancelledOffsetDays).toIso8601String(),

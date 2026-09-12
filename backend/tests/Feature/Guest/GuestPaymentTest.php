@@ -56,13 +56,36 @@ class GuestPaymentTest extends TestCase
         $this->getJson("/api/v1/guest/reservations/{$other->id}/payment")->assertStatus(404);
     }
 
-    public function test_deposit_hold_is_blocked_pending_an_approved_deposit_rule(): void
+    public function test_deposit_hold_places_a_percentage_of_the_reservation_price(): void
+    {
+        $guest = $this->actingGuest();
+        $reservation = Reservation::factory()->create([
+            'guest_id' => $guest->id,
+            'status' => Reservation::STATUS_PENDING,
+            'price_snapshot' => '1000.00',
+        ]);
+
+        config()->set('guest_booking.deposit.rule', 'percentage');
+        config()->set('guest_booking.deposit.percentage', 20);
+
+        $this->postJson("/api/v1/guest/reservations/{$reservation->id}/payment/hold")
+            ->assertStatus(201)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.status', Payment::STATUS_HOLD_ACTIVE)
+            ->assertJsonPath('data.amount', '200.00');
+
+        $this->assertDatabaseCount('payments', 1);
+    }
+
+    public function test_deposit_hold_is_blocked_when_no_rule_is_configured(): void
     {
         $guest = $this->actingGuest();
         $reservation = Reservation::factory()->create([
             'guest_id' => $guest->id,
             'status' => Reservation::STATUS_PENDING,
         ]);
+
+        config()->set('guest_booking.deposit.rule', null);
 
         $this->postJson("/api/v1/guest/reservations/{$reservation->id}/payment/hold")
             ->assertStatus(422)
@@ -73,7 +96,7 @@ class GuestPaymentTest extends TestCase
         $this->assertDatabaseCount('payments', 0);
     }
 
-    public function test_deposit_hold_is_ownership_scoped_before_the_block(): void
+    public function test_deposit_hold_is_ownership_scoped(): void
     {
         $this->actingGuest();
         $other = Reservation::factory()->create();

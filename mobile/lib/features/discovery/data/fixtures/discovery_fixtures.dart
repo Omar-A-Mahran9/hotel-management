@@ -8,6 +8,7 @@
 // The dataset is small (8 hotels) but the "total matched" count shown in the UI
 // always reflects the real filtered length, so it never claims more than exists.
 
+import '../../domain/entities/money.dart';
 import '../models/discovery_models.dart';
 
 abstract final class DiscoveryFixtures {
@@ -178,7 +179,7 @@ abstract final class DiscoveryFixtures {
       },
       'rating': 4.96,
       'review_count': 217,
-      'nightly_rate_from': <String, Object?>{'amount': 320, 'currency': 'SAR'},
+      'nightly_rate_from': <String, Object?>{'amount': 320, 'currency': Money.fallbackCurrency},
       'is_available': true,
       'amenities': <Object?>[
         'free_wifi', 'breakfast', 'pool', 'gym', 'parking', 'room_service',
@@ -221,7 +222,7 @@ abstract final class DiscoveryFixtures {
       },
       'rating': 4.90,
       'review_count': 184,
-      'nightly_rate_from': <String, Object?>{'amount': 460, 'currency': 'SAR'},
+      'nightly_rate_from': <String, Object?>{'amount': 460, 'currency': Money.fallbackCurrency},
       'is_available': true,
       'amenities': <Object?>['free_wifi', 'breakfast', 'pool', 'parking', 'airport_shuttle'],
       'review_scores': <String, Object?>{
@@ -258,7 +259,7 @@ abstract final class DiscoveryFixtures {
       },
       'rating': 4.85,
       'review_count': 203,
-      'nightly_rate_from': <String, Object?>{'amount': 380, 'currency': 'SAR'},
+      'nightly_rate_from': <String, Object?>{'amount': 380, 'currency': Money.fallbackCurrency},
       'is_available': true,
       'amenities': <Object?>['free_wifi', 'breakfast', 'gym', 'parking', 'room_service'],
       'review_scores': <String, Object?>{
@@ -294,7 +295,7 @@ abstract final class DiscoveryFixtures {
       },
       'rating': 4.70,
       'review_count': 96,
-      'nightly_rate_from': <String, Object?>{'amount': 540, 'currency': 'SAR'},
+      'nightly_rate_from': <String, Object?>{'amount': 540, 'currency': Money.fallbackCurrency},
       'is_available': true,
       'amenities': <Object?>['free_wifi', 'breakfast', 'gym', 'family_rooms'],
       'review_scores': <String, Object?>{
@@ -330,7 +331,7 @@ abstract final class DiscoveryFixtures {
       },
       'rating': 4.60,
       'review_count': 142,
-      'nightly_rate_from': <String, Object?>{'amount': 300, 'currency': 'SAR'},
+      'nightly_rate_from': <String, Object?>{'amount': 300, 'currency': Money.fallbackCurrency},
       'is_available': true,
       'amenities': <Object?>['free_wifi', 'breakfast', 'parking', 'family_rooms'],
       'review_scores': <String, Object?>{
@@ -366,7 +367,7 @@ abstract final class DiscoveryFixtures {
       },
       'rating': 4.55,
       'review_count': 61,
-      'nightly_rate_from': <String, Object?>{'amount': 720, 'currency': 'SAR'},
+      'nightly_rate_from': <String, Object?>{'amount': 720, 'currency': Money.fallbackCurrency},
       'is_available': true,
       'amenities': <Object?>['free_wifi', 'breakfast', 'pool', 'airport_shuttle', 'room_service'],
       'review_scores': <String, Object?>{
@@ -401,7 +402,7 @@ abstract final class DiscoveryFixtures {
       },
       'rating': 4.40,
       'review_count': 74,
-      'nightly_rate_from': <String, Object?>{'amount': 350, 'currency': 'SAR'},
+      'nightly_rate_from': <String, Object?>{'amount': 350, 'currency': Money.fallbackCurrency},
       'is_available': true,
       'amenities': <Object?>['free_wifi', 'breakfast', 'room_service'],
       'review_scores': <String, Object?>{
@@ -436,7 +437,7 @@ abstract final class DiscoveryFixtures {
       },
       'rating': null,
       'review_count': null,
-      'nightly_rate_from': <String, Object?>{'amount': 430, 'currency': 'SAR'},
+      'nightly_rate_from': <String, Object?>{'amount': 430, 'currency': Money.fallbackCurrency},
       'is_available': false,
       'amenities': <Object?>['free_wifi', 'gym', 'parking'],
       'review_scores': null,

@@ -91,11 +91,12 @@ it `null`, a documented gap). It now prefers the authoritative
 
 ## Not built
 
-- The "الخدمات" tab's quick-action tiles do not include a fifth
-  Figma board (`Report a problem` per `mobile/CLAUDE.md`'s design asset list)
-  — "الإبلاغ عن مشكلة" opens the matching **service** ("Maintenance") rather
-  than a dedicated report-a-problem flow, since only the STAY_Home board was
-  supplied this phase.
 - No `StatefulShellRoute` migration — each tab stays a plain top-level
   `GoRoute` with its own `AppBottomNav`, matching the app's existing router
   shape; revisit only if tab-state preservation becomes a real requirement.
+
+> The "الخدمات" tab's "الإبلاغ عن مشكلة" quick action originally opened the
+> matching **service** ("Maintenance") rather than a dedicated flow, since only
+> the `STAY_Home` board was supplied this phase. A later addendum built the
+> dedicated `13 · Report a problem` flow and repointed the tile — see
+> `mobile-report-a-problem.md`.

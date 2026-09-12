@@ -2,6 +2,7 @@ import '../../../../core/data/data_source.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../domain/entities/hotel_filters.dart';
 import '../../domain/entities/hotel_sort.dart';
+import '../../domain/entities/money.dart';
 import '../fixtures/discovery_fixtures.dart';
 import '../models/discovery_models.dart';
 import 'discovery_data_source.dart';
@@ -63,7 +64,7 @@ class DummyDiscoveryDataSource implements DiscoveryDataSource, DummyDataSource {
             ...DiscoveryFixtures.roomCatalogue[(raw as Json)['room_type_id']]!,
             'nightly_rate': <String, Object?>{
               'amount': ((raw)['nightly_rate'] as num).toInt(),
-              'currency': 'SAR',
+              'currency': Money.fallbackCurrency,
             },
           },
         }),
@@ -84,7 +85,7 @@ class DummyDiscoveryDataSource implements DiscoveryDataSource, DummyDataSource {
     },
     'hotel_name': <String, Object?>{'ar': 'فندق النخيل', 'en': 'The Palm Hotel'},
     'city_name': <String, Object?>{'ar': 'الرياض', 'en': 'Riyadh'},
-    'nightly_rate': <String, Object?>{'amount': 450, 'currency': 'SAR'},
+    'nightly_rate': <String, Object?>{'amount': 450, 'currency': Money.fallbackCurrency},
     'is_available': true,
   };
 
@@ -148,7 +149,7 @@ class DummyDiscoveryDataSource implements DiscoveryDataSource, DummyDataSource {
       ...DiscoveryFixtures.roomCatalogue[cheapest['room_type_id']]!,
       'nightly_rate': <String, Object?>{
         'amount': cheapestRate,
-        'currency': 'SAR',
+        'currency': Money.fallbackCurrency,
       },
     };
   }
@@ -178,7 +179,7 @@ class DummyDiscoveryDataSource implements DiscoveryDataSource, DummyDataSource {
           ...catalogue,
           'nightly_rate': <String, Object?>{
             'amount': (offering['nightly_rate'] as num).toInt(),
-            'currency': 'SAR',
+            'currency': Money.fallbackCurrency,
           },
         },
       });

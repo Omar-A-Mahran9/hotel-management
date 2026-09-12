@@ -122,8 +122,10 @@ class _RowCard extends StatelessWidget {
   }
 }
 
-/// `HOME_Default` grid tile: photo with the rating badge overlaid, then the
-/// name and city. No price / availability — the mockup keeps the tile clean.
+/// `HOME_Default` grid tile: the "Stacked" `Listing Card` layout
+/// (`design-system-tokens.md` §9) — a full-bleed, top-rounded photo, then the
+/// rating badge, name and city below it on the card's own surface. No price /
+/// availability — the mockup keeps the tile clean.
 class _TileCard extends StatelessWidget {
   const _TileCard({required this.hotel, required this.onTap});
 
@@ -137,32 +139,39 @@ class _TileCard extends StatelessWidget {
 
     return AppCard(
       onTap: onTap,
-      padding: const EdgeInsets.all(AppSpacing.xs),
+      padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Stack(
-            children: <Widget>[
-              HotelThumbnail(
-                imageUrl: hotel.coverUrl,
-                height: 116,
-                width: double.infinity,
-                borderRadius: AppRadius.allMd,
-              ),
-              if (hotel.rating != null)
-                PositionedDirectional(
-                  top: AppSpacing.xs,
-                  start: AppSpacing.xs,
-                  child: RatingBadge(rating: hotel.rating!),
-                ),
-            ],
+          HotelThumbnail(
+            imageUrl: hotel.coverUrl,
+            seed: hotel.id,
+            height: 128,
+            width: double.infinity,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(AppRadius.card),
+            ),
           ),
-          const SizedBox(height: AppSpacing.xs),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 2),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.sm,
+              AppSpacing.xs,
+              AppSpacing.sm,
+              AppSpacing.sm,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
+                if (hotel.rating != null) ...<Widget>[
+                  // Numerals/ratings stay fixed regardless of text direction
+                  // (design-system-tokens.md §8 RTL mirroring table).
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: RatingBadge(rating: hotel.rating!),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                ],
                 Text(
                   hotel.name.resolve(locale),
                   style: theme.textTheme.titleSmall,
@@ -176,7 +185,6 @@ class _TileCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 2),
               ],
             ),
           ),

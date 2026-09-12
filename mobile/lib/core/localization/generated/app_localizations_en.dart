@@ -2239,4 +2239,112 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get extendStayNotEligible =>
       'Extend stay is only available during your current stay.';
+
+  @override
+  String get reportProblemTitle => 'Report a problem';
+
+  @override
+  String get reportProblemCategoryHeading => 'What\'s the issue?';
+
+  @override
+  String get reportProblemCategoryBody =>
+      'Choose the closest category so your report reaches the right team directly.';
+
+  @override
+  String get reportCategoryAcHeating => 'AC or heating';
+
+  @override
+  String get reportCategoryPlumbingWater => 'Plumbing or water';
+
+  @override
+  String get reportCategoryElectricityLighting => 'Electricity and lighting';
+
+  @override
+  String get reportCategoryRoomCleanliness => 'Room cleanliness';
+
+  @override
+  String get reportCategoryInternetWifi => 'Internet and Wi-Fi';
+
+  @override
+  String get reportCategoryNoiseDisturbance => 'Noise or disturbance';
+
+  @override
+  String get reportProblemContinueCta => 'Continue';
+
+  @override
+  String get reportDescriptionTitle => 'Problem description';
+
+  @override
+  String get reportUrgencyHeading => 'How urgent is this?';
+
+  @override
+  String get reportUrgencyNormal => 'Normal';
+
+  @override
+  String get reportUrgencyImportant => 'Important';
+
+  @override
+  String get reportUrgencyUrgent => 'Urgent';
+
+  @override
+  String get reportNotesLabel => 'Notes (optional)';
+
+  @override
+  String get reportNotesHint =>
+      'Add any details that help our team respond faster';
+
+  @override
+  String get reportNoFeeTitle => 'No fees';
+
+  @override
+  String get reportNoFeeBody =>
+      'Reporting a problem is free and will never be added to your bill.';
+
+  @override
+  String get reportSubmitCta => 'Submit report';
+
+  @override
+  String get reportSubmittingCta => 'Submitting…';
+
+  @override
+  String get reportFailedTitle => 'We couldn\'t send your report';
+
+  @override
+  String get reportSubmittedTitle => 'Submitted';
+
+  @override
+  String get reportSubmittedBannerTitle => 'Your report reached reception';
+
+  @override
+  String reportSubmittedBannerBody(String reference) {
+    return 'Report $reference. Our reception team will be in touch shortly, and you can track its status anytime.';
+  }
+
+  @override
+  String get reportTrackCta => 'Track report';
+
+  @override
+  String get reportDetailTitle => 'Report details';
+
+  @override
+  String get reportDetailBody =>
+      'Your report has been received and our team is on it.';
+
+  @override
+  String get reportContactReceptionCta => 'Contact reception';
+
+  @override
+  String get reportStatusOpen => 'Open';
+
+  @override
+  String get reportStatusInProgress => 'In progress';
+
+  @override
+  String get reportStatusResolved => 'Resolved';
+
+  @override
+  String get reportUnavailableTitle => 'Reports are unavailable';
+
+  @override
+  String get reportNotFoundTitle => 'Report not found';
 }

@@ -197,6 +197,29 @@ abstract final class AppRoutes {
   static const String extendStay = '/reservation/:reservationId/extend';
   static const String extendStayName = 'extendStay';
 
+  /// `13 · Report a problem` screen 1 — the category picker (Mobile Phase 11
+  /// addendum). Replaces the earlier shortcut into the Maintenance service.
+  static const String reportProblem = '/reservation/:reservationId/report';
+  static const String reportProblemName = 'reportProblem';
+
+  /// `13 · Report a problem` screen 2 — urgency + optional notes for the
+  /// category chosen on screen 1. `:category` is the wire value
+  /// (`ProblemCategory.wireValue`).
+  static const String reportProblemDescribe =
+      '/reservation/:reservationId/report/:category/describe';
+  static const String reportProblemDescribeName = 'reportProblemDescribe';
+
+  /// `13 · Report a problem` screen 3 — the submitted confirmation, by the
+  /// newly created report's id.
+  static const String reportProblemSubmitted =
+      '/reservation/:reservationId/report/:reportId/submitted';
+  static const String reportProblemSubmittedName = 'reportProblemSubmitted';
+
+  /// `13 · Report a problem` screen 4 — one report's status ("track report").
+  static const String problemReportDetail =
+      '/reservation/:reservationId/report/:reportId';
+  static const String problemReportDetailName = 'problemReportDetail';
+
   /// The authenticated landing route.
   static const String authenticatedHome = discover;
 

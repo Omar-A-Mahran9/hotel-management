@@ -28,9 +28,10 @@ class RoomController extends Controller
 
         $roomTypeId = $request->filled('room_type_id') ? (int) $request->query('room_type_id') : null;
 
-        return $this->success(RoomResource::collection(
-            $this->rooms->listForHotel($request->user(), $hotel, $roomTypeId)
-        ));
+        $rooms = $this->rooms->listForHotel($request->user(), $hotel, $roomTypeId);
+        $rooms->getCollection()->load('media');
+
+        return $this->success(RoomResource::collection($rooms));
     }
 
     public function store(StoreRoomRequest $request, Hotel $hotel): JsonResponse
@@ -46,6 +47,8 @@ class RoomController extends Controller
     {
         $this->ensureBelongsToHotel($room, $hotel);
         $this->authorize('view', $room);
+
+        $room->load('media');
 
         return $this->success(new RoomResource($room));
     }

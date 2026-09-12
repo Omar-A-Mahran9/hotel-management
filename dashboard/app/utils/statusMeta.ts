@@ -7,6 +7,8 @@ import type {
   IdentityVerificationStatus,
   NotificationDeliveryStatus,
   PaymentStatus,
+  ProblemReportStatus,
+  ProblemReportUrgency,
   ReviewStatus,
   ServiceOrderStatus,
 } from '~/types/api'
@@ -92,6 +94,28 @@ export const REVIEW_STATUS_TONE: Record<ReviewStatus, BadgeTone> = {
   pending: 'warning',
   published: 'success',
   rejected: 'destructive',
+}
+
+export const PROBLEM_STATUS_TONE: Record<ProblemReportStatus, BadgeTone> = {
+  open: 'warning',
+  in_progress: 'info',
+  resolved: 'success',
+}
+
+export const PROBLEM_URGENCY_TONE: Record<ProblemReportUrgency, BadgeTone> = {
+  normal: 'neutral',
+  important: 'warning',
+  urgent: 'destructive',
+}
+
+// Valid forward transitions offered in the UI (open -> in_progress|resolved,
+// in_progress -> resolved, resolved is terminal). The backend
+// (App\Domain\Problems) re-validates and rejects an illegal one with 422 —
+// this is only which buttons to show.
+export const PROBLEM_STATUS_TRANSITIONS: Record<ProblemReportStatus, Array<'in_progress' | 'resolved'>> = {
+  open: ['in_progress', 'resolved'],
+  in_progress: ['resolved'],
+  resolved: [],
 }
 
 /** A pending-manual-review session is the only state a staff review acts on. */

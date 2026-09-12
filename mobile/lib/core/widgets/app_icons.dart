@@ -21,7 +21,7 @@ abstract final class AppIcons {
   static const IconData chevronRtl = IconsaxPlusLinear.arrow_left_2;
   static const IconData notifications = IconsaxPlusLinear.notification;
   static const IconData search = IconsaxPlusLinear.search_normal_1;
-  static const IconData filter = IconsaxPlusLinear.candle_2;
+  static const IconData filter = IconsaxPlusLinear.filter;
   static const IconData sort = IconsaxPlusLinear.sort;
   static const IconData edit = IconsaxPlusLinear.edit_2;
 
@@ -58,6 +58,11 @@ abstract final class AppIcons {
   static const IconData calendar = IconsaxPlusLinear.calendar_2;
   static const IconData rating = IconsaxPlusBold.star_1;
   static const IconData ratingOutline = IconsaxPlusLinear.star_1;
+
+  /// The flower/sparkle glyph on the `HOTEL_Detail` hero's second circular
+  /// button (matches the [rating] pill's mark in the reference screenshot).
+  /// No product behaviour is wired to it — see `hotel_detail_page.dart`.
+  static const IconData sparkle = IconsaxPlusBold.magic_star;
   static const IconData payment = IconsaxPlusLinear.card;
   static const IconData wallet = IconsaxPlusLinear.wallet_3;
   static const IconData identity = IconsaxPlusLinear.personalcard;

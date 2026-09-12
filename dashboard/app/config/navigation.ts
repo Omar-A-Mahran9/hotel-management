@@ -175,6 +175,14 @@ export const NAVIGATION: NavSection[] = [
         scope: 'hotel',
       },
       {
+        key: 'problem-reports',
+        labelKey: 'nav.problemReports',
+        to: '/problem-reports',
+        icon: 'ki-information-2',
+        permission: 'problems.view',
+        scope: 'hotel',
+      },
+      {
         key: 'notifications',
         labelKey: 'nav.notifications',
         to: '/notifications',

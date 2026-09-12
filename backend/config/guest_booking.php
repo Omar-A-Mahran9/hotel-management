@@ -28,23 +28,26 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Deposit amount rule — GENUINELY UNRESOLVED
+    | Deposit amount rule
     |--------------------------------------------------------------------------
     |
     | PaymentWorkflowService::initiateHold() requires an approved deposit
-    | amount. There is no approved business rule for what a guest deposit is
-    | (a flat amount? first night? a percentage of the stay total? nothing?).
-    | No value is invented here — it stays null, and the guest
-    | POST /payment/hold endpoint refuses with a machine-readable
-    | `deposit_amount_rule_undefined` reason until a rule is approved. The
-    | full reservation price is explicitly NOT used as a stand-in.
+    | amount. The approved rule is "percentage": the hold is a percentage of
+    | the reservation's `price_snapshot`. GuestPaymentController resolves the
+    | amount from this config only — it never invents or hardcodes a figure.
+    |
+    | The 20% default below is a placeholder so the endpoint is functional;
+    | the exact percentage still needs explicit product/business sign-off
+    | before this goes to production. Set GUEST_BOOKING_DEPOSIT_RULE=null (or
+    | unset it) to fall back to the previous behaviour — the endpoint refuses
+    | with a machine-readable `deposit_amount_rule_undefined` reason.
     |
     */
 
     'deposit' => [
-        'rule' => env('GUEST_BOOKING_DEPOSIT_RULE'), // e.g. 'first_night' | 'flat' | 'percentage'
-        'amount' => env('GUEST_BOOKING_DEPOSIT_AMOUNT'),
-        'percentage' => env('GUEST_BOOKING_DEPOSIT_PERCENTAGE'),
+        'rule' => env('GUEST_BOOKING_DEPOSIT_RULE', 'percentage'), // 'percentage' | null
+        'amount' => env('GUEST_BOOKING_DEPOSIT_AMOUNT'), // unused by the 'percentage' rule; reserved for a future 'flat' rule
+        'percentage' => env('GUEST_BOOKING_DEPOSIT_PERCENTAGE', 20), // % of price_snapshot — PLACEHOLDER pending business sign-off
     ],
 
 ];

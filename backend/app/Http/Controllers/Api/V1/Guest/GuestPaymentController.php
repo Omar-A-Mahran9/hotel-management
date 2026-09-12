@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Api\V1\Guest;
 
+use App\Domain\Payment\Models\Payment;
+use App\Domain\Payment\Services\PaymentWorkflowService;
 use App\Domain\Reservation\Models\Guest;
+use App\Domain\Reservation\Models\Reservation;
 use App\Domain\Reservation\Services\ReservationService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Guest\InitiateGuestPaymentHoldRequest;
@@ -11,31 +14,30 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
- * The authenticated guest's view of their reservation's deposit payment
- * (`/api/v1/guest/reservations/{reservation}/payment`).
+ * The authenticated guest's view of, and write path into, their
+ * reservation's deposit payment (`/api/v1/guest/reservations/{reservation}/payment`).
  *
- * Architecture: dedicated GUEST controller/resource. Reads reuse the shared
- * reservation ownership scope; the write path is designed to reuse
- * PaymentWorkflowService unchanged — but see the deposit-amount block below.
- * Authorization is ownership (guest_id === token guest); a non-owned or
- * missing reservation is an identical plain 404.
+ * Architecture: dedicated GUEST controller/resource, thin over the shared
+ * PaymentWorkflowService — mirrors the staff PaymentController::hold()
+ * response mapping exactly. Authorization is ownership (guest_id === token
+ * guest); a non-owned or missing reservation is an identical plain 404.
  *
  * ─────────────────────────────────────────────────────────────────────────
- * DEPOSIT AMOUNT — EXPLICIT BUSINESS DECISION REQUIRED
+ * DEPOSIT AMOUNT
  * ─────────────────────────────────────────────────────────────────────────
  * PaymentWorkflowService::initiateHold() requires an approved deposit
- * amount. There is NO approved rule for a guest deposit anywhere in the
- * codebase (flat? first night? a % of the stay? none?). This controller
- * therefore does NOT initiate a hold — `hold()` refuses with a
- * machine-readable `deposit_amount_rule_undefined` reason. The full
- * reservation price is explicitly NOT used as a stand-in. Once
- * config/guest_booking.php → `deposit.rule` is approved, `hold()` becomes a
- * thin call into the existing PaymentWorkflowService (structure, ownership,
- * idempotency and validation are already in place here).
+ * amount. The approved rule (config/guest_booking.php -> deposit.rule) is
+ * "percentage": the hold is `deposit.percentage`% of the reservation's
+ * price_snapshot — resolved here, never invented inline. If the rule
+ * config is unset, hold() refuses with a machine-readable
+ * `deposit_amount_rule_undefined` reason, unchanged from before.
  */
 class GuestPaymentController extends Controller
 {
-    public function __construct(private readonly ReservationService $reservations) {}
+    public function __construct(
+        private readonly ReservationService $reservations,
+        private readonly PaymentWorkflowService $payments,
+    ) {}
 
     public function show(Request $request, int $reservation): JsonResponse
     {
@@ -62,7 +64,9 @@ class GuestPaymentController extends Controller
             abort(404);
         }
 
-        if (config('guest_booking.deposit.rule') === null) {
+        $rule = config('guest_booking.deposit.rule');
+
+        if ($rule === null) {
             return $this->error(
                 __('api.guest_booking.deposit_rule_undefined'),
                 422,
@@ -70,11 +74,50 @@ class GuestPaymentController extends Controller
             );
         }
 
-        // Intentionally unreachable until a deposit rule is approved. When it
-        // is, resolve the amount from the rule + reservation and delegate to
-        // the shared PaymentWorkflowService::initiateHold(...) — do not
-        // compute or transition anything here.
-        abort(501); // @codeCoverageIgnore
+        $payment = $this->payments->initiateHold(
+            reservation: $found,
+            amount: $this->resolveDepositAmount($rule, $found),
+            idempotencyKey: $request->idempotencyKey(),
+        );
+
+        return $this->respond($payment);
+    }
+
+    private function resolveDepositAmount(string $rule, Reservation $reservation): string
+    {
+        return match ($rule) {
+            'percentage' => $this->percentageOfTotal($reservation),
+            default => throw new \RuntimeException("Unsupported guest deposit rule [{$rule}]."),
+        };
+    }
+
+    private function percentageOfTotal(Reservation $reservation): string
+    {
+        $percentage = (string) config('guest_booking.deposit.percentage');
+
+        return bcdiv(bcmul((string) $reservation->price_snapshot, $percentage, 4), '100', 2);
+    }
+
+    private function respond(Payment $payment): JsonResponse
+    {
+        return match ($payment->status) {
+            Payment::STATUS_HOLD_ACTIVE => $this->success(
+                new GuestPaymentResource($payment), __('api.payment.hold_placed'), 201,
+            ),
+            Payment::STATUS_HOLD_REQUESTED => $this->success(
+                new GuestPaymentResource($payment), __('api.payment.hold_pending'), 200,
+            ),
+            Payment::STATUS_HOLD_FAILED => $this->error(
+                __('api.payment.hold_failed'), 422, ['status' => $payment->status],
+            ),
+            Payment::STATUS_CANCELLED => $this->error(
+                __('api.payment.hold_cancelled'), 422, ['status' => $payment->status],
+            ),
+            Payment::STATUS_EXPIRED => $this->error(
+                __('api.payment.hold_expired'), 422, ['status' => $payment->status],
+            ),
+            default => $this->success(new GuestPaymentResource($payment), __('api.payment.hold_state')),
+        };
     }
 
     private function guest(Request $request): Guest

@@ -198,7 +198,6 @@ class _QuickActionsGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final HotelService? cleaning = findServiceByKeyword(catalogue, 'cleaning');
-    final HotelService? maintenance = findServiceByKeyword(catalogue, 'maintenance');
 
     return GridView.count(
       shrinkWrap: true,
@@ -240,15 +239,10 @@ class _QuickActionsGrid extends StatelessWidget {
         _ActionTile(
           icon: AppIcons.report,
           label: l10n.stayHomeReportProblem,
-          onTap: maintenance == null
-              ? null
-              : () => context.pushNamed(
-                    AppRoutes.serviceDetailName,
-                    pathParameters: <String, String>{
-                      'reservationId': reservation.id,
-                      'serviceId': maintenance.id,
-                    },
-                  ),
+          onTap: () => context.pushNamed(
+            AppRoutes.reportProblemName,
+            pathParameters: <String, String>{'reservationId': reservation.id},
+          ),
         ),
       ],
     );

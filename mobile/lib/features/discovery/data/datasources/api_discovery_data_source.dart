@@ -312,7 +312,7 @@ class ApiDiscoveryDataSource implements DiscoveryDataSource, RemoteDataSource {
     int amount = 0;
     if (raw is num) amount = raw.round();
     if (raw is String) amount = (double.tryParse(raw) ?? 0).round();
-    return Money(amount: amount, currency: 'SAR');
+    return Money(amount: amount, currency: Money.fallbackCurrency);
   }
 
   static String _isoDate(DateTime date) {

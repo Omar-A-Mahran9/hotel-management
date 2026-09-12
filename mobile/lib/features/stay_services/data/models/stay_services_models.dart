@@ -81,7 +81,7 @@ class HotelServiceModel {
         name: _text(json['name']),
         description: _text(json['description']),
         price: _money(json['price']),
-        currency: (json['currency'] as String?) ?? 'SAR',
+        currency: (json['currency'] as String?) ?? Money.fallbackCurrency,
         isActive: json['is_active'] as bool? ?? true,
         estimatedMinutes: (json['estimated_minutes'] as num?)?.toInt(),
       );
@@ -156,7 +156,7 @@ class ServiceOrderModel {
         serviceId: '${json['service_id']}',
         quantity: (json['quantity'] as num?)?.toInt() ?? 1,
         unitPrice: _money(json['unit_price_snapshot']),
-        currency: (json['currency_snapshot'] as String?) ?? 'SAR',
+        currency: (json['currency_snapshot'] as String?) ?? Money.fallbackCurrency,
         totalAmount: _money(json['total_amount']),
         status: ServiceOrderStatus.fromWire(
           (json['status'] as String?) ?? ServiceOrderStatus.requested.wireValue,

@@ -61,6 +61,8 @@ class RolePermissionSeeder extends Seeder
             'notifications.view' => ['View notifications', 'عرض الإشعارات', 'View and mark read a reservation notification feed within authorized scope', 'عرض قائمة إشعارات الحجز وتحديدها كمقروءة ضمن النطاق المصرح به'],
             'reviews.view' => ['View reviews', 'عرض التقييمات', 'View a hotel\'s guest reviews, including pending/rejected, within authorized scope', 'عرض تقييمات نزلاء الفندق، بما في ذلك المعلّقة/المرفوضة، ضمن النطاق المصرح به'],
             'reviews.moderate' => ['Moderate reviews', 'مراجعة التقييمات', 'Approve or reject a submitted guest review within authorized scope', 'الموافقة على تقييم نزيل مُرسل أو رفضه ضمن النطاق المصرح به'],
+            'problems.view' => ['View problem reports', 'عرض بلاغات المشاكل', 'View guest-submitted problem reports within authorized scope', 'عرض بلاغات المشاكل المُرسلة من النزلاء ضمن النطاق المصرح به'],
+            'problems.manage' => ['Manage problem reports', 'إدارة بلاغات المشاكل', 'Triage and transition a guest problem report\'s status within authorized scope', 'فرز بلاغ مشكلة النزيل ونقل حالته ضمن النطاق المصرح به'],
             'guests.view' => ['View guests', 'عرض النزلاء', 'View the staff-facing guest directory and a guest\'s reservation history', 'عرض دليل النزلاء وسجل حجوزات النزيل'],
             'guests.manage' => ['Manage guests', 'إدارة النزلاء', 'Register a walk-in guest with no app account yet', 'تسجيل نزيل حضر مباشرة دون حساب في التطبيق'],
             'reports.view' => ['View reports', 'عرض التقارير', 'View occupancy, revenue and hotel comparison reports within authorized scope', 'عرض تقارير الإشغال والإيرادات ومقارنة الفنادق ضمن النطاق المصرح به'],
@@ -105,7 +107,7 @@ class RolePermissionSeeder extends Seeder
                 'name_ar' => 'مدير الفندق',
                 'description_en' => 'Manages one or more assigned hotels.',
                 'description_ar' => 'يدير فندقًا واحدًا أو أكثر من الفنادق المسندة إليه.',
-                'permissions' => ['hotels.view', 'locations.view', 'inventory.view', 'inventory.manage', 'reservations.view', 'reservations.manage', 'payments.manage', 'payments.view', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke', 'services.view', 'services.manage', 'service-orders.view', 'service-orders.manage', 'folio.view', 'checkout.perform', 'invoice.view', 'loyalty.view', 'loyalty.manage', 'notifications.view', 'reviews.view', 'reviews.moderate', 'guests.view', 'guests.manage', 'reports.view', 'audit.view'],
+                'permissions' => ['hotels.view', 'locations.view', 'inventory.view', 'inventory.manage', 'reservations.view', 'reservations.manage', 'payments.manage', 'payments.view', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke', 'services.view', 'services.manage', 'service-orders.view', 'service-orders.manage', 'folio.view', 'checkout.perform', 'invoice.view', 'loyalty.view', 'loyalty.manage', 'notifications.view', 'reviews.view', 'reviews.moderate', 'problems.view', 'problems.manage', 'guests.view', 'guests.manage', 'reports.view', 'audit.view'],
             ],
             Role::RECEPTION => [
                 'name_en' => 'Reception',
@@ -139,8 +141,11 @@ class RolePermissionSeeder extends Seeder
                 // effect) but reservation CREATION itself stays on
                 // reservations.manage, which Reception does not hold — the
                 // same split as every other "operational read/assist, not a
-                // state-changing write" boundary above.
-                'permissions' => ['hotels.view', 'locations.view', 'inventory.view', 'reservations.view', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke', 'services.view', 'service-orders.view', 'service-orders.manage', 'folio.view', 'checkout.perform', 'invoice.view', 'loyalty.view', 'notifications.view', 'reviews.view', 'guests.view', 'guests.manage', 'payments.view'],
+                // state-changing write" boundary above. Reception may view
+                // and triage guest problem reports (problems.view/.manage —
+                // routing a maintenance issue is routine front-desk work,
+                // unlike reviews.moderate's reputational judgment call).
+                'permissions' => ['hotels.view', 'locations.view', 'inventory.view', 'reservations.view', 'identity-verification.view', 'identity-verification.submit', 'identity-verification.review', 'check-in.perform', 'digital-access.view', 'digital-access.revoke', 'services.view', 'service-orders.view', 'service-orders.manage', 'folio.view', 'checkout.perform', 'invoice.view', 'loyalty.view', 'notifications.view', 'reviews.view', 'problems.view', 'problems.manage', 'guests.view', 'guests.manage', 'payments.view'],
             ],
             Role::GUEST => [
                 'name_en' => 'Guest',

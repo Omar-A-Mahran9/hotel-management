@@ -76,6 +76,7 @@ class _LoyaltyRedeemPageState extends ConsumerState<LoyaltyRedeemPage> {
             return _Body(
               reservationId: widget.reservationId,
               account: account,
+              currency: ctx.currency,
               points: _resolvedPoints(account.pointsBalance),
               onChanged: (int v) => setState(() => _points = v),
               step: _step,
@@ -110,6 +111,7 @@ class _Body extends ConsumerWidget {
   const _Body({
     required this.reservationId,
     required this.account,
+    required this.currency,
     required this.points,
     required this.onChanged,
     required this.step,
@@ -117,6 +119,7 @@ class _Body extends ConsumerWidget {
 
   final String reservationId;
   final LoyaltyAccount account;
+  final String currency;
   final int points;
   final ValueChanged<int> onChanged;
   final int step;
@@ -200,7 +203,7 @@ class _Body extends ConsumerWidget {
               Text(l10n.loyaltyRedeemNote, style: theme.textTheme.bodySmall),
               if (result != null) ...<Widget>[
                 const SizedBox(height: AppSpacing.md),
-                _RedeemResultBanner(result: result, currency: 'SAR'),
+                _RedeemResultBanner(result: result, currency: currency),
               ],
               if (action is RedeemFailed && forThis) ...<Widget>[
                 const SizedBox(height: AppSpacing.md),

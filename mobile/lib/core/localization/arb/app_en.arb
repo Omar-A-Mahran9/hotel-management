@@ -867,5 +867,43 @@
   "@extendStaySuccessBody": {
     "placeholders": { "date": { "type": "String" }, "amount": { "type": "String" } }
   },
-  "extendStayNotEligible": "Extend stay is only available during your current stay."
+  "extendStayNotEligible": "Extend stay is only available during your current stay.",
+
+  "reportProblemTitle": "Report a problem",
+  "reportProblemCategoryHeading": "What's the issue?",
+  "reportProblemCategoryBody": "Choose the closest category so your report reaches the right team directly.",
+  "reportCategoryAcHeating": "AC or heating",
+  "reportCategoryPlumbingWater": "Plumbing or water",
+  "reportCategoryElectricityLighting": "Electricity and lighting",
+  "reportCategoryRoomCleanliness": "Room cleanliness",
+  "reportCategoryInternetWifi": "Internet and Wi-Fi",
+  "reportCategoryNoiseDisturbance": "Noise or disturbance",
+  "reportProblemContinueCta": "Continue",
+  "reportDescriptionTitle": "Problem description",
+  "reportUrgencyHeading": "How urgent is this?",
+  "reportUrgencyNormal": "Normal",
+  "reportUrgencyImportant": "Important",
+  "reportUrgencyUrgent": "Urgent",
+  "reportNotesLabel": "Notes (optional)",
+  "reportNotesHint": "Add any details that help our team respond faster",
+  "reportNoFeeTitle": "No fees",
+  "reportNoFeeBody": "Reporting a problem is free and will never be added to your bill.",
+  "reportSubmitCta": "Submit report",
+  "reportSubmittingCta": "Submitting…",
+  "reportFailedTitle": "We couldn't send your report",
+  "reportSubmittedTitle": "Submitted",
+  "reportSubmittedBannerTitle": "Your report reached reception",
+  "reportSubmittedBannerBody": "Report {reference}. Our reception team will be in touch shortly, and you can track its status anytime.",
+  "@reportSubmittedBannerBody": {
+    "placeholders": { "reference": { "type": "String" } }
+  },
+  "reportTrackCta": "Track report",
+  "reportDetailTitle": "Report details",
+  "reportDetailBody": "Your report has been received and our team is on it.",
+  "reportContactReceptionCta": "Contact reception",
+  "reportStatusOpen": "Open",
+  "reportStatusInProgress": "In progress",
+  "reportStatusResolved": "Resolved",
+  "reportUnavailableTitle": "Reports are unavailable",
+  "reportNotFoundTitle": "Report not found"
 }

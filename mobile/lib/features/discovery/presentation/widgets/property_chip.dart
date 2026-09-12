@@ -22,16 +22,18 @@ class PropertyChip extends StatelessWidget {
         vertical: AppSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: c.bgSurface,
+        color: c.bgSubtle,
         borderRadius: AppRadius.allPill,
-        border: Border.all(color: c.borderDefault),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Icon(icon, size: 15, color: c.textSecondary),
+          Icon(icon, size: 15, color: c.textLabel),
           const SizedBox(width: AppSpacing.space1 + 2),
-          Text(label, style: theme.textTheme.bodySmall),
+          Text(
+            label,
+            style: theme.textTheme.bodySmall?.copyWith(color: c.textLabel),
+          ),
         ],
       ),
     );

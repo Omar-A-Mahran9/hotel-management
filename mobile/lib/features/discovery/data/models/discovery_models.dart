@@ -35,7 +35,7 @@ Money _money(Object? value) {
   final Json map = (value as Json?) ?? const <String, Object?>{};
   return Money(
     amount: (map['amount'] as num?)?.toInt() ?? 0,
-    currency: (map['currency'] as String?) ?? 'SAR',
+    currency: (map['currency'] as String?) ?? Money.fallbackCurrency,
   );
 }
 

@@ -51,6 +51,7 @@ feature.
 - `docs/mobile-phase-9-checkout-invoice.md` — checkout + invoice
 - `docs/mobile-phase-10-loyalty-reviews.md` — loyalty points + reviews
 - `docs/mobile-phase-11-bookings-account.md` — bookings list/detail, account home, the current-stay services hub + Extend Stay (`11 · Bookings & Account`, `04 · Check in & Stay`)
+- `docs/mobile-report-a-problem.md` — dedicated in-stay problem-report flow: category → urgency/notes → submitted → track (`13 · Report a problem`)
 
 When a new phase/feature is built, add its doc here and link it above.
 

@@ -191,6 +191,16 @@ export interface LoginResponse {
 }
 
 // ---- Inventory -----------------------------------------------------
+export interface RoomMedia {
+  id: number
+  collection: 'gallery'
+  url: string
+  sort_order: number
+  mime_type: string | null
+  size: number | null
+  created_at: string
+}
+
 export interface RoomType {
   id: number
   hotel_id: number
@@ -200,6 +210,8 @@ export interface RoomType {
   amenities: string[] | null
   description: string | null
   is_active: boolean
+  // Present when the backend eager-loads the relation (list / show).
+  photos?: RoomMedia[]
   rooms_count?: number
   available_rooms_count?: number
   maintenance_rooms_count?: number
@@ -215,6 +227,8 @@ export interface Room {
   room_type_id: number
   room_number: string
   status: RoomStatus
+  // Present when the backend eager-loads the relation (list / show).
+  photos?: RoomMedia[]
   created_at: string
   updated_at: string
 }
@@ -584,6 +598,33 @@ export interface Review {
   hotel_id?: number
   guest_id?: number | null
   moderated_at?: string | null
+}
+
+// ---- Problem reports (guest-submitted in-stay issues, ProblemReportResource) ----
+export type ProblemReportCategory =
+  | 'ac_heating'
+  | 'plumbing_water'
+  | 'electricity_lighting'
+  | 'room_cleanliness'
+  | 'internet_wifi'
+  | 'noise_disturbance'
+
+export type ProblemReportUrgency = 'normal' | 'important' | 'urgent'
+export type ProblemReportStatus = 'open' | 'in_progress' | 'resolved'
+
+export interface ProblemReport {
+  id: number
+  reservation_id: number
+  guest_id: number
+  hotel_id: number
+  category: ProblemReportCategory
+  urgency: ProblemReportUrgency
+  notes: string | null
+  status: ProblemReportStatus
+  resolved_by_user_id: number | null
+  resolved_at: string | null
+  created_at: string
+  updated_at: string
 }
 
 // ---- Notifications (NotificationResource) --------------------

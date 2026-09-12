@@ -22,6 +22,7 @@ class RoomTypeResource extends JsonResource
             'amenities' => $this->amenities,
             'description' => $this->description,
             'is_active' => $this->is_active,
+            'photos' => RoomMediaResource::collection($this->whenLoaded('media')),
             'rooms_count' => $this->whenCounted('rooms'),
             'available_rooms_count' => $this->whenCounted('available_rooms'),
             'maintenance_rooms_count' => $this->whenCounted('maintenance_rooms'),

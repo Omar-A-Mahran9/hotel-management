@@ -44,6 +44,11 @@ import '../../features/identity_verification/presentation/pages/identity_verific
 import '../../features/payment/presentation/pages/payment_processing_page.dart';
 import '../../features/payment/presentation/pages/payment_result_page.dart';
 import '../../features/payment/presentation/pages/payment_review_page.dart';
+import '../../features/problem_reports/domain/entities/problem_category.dart';
+import '../../features/problem_reports/presentation/pages/problem_report_detail_page.dart';
+import '../../features/problem_reports/presentation/pages/report_problem_category_page.dart';
+import '../../features/problem_reports/presentation/pages/report_problem_description_page.dart';
+import '../../features/problem_reports/presentation/pages/report_problem_submitted_page.dart';
 import '../../features/reservation/presentation/pages/reservation_detail_page.dart';
 import '../../features/stay_services/presentation/pages/my_service_requests_page.dart';
 import '../../features/stay_services/presentation/pages/service_detail_page.dart';
@@ -398,6 +403,41 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
         name: AppRoutes.extendStayName,
         builder: (BuildContext context, GoRouterState state) => ExtendStayPage(
           reservationId: state.pathParameters['reservationId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.reportProblem,
+        name: AppRoutes.reportProblemName,
+        builder: (BuildContext context, GoRouterState state) =>
+            ReportProblemCategoryPage(
+          reservationId: state.pathParameters['reservationId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.reportProblemDescribe,
+        name: AppRoutes.reportProblemDescribeName,
+        builder: (BuildContext context, GoRouterState state) =>
+            ReportProblemDescriptionPage(
+          reservationId: state.pathParameters['reservationId']!,
+          category: ProblemCategory.fromWire(state.pathParameters['category']),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.reportProblemSubmitted,
+        name: AppRoutes.reportProblemSubmittedName,
+        builder: (BuildContext context, GoRouterState state) =>
+            ReportProblemSubmittedPage(
+          reservationId: state.pathParameters['reservationId']!,
+          reportId: state.pathParameters['reportId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.problemReportDetail,
+        name: AppRoutes.problemReportDetailName,
+        builder: (BuildContext context, GoRouterState state) =>
+            ProblemReportDetailPage(
+          reservationId: state.pathParameters['reservationId']!,
+          reportId: state.pathParameters['reportId']!,
         ),
       ),
     ],

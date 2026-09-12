@@ -47,6 +47,7 @@ use App\Domain\Review\Exceptions\ReviewNotAllowedException;
 use App\Domain\StayServices\Exceptions\FolioChargeAmountException;
 use App\Domain\StayServices\Exceptions\InvalidServiceOrderStatusTransitionException;
 use App\Domain\StayServices\Exceptions\ServiceOrderNotAllowedException;
+use App\Domain\Support\Exceptions\InvalidProblemReportStatusTransitionException;
 use App\Http\Middleware\ForceJsonResponse;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -433,6 +434,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->renderable(function (ReviewNotAllowedException $e, Request $request) use ($envelope) {
             if ($request->is('api/*')) {
                 return $envelope($e->getMessage(), 422, ['reason' => $e->reason]);
+            }
+        });
+
+        $exceptions->renderable(function (InvalidProblemReportStatusTransitionException $e, Request $request) use ($envelope) {
+            if ($request->is('api/*')) {
+                return $envelope($e->getMessage(), 422);
             }
         });
 

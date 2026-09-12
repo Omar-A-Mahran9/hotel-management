@@ -76,6 +76,7 @@
     "settlements": "التسويات",
     "loyalty": "الولاء",
     "reviews": "التقييمات",
+    "problemReports": "بلاغات المشاكل",
     "notifications": "الإشعارات",
     "reports": "التقارير",
     "users": "المستخدمون",
@@ -302,6 +303,21 @@
     "editTitle": "تعديل الغرفة",
     "created": "تم إنشاء الغرفة.",
     "updated": "تم تحديث الغرفة."
+  },
+  "media": {
+    "gallery": "معرض الصور",
+    "addMore": "إضافة المزيد",
+    "galleryEmpty": "لا توجد صور في المعرض بعد.",
+    "uploaded": "تم رفع الصورة.",
+    "removed": "تمت إزالة الصورة.",
+    "removeConfirm": "إزالة هذه الصورة؟",
+    "dropHintGallery": "اسحب وأفلِت الصور هنا، أو انقر للإضافة.",
+    "stagedHint": "اختر صور المعرض الآن — سيتم رفعها تلقائيًا فور الحفظ أدناه.",
+    "pending": "لم تُحفظ بعد",
+    "invalidType": "نوع الملف غير مدعوم. استخدم JPG أو PNG أو WebP.",
+    "tooLarge": "حجم الملف كبير جدًا (الحد الأقصى {max} ميغابايت).",
+    "galleryFull": "المعرض يحتوي بالفعل على الحد الأقصى وهو {max} صورة.",
+    "someUploadsFailed": "تم الحفظ، لكن فشل رفع بعض الصور. أضِفها مرة أخرى من شاشة التعديل."
   },
   "services": {
     "title": "خدمات الإقامة",
@@ -686,6 +702,30 @@
     "rejected": "تم رفض التقييم.",
     "empty": "لا توجد تقييمات بعد."
   },
+  "problemReportsPage": {
+    "subtitle": "بلاغات مشاكل الإقامة المُقدَّمة من النزلاء.",
+    "guest": "النزيل",
+    "reservation": "الحجز",
+    "category": "الفئة",
+    "urgency": "الأولوية",
+    "notes": "الملاحظات",
+    "status": "الحالة",
+    "created": "تاريخ التقديم",
+    "startWork": "بدء المعالجة",
+    "markResolved": "وضع كمحلول",
+    "movedToInProgress": "تم نقل البلاغ إلى قيد المعالجة.",
+    "markedResolved": "تم وضع البلاغ كمحلول.",
+    "empty": "لا توجد بلاغات مشاكل بعد.",
+    "category_ac_heating": "تكييف أو تدفئة",
+    "category_plumbing_water": "سباكة أو مياه",
+    "category_electricity_lighting": "كهرباء وإضاءة",
+    "category_room_cleanliness": "نظافة الغرفة",
+    "category_internet_wifi": "إنترنت وواي فاي",
+    "category_noise_disturbance": "ضوضاء أو إزعاج",
+    "urgency_normal": "عادي",
+    "urgency_important": "مهم",
+    "urgency_urgent": "عاجل"
+  },
   "notificationsPage": {
     "subtitle": "قناة الإشعارات التشغيلية.",
     "type": "الإشعار",
@@ -763,6 +803,8 @@
     "body": "لا توجد سجلات لعرضها."
   },
   "status": {
+    "open": "مفتوح",
+    "resolved": "تم الحل",
     "pending": "قيد الانتظار",
     "deposit_held": "تم حجز العربون",
     "verified": "تم التحقق",

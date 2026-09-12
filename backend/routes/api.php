@@ -1,15 +1,14 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AuditLogController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CheckInController;
-use App\Http\Controllers\Api\V1\AuditLogController;
 use App\Http\Controllers\Api\V1\CheckoutController;
 use App\Http\Controllers\Api\V1\CityController;
 use App\Http\Controllers\Api\V1\CountryController;
 use App\Http\Controllers\Api\V1\DigitalAccessController;
 use App\Http\Controllers\Api\V1\FacilityController;
 use App\Http\Controllers\Api\V1\FolioController;
-use App\Http\Controllers\Api\V1\GuestController;
 use App\Http\Controllers\Api\V1\Guest\GuestAuthController;
 use App\Http\Controllers\Api\V1\Guest\GuestCheckInController;
 use App\Http\Controllers\Api\V1\Guest\GuestCheckoutController;
@@ -21,10 +20,12 @@ use App\Http\Controllers\Api\V1\Guest\GuestInvoiceController;
 use App\Http\Controllers\Api\V1\Guest\GuestLoyaltyController;
 use App\Http\Controllers\Api\V1\Guest\GuestNotificationController;
 use App\Http\Controllers\Api\V1\Guest\GuestPaymentController;
+use App\Http\Controllers\Api\V1\Guest\GuestProblemReportController;
 use App\Http\Controllers\Api\V1\Guest\GuestReservationController;
 use App\Http\Controllers\Api\V1\Guest\GuestReviewController;
 use App\Http\Controllers\Api\V1\Guest\GuestServiceCatalogController;
 use App\Http\Controllers\Api\V1\Guest\GuestServiceOrderController;
+use App\Http\Controllers\Api\V1\GuestController;
 use App\Http\Controllers\Api\V1\HotelController;
 use App\Http\Controllers\Api\V1\HotelGroupController;
 use App\Http\Controllers\Api\V1\HotelMediaController;
@@ -36,12 +37,15 @@ use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\PaymentWebhookController;
 use App\Http\Controllers\Api\V1\PermissionController;
-use App\Http\Controllers\Api\V1\ReservationController;
+use App\Http\Controllers\Api\V1\ProblemReportController;
 use App\Http\Controllers\Api\V1\ReportController;
+use App\Http\Controllers\Api\V1\ReservationController;
 use App\Http\Controllers\Api\V1\ReviewController;
 use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\RoomController;
+use App\Http\Controllers\Api\V1\RoomMediaController;
 use App\Http\Controllers\Api\V1\RoomTypeController;
+use App\Http\Controllers\Api\V1\RoomTypeMediaController;
 use App\Http\Controllers\Api\V1\ServiceCategoryController;
 use App\Http\Controllers\Api\V1\ServiceController;
 use App\Http\Controllers\Api\V1\ServiceOrderController;
@@ -185,6 +189,17 @@ Route::prefix('v1')->group(function () {
             Route::post('/reservations/{reservation}/review', [GuestReviewController::class, 'store'])
                 ->whereNumber('reservation')
                 ->middleware('throttle:guest.booking.write');
+
+            // Problem reports — a guest reports an in-stay issue (category +
+            // urgency + optional note); hotel/status are server-derived.
+            // Many per reservation, unlike Review (mobile/Design/13 · Report
+            // a problem.png).
+            Route::prefix('/reservations/{reservation}/problems')->whereNumber('reservation')->group(function () {
+                Route::get('/', [GuestProblemReportController::class, 'index']);
+                Route::post('/', [GuestProblemReportController::class, 'store'])
+                    ->middleware('throttle:guest.booking.write');
+                Route::get('/{problem}', [GuestProblemReportController::class, 'show'])->whereNumber('problem');
+            });
         });
 
         /*
@@ -404,6 +419,12 @@ Route::prefix('v1')->group(function () {
         Route::post('/reviews/{review}/moderate', [ReviewController::class, 'moderate'])
             ->whereNumber('review');
 
+        // Problem reports — staff triage decision. Listing a hotel's reports
+        // is registered in the /hotels/{hotel} group below, alongside the
+        // rest of the hotel-scoped staff reads.
+        Route::patch('/problems/{problem}/status', [ProblemReportController::class, 'transitionStatus'])
+            ->whereNumber('problem');
+
         Route::prefix('/hotels/{hotel}')->group(function () {
             // Hotel media (logo / cover / gallery). Staff-only —
             // `hotels.manage` + hotel scope (HotelPolicy::manageMedia). The
@@ -423,11 +444,30 @@ Route::prefix('v1')->group(function () {
             Route::patch('/room-types/{roomType}/activate', [RoomTypeController::class, 'activate']);
             Route::patch('/room-types/{roomType}/deactivate', [RoomTypeController::class, 'deactivate']);
 
+            // Room Type media (gallery). Staff-only — `inventory.manage` +
+            // hotel scope (RoomTypePolicy::manageMedia). `reorder` is
+            // declared before the `{media}` param route so it is not
+            // shadowed.
+            Route::patch('/room-types/{roomType}/media/reorder', [RoomTypeMediaController::class, 'reorder']);
+            Route::post('/room-types/{roomType}/media', [RoomTypeMediaController::class, 'store'])
+                ->middleware('throttle:room-media.upload');
+            Route::delete('/room-types/{roomType}/media/{media}', [RoomTypeMediaController::class, 'destroy'])
+                ->whereNumber('media');
+
             Route::get('/rooms', [RoomController::class, 'index']);
             Route::post('/rooms', [RoomController::class, 'store']);
             Route::get('/rooms/{room}', [RoomController::class, 'show']);
             Route::match(['put', 'patch'], '/rooms/{room}', [RoomController::class, 'update']);
             Route::patch('/rooms/{room}/status', [RoomController::class, 'updateStatus']);
+
+            // Room media (gallery) — a per-physical-room override on top of
+            // the room type's shared gallery. Staff-only — `inventory.manage`
+            // + hotel scope (RoomPolicy::manageMedia).
+            Route::patch('/rooms/{room}/media/reorder', [RoomMediaController::class, 'reorder']);
+            Route::post('/rooms/{room}/media', [RoomMediaController::class, 'store'])
+                ->middleware('throttle:room-media.upload');
+            Route::delete('/rooms/{room}/media/{media}', [RoomMediaController::class, 'destroy'])
+                ->whereNumber('media');
 
             // Phase 8 — hotel service catalog (Phase 0 §16). Categories are
             // an optional grouping; services carry the price. No delete —
@@ -448,6 +488,10 @@ Route::prefix('v1')->group(function () {
             // Reviews — every moderation state (pending/published/rejected);
             // the guest-facing published-only listing is under /guest above.
             Route::get('/reviews', [ReviewController::class, 'index']);
+
+            // Problem reports — every status; the guest-facing
+            // reservation-scoped listing is under /guest above.
+            Route::get('/problems', [ProblemReportController::class, 'index']);
 
             // Staff financial ledgers — hotel-wide reads over the same
             // reservation-scoped domains the workspace already uses.

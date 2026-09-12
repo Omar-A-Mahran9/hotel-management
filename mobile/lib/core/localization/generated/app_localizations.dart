@@ -3943,6 +3943,210 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Extend stay is only available during your current stay.'**
   String get extendStayNotEligible;
+
+  /// No description provided for @reportProblemTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report a problem'**
+  String get reportProblemTitle;
+
+  /// No description provided for @reportProblemCategoryHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s the issue?'**
+  String get reportProblemCategoryHeading;
+
+  /// No description provided for @reportProblemCategoryBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the closest category so your report reaches the right team directly.'**
+  String get reportProblemCategoryBody;
+
+  /// No description provided for @reportCategoryAcHeating.
+  ///
+  /// In en, this message translates to:
+  /// **'AC or heating'**
+  String get reportCategoryAcHeating;
+
+  /// No description provided for @reportCategoryPlumbingWater.
+  ///
+  /// In en, this message translates to:
+  /// **'Plumbing or water'**
+  String get reportCategoryPlumbingWater;
+
+  /// No description provided for @reportCategoryElectricityLighting.
+  ///
+  /// In en, this message translates to:
+  /// **'Electricity and lighting'**
+  String get reportCategoryElectricityLighting;
+
+  /// No description provided for @reportCategoryRoomCleanliness.
+  ///
+  /// In en, this message translates to:
+  /// **'Room cleanliness'**
+  String get reportCategoryRoomCleanliness;
+
+  /// No description provided for @reportCategoryInternetWifi.
+  ///
+  /// In en, this message translates to:
+  /// **'Internet and Wi-Fi'**
+  String get reportCategoryInternetWifi;
+
+  /// No description provided for @reportCategoryNoiseDisturbance.
+  ///
+  /// In en, this message translates to:
+  /// **'Noise or disturbance'**
+  String get reportCategoryNoiseDisturbance;
+
+  /// No description provided for @reportProblemContinueCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get reportProblemContinueCta;
+
+  /// No description provided for @reportDescriptionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Problem description'**
+  String get reportDescriptionTitle;
+
+  /// No description provided for @reportUrgencyHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'How urgent is this?'**
+  String get reportUrgencyHeading;
+
+  /// No description provided for @reportUrgencyNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get reportUrgencyNormal;
+
+  /// No description provided for @reportUrgencyImportant.
+  ///
+  /// In en, this message translates to:
+  /// **'Important'**
+  String get reportUrgencyImportant;
+
+  /// No description provided for @reportUrgencyUrgent.
+  ///
+  /// In en, this message translates to:
+  /// **'Urgent'**
+  String get reportUrgencyUrgent;
+
+  /// No description provided for @reportNotesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes (optional)'**
+  String get reportNotesLabel;
+
+  /// No description provided for @reportNotesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add any details that help our team respond faster'**
+  String get reportNotesHint;
+
+  /// No description provided for @reportNoFeeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No fees'**
+  String get reportNoFeeTitle;
+
+  /// No description provided for @reportNoFeeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Reporting a problem is free and will never be added to your bill.'**
+  String get reportNoFeeBody;
+
+  /// No description provided for @reportSubmitCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit report'**
+  String get reportSubmitCta;
+
+  /// No description provided for @reportSubmittingCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitting…'**
+  String get reportSubmittingCta;
+
+  /// No description provided for @reportFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t send your report'**
+  String get reportFailedTitle;
+
+  /// No description provided for @reportSubmittedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted'**
+  String get reportSubmittedTitle;
+
+  /// No description provided for @reportSubmittedBannerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your report reached reception'**
+  String get reportSubmittedBannerTitle;
+
+  /// No description provided for @reportSubmittedBannerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Report {reference}. Our reception team will be in touch shortly, and you can track its status anytime.'**
+  String reportSubmittedBannerBody(String reference);
+
+  /// No description provided for @reportTrackCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Track report'**
+  String get reportTrackCta;
+
+  /// No description provided for @reportDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report details'**
+  String get reportDetailTitle;
+
+  /// No description provided for @reportDetailBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your report has been received and our team is on it.'**
+  String get reportDetailBody;
+
+  /// No description provided for @reportContactReceptionCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact reception'**
+  String get reportContactReceptionCta;
+
+  /// No description provided for @reportStatusOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get reportStatusOpen;
+
+  /// No description provided for @reportStatusInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get reportStatusInProgress;
+
+  /// No description provided for @reportStatusResolved.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolved'**
+  String get reportStatusResolved;
+
+  /// No description provided for @reportUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports are unavailable'**
+  String get reportUnavailableTitle;
+
+  /// No description provided for @reportNotFoundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report not found'**
+  String get reportNotFoundTitle;
 }
 
 class _AppLocalizationsDelegate

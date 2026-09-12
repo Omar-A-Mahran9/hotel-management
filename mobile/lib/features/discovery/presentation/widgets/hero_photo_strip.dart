@@ -20,11 +20,22 @@ class HeroPhotoStrip extends StatelessWidget {
     required this.galleryUrls,
     required this.totalPhotos,
     this.visible = 3,
+    this.selectedIndex,
+    this.onSelect,
   });
 
   final List<String> galleryUrls;
   final int totalPhotos;
   final int visible;
+
+  /// Index into [galleryUrls] drawn with the accent selection border. `null`
+  /// (the default — `room_detail_page`'s read-only strip) disables the
+  /// selected-state styling entirely.
+  final int? selectedIndex;
+
+  /// Called with a tile's index (into [galleryUrls]) when tapped, so the
+  /// caller can swap the hero photo. `null` keeps every tile static.
+  final ValueChanged<int>? onSelect;
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +46,9 @@ class HeroPhotoStrip extends StatelessWidget {
     return SizedBox(
       height: 64,
       child: Row(
+        // Always hug the tiles' own width — never expand to fill a looser
+        // ancestor (e.g. the centred placement on `HOTEL_Detail`).
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           if (overflow > 0) ...<Widget>[
             _Tile(
@@ -55,6 +69,8 @@ class HeroPhotoStrip extends StatelessWidget {
           ],
           for (int i = 0; i < shown; i++) ...<Widget>[
             _Tile(
+              selected: selectedIndex == i,
+              onTap: onSelect == null ? null : () => onSelect!(i),
               child: HotelThumbnail(
                 imageUrl: i < galleryUrls.length ? galleryUrls[i] : null,
                 width: 64,
@@ -71,21 +87,30 @@ class HeroPhotoStrip extends StatelessWidget {
 }
 
 class _Tile extends StatelessWidget {
-  const _Tile({required this.child});
+  const _Tile({required this.child, this.onTap, this.selected = false});
 
   final Widget child;
+  final VoidCallback? onTap;
+  final bool selected;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 64,
-      height: 64,
-      decoration: BoxDecoration(
-        borderRadius: AppRadius.allMd,
-        border: Border.all(color: AppPrimitives.white, width: 2),
+    final AppColorTokens c = context.colors;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 64,
+        height: 64,
+        decoration: BoxDecoration(
+          borderRadius: AppRadius.allMd,
+          border: Border.all(
+            color: selected ? c.accentWarm : AppPrimitives.white,
+            width: 2,
+          ),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: child,
       ),
-      clipBehavior: Clip.antiAlias,
-      child: child,
     );
   }
 }

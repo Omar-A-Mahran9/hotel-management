@@ -45,4 +45,15 @@ class RoomTypePolicy
         return $user->hasPermission('inventory.manage')
             && $this->hotelAccess->canAccessHotel($user, $roomType->hotel_id);
     }
+
+    /**
+     * Managing a room type's images is a room-type-edit action: the same
+     * `inventory.manage` permission as update, plus the hotel-scope check
+     * resolved from the user's own stored access records.
+     */
+    public function manageMedia(User $user, RoomType $roomType): bool
+    {
+        return $user->hasPermission('inventory.manage')
+            && $this->hotelAccess->canAccessHotel($user, $roomType->hotel_id);
+    }
 }

@@ -32,6 +32,8 @@ import type {
   PaymentsReport,
   PaymentStatus,
   Permission,
+  ProblemReport,
+  ProblemReportStatus,
   Reservation,
   ReservationsReport,
   ReservationStatus,
@@ -42,6 +44,7 @@ import type {
   Role,
   RoleWriteBody,
   Room,
+  RoomMedia,
   RoomStatus,
   RoomType,
   ServiceCategory,
@@ -202,6 +205,23 @@ export const roomTypesService = {
     api()<RoomType>(`/hotels/${hotelId}/room-types/${id}/deactivate`, { method: 'PATCH' }),
 }
 
+// ---- Room Type media (gallery, hotel-scoped) --------------------------
+// Real Laravel endpoints (POST/DELETE/PATCH
+// /hotels/{id}/room-types/{id}/media...). Upload is multipart — ofetch sets
+// the boundary from the FormData automatically.
+export const roomTypeMediaService = {
+  upload: (hotelId: number, roomTypeId: number, file: File) => {
+    const body = new FormData()
+    body.append('collection', 'gallery')
+    body.append('image', file)
+    return api()<RoomMedia>(`/hotels/${hotelId}/room-types/${roomTypeId}/media`, { method: 'POST', body })
+  },
+  remove: (hotelId: number, roomTypeId: number, mediaId: number) =>
+    api()<null>(`/hotels/${hotelId}/room-types/${roomTypeId}/media/${mediaId}`, { method: 'DELETE' }),
+  reorderGallery: (hotelId: number, roomTypeId: number, ids: number[]) =>
+    api()<RoomMedia[]>(`/hotels/${hotelId}/room-types/${roomTypeId}/media/reorder`, { method: 'PATCH', body: { ids } }),
+}
+
 // ---- Rooms (hotel-scoped) ----------------------------------------------
 export const roomsService = {
   list: (hotelId: number, roomTypeId?: number) =>
@@ -217,6 +237,24 @@ export const roomsService = {
   // is never a valid target here.
   setStatus: (hotelId: number, id: number, status: Extract<RoomStatus, 'available' | 'under_maintenance'>) =>
     api()<Room>(`/hotels/${hotelId}/rooms/${id}/status`, { method: 'PATCH', body: { status } }),
+}
+
+// ---- Room media (gallery, hotel-scoped) --------------------------------
+// A per-physical-room override on top of the room type's shared gallery.
+// Real Laravel endpoints (POST/DELETE/PATCH
+// /hotels/{id}/rooms/{id}/media...). Upload is multipart — ofetch sets the
+// boundary from the FormData automatically.
+export const roomMediaService = {
+  upload: (hotelId: number, roomId: number, file: File) => {
+    const body = new FormData()
+    body.append('collection', 'gallery')
+    body.append('image', file)
+    return api()<RoomMedia>(`/hotels/${hotelId}/rooms/${roomId}/media`, { method: 'POST', body })
+  },
+  remove: (hotelId: number, roomId: number, mediaId: number) =>
+    api()<null>(`/hotels/${hotelId}/rooms/${roomId}/media/${mediaId}`, { method: 'DELETE' }),
+  reorderGallery: (hotelId: number, roomId: number, ids: number[]) =>
+    api()<RoomMedia[]>(`/hotels/${hotelId}/rooms/${roomId}/media/reorder`, { method: 'PATCH', body: { ids } }),
 }
 
 // ---- Service catalog (hotel-scoped) ----------------------------------
@@ -252,6 +290,15 @@ export const reviewsService = {
   // decision is 'published' or 'rejected' — no other state is accepted.
   moderate: (reviewId: number, decision: Extract<ReviewStatus, 'published' | 'rejected'>) =>
     api()<Review>(`/reviews/${reviewId}/moderate`, { method: 'POST', body: { decision } }),
+}
+
+// ---- Problem reports (hotel-scoped, guest-submitted in-stay issues) ---
+export const problemReportsService = {
+  list: (hotelId: number, params: { status?: ProblemReportStatus, page?: number, per_page?: number } = {}) =>
+    api().withMeta<ProblemReport[]>(`/hotels/${hotelId}/problems`, { query: cleanQuery(params) }),
+  // Forward-only: open -> in_progress|resolved, in_progress -> resolved.
+  transitionStatus: (problemId: number, status: ProblemReportStatus) =>
+    api()<ProblemReport>(`/problems/${problemId}/status`, { method: 'PATCH', body: { status } }),
 }
 
 // ---- Reservations ---------------------------------------------------

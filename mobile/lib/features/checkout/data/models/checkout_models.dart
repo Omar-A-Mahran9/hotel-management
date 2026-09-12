@@ -50,7 +50,7 @@ class FolioModel {
 
   Folio toEntity() {
     final Json totals = (_json['totals'] as Json?) ?? const <String, Object?>{};
-    final String currency = (_json['currency'] as String?) ?? 'SAR';
+    final String currency = (_json['currency'] as String?) ?? Money.fallbackCurrency;
     final List<Object?> charges =
         (_json['charges'] as List<Object?>?) ?? const <Object?>[];
     final Json reservation =
@@ -83,7 +83,7 @@ class CheckoutResultModel {
         (_json['reservation'] as Json?) ?? const <String, Object?>{};
     final Json totals =
         (_json['totals'] as Json?) ?? const <String, Object?>{};
-    final String currency = (_json['currency'] as String?) ?? 'SAR';
+    final String currency = (_json['currency'] as String?) ?? Money.fallbackCurrency;
     final Json? payment = _json['payment'] as Json?;
     final Json? invoice = _json['invoice'] as Json?;
 
@@ -140,7 +140,7 @@ class InvoiceModel {
   final Json _json;
 
   Invoice toEntity() {
-    final String currency = (_json['currency'] as String?) ?? 'SAR';
+    final String currency = (_json['currency'] as String?) ?? Money.fallbackCurrency;
     final List<Object?> items =
         (_json['items'] as List<Object?>?) ?? const <Object?>[];
     return Invoice(

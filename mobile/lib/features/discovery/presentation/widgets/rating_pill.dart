@@ -18,28 +18,27 @@ class RatingPill extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     final AppLocalizations l10n = context.l10n;
 
+    final AppColorTokens c = context.colors;
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.xs,
         vertical: AppSpacing.xxs,
       ),
       decoration: BoxDecoration(
-        color: AppColors.bronze200.withValues(alpha: 0.45),
+        color: c.accentWarmBg,
         borderRadius: AppRadius.allPill,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          const Icon(AppIcons.rating, size: 14, color: AppColors.bronze400),
+          Icon(AppIcons.rating, size: 14, color: c.accentWarm),
           const SizedBox(width: AppSpacing.xxs),
           Flexible(
             child: Text(
               reviewCount == null
                   ? l10n.hotelRatingValue(rating)
                   : '${l10n.hotelRatingValue(rating)} · ${l10n.hotelReviewCount(reviewCount!)}',
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: AppColors.bronze500,
-              ),
+              style: theme.textTheme.labelMedium?.copyWith(color: c.accentWarm),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

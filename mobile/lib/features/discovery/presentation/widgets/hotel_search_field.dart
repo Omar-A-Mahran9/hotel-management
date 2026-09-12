@@ -21,6 +21,7 @@ class HotelSearchField extends StatelessWidget {
     this.onClear,
     this.onFilterTap,
     this.filterBadgeCount = 0,
+    this.trailingIcon,
   });
 
   final TextEditingController? controller;
@@ -31,6 +32,13 @@ class HotelSearchField extends StatelessWidget {
   final VoidCallback? onClear;
   final VoidCallback? onFilterTap;
   final int filterBadgeCount;
+
+  /// A static glyph shown inside the field on its trailing edge (`end` — the
+  /// left in RTL) when there is no clear button to show, e.g. the read-only
+  /// Home field's filter/list glyph (`HOME_Default`). Purely decorative: the
+  /// whole field already navigates on tap, so this never gets its own
+  /// [onFilterTap]-style handler.
+  final IconData? trailingIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +65,9 @@ class HotelSearchField extends StatelessWidget {
                       tooltip: l10n.searchClearTooltip,
                       onPressed: onClear,
                     )
-                  : null,
+                  : trailingIcon != null
+                      ? Icon(trailingIcon, size: 20)
+                      : null,
               border: const OutlineInputBorder(
                 borderRadius: AppRadius.allPill,
                 borderSide: BorderSide.none,

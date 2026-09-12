@@ -29,6 +29,19 @@ return [
         'reorder_mismatch' => 'The ids must be exactly the hotel gallery, in the desired order.',
     ],
 
+    'room_media' => [
+        'gallery_full' => 'This already has the maximum of :max gallery images.',
+        'reorder_mismatch' => 'The ids must be exactly the gallery, in the desired order.',
+    ],
+
+    'problem_reports' => [
+        'list' => 'Problem reports are returned.',
+        'status' => 'The problem report is returned.',
+        'submitted' => 'Your problem report was submitted.',
+        'in_progress' => 'The problem report is being worked on.',
+        'resolved' => 'The problem report was resolved.',
+    ],
+
     'guest_booking' => [
         'room_type_unavailable' => 'This room type is not available for booking.',
         'party_exceeds_capacity' => 'This room type seats up to :capacity guests.',

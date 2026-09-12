@@ -76,6 +76,7 @@
     "settlements": "Settlements",
     "loyalty": "Loyalty",
     "reviews": "Reviews",
+    "problemReports": "Problem reports",
     "notifications": "Notifications",
     "reports": "Reports",
     "users": "Users",
@@ -321,6 +322,21 @@
     "editTitle": "Edit room",
     "created": "Room created.",
     "updated": "Room updated."
+  },
+  "media": {
+    "gallery": "Photo gallery",
+    "addMore": "Add more",
+    "galleryEmpty": "No gallery images yet.",
+    "uploaded": "Image uploaded.",
+    "removed": "Image removed.",
+    "removeConfirm": "Remove this image?",
+    "dropHintGallery": "Drag and drop images here, or click to add.",
+    "stagedHint": "Pick gallery photos now — they upload automatically once you save below.",
+    "pending": "Not saved yet",
+    "invalidType": "Unsupported file type. Use JPG, PNG or WebP.",
+    "tooLarge": "That file is too large (max {max}MB).",
+    "galleryFull": "The gallery already has the maximum of {max} images.",
+    "someUploadsFailed": "Saved, but some images failed to upload. Add them again from Edit."
   },
   "services": {
     "title": "Stay services",
@@ -705,6 +721,30 @@
     "rejected": "Review rejected.",
     "empty": "No reviews yet."
   },
+  "problemReportsPage": {
+    "subtitle": "Guest-submitted in-stay problem reports.",
+    "guest": "Guest",
+    "reservation": "Reservation",
+    "category": "Category",
+    "urgency": "Urgency",
+    "notes": "Notes",
+    "status": "Status",
+    "created": "Submitted",
+    "startWork": "Start work",
+    "markResolved": "Mark resolved",
+    "movedToInProgress": "Report moved to in progress.",
+    "markedResolved": "Report marked resolved.",
+    "empty": "No problem reports yet.",
+    "category_ac_heating": "AC / heating",
+    "category_plumbing_water": "Plumbing / water",
+    "category_electricity_lighting": "Electricity / lighting",
+    "category_room_cleanliness": "Room cleanliness",
+    "category_internet_wifi": "Internet / Wi-Fi",
+    "category_noise_disturbance": "Noise / disturbance",
+    "urgency_normal": "Normal",
+    "urgency_important": "Important",
+    "urgency_urgent": "Urgent"
+  },
   "notificationsPage": {
     "subtitle": "Operational notification feed.",
     "type": "Notification",
@@ -782,6 +822,8 @@
     "body": "There are no records to show."
   },
   "status": {
+    "open": "Open",
+    "resolved": "Resolved",
     "pending": "Pending",
     "deposit_held": "Deposit held",
     "verified": "Verified",

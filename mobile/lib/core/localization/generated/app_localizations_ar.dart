@@ -2218,4 +2218,111 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get extendStayNotEligible =>
       'تمديد الإقامة متاح فقط أثناء إقامتك الحالية.';
+
+  @override
+  String get reportProblemTitle => 'الإبلاغ عن مشكلة';
+
+  @override
+  String get reportProblemCategoryHeading => 'ما نوع المشكلة؟';
+
+  @override
+  String get reportProblemCategoryBody =>
+      'اختر التصنيف الأقرب حتى يصل البلاغ للفريق المختص مباشرة.';
+
+  @override
+  String get reportCategoryAcHeating => 'تكييف أو تدفئة';
+
+  @override
+  String get reportCategoryPlumbingWater => 'سباكة أو مياه';
+
+  @override
+  String get reportCategoryElectricityLighting => 'كهرباء وإضاءة';
+
+  @override
+  String get reportCategoryRoomCleanliness => 'نظافة الغرفة';
+
+  @override
+  String get reportCategoryInternetWifi => 'إنترنت وواي فاي';
+
+  @override
+  String get reportCategoryNoiseDisturbance => 'ضوضاء أو إزعاج';
+
+  @override
+  String get reportProblemContinueCta => 'متابعة';
+
+  @override
+  String get reportDescriptionTitle => 'وصف المشكلة';
+
+  @override
+  String get reportUrgencyHeading => 'ما مدى إلحاح المشكلة؟';
+
+  @override
+  String get reportUrgencyNormal => 'عادي';
+
+  @override
+  String get reportUrgencyImportant => 'مهم';
+
+  @override
+  String get reportUrgencyUrgent => 'عاجل';
+
+  @override
+  String get reportNotesLabel => 'ملاحظات (اختياري)';
+
+  @override
+  String get reportNotesHint =>
+      'أضِف أي تفاصيل تساعد فريقنا على الاستجابة بسرعة';
+
+  @override
+  String get reportNoFeeTitle => 'بدون رسوم';
+
+  @override
+  String get reportNoFeeBody =>
+      'الإبلاغ عن مشكلة مجاني ولن يُضاف إلى فاتورتك أبدًا.';
+
+  @override
+  String get reportSubmitCta => 'إرسال البلاغ';
+
+  @override
+  String get reportSubmittingCta => 'جارٍ الإرسال…';
+
+  @override
+  String get reportFailedTitle => 'تعذّر إرسال بلاغك';
+
+  @override
+  String get reportSubmittedTitle => 'تم الإرسال';
+
+  @override
+  String get reportSubmittedBannerTitle => 'وصل بلاغك للاستقبال';
+
+  @override
+  String reportSubmittedBannerBody(String reference) {
+    return 'رقم البلاغ $reference. سيتواصل معك فريق الاستقبال قريبًا، ويمكنك متابعة الحالة في أي وقت.';
+  }
+
+  @override
+  String get reportTrackCta => 'تتبّع البلاغ';
+
+  @override
+  String get reportDetailTitle => 'تفاصيل البلاغ';
+
+  @override
+  String get reportDetailBody => 'تم استلام بلاغك وفريقنا يتابعه الآن.';
+
+  @override
+  String get reportContactReceptionCta => 'تواصل مع الاستقبال';
+
+  @override
+  String get reportStatusOpen => 'مفتوح';
+
+  @override
+  String get reportStatusInProgress => 'قيد المعالجة';
+
+  @override
+  String get reportStatusResolved => 'تم الحل';
+
+  @override
+  String get reportUnavailableTitle => 'تعذّر عرض البلاغات';
+
+  @override
+  String get reportNotFoundTitle => 'البلاغ غير موجود';
 }

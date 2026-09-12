@@ -3,6 +3,7 @@
 namespace App\Domain\Inventory\Models;
 
 use App\Domain\HotelGroup\Models\Hotel;
+use App\Domain\Inventory\Concerns\HasRoomMedia;
 use App\Domain\Reservation\Models\Reservation;
 use App\Domain\Shared\Concerns\HotelScoped;
 use Database\Factories\RoomTypeFactory;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class RoomType extends Model
 {
-    use HasFactory, HotelScoped;
+    use HasFactory, HasRoomMedia, HotelScoped;
 
     protected $fillable = [
         'hotel_id',

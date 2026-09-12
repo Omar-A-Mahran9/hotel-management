@@ -25,9 +25,10 @@ class RoomTypeController extends Controller
     {
         $this->authorize('viewAny', [RoomType::class, $hotel]);
 
-        return $this->success(RoomTypeResource::collection(
-            $this->roomTypes->listForHotel($request->user(), $hotel)
-        ));
+        $roomTypes = $this->roomTypes->listForHotel($request->user(), $hotel);
+        $roomTypes->getCollection()->load('media');
+
+        return $this->success(RoomTypeResource::collection($roomTypes));
     }
 
     public function store(StoreRoomTypeRequest $request, Hotel $hotel): JsonResponse
@@ -44,7 +45,10 @@ class RoomTypeController extends Controller
         $this->ensureBelongsToHotel($roomType, $hotel);
         $this->authorize('view', $roomType);
 
-        return $this->success(new RoomTypeResource($this->roomTypes->find($roomType->id)));
+        $found = $this->roomTypes->find($roomType->id);
+        $found?->load('media');
+
+        return $this->success(new RoomTypeResource($found));
     }
 
     public function update(UpdateRoomTypeRequest $request, Hotel $hotel, RoomType $roomType): JsonResponse

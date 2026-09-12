@@ -8,7 +8,15 @@ import 'package:flutter/foundation.dart';
 /// localization, never here — this type only carries the value.
 @immutable
 class Money {
-  const Money({required this.amount, this.currency = 'SAR'});
+  const Money({required this.amount, this.currency = fallbackCurrency});
+
+  /// The single home for the "backend has no configured currency yet"
+  /// fallback (mobile/docs/coding_rules.md §2 — no duplicate constants for the
+  /// same concept). Every data-layer `?? 'SAR'` across the app should read
+  /// this instead of repeating the literal. This is a de-duplication only —
+  /// the fallback behaviour itself is a deliberate, documented backend gap
+  /// and is not being removed.
+  static const String fallbackCurrency = 'SAR';
 
   final int amount;
   final String currency;

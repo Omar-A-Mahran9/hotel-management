@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Domain\Audit\Models\AuditLog;
+use App\Domain\Audit\Policies\AuditLogPolicy;
+use App\Domain\Audit\Repositories\Contracts\AuditLogRepositoryInterface;
+use App\Domain\Audit\Repositories\EloquentAuditLogRepository;
 use App\Domain\Checkout\Models\Checkout;
 use App\Domain\Checkout\Models\Invoice;
 use App\Domain\Checkout\Policies\CheckoutPolicy;
@@ -105,10 +109,6 @@ use App\Domain\Reservation\Models\Guest;
 use App\Domain\Reservation\Models\Reservation;
 use App\Domain\Reservation\Policies\GuestPolicy;
 use App\Domain\Reservation\Policies\ReservationPolicy;
-use App\Domain\Audit\Models\AuditLog;
-use App\Domain\Audit\Policies\AuditLogPolicy;
-use App\Domain\Audit\Repositories\Contracts\AuditLogRepositoryInterface;
-use App\Domain\Audit\Repositories\EloquentAuditLogRepository;
 use App\Domain\Reservation\Repositories\Contracts\GuestRepositoryInterface;
 use App\Domain\Reservation\Repositories\Contracts\ReservationExtensionRepositoryInterface;
 use App\Domain\Reservation\Repositories\Contracts\ReservationRepositoryInterface;
@@ -135,6 +135,10 @@ use App\Domain\StayServices\Repositories\EloquentHotelServiceRepository;
 use App\Domain\StayServices\Repositories\EloquentServiceCategoryRepository;
 use App\Domain\StayServices\Repositories\EloquentServiceOrderRepository;
 use App\Domain\StayServices\Services\Folio;
+use App\Domain\Support\Models\ProblemReport;
+use App\Domain\Support\Policies\ProblemReportPolicy;
+use App\Domain\Support\Repositories\Contracts\ProblemReportRepositoryInterface;
+use App\Domain\Support\Repositories\EloquentProblemReportRepository;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -181,6 +185,7 @@ class AppServiceProvider extends ServiceProvider
         NotificationRepositoryInterface::class => EloquentNotificationRepository::class,
         ReviewRepositoryInterface::class => EloquentReviewRepository::class,
         AuditLogRepositoryInterface::class => EloquentAuditLogRepository::class,
+        ProblemReportRepositoryInterface::class => EloquentProblemReportRepository::class,
     ];
 
     /**
@@ -212,6 +217,7 @@ class AppServiceProvider extends ServiceProvider
         Review::class => ReviewPolicy::class,
         AuditLog::class => AuditLogPolicy::class,
         Guest::class => GuestPolicy::class,
+        ProblemReport::class => ProblemReportPolicy::class,
     ];
 
     public function register(): void
@@ -303,6 +309,7 @@ class AppServiceProvider extends ServiceProvider
         $this->registerCheckoutRateLimiters();
         $this->registerNotificationRateLimiters();
         $this->registerHotelMediaRateLimiters();
+        $this->registerRoomMediaRateLimiters();
         $this->registerGuestBookingRateLimiters();
     }
 
@@ -314,6 +321,18 @@ class AppServiceProvider extends ServiceProvider
     {
         RateLimiter::for('hotel-media.upload', fn (Request $request) => Limit::perMinute(
             (int) config('hotel_media.rate_limits.upload.per_minute'),
+        )->by((string) ($request->user()?->id ?? $request->ip())));
+    }
+
+    /**
+     * Rate limiting on the staff room/room-type media upload endpoints.
+     * Config-driven (config/room_media.php), keyed by authenticated user id
+     * (IP fallback). Mirrors registerHotelMediaRateLimiters().
+     */
+    private function registerRoomMediaRateLimiters(): void
+    {
+        RateLimiter::for('room-media.upload', fn (Request $request) => Limit::perMinute(
+            (int) config('room_media.rate_limits.upload.per_minute'),
         )->by((string) ($request->user()?->id ?? $request->ip())));
     }
 

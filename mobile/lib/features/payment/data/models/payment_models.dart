@@ -54,7 +54,7 @@ class PaymentModel {
         (json['status'] as String?) ?? PaymentStatus.notStarted.wireValue,
       ),
       amount: _amount(json['amount']),
-      currency: (json['currency'] as String?) ?? 'SAR',
+      currency: (json['currency'] as String?) ?? Money.fallbackCurrency,
       holdExpiresAt: _dateOrNull(json['hold_expires_at']),
       createdAt: _dateOrNull(json['created_at']) ??
           DateTime.fromMillisecondsSinceEpoch(0),

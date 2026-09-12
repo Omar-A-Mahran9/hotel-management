@@ -9,3 +9,10 @@ final hotelDetailProvider = FutureProvider.autoDispose.family<Hotel, String>(
   (Ref ref, String hotelId) =>
       ref.watch(discoveryRepositoryProvider).hotel(hotelId),
 );
+
+/// Index into the hotel's combined photo list of the picture currently shown
+/// as the `HOTEL_Detail` hero — the guest swaps it by tapping a thumbnail in
+/// the [HeroPhotoStrip]. `autoDispose` + keyed by hotel id so it always
+/// starts back at the cover photo (index 0) on a fresh visit.
+final heroPhotoIndexProvider =
+    StateProvider.autoDispose.family<int, String>((Ref ref, String hotelId) => 0);

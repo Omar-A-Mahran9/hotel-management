@@ -19,6 +19,7 @@ class RoomResource extends JsonResource
             'room_type_id' => $this->room_type_id,
             'room_number' => $this->room_number,
             'status' => $this->status,
+            'photos' => RoomMediaResource::collection($this->whenLoaded('media')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
