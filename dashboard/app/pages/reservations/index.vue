@@ -47,16 +47,15 @@ function changePage(n: number) {
   list.reload()
 }
 
-const gapOpen = ref(false)
 </script>
 
 <template>
   <div>
     <PageHeader :title="t('reservations.title')" :subtitle="t('reservations.subtitle')">
       <template v-if="can('reservations.manage')" #actions>
-        <button type="button" class="btn btn-secondary" @click="gapOpen = true">
+        <NuxtLink to="/reservations/new" class="btn btn-primary">
           <KtIcon name="plus" /> {{ t('reservations.new') }}
-        </button>
+        </NuxtLink>
       </template>
     </PageHeader>
 
@@ -123,11 +122,5 @@ const gapOpen = ref(false)
         />
       </template>
     </DataTable>
-
-    <AppModal v-model:open="gapOpen" :title="t('reservations.createGapTitle')">
-      <p class="text-sm text-muted-foreground">
-        {{ t('reservations.createGapBody') }}
-      </p>
-    </AppModal>
   </div>
 </template>

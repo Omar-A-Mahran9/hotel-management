@@ -53,6 +53,7 @@ return [
         'hold_cancelled' => 'The payment hold was cancelled by the provider.',
         'hold_expired' => 'The payment hold expired before it could be confirmed.',
         'hold_state' => 'The current payment state is returned.',
+        'ledger' => 'The hotel payments ledger is returned.',
 
         'webhook_processed' => 'The webhook was processed.',
         'webhook_duplicate_ignored' => 'The webhook was a duplicate and was ignored.',
@@ -85,6 +86,28 @@ return [
 
     'stay_services' => [
         'folio' => 'The current reservation folio is returned.',
+        'folio_ledger' => 'The hotel folio ledger is returned.',
+    ],
+
+    'audit' => [
+        'log' => 'The audit log is returned.',
+    ],
+
+    'reports' => [
+        'occupancy' => 'The occupancy report is returned.',
+        'revenue' => 'The revenue report is returned.',
+        'hotel_comparison' => 'The hotel comparison report is returned.',
+        'reservations' => 'The reservations report is returned.',
+        'payments' => 'The payments report is returned.',
+        'services' => 'The services report is returned.',
+        'loyalty' => 'The loyalty report is returned.',
+        'reviews' => 'The reviews report is returned.',
+    ],
+
+    'front_desk' => [
+        'arrivals' => 'Today\'s arrivals are returned.',
+        'departures' => 'Today\'s departures are returned.',
+        'in_house' => 'The in-house guest list is returned.',
     ],
 
     'checkout' => [
@@ -92,6 +115,8 @@ return [
         'settlement_pending' => 'The final settlement is awaiting confirmation from the payment provider. Checkout is not complete.',
         'settlement_failed' => 'The final settlement was not successful. Checkout is not complete and can be retried.',
         'invoice' => 'The reservation invoice is returned.',
+        'invoices_ledger' => 'The hotel invoices ledger is returned.',
+        'settlements_ledger' => 'The hotel settlements ledger is returned.',
     ],
 
     'loyalty' => [

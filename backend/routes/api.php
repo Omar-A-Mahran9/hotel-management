@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CheckInController;
+use App\Http\Controllers\Api\V1\AuditLogController;
 use App\Http\Controllers\Api\V1\CheckoutController;
 use App\Http\Controllers\Api\V1\CityController;
 use App\Http\Controllers\Api\V1\CountryController;
@@ -36,6 +37,7 @@ use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\PaymentWebhookController;
 use App\Http\Controllers\Api\V1\PermissionController;
 use App\Http\Controllers\Api\V1\ReservationController;
+use App\Http\Controllers\Api\V1\ReportController;
 use App\Http\Controllers\Api\V1\ReviewController;
 use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\RoomController;
@@ -286,9 +288,31 @@ Route::prefix('v1')->group(function () {
         // only ever mutated through the guest app's own profile flow). Not
         // hotel-scoped, matching Users; the reservations sub-list is still
         // filtered through the caller's own hotel access.
+        // Staff reports — aggregate reads across the caller's accessible
+        // hotels, never a single owning Model, so not nested under /hotels.
+        Route::get('/reports/occupancy', [ReportController::class, 'occupancy']);
+        Route::get('/reports/revenue', [ReportController::class, 'revenue']);
+        Route::get('/reports/hotel-comparison', [ReportController::class, 'hotelComparison']);
+        Route::get('/reports/reservations', [ReportController::class, 'reservations']);
+        Route::get('/reports/payments', [ReportController::class, 'payments']);
+        Route::get('/reports/services', [ReportController::class, 'services']);
+        Route::get('/reports/loyalty', [ReportController::class, 'loyalty']);
+        Route::get('/reports/reviews', [ReportController::class, 'reviews']);
+
+        // Audit trail read — group-wide (Group Owner only); the hotel-scoped
+        // variant is registered in the /hotels/{hotel} group below.
+        Route::get('/audit-log', [AuditLogController::class, 'global']);
+
         Route::get('/guests', [GuestController::class, 'index']);
+        Route::post('/guests', [GuestController::class, 'store']);
         Route::get('/guests/{guest}', [GuestController::class, 'show']);
         Route::get('/guests/{guest}/reservations', [GuestController::class, 'reservations']);
+
+        // Guest-level loyalty dashboard — read-only, group-wide (not
+        // hotel-scoped, like the rest of the Guest directory). Earn/redeem
+        // stay reservation-scoped under /reservations/{reservation}/loyalty.
+        Route::get('/guests/{guest}/loyalty', [LoyaltyController::class, 'guestAccount']);
+        Route::get('/guests/{guest}/loyalty/transactions', [LoyaltyController::class, 'guestTransactions']);
 
         Route::get('/reservations', [ReservationController::class, 'index']);
         Route::post('/reservations', [ReservationController::class, 'store']);
@@ -424,6 +448,29 @@ Route::prefix('v1')->group(function () {
             // Reviews — every moderation state (pending/published/rejected);
             // the guest-facing published-only listing is under /guest above.
             Route::get('/reviews', [ReviewController::class, 'index']);
+
+            // Staff financial ledgers — hotel-wide reads over the same
+            // reservation-scoped domains the workspace already uses.
+            Route::get('/payments', [PaymentController::class, 'index']);
+            Route::get('/invoices', [InvoiceController::class, 'index']);
+            Route::get('/settlements', [CheckoutController::class, 'index']);
+
+            // Front-desk lists — hotel-wide reads over Reservation; the
+            // per-reservation check-in / access flow lives in the workspace.
+            Route::get('/arrivals', [ReservationController::class, 'arrivals']);
+            Route::get('/departures', [ReservationController::class, 'departures']);
+            Route::get('/in-house', [ReservationController::class, 'inHouse']);
+
+            // Staff-wide notification feed — hotel-wide read over the same
+            // reservation-scoped in_app channel the workspace already uses.
+            Route::get('/notifications', [NotificationController::class, 'forHotel']);
+
+            // Audit trail — hotel-scoped read.
+            Route::get('/audit-log', [AuditLogController::class, 'forHotel']);
+
+            // Standalone folio ledger — every reservation with a live
+            // folio, same FolioService the reservation-scoped read uses.
+            Route::get('/folios', [FolioController::class, 'index']);
         });
     });
 });

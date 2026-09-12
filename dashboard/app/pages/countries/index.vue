@@ -23,9 +23,7 @@ function params() {
     is_active:
       status.value === 'all'
         ? undefined
-        : status.value === 'active'
-          ? 1
-          : 0,
+        : ((status.value === 'active' ? 1 : 0) as 0 | 1),
   }
 }
 

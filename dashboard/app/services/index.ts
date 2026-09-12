@@ -6,7 +6,9 @@
 import type {
   AccessGrant,
   AppNotification,
+  AuditLogEntry,
   CheckoutResult,
+  CheckoutStatus,
   City,
   Country,
   ExtendReservationResult,
@@ -16,17 +18,26 @@ import type {
   Hotel,
   HotelGroup,
   HotelMedia,
+  HotelComparisonReport,
   HotelService,
   IdentityVerification,
   Invoice,
+  InvoiceStatus,
   LoyaltyAccount,
+  LoyaltyReport,
   LoyaltyRule,
   LoyaltyTransaction,
+  OccupancyReport,
   Payment,
+  PaymentsReport,
+  PaymentStatus,
   Permission,
   Reservation,
+  ReservationsReport,
   ReservationStatus,
+  RevenueReport,
   Review,
+  ReviewsReport,
   ReviewStatus,
   Role,
   RoleWriteBody,
@@ -34,8 +45,10 @@ import type {
   RoomStatus,
   RoomType,
   ServiceCategory,
+  ServicesReport,
   ServiceOrder,
   ServiceOrderStatus,
+  Settlement,
   StaffUser,
 } from '~/types/api'
 
@@ -271,6 +284,16 @@ export const reservationsService = {
     }),
 }
 
+// ---- Front desk (hotel-scoped): arrivals / departures / in-house ------
+export const frontDeskService = {
+  arrivals: (hotelId: number, params: { date?: string, page?: number, per_page?: number } = {}) =>
+    api().withMeta<Reservation[]>(`/hotels/${hotelId}/arrivals`, { query: cleanQuery(params) }),
+  departures: (hotelId: number, params: { date?: string, page?: number, per_page?: number } = {}) =>
+    api().withMeta<Reservation[]>(`/hotels/${hotelId}/departures`, { query: cleanQuery(params) }),
+  inHouse: (hotelId: number, params: { page?: number, per_page?: number } = {}) =>
+    api().withMeta<Reservation[]>(`/hotels/${hotelId}/in-house`, { query: cleanQuery(params) }),
+}
+
 // ---- Guests (staff directory, not hotel-scoped) -----------------------
 export const guestsService = {
   list: (params: { search?: string, page?: number, per_page?: number } = {}) =>
@@ -278,6 +301,9 @@ export const guestsService = {
   get: (id: number) => api()<Guest>(`/guests/${id}`),
   reservations: (id: number, page = 1) =>
     api().withMeta<Reservation[]>(`/guests/${id}/reservations`, { query: { page } }),
+  // Register a walk-in guest — front desk, no OTP (guests.manage).
+  create: (body: { name?: string, phone: string, email?: string }) =>
+    api()<Guest>('/guests', { method: 'POST', body }),
 }
 
 // ---- Reservation workspace: payment ------------------------------
@@ -288,11 +314,32 @@ export const paymentsService = {
       method: 'POST',
       body: currency ? { amount, currency } : { amount },
     }),
+  // The staff payments ledger for a hotel — read-only, `payments.view`.
+  list: (hotelId: number, params: { status?: PaymentStatus, page?: number, per_page?: number } = {}) =>
+    api().withMeta<Payment[]>(`/hotels/${hotelId}/payments`, { query: cleanQuery(params) }),
+}
+
+// ---- Invoices ledger (hotel-scoped) -----------------------------
+export const invoicesService = {
+  list: (hotelId: number, params: { status?: InvoiceStatus, page?: number, per_page?: number } = {}) =>
+    api().withMeta<Invoice[]>(`/hotels/${hotelId}/invoices`, { query: cleanQuery(params) }),
+}
+
+// ---- Settlements ledger (hotel-scoped) --------------------------
+export const settlementsService = {
+  list: (hotelId: number, params: { status?: CheckoutStatus, page?: number, per_page?: number } = {}) =>
+    api().withMeta<Settlement[]>(`/hotels/${hotelId}/settlements`, { query: cleanQuery(params) }),
 }
 
 // ---- Reservation workspace: folio -------------------------------
 export const folioService = {
   get: (reservationId: number) => api()<Folio>(`/reservations/${reservationId}/folio`),
+  // The standalone folio ledger for a hotel — every totals row is computed
+  // by the same authoritative FolioService the per-reservation read uses.
+  listForHotel: (hotelId: number, params: { search?: string, outstanding?: boolean, page?: number, per_page?: number } = {}) =>
+    api().withMeta<Folio[]>(`/hotels/${hotelId}/folios`, {
+      query: cleanQuery({ ...params, outstanding: params.outstanding ? 1 : undefined }),
+    }),
 }
 
 // ---- Reservation workspace: service orders ----------------------
@@ -356,6 +403,11 @@ export const loyaltyService = {
       method: 'POST',
       body: { points },
     }),
+  // Guest-level dashboard — read-only, not hotel-scoped (group-wide, like
+  // the guest directory itself). Earn/redeem stay reservation-scoped above.
+  forGuest: (guestId: number) => api()<LoyaltyAccount>(`/guests/${guestId}/loyalty`),
+  transactionsForGuest: (guestId: number) =>
+    api()<LoyaltyTransaction[]>(`/guests/${guestId}/loyalty/transactions`),
 }
 
 // ---- Reservation workspace: notifications --------------------
@@ -374,6 +426,51 @@ export const notificationsService = {
       method: 'POST',
       body: {},
     }),
+  // The staff-wide in_app feed for a hotel — read-only.
+  forHotel: (hotelId: number, params: { unread?: boolean, page?: number, per_page?: number } = {}) =>
+    api().withMeta<AppNotification[]>(`/hotels/${hotelId}/notifications`, {
+      query: cleanQuery({ ...params, unread: params.unread ? 1 : undefined }),
+    }),
+}
+
+// ---- Reports (aggregate reads, not hotel-nested) ----------------------
+export const reportsService = {
+  occupancy: (params: { from: string, to: string, hotel_id?: number }) =>
+    api()<OccupancyReport>('/reports/occupancy', { query: cleanQuery(params) }),
+  revenue: (params: { from: string, to: string, hotel_id?: number }) =>
+    api()<RevenueReport>('/reports/revenue', { query: cleanQuery(params) }),
+  hotelComparison: (params: { from: string, to: string }) =>
+    api()<HotelComparisonReport>('/reports/hotel-comparison', { query: cleanQuery(params) }),
+  reservations: (params: { from: string, to: string, hotel_id?: number }) =>
+    api()<ReservationsReport>('/reports/reservations', { query: cleanQuery(params) }),
+  payments: (params: { from: string, to: string, hotel_id?: number }) =>
+    api()<PaymentsReport>('/reports/payments', { query: cleanQuery(params) }),
+  services: (params: { from: string, to: string, hotel_id?: number }) =>
+    api()<ServicesReport>('/reports/services', { query: cleanQuery(params) }),
+  loyalty: (params: { from: string, to: string, hotel_id?: number }) =>
+    api()<LoyaltyReport>('/reports/loyalty', { query: cleanQuery(params) }),
+  reviews: (params: { from: string, to: string, hotel_id?: number }) =>
+    api()<ReviewsReport>('/reports/reviews', { query: cleanQuery(params) }),
+}
+
+// ---- Audit trail (read-only) -------------------------------------
+export interface AuditLogParams {
+  actor_id?: number
+  action?: string
+  auditable_type?: string
+  from?: string
+  to?: string
+  page?: number
+  per_page?: number
+  [key: string]: unknown
+}
+
+export const auditService = {
+  forHotel: (hotelId: number, params: AuditLogParams = {}) =>
+    api().withMeta<AuditLogEntry[]>(`/hotels/${hotelId}/audit-log`, { query: cleanQuery(params) }),
+  // Group Owner only — group-wide, `hotel_id` optionally narrows it.
+  global: (params: AuditLogParams & { hotel_id?: number } = {}) =>
+    api().withMeta<AuditLogEntry[]>('/audit-log', { query: cleanQuery(params) }),
 }
 
 // ---- RBAC reference --------------------------------------------------

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Domain\Loyalty\Models\LoyaltyAccount;
 use App\Domain\Loyalty\Services\LoyaltyService;
+use App\Domain\Reservation\Models\Guest;
 use App\Domain\Reservation\Services\ReservationService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Loyalty\RedeemLoyaltyRequest;
@@ -91,5 +92,34 @@ class LoyaltyController extends Controller
         $this->authorize($ability, [LoyaltyAccount::class, $found]);
 
         return $found;
+    }
+
+    /**
+     * GET /api/v1/guests/{guest}/loyalty
+     *
+     * The guest-level loyalty dashboard — read-only, not hotel-scoped (a
+     * Guest may hold reservations, and so earn points, across multiple
+     * hotels in the group; same reasoning as GuestPolicy). Earn/redeem stay
+     * reservation-scoped (`earn`/`redeem` above) — a redemption always
+     * happens against one eligible booking, never floating free.
+     */
+    public function guestAccount(Request $request, Guest $guest): JsonResponse
+    {
+        $this->authorize('viewForGuest', [LoyaltyAccount::class, $guest]);
+
+        return $this->success(new LoyaltyAccountResource($this->loyalty->accountFor($guest)), __('api.loyalty.account'));
+    }
+
+    /**
+     * GET /api/v1/guests/{guest}/loyalty/transactions
+     */
+    public function guestTransactions(Request $request, Guest $guest): JsonResponse
+    {
+        $this->authorize('viewForGuest', [LoyaltyAccount::class, $guest]);
+
+        return $this->success(
+            LoyaltyTransactionResource::collection($this->loyalty->ledgerFor($guest)),
+            __('api.loyalty.transactions'),
+        );
     }
 }

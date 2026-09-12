@@ -22,6 +22,7 @@ use App\Domain\Payment\StateMachine\PaymentStateMachine;
 use App\Domain\Reservation\Models\Reservation;
 use App\Domain\Reservation\Repositories\Contracts\ReservationRepositoryInterface;
 use App\Domain\Reservation\Services\ReservationService;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
@@ -580,6 +581,18 @@ class PaymentWorkflowService
         }
 
         return number_format((float) $amount, 2, '.', '');
+    }
+
+    /**
+     * The staff payments ledger for a hotel — a pure read, no workflow
+     * decision. `status` is an optional exact-match filter over
+     * Payment::STATUSES.
+     *
+     * @param  array{status?: string|null}  $filters
+     */
+    public function listForHotel(int $hotelId, array $filters, int $perPage): LengthAwarePaginator
+    {
+        return $this->payments->paginateForHotel($hotelId, $filters, $perPage);
     }
 
     /**

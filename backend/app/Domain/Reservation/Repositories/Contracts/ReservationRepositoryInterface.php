@@ -6,6 +6,7 @@ use App\Domain\IdentityAccess\Models\User;
 use App\Domain\Reservation\Models\Guest;
 use App\Domain\Reservation\Models\Reservation;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 interface ReservationRepositoryInterface
 {
@@ -92,4 +93,58 @@ interface ReservationRepositoryInterface
      * countOverlappingForRoom().
      */
     public function countOverlappingForRoomType(int $roomTypeId, string $checkIn, string $checkOut): int;
+
+    /**
+     * The front-desk arrivals list: every non-cancelled reservation of
+     * $hotelId whose check_in is exactly $date, newest-scheduled first.
+     * No further status narrowing — a Pending/Deposit-held/Verified row is
+     * still "expected to arrive"; its own status badge tells staff where
+     * it stands.
+     */
+    public function paginateArrivalsForHotel(int $hotelId, string $date, int $perPage = 15): LengthAwarePaginator;
+
+    /**
+     * The front-desk departures list: every non-cancelled reservation of
+     * $hotelId whose check_out is exactly $date.
+     */
+    public function paginateDeparturesForHotel(int $hotelId, string $date, int $perPage = 15): LengthAwarePaginator;
+
+    /**
+     * The front-desk in-house list: every reservation of $hotelId
+     * currently occupying a room — IN_STAY or mid-checkout
+     * (CHECKOUT_IN_PROGRESS / CHECKOUT_BLOCKED), regardless of date.
+     */
+    public function paginateInHouseForHotel(int $hotelId, int $perPage = 15): LengthAwarePaginator;
+
+    /**
+     * Every blocking-status reservation of $hotelId whose date range
+     * overlaps [$from, $to) (same checkout-exclusive predicate as
+     * countOverlappingForRoom) — `check_in`/`check_out` only, for the
+     * occupancy report's room-night calculation. Not paginated: report
+     * aggregation needs the full set to sum, not a page of it.
+     *
+     * @return Collection<int, Reservation>
+     */
+    public function overlappingForHotel(int $hotelId, string $from, string $to): Collection;
+
+    /**
+     * Reservations of $hotelId eligible for the standalone folio ledger
+     * (never cancelled — a cancelled stay has no live folio), newest
+     * check-in first. `search` matches the reservation id (prefix) or its
+     * guest's name/phone; `reservation_ids`, when present in $filters
+     * (even as an empty array), restricts the result to exactly those ids
+     * — the folio ledger's "outstanding only" filter, computed by
+     * FolioService from the authoritative charge/payment totals.
+     *
+     * @param  array{search?: string|null, reservation_ids?: list<int>}  $filters
+     */
+    public function paginateForFolioLedger(int $hotelId, array $filters, int $perPage): LengthAwarePaginator;
+
+    /**
+     * Reservation counts by status for $hotelId whose check_in falls in
+     * [$from, $to] — the reservations report's data source.
+     *
+     * @return array<string, int>
+     */
+    public function countsByStatusForHotel(int $hotelId, string $from, string $to): array;
 }

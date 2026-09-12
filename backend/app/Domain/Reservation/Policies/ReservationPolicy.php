@@ -82,4 +82,15 @@ class ReservationPolicy
         return $user->hasPermission('reservations.manage')
             && $this->hotelAccess->canAccessHotel($user, $reservation->hotel_id);
     }
+
+    /**
+     * The front-desk arrivals/departures/in-house lists for one hotel — a
+     * read, gated the same as any other reservation read (`reservations.view`
+     * + hotel scope), never the narrower check-in-specific permission.
+     */
+    public function viewFrontDesk(User $user, Hotel $hotel): bool
+    {
+        return $user->hasPermission('reservations.view')
+            && $this->hotelAccess->canAccessHotel($user, $hotel->id);
+    }
 }

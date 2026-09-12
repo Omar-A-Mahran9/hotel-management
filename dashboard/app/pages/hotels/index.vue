@@ -23,7 +23,9 @@ function params() {
     page: page.value,
     search: search.value.trim() || undefined,
     is_active:
-      status.value === "all" ? undefined : status.value === "active" ? 1 : 0,
+      status.value === "all"
+        ? undefined
+        : ((status.value === "active" ? 1 : 0) as 0 | 1),
     sort: sort.value,
   };
 }
@@ -138,34 +140,8 @@ async function toggleActive(h: Hotel) {
   }
 }
 
-// ---------------------------------------------------------------------
-// Delete
-// ---------------------------------------------------------------------
-
-const deleting = ref<Hotel | null>(null);
-const removing = ref(false);
-
-async function confirmDelete() {
-  if (!deleting.value || removing.value) return;
-
-  removing.value = true;
-
-  try {
-    await hotelsService.remove(deleting.value.id);
-
-    app.pushToast("success", t("hotels.deleted"));
-
-    deleting.value = null;
-    list.reload();
-  } catch (e) {
-    app.pushToast(
-      "error",
-      e instanceof ApiError ? e.message : t("errors.genericBody"),
-    );
-  } finally {
-    removing.value = false;
-  }
-}
+// Hard delete is intentionally not offered here — the backend exposes no
+// DELETE /hotels/{hotel} endpoint (hotels are deactivated, never removed).
 </script>
 
 <template>
@@ -411,39 +387,9 @@ async function confirmDelete() {
                 }}
               </span>
             </button>
-
-            <!-- Delete -->
-
-            <button
-              type="button"
-              class="btn btn-ghost px-2.5 py-2 text-danger hover:text-danger"
-              :title="t('common.delete')"
-              :disabled="removing"
-              @click.stop="deleting = row as Hotel"
-            >
-              <KtIcon name="trash" />
-
-              <span class="sr-only">
-                {{ t("common.delete") }}
-              </span>
-            </button>
           </div>
         </template>
       </DataTable>
     </div>
-
-    <!-- ============================================================= -->
-    <!-- Delete Confirmation -->
-    <!-- ============================================================= -->
-
-    <ConfirmDialog
-      v-if="deleting"
-      :open="!!deleting"
-      :loading="removing"
-      :title="t('common.delete')"
-      :message="t('hotels.deleteConfirm')"
-      @confirm="confirmDelete"
-      @cancel="deleting = null"
-    />
   </div>
 </template>

@@ -491,6 +491,23 @@ export interface CheckoutResult {
   invoice: null | { id: number, invoice_number: string, status: string, issued_at: string | null }
 }
 
+// ---- Settlement (SettlementResource) — one row of the staff settlements
+// ledger. A "settlement" is a Checkout record; the domain has no separate
+// Settlement entity. Distinct from CheckoutResult, which wraps the fuller
+// checkout+payment+invoice outcome returned by the perform/read-one action.
+export interface Settlement {
+  id: number
+  reservation_id: number
+  hotel_id: number
+  status: CheckoutStatus
+  charges_total: string
+  payments_total: string
+  outstanding_total: string
+  currency: string | null
+  started_at: string | null
+  completed_at: string | null
+}
+
 export type InvoiceStatus = 'draft' | 'issued'
 
 export interface InvoiceItem {
@@ -588,5 +605,132 @@ export interface AppNotification {
   read_at: string | null
   sent_at: string | null
   failed_at: string | null
+  created_at: string
+}
+
+// ---- Reports (ReportService — aggregates, not persisted resources) ---
+export interface ReportRange { from: string, to: string }
+
+export interface OccupancyHotelRow {
+  hotel_id: number
+  hotel_name: string
+  rooms: number
+  nights: number
+  capacity_room_nights: number
+  booked_room_nights: number
+  occupancy_rate: number
+}
+
+export interface OccupancyReport {
+  range: ReportRange
+  hotels: OccupancyHotelRow[]
+  totals: {
+    rooms: number
+    capacity_room_nights: number
+    booked_room_nights: number
+    occupancy_rate: number
+  }
+}
+
+export interface RevenueEntry { currency: string, amount: string }
+
+export interface RevenueHotelRow {
+  hotel_id: number
+  hotel_name: string
+  revenue: RevenueEntry[]
+}
+
+export interface RevenueReport {
+  range: ReportRange
+  hotels: RevenueHotelRow[]
+  totals: RevenueEntry[]
+}
+
+export interface HotelComparisonRow {
+  hotel_id: number
+  hotel_name: string
+  occupancy_rate: number
+  booked_room_nights: number
+  revenue: RevenueEntry[]
+}
+
+export interface HotelComparisonReport {
+  range: ReportRange
+  hotels: HotelComparisonRow[]
+}
+
+export interface StatusCountRow {
+  hotel_id: number
+  hotel_name: string
+  by_status: Record<string, number>
+  total: number
+}
+
+export interface ReservationsReport {
+  range: ReportRange
+  hotels: StatusCountRow[]
+  totals: Record<string, number>
+}
+
+export interface PaymentsReport {
+  range: ReportRange
+  hotels: StatusCountRow[]
+  totals: Record<string, number>
+}
+
+export interface ServicesHotelRow {
+  hotel_id: number
+  hotel_name: string
+  by_status: Record<string, number>
+  total: number
+  revenue: RevenueEntry[]
+}
+
+export interface ServicesReport {
+  range: ReportRange
+  hotels: ServicesHotelRow[]
+  totals: { by_status: Record<string, number>, revenue: RevenueEntry[] }
+}
+
+export interface LoyaltyHotelRow {
+  hotel_id: number
+  hotel_name: string
+  points_earned: number
+  points_redeemed: number
+  net: number
+}
+
+export interface LoyaltyReport {
+  range: ReportRange
+  hotels: LoyaltyHotelRow[]
+  totals: { points_earned: number, points_redeemed: number, net: number }
+}
+
+export interface ReviewsHotelRow {
+  hotel_id: number
+  hotel_name: string
+  by_status: Record<string, number>
+  total: number
+  average_rating: number | null
+}
+
+export interface ReviewsReport {
+  range: ReportRange
+  hotels: ReviewsHotelRow[]
+  totals: { by_status: Record<string, number>, average_rating: number | null, count: number }
+}
+
+// ---- Audit log (AuditLogResource) -----------------------------------
+export interface AuditLogEntry {
+  id: number
+  actor_id: number | null
+  actor?: { id: number, name: string, email: string } | null
+  action: string
+  auditable_type: string | null
+  auditable_id: number | null
+  hotel_id: number | null
+  before: Record<string, unknown> | null
+  after: Record<string, unknown> | null
+  ip_address: string | null
   created_at: string
 }

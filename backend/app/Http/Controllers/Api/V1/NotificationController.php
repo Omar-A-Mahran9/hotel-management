@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\Notification\Models\Notification;
 use App\Domain\Notification\Services\NotificationService;
 use App\Domain\Reservation\Services\ReservationService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Notification\IndexNotificationRequest;
 use App\Http\Resources\V1\NotificationResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -91,5 +93,20 @@ class NotificationController extends Controller
         $perPage = (int) $request->integer('per_page', 20);
 
         return max(1, min($perPage, 100));
+    }
+
+    /**
+     * GET /api/v1/hotels/{hotel}/notifications
+     *
+     * The staff-wide `in_app` feed for one hotel — every guest notification
+     * across the hotel's reservations, not just one.
+     */
+    public function forHotel(IndexNotificationRequest $request, Hotel $hotel): JsonResponse
+    {
+        $this->authorize('viewAnyForHotel', [Notification::class, $hotel]);
+
+        $feed = $this->notifications->listForHotel($hotel->id, $request->filters(), $request->perPage());
+
+        return $this->success(NotificationResource::collection($feed), __('api.notifications.feed'));
     }
 }

@@ -4,6 +4,7 @@ namespace App\Domain\Loyalty\Policies;
 
 use App\Domain\IdentityAccess\Models\User;
 use App\Domain\IdentityAccess\Services\HotelAccessService;
+use App\Domain\Reservation\Models\Guest;
 use App\Domain\Reservation\Models\Reservation;
 
 /**
@@ -36,5 +37,17 @@ class LoyaltyPolicy
     {
         return $user->hasPermission('loyalty.manage')
             && $this->hotelAccess->canAccessHotel($user, $reservation->hotel_id);
+    }
+
+    /**
+     * The guest-level loyalty dashboard — a Guest is not hotel-bound (they
+     * may book, and so earn, across multiple hotels in the group), so
+     * unlike the reservation-scoped view() there is no HotelAccessService
+     * check here — `loyalty.view` alone gates it, mirroring GuestPolicy's
+     * shape for the other hotel-independent staff resource.
+     */
+    public function viewForGuest(User $user, Guest $guest): bool
+    {
+        return $user->hasPermission('loyalty.view');
     }
 }

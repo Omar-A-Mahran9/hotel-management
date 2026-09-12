@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Domain\Checkout\Models\Checkout;
 use App\Domain\Checkout\Services\CheckoutService;
+use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\Reservation\Services\ReservationService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Checkout\IndexSettlementRequest;
 use App\Http\Requests\Api\V1\Checkout\PerformCheckoutRequest;
 use App\Http\Resources\V1\CheckoutResource;
+use App\Http\Resources\V1\SettlementResource;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -68,5 +71,19 @@ class CheckoutController extends Controller
         // it or replayed an already-completed one — the operation is
         // idempotent and the body carries the full authoritative state.
         return $this->success(new CheckoutResource($result), __('api.checkout.completed'));
+    }
+
+    /**
+     * GET /api/v1/hotels/{hotel}/settlements
+     *
+     * The staff settlements ledger for one hotel.
+     */
+    public function index(IndexSettlementRequest $request, Hotel $hotel): JsonResponse
+    {
+        $this->authorize('viewLedger', [Checkout::class, $hotel]);
+
+        $settlements = $this->checkouts->listForHotel($hotel->id, $request->filters(), $request->perPage());
+
+        return $this->success(SettlementResource::collection($settlements), __('api.checkout.settlements_ledger'));
     }
 }

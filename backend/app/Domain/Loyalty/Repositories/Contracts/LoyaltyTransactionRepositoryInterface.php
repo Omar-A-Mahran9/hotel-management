@@ -28,6 +28,19 @@ interface LoyaltyTransactionRepositoryInterface
     public function sumPointsForAccount(int $accountId): int;
 
     /**
+     * Sum of `points` by transaction type (earn/redeem/…) for $hotelId,
+     * created within [$from, $to] — the loyalty report's data source.
+     * Loyalty transactions carry no hotel_id of their own (a guest's
+     * ledger is group-wide); scope is resolved through
+     * `source_type = 'reservation'` joined to that reservation's own
+     * hotel_id — the exact same source reference LoyaltyService itself
+     * writes on every earn/redeem.
+     *
+     * @return array<string, int>
+     */
+    public function sumsByTypeForHotel(int $hotelId, string $from, string $to): array;
+
+    /**
      * @param  array<string, mixed>  $data
      */
     public function create(array $data): LoyaltyTransaction;

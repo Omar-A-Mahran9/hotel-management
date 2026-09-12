@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\Payment\Models\Payment;
 use App\Domain\Payment\Services\PaymentWorkflowService;
 use App\Domain\Reservation\Services\ReservationService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Payment\IndexPaymentRequest;
 use App\Http\Requests\Api\V1\Payment\StorePaymentHoldRequest;
 use App\Http\Resources\V1\PaymentResource;
 use Illuminate\Http\JsonResponse;
@@ -55,6 +57,21 @@ class PaymentController extends Controller
         );
 
         return $this->respond($payment);
+    }
+
+    /**
+     * GET /api/v1/hotels/{hotel}/payments
+     *
+     * The staff payments ledger for one hotel. Read-only, gated by the
+     * separate `payments.view` permission (never `payments.manage`).
+     */
+    public function index(IndexPaymentRequest $request, Hotel $hotel): JsonResponse
+    {
+        $this->authorize('viewLedger', [Payment::class, $hotel]);
+
+        $payments = $this->payments->listForHotel($hotel->id, $request->filters(), $request->perPage());
+
+        return $this->success(PaymentResource::collection($payments), __('api.payment.ledger'));
     }
 
     /**

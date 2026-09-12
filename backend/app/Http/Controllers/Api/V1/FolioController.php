@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\Reservation\Services\ReservationService;
 use App\Domain\StayServices\Services\Folio;
 use App\Domain\StayServices\Services\FolioService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Folio\IndexFolioRequest;
 use App\Http\Resources\V1\FolioResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -37,5 +39,23 @@ class FolioController extends Controller
             new FolioResource($this->folios->folioFor($found)),
             __('api.stay_services.folio'),
         );
+    }
+
+    /**
+     * GET /api/v1/hotels/{hotel}/folios
+     *
+     * The standalone folio ledger for one hotel. Every row's totals are
+     * computed by the same FolioService::folioFor() the reservation-scoped
+     * read uses — this never recomputes the money maths itself.
+     */
+    public function index(IndexFolioRequest $request, Hotel $hotel): JsonResponse
+    {
+        $this->authorize('viewForHotel', [Folio::class, $hotel]);
+
+        $reservations = $this->folios->listForHotel($hotel->id, $request->filters(), $request->perPage());
+        $folios = collect($reservations->items())->map(fn ($reservation) => $this->folios->folioFor($reservation));
+        $reservations->setCollection($folios);
+
+        return $this->success(FolioResource::collection($reservations), __('api.stay_services.folio_ledger'));
     }
 }

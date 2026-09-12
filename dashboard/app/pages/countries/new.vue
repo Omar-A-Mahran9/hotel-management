@@ -9,10 +9,6 @@ const router = useRouter()
 function onSaved(_country: Country) {
   router.push('/countries')
 }
-
-function goBack() {
-  router.push('/countries')
-}
 </script>
 
 <template>

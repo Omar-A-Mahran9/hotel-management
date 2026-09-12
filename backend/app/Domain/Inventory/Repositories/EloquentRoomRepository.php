@@ -45,4 +45,9 @@ class EloquentRoomRepository implements RoomRepositoryInterface
     {
         return Room::query()->where('room_type_id', $roomTypeId)->count();
     }
+
+    public function countByHotel(int $hotelId): int
+    {
+        return Room::query()->where('hotel_id', $hotelId)->count();
+    }
 }

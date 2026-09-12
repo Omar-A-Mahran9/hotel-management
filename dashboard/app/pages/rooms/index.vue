@@ -272,36 +272,9 @@ async function saveStatus() {
   }
 }
 
-// ---------------------------------------------------------------------
-// Delete
-// ---------------------------------------------------------------------
-
-const deleting = ref<Room | null>(null);
-const removing = ref(false);
-
-async function confirmDelete() {
-  if (!deleting.value || removing.value || hotelId.value == null) {
-    return;
-  }
-
-  removing.value = true;
-
-  try {
-    await roomsService.remove(hotelId.value, deleting.value.id);
-
-    app.pushToast("success", t("rooms.deleted"));
-
-    deleting.value = null;
-    list.reload();
-  } catch (e) {
-    app.pushToast(
-      "error",
-      e instanceof ApiError ? e.message : t("errors.genericBody"),
-    );
-  } finally {
-    removing.value = false;
-  }
-}
+// Hard delete is intentionally not offered here — the backend exposes no
+// DELETE /hotels/{hotel}/rooms/{room} endpoint (rooms move to
+// under_maintenance, they are never removed).
 </script>
 
 <template>
@@ -494,21 +467,6 @@ async function confirmDelete() {
                   {{ t("rooms.setStatus") }}
                 </span>
               </button>
-              <!-- Delete -->
-
-              <button
-                type="button"
-                class="btn btn-ghost px-2.5 py-2 text-danger hover:text-danger"
-                :title="t('common.delete')"
-                :disabled="removing"
-                @click.stop="deleting = row as Room"
-              >
-                <KtIcon name="trash" />
-
-                <span class="sr-only">
-                  {{ t("common.delete") }}
-                </span>
-              </button>
             </div>
           </template>
         </DataTable>
@@ -634,19 +592,5 @@ async function confirmDelete() {
         </button>
       </template>
     </AppModal>
-
-    <!-- ============================================================= -->
-    <!-- Delete Confirmation -->
-    <!-- ============================================================= -->
-
-    <ConfirmDialog
-      v-if="deleting"
-      :open="!!deleting"
-      :loading="removing"
-      :title="t('common.delete')"
-      :message="t('rooms.deleteConfirm')"
-      @confirm="confirmDelete"
-      @cancel="deleting = null"
-    />
   </div>
 </template>

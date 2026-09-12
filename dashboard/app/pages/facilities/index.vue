@@ -23,7 +23,9 @@ function params() {
     page: page.value,
     search: search.value.trim() || undefined,
     is_active:
-      status.value === "all" ? undefined : status.value === "active" ? 1 : 0,
+      status.value === "all"
+        ? undefined
+        : ((status.value === "active" ? 1 : 0) as 0 | 1),
     sort: sort.value,
   };
 }

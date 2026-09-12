@@ -30,16 +30,25 @@ class FolioChargeService
     ) {}
 
     /**
-     * Post (once) the reservation accommodation charge. The amount is
-     * `reservation.price_snapshot` used EXACTLY — no nights maths, no tax,
-     * no second pricing calculation (Phase 9 review requirement).
+     * Post (once) the reservation accommodation charge.
+     *
+     * The base amount is `reservation.price_snapshot` — but
+     * ReservationExtensionService also adds every stay extension's amount
+     * onto `price_snapshot` (so it reflects "current total accommodation
+     * price" for display/loyalty purposes) AND posts that same amount as
+     * its own separate `stay_extension` folio charge (so the folio shows it
+     * as owed immediately, without waiting for checkout). Left alone, this
+     * accommodation charge would therefore bill every extension a second
+     * time. Already-posted `stay_extension` charges are subtracted here so
+     * the two charge types never overlap — no second pricing calculation,
+     * just excluding money this reservation already has its own charge for.
      *
      * Idempotent: `source_type = accommodation`, `source_id = reservation.id`,
      * so a checkout retry always reuses the same row and never duplicates it.
      *
-     * Returns null when there is no accommodation amount to bill
-     * (`price_snapshot` null or not > 0) — nothing to post, exactly like a
-     * folio with no service orders has no service lines.
+     * Returns null when there is no accommodation amount left to bill after
+     * that subtraction — nothing to post, exactly like a folio with no
+     * service orders has no service lines.
      */
     public function postAccommodationCharge(Reservation $reservation, ?string $currency, ?User $actor): ?FolioCharge
     {
@@ -52,11 +61,22 @@ class FolioChargeService
             return $existing;
         }
 
-        $amount = $reservation->price_snapshot === null
+        $totalPrice = $reservation->price_snapshot === null
             ? null
             : bcadd((string) $reservation->price_snapshot, '0', 2);
 
-        if ($amount === null || bccomp($amount, '0.00', 2) <= 0) {
+        if ($totalPrice === null) {
+            return null;
+        }
+
+        $extensionsAlreadyCharged = $this->charges->allForReservation($reservation->id)
+            ->where('source_type', FolioCharge::SOURCE_STAY_EXTENSION)
+            ->where('status', FolioCharge::STATUS_POSTED)
+            ->reduce(fn (string $carry, FolioCharge $charge) => bcadd($carry, (string) $charge->total_amount, 2), '0.00');
+
+        $amount = bcsub($totalPrice, $extensionsAlreadyCharged, 2);
+
+        if (bccomp($amount, '0.00', 2) <= 0) {
             return null;
         }
 

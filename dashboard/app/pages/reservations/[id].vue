@@ -62,7 +62,7 @@ type TabKey = 'overview' | 'payment' | 'identity' | 'access' | 'folio' | 'servic
 
 const tabs = computed(() => {
   const list: Array<{ key: TabKey, label: string }> = [{ key: 'overview', label: t('reservations.workflow') }]
-  if (can('folio.view') || can('payments.manage')) list.push({ key: 'payment', label: t('workspace.payment') })
+  if (can('folio.view') || can('payments.manage') || can('payments.view')) list.push({ key: 'payment', label: t('workspace.payment') })
   if (can('identity-verification.view')) list.push({ key: 'identity', label: t('workspace.identity') })
   if (can('digital-access.view')) list.push({ key: 'access', label: t('workspace.access') })
   if (can('folio.view')) list.push({ key: 'folio', label: t('workspace.folio') })

@@ -39,4 +39,20 @@ class EloquentLoyaltyTransactionRepository implements LoyaltyTransactionReposito
     {
         return LoyaltyTransaction::create($data)->refresh();
     }
+
+    public function sumsByTypeForHotel(int $hotelId, string $from, string $to): array
+    {
+        return LoyaltyTransaction::query()
+            ->join('reservations', function ($join) {
+                $join->on('reservations.id', '=', 'loyalty_transactions.source_id')
+                    ->where('loyalty_transactions.source_type', '=', LoyaltyTransaction::SOURCE_RESERVATION);
+            })
+            ->where('reservations.hotel_id', $hotelId)
+            ->whereBetween('loyalty_transactions.created_at', ["{$from} 00:00:00", "{$to} 23:59:59"])
+            ->groupBy('loyalty_transactions.type')
+            ->selectRaw('loyalty_transactions.type as type, COALESCE(SUM(loyalty_transactions.points), 0) as aggregate')
+            ->pluck('aggregate', 'type')
+            ->map(fn ($v) => (int) $v)
+            ->all();
+    }
 }

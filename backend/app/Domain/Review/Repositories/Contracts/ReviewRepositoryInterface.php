@@ -34,4 +34,14 @@ interface ReviewRepositoryInterface
      * @return LengthAwarePaginator<Review>
      */
     public function paginateForHotel(int $hotelId, ?string $status, int $perPage = 15): LengthAwarePaginator;
+
+    /**
+     * Review counts by moderation status, plus the rating sum and rated
+     * count (so a precise average can be computed at any aggregation
+     * level without averaging averages), for $hotelId, submitted within
+     * [$from, $to] — the reviews report's data source.
+     *
+     * @return array{by_status: array<string, int>, rating_sum: int, rated_count: int}
+     */
+    public function statsForHotel(int $hotelId, string $from, string $to): array;
 }

@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Domain\Checkout\Models\Invoice;
 use App\Domain\Checkout\Services\InvoiceService;
+use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\Reservation\Services\ReservationService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Invoice\IndexInvoiceRequest;
 use App\Http\Resources\V1\InvoiceResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -47,5 +49,19 @@ class InvoiceController extends Controller
         }
 
         return $this->success(new InvoiceResource($invoice), __('api.checkout.invoice'));
+    }
+
+    /**
+     * GET /api/v1/hotels/{hotel}/invoices
+     *
+     * The staff invoices ledger for one hotel.
+     */
+    public function index(IndexInvoiceRequest $request, Hotel $hotel): JsonResponse
+    {
+        $this->authorize('viewLedger', [Invoice::class, $hotel]);
+
+        $invoices = $this->invoices->listForHotel($hotel->id, $request->filters(), $request->perPage());
+
+        return $this->success(InvoiceResource::collection($invoices), __('api.checkout.invoices_ledger'));
     }
 }

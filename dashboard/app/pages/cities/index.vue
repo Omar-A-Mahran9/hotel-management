@@ -23,7 +23,9 @@ function paramsFor() {
     search: search.value.trim() || undefined,
     country_id: countryId.value ?? undefined,
     is_active:
-      status.value === "all" ? undefined : status.value === "active" ? 1 : 0,
+      status.value === "all"
+        ? undefined
+        : ((status.value === "active" ? 1 : 0) as 0 | 1),
   };
 }
 

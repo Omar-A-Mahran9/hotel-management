@@ -74,4 +74,19 @@ class EloquentNotificationRepository implements NotificationRepositoryInterface
             ->whereNull('read_at')
             ->update(['read_at' => $timestamp]);
     }
+
+    public function paginateForHotelChannel(
+        int $hotelId,
+        NotificationChannel $channel,
+        array $filters,
+        int $perPage,
+    ): LengthAwarePaginator {
+        return Notification::query()
+            ->where('hotel_id', $hotelId)
+            ->where('channel', $channel->value)
+            ->when($filters['unread_only'] ?? false, fn ($query) => $query->whereNull('read_at'))
+            ->orderByDesc('id')
+            ->paginate($perPage)
+            ->withQueryString();
+    }
 }

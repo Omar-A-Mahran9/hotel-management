@@ -2,6 +2,7 @@
 
 namespace App\Domain\Checkout\Policies;
 
+use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\IdentityAccess\Models\User;
 use App\Domain\IdentityAccess\Services\HotelAccessService;
 use App\Domain\Reservation\Models\Reservation;
@@ -22,5 +23,15 @@ class InvoicePolicy
     {
         return $user->hasPermission('invoice.view')
             && $this->hotelAccess->canAccessHotel($user, $reservation->hotel_id);
+    }
+
+    /**
+     * The staff invoices ledger for a hotel — same `invoice.view`
+     * permission as the reservation-scoped read, just hotel-wide.
+     */
+    public function viewLedger(User $user, Hotel $hotel): bool
+    {
+        return $user->hasPermission('invoice.view')
+            && $this->hotelAccess->canAccessHotel($user, $hotel->id);
     }
 }

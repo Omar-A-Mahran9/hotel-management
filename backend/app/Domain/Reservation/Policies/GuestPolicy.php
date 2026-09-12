@@ -23,4 +23,14 @@ class GuestPolicy
     {
         return $user->hasPermission('guests.view');
     }
+
+    /**
+     * Registering a walk-in guest (no hotel scope — same reasoning as
+     * view/viewAny). `guests.manage` is a distinct permission from
+     * `guests.view` so a read-only directory role never gains write access.
+     */
+    public function create(User $user): bool
+    {
+        return $user->hasPermission('guests.manage');
+    }
 }

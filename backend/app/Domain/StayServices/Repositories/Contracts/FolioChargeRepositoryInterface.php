@@ -38,6 +38,17 @@ interface FolioChargeRepositoryInterface
     public function sumTotalForReservation(int $reservationId, array $statuses): string;
 
     /**
+     * The same sum as sumTotalForReservation(), computed for every
+     * reservation of $hotelId at once — the folio ledger's efficient
+     * "which reservations have an outstanding balance" data source (a
+     * single grouped aggregate, never one query per reservation).
+     *
+     * @param  list<string>  $statuses
+     * @return array<int, string> reservation_id => decimal-string sum
+     */
+    public function sumsGroupedByReservationForHotel(int $hotelId, array $statuses): array;
+
+    /**
      * @param  array<string, mixed>  $data
      */
     public function create(array $data): FolioCharge;

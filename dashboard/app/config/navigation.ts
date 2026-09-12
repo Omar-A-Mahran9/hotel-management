@@ -101,8 +101,8 @@ export const NAVIGATION: NavSection[] = [
         labelKey: 'nav.digitalAccess',
         to: '/digital-access',
         icon: 'ki-entrance-left',
-        permission: 'check-in.perform',
-        backendGap: true, // no arrivals/departures/in-house list endpoint
+        permission: 'reservations.view',
+        scope: 'hotel',
       },
     ],
   },
@@ -115,8 +115,8 @@ export const NAVIGATION: NavSection[] = [
         labelKey: 'nav.payments',
         to: '/payments',
         icon: 'ki-dollar',
-        permission: 'payments.manage',
-        backendGap: true, // only reservation-scoped; no hotel/group ledger
+        permission: 'payments.view',
+        scope: 'hotel',
       },
       {
         key: 'folio',
@@ -124,7 +124,7 @@ export const NAVIGATION: NavSection[] = [
         to: '/folio',
         icon: 'ki-book-open',
         permission: 'folio.view',
-        backendGap: true, // reservation-scoped only; lookup routes into the workspace
+        scope: 'hotel',
       },
       {
         key: 'checkout',
@@ -132,7 +132,10 @@ export const NAVIGATION: NavSection[] = [
         to: '/checkout',
         icon: 'ki-exit-right-corner',
         permission: 'checkout.perform',
-        backendGap: true, // reservation-scoped only; lookup routes into the workspace
+        // Not a gap: checkout is inherently a one-reservation-at-a-time
+        // action (no "bulk checkout" concept exists), so a reservation-id
+        // lookup into the real workspace IS the correct design, backed by
+        // real shortcuts into /digital-access (departures) and /settlements.
       },
       {
         key: 'invoices',
@@ -140,7 +143,7 @@ export const NAVIGATION: NavSection[] = [
         to: '/invoices',
         icon: 'ki-document',
         permission: 'invoice.view',
-        backendGap: true, // only reservation-scoped; no ledger
+        scope: 'hotel',
       },
       {
         key: 'settlements',
@@ -148,7 +151,7 @@ export const NAVIGATION: NavSection[] = [
         to: '/settlements',
         icon: 'ki-bank',
         permission: 'checkout.perform',
-        backendGap: true, // no settlement ledger endpoint
+        scope: 'hotel',
       },
     ],
   },
@@ -162,7 +165,6 @@ export const NAVIGATION: NavSection[] = [
         to: '/loyalty',
         icon: 'ki-medal-star',
         permission: 'loyalty.view',
-        backendGap: true, // only reservation-scoped; no group loyalty ledger
       },
       {
         key: 'reviews',
@@ -178,7 +180,7 @@ export const NAVIGATION: NavSection[] = [
         to: '/notifications',
         icon: 'ki-notification-status',
         permission: 'notifications.view',
-        backendGap: true, // reservation-scoped feed only; no staff-wide feed
+        scope: 'hotel',
       },
     ],
   },
@@ -191,8 +193,7 @@ export const NAVIGATION: NavSection[] = [
         labelKey: 'nav.reports',
         to: '/reports',
         icon: 'ki-chart-simple',
-        permission: 'hotels.view',
-        backendGap: true, // no reporting endpoints
+        permission: 'reports.view',
       },
     ],
   },
@@ -249,8 +250,7 @@ export const NAVIGATION: NavSection[] = [
         labelKey: 'nav.audit',
         to: '/audit',
         icon: 'ki-notepad-edit',
-        permission: 'users.view',
-        backendGap: true, // audit written on every sensitive action, no read endpoint
+        permission: 'audit.view',
       },
     ],
   },

@@ -26,14 +26,36 @@ function open() {
         </form>
       </DataCard>
 
-      <div class="lg:col-span-2">
-        <UnavailablePanel
-          :body="t('gap.checkoutBody')"
-          :endpoints="['GET /api/v1/hotels/{hotel}/departures', 'GET /api/v1/checkouts?status=awaiting_settlement']"
-          alternative-to="/reservations"
-          :alternative-label="t('nav.reservations')"
-        />
-      </div>
+      <DataCard :title="t('checkoutPage.shortcuts')" class="lg:col-span-2">
+        <div class="flex flex-col gap-3 p-4 sm:p-5">
+          <NuxtLink to="/digital-access?tab=departures" class="flex items-center gap-3 rounded-lg border border-border p-3 transition-colors hover:bg-secondary/60">
+            <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <KtIcon name="exit-left" />
+            </div>
+            <div class="min-w-0">
+              <div class="font-medium text-foreground">
+                {{ t('nav.digitalAccess') }}
+              </div>
+              <p class="text-2sm text-muted-foreground">
+                {{ t('checkoutPage.departuresHint') }}
+              </p>
+            </div>
+          </NuxtLink>
+          <NuxtLink to="/settlements" class="flex items-center gap-3 rounded-lg border border-border p-3 transition-colors hover:bg-secondary/60">
+            <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <KtIcon name="bank" />
+            </div>
+            <div class="min-w-0">
+              <div class="font-medium text-foreground">
+                {{ t('nav.settlements') }}
+              </div>
+              <p class="text-2sm text-muted-foreground">
+                {{ t('checkoutPage.settlementsHint') }}
+              </p>
+            </div>
+          </NuxtLink>
+        </div>
+      </DataCard>
     </div>
   </div>
 </template>

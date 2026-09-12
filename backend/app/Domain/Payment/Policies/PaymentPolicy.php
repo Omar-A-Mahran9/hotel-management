@@ -2,6 +2,7 @@
 
 namespace App\Domain\Payment\Policies;
 
+use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\IdentityAccess\Models\User;
 use App\Domain\IdentityAccess\Services\HotelAccessService;
 use App\Domain\Reservation\Models\Reservation;
@@ -32,5 +33,16 @@ class PaymentPolicy
     {
         return $user->hasPermission('payments.manage')
             && $this->hotelAccess->canAccessHotel($user, $reservation->hotel_id);
+    }
+
+    /**
+     * The staff payments ledger for a hotel — a read, not a financial
+     * action, so it takes the separate `payments.view` permission (granted
+     * to Reception too, unlike `payments.manage`).
+     */
+    public function viewLedger(User $user, Hotel $hotel): bool
+    {
+        return $user->hasPermission('payments.view')
+            && $this->hotelAccess->canAccessHotel($user, $hotel->id);
     }
 }

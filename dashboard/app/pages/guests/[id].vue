@@ -1,19 +1,37 @@
 <script setup lang="ts">
-import { guestsService } from '~/services'
+import { guestsService, loyaltyService } from '~/services'
 import type { Column } from '~/components/DataTable.vue'
-import type { Reservation } from '~/types/api'
+import type { LoyaltyTransaction, Reservation } from '~/types/api'
 import { RESERVATION_STATUS_TONE } from '~/utils/reservationStateMachine'
 import { date, money } from '~/utils/format'
 
 definePageMeta({ permission: 'guests.view' })
 
 const { t } = useI18n()
+const { can } = useCan()
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const id = Number(route.params.id)
+const canViewLoyalty = can('loyalty.view')
 
 const guest = useResource(() => guestsService.get(id))
+
+const loyaltyAccount = useResource(
+  () => loyaltyService.forGuest(id),
+  { immediate: canViewLoyalty },
+)
+const loyaltyTransactions = useResource(
+  () => loyaltyService.transactionsForGuest(id),
+  { immediate: canViewLoyalty },
+)
+
+const loyaltyColumns: Column[] = [
+  { key: 'created_at', label: t('loyaltyPage.when') },
+  { key: 'type', label: t('loyaltyPage.type') },
+  { key: 'points', label: t('loyaltyPage.points'), align: 'end' },
+  { key: 'description', label: t('loyaltyPage.description') },
+]
 
 const page = ref(1)
 const reservations = useResource(() => guestsService.reservations(id, page.value))
@@ -104,6 +122,60 @@ const columns: Column[] = [
               />
             </template>
           </DataTable>
+        </DataCard>
+
+        <DataCard v-if="canViewLoyalty" :title="t('nav.loyalty')">
+          <LoadingState v-if="loyaltyAccount.pending.value" :rows="1" />
+          <ErrorState
+            v-else-if="loyaltyAccount.error.value"
+            :error="loyaltyAccount.error.value"
+            @retry="loyaltyAccount.reload"
+          />
+          <template v-else-if="loyaltyAccount.data.value">
+            <div class="flex items-center gap-3 border-b border-border px-4 py-4 sm:px-5">
+              <div class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <KtIcon name="medal-star" class="size-5" />
+              </div>
+              <div>
+                <div class="text-2sm text-muted-foreground">
+                  {{ t('loyaltyPage.balance') }}
+                </div>
+                <div class="text-lg font-semibold text-foreground">
+                  {{ t('loyaltyPage.pointsValue', { count: loyaltyAccount.data.value.points_balance }) }}
+                </div>
+              </div>
+            </div>
+
+            <DataTable
+              :columns="loyaltyColumns"
+              :rows="loyaltyTransactions.data.value ?? []"
+              :loading="loyaltyTransactions.pending.value"
+              :error="loyaltyTransactions.error.value"
+              :empty-title="t('loyaltyPage.empty')"
+              @retry="loyaltyTransactions.reload"
+            >
+              <template #cell-created_at="{ row }">
+                {{ dateTime((row as LoyaltyTransaction).created_at) }}
+              </template>
+              <template #cell-type="{ row }">
+                <StatusBadge
+                  :label="t(`loyaltyPage.type${(row as LoyaltyTransaction).type === 'earn' ? 'Earn' : 'Redeem'}`)"
+                  :tone="(row as LoyaltyTransaction).type === 'earn' ? 'success' : 'warning'"
+                />
+              </template>
+              <template #cell-points="{ row }">
+                <span
+                  class="font-medium"
+                  :class="(row as LoyaltyTransaction).type === 'earn' ? 'text-success' : 'text-warning'"
+                >
+                  {{ (row as LoyaltyTransaction).type === 'earn' ? '+' : '-' }}{{ (row as LoyaltyTransaction).points }}
+                </span>
+              </template>
+              <template #cell-description="{ row }">
+                {{ (row as LoyaltyTransaction).description || t('common.notAvailable') }}
+              </template>
+            </DataTable>
+          </template>
         </DataCard>
       </div>
     </template>

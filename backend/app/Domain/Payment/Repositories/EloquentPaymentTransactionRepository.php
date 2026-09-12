@@ -44,6 +44,20 @@ class EloquentPaymentTransactionRepository implements PaymentTransactionReposito
         return bcadd((string) $sum, '0', 2);
     }
 
+    public function collectedSumsGroupedByReservationForHotel(int $hotelId): array
+    {
+        return PaymentTransaction::query()
+            ->join('payments', 'payments.id', '=', 'payment_transactions.payment_id')
+            ->where('payments.hotel_id', $hotelId)
+            ->whereIn('payment_transactions.type', PaymentTransaction::COLLECTED_TYPES)
+            ->where('payment_transactions.status', PaymentTransaction::STATUS_SUCCEEDED)
+            ->groupBy('payments.reservation_id')
+            ->selectRaw('payments.reservation_id as reservation_id, COALESCE(SUM(payment_transactions.amount), 0) as aggregate')
+            ->pluck('aggregate', 'reservation_id')
+            ->map(fn ($v) => bcadd((string) $v, '0', 2))
+            ->all();
+    }
+
     public function create(array $data): PaymentTransaction
     {
         return PaymentTransaction::create($data)->refresh();

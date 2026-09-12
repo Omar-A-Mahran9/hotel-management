@@ -6,17 +6,20 @@ use App\Domain\Reservation\Models\Guest;
 use App\Domain\Reservation\Services\GuestService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Guests\IndexGuestRequest;
+use App\Http\Requests\Api\V1\Guests\StoreGuestRequest;
 use App\Http\Resources\V1\GuestResource;
 use App\Http\Resources\V1\ReservationResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
- * Staff-facing guest directory — read-only (a Guest's own data is only
- * ever mutated through the guest app's own profile flow). Not hotel-scoped:
- * a Guest may hold reservations across multiple hotels, so `guests.view`
- * alone gates it; the reservations sub-list is still filtered through the
- * caller's own hotel access.
+ * Staff-facing guest directory. Mostly read-only (a Guest's own data is
+ * normally mutated only through the guest app's own profile flow); store()
+ * is the one staff-initiated write, for front desk registering a walk-in
+ * (`guests.manage`). Not hotel-scoped: a Guest may hold reservations across
+ * multiple hotels, so `guests.view`/`guests.manage` alone gate it; the
+ * reservations sub-list is still filtered through the caller's own hotel
+ * access.
  */
 class GuestController extends Controller
 {
@@ -29,6 +32,20 @@ class GuestController extends Controller
         return $this->success(GuestResource::collection(
             $this->guests->list($request->filters(), $request->perPage())
         ));
+    }
+
+    /**
+     * POST /api/v1/guests — register a walk-in guest (front desk, no app
+     * account yet). No OTP: the phone stays unverified until its owner
+     * verifies it themselves in the guest app.
+     */
+    public function store(StoreGuestRequest $request): JsonResponse
+    {
+        $this->authorize('create', Guest::class);
+
+        $guest = $this->guests->create($request->guestData());
+
+        return $this->success(new GuestResource($guest), __('api.created'), 201);
     }
 
     public function show(Request $request, Guest $guest): JsonResponse

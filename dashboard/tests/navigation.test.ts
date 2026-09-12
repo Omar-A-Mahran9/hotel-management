@@ -5,10 +5,11 @@ import { filterNavigation, gapItemsFor, isItemVisible } from '~/utils/navigation
 const GROUP_OWNER_PERMS = [
   'hotel-groups.manage', 'hotels.view', 'hotels.manage', 'users.view', 'users.manage',
   'roles.view', 'permissions.view', 'inventory.view', 'inventory.manage',
-  'reservations.view', 'reservations.manage', 'payments.manage', 'loyalty.view',
+  'reservations.view', 'reservations.manage', 'payments.manage', 'payments.view', 'loyalty.view',
   'services.view', 'services.manage', 'loyalty.rules.manage', 'invoice.view',
   'folio.view', 'checkout.perform', 'notifications.view', 'check-in.perform',
-  'locations.view', 'locations.manage',
+  'locations.view', 'locations.manage', 'guests.view', 'reviews.view', 'reviews.moderate',
+  'reports.view', 'audit.view',
 ]
 const RECEPTION_PERMS = [
   'hotels.view', 'inventory.view', 'reservations.view', 'check-in.perform',
@@ -28,7 +29,7 @@ describe('navigation filter', () => {
     expect(keys).not.toContain('users') // needs users.view
     expect(keys).not.toContain('roles') // needs roles.view
     expect(keys).not.toContain('hotel-group') // needs hotel-groups.manage
-    expect(keys).not.toContain('payments') // needs payments.manage
+    expect(keys).not.toContain('payments') // needs payments.view
   })
 
   it('shows every IA section item to a Group Owner', () => {
@@ -43,7 +44,7 @@ describe('navigation filter', () => {
     ]))
   })
 
-  it('keeps backend-gap items visible in their own section (they route to an honest page)', () => {
+  it('every finance-section item routes to a real page', () => {
     const nav = filterNavigation(NAVIGATION, { permissions: GROUP_OWNER_PERMS, hasHotels: true })
     const finance = nav.find(s => s.key === 'finance')
     expect(finance?.items.map(i => i.key)).toContain('payments')
@@ -69,11 +70,8 @@ describe('navigation filter', () => {
     expect(adminWithout?.items.find(i => i.key === 'locations')).toBeFalsy()
   })
 
-  it('gapItemsFor lists the documented gaps the user could otherwise see', () => {
+  it('gapItemsFor finds no remaining gaps — every requested module now has a real endpoint', () => {
     const gaps = gapItemsFor(NAVIGATION, GROUP_OWNER_PERMS).map(i => i.key)
-    expect(gaps).toContain('reports')
-    expect(gaps).toContain('audit')
-    expect(gaps).toContain('guests')
-    expect(gaps).not.toContain('hotels') // hotels has a real endpoint
+    expect(gaps).toEqual([])
   })
 })

@@ -334,6 +334,18 @@ class NotificationService
     }
 
     /**
+     * The staff-wide `in_app` feed for a hotel — a pure read, no workflow
+     * decision.
+     *
+     * @param  array{unread_only?: bool}  $filters
+     * @return LengthAwarePaginator<Notification>
+     */
+    public function listForHotel(int $hotelId, array $filters, int $perPage = 20): LengthAwarePaginator
+    {
+        return $this->notifications->paginateForHotelChannel($hotelId, NotificationChannel::InApp, $filters, $perPage);
+    }
+
+    /**
      * Resolve one notification that belongs to $reservation and mark it read.
      * A missing id, or an id belonging to another reservation, is an
      * identical ModelNotFoundException (rendered as a plain 404).

@@ -56,6 +56,22 @@ class EloquentFolioChargeRepository implements FolioChargeRepositoryInterface
         return bcadd((string) $sum, '0', 2);
     }
 
+    public function sumsGroupedByReservationForHotel(int $hotelId, array $statuses): array
+    {
+        if ($statuses === []) {
+            return [];
+        }
+
+        return FolioCharge::query()
+            ->where('hotel_id', $hotelId)
+            ->whereIn('status', $statuses)
+            ->groupBy('reservation_id')
+            ->selectRaw('reservation_id, COALESCE(SUM(total_amount), 0) as aggregate')
+            ->pluck('aggregate', 'reservation_id')
+            ->map(fn ($v) => bcadd((string) $v, '0', 2))
+            ->all();
+    }
+
     public function create(array $data): FolioCharge
     {
         return FolioCharge::create($data)->refresh();

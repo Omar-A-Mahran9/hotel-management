@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\Inventory\Services\RoomTypeService;
 use App\Domain\Reservation\Models\Reservation;
 use App\Domain\Reservation\Services\ReservationExtensionService;
@@ -9,6 +10,7 @@ use App\Domain\Reservation\Services\ReservationService;
 use App\Domain\StayServices\Services\FolioService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Reservation\ExtendReservationRequest;
+use App\Http\Requests\Api\V1\Reservation\IndexFrontDeskRequest;
 use App\Http\Requests\Api\V1\Reservation\StoreReservationRequest;
 use App\Http\Requests\Api\V1\Reservation\TransitionReservationRequest;
 use App\Http\Resources\V1\FolioResource;
@@ -143,5 +145,51 @@ class ReservationController extends Controller
             'extension' => new ReservationExtensionResource($extension),
             'folio' => new FolioResource($this->folios->folioFor($updated)),
         ], __('api.updated'));
+    }
+
+    /**
+     * GET /api/v1/hotels/{hotel}/arrivals
+     *
+     * Front-desk arrivals for one date (defaults to today).
+     */
+    public function arrivals(IndexFrontDeskRequest $request, Hotel $hotel): JsonResponse
+    {
+        $this->authorize('viewFrontDesk', [Reservation::class, $hotel]);
+
+        $date = $request->requestedDate() ?? CarbonImmutable::now()->toDateString();
+
+        return $this->success(ReservationResource::collection(
+            $this->reservations->arrivalsForHotel($hotel->id, $date, $request->perPage())
+        ), __('api.front_desk.arrivals'));
+    }
+
+    /**
+     * GET /api/v1/hotels/{hotel}/departures
+     *
+     * Front-desk departures for one date (defaults to today).
+     */
+    public function departures(IndexFrontDeskRequest $request, Hotel $hotel): JsonResponse
+    {
+        $this->authorize('viewFrontDesk', [Reservation::class, $hotel]);
+
+        $date = $request->requestedDate() ?? CarbonImmutable::now()->toDateString();
+
+        return $this->success(ReservationResource::collection(
+            $this->reservations->departuresForHotel($hotel->id, $date, $request->perPage())
+        ), __('api.front_desk.departures'));
+    }
+
+    /**
+     * GET /api/v1/hotels/{hotel}/in-house
+     *
+     * Every reservation currently occupying a room at this hotel.
+     */
+    public function inHouse(IndexFrontDeskRequest $request, Hotel $hotel): JsonResponse
+    {
+        $this->authorize('viewFrontDesk', [Reservation::class, $hotel]);
+
+        return $this->success(ReservationResource::collection(
+            $this->reservations->inHouseForHotel($hotel->id, $request->perPage())
+        ), __('api.front_desk.in_house'));
     }
 }

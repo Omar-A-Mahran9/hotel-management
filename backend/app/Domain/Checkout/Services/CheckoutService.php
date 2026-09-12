@@ -19,6 +19,7 @@ use App\Domain\Reservation\Repositories\Contracts\ReservationRepositoryInterface
 use App\Domain\Reservation\Services\ReservationService;
 use App\Domain\StayServices\Services\FolioChargeService;
 use App\Domain\StayServices\Services\FolioService;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
@@ -90,6 +91,18 @@ class CheckoutService
         }
 
         return $this->result($checkout->id);
+    }
+
+    /**
+     * The staff settlements ledger for a hotel — a pure read, no workflow
+     * decision. A "settlement" is a Checkout row; the domain has no
+     * separate Settlement entity.
+     *
+     * @param  array{status?: string|null}  $filters
+     */
+    public function listForHotel(int $hotelId, array $filters, int $perPage): LengthAwarePaginator
+    {
+        return $this->checkouts->paginateForHotel($hotelId, $filters, $perPage);
     }
 
     /**

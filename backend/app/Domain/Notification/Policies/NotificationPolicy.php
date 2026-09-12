@@ -2,6 +2,7 @@
 
 namespace App\Domain\Notification\Policies;
 
+use App\Domain\HotelGroup\Models\Hotel;
 use App\Domain\IdentityAccess\Models\User;
 use App\Domain\IdentityAccess\Services\HotelAccessService;
 use App\Domain\Reservation\Models\Reservation;
@@ -35,5 +36,15 @@ class NotificationPolicy
     public function markRead(User $user, Reservation $reservation): bool
     {
         return $this->viewAny($user, $reservation);
+    }
+
+    /**
+     * The staff-wide notification feed for a hotel — same `notifications.view`
+     * permission as the reservation-scoped feed, just hotel-wide.
+     */
+    public function viewAnyForHotel(User $user, Hotel $hotel): bool
+    {
+        return $user->hasPermission('notifications.view')
+            && $this->hotelAccess->canAccessHotel($user, $hotel->id);
     }
 }

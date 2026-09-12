@@ -36,6 +36,16 @@ interface PaymentTransactionRepositoryInterface
     public function sumCollectedForPayment(int $paymentId): string;
 
     /**
+     * The same "succeeded capture + settlement" sum as
+     * sumCollectedForPayment(), computed for every reservation of
+     * $hotelId at once (joined through `payments`) — the folio ledger's
+     * efficient outstanding-balance data source.
+     *
+     * @return array<int, string> reservation_id => decimal-string sum
+     */
+    public function collectedSumsGroupedByReservationForHotel(int $hotelId): array;
+
+    /**
      * `find()` under a `SELECT ... FOR UPDATE` row lock — the lock the
      * Phase 5C payment workflow acquires in Step C (third in the approved
      * Reservation -> Payment -> PaymentTransaction order). Must be called

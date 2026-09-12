@@ -11,6 +11,7 @@ use App\Domain\IdentityAccess\Models\User;
 use App\Domain\Reservation\Models\Reservation;
 use App\Domain\StayServices\Models\FolioCharge;
 use App\Domain\StayServices\Repositories\Contracts\FolioChargeRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\UniqueConstraintViolationException;
 
 /**
@@ -42,6 +43,16 @@ class InvoiceService
     public function findForReservation(Reservation $reservation): ?Invoice
     {
         return $this->invoices->findByReservation($reservation->id);
+    }
+
+    /**
+     * The staff invoices ledger for a hotel — a pure read.
+     *
+     * @param  array{status?: string|null}  $filters
+     */
+    public function listForHotel(int $hotelId, array $filters, int $perPage): LengthAwarePaginator
+    {
+        return $this->invoices->paginateForHotel($hotelId, $filters, $perPage);
     }
 
     /**

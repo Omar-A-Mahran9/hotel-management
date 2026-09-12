@@ -67,4 +67,18 @@ interface NotificationRepositoryInterface
         NotificationChannel $channel,
         string $timestamp,
     ): int;
+
+    /**
+     * The staff-wide `in_app` notification feed for a hotel — every guest
+     * notification across the hotel's reservations, newest first.
+     *
+     * @param  array{unread_only?: bool}  $filters
+     * @return LengthAwarePaginator<Notification>
+     */
+    public function paginateForHotelChannel(
+        int $hotelId,
+        NotificationChannel $channel,
+        array $filters,
+        int $perPage,
+    ): LengthAwarePaginator;
 }

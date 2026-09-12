@@ -58,6 +58,26 @@ class ReservationService
     }
 
     /**
+     * The front-desk arrivals/departures/in-house lists — pure reads, no
+     * workflow decision. Hotel scope is already confirmed by the Policy
+     * before these are called (ReservationPolicy::viewFrontDesk).
+     */
+    public function arrivalsForHotel(int $hotelId, string $date, int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->reservations->paginateArrivalsForHotel($hotelId, $date, $perPage);
+    }
+
+    public function departuresForHotel(int $hotelId, string $date, int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->reservations->paginateDeparturesForHotel($hotelId, $date, $perPage);
+    }
+
+    public function inHouseForHotel(int $hotelId, int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->reservations->paginateInHouseForHotel($hotelId, $perPage);
+    }
+
+    /**
      * The guest booking API's read scope: a guest sees only their own
      * reservations (guest_id === $guest->id). Same thin delegation as
      * listAccessibleBy() — the ownership filter is the whole authorization.

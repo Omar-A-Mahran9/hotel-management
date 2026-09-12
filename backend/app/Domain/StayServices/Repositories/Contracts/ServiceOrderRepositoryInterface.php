@@ -24,6 +24,17 @@ interface ServiceOrderRepositoryInterface
     public function find(int $id): ?ServiceOrder;
 
     /**
+     * Order counts by status, plus revenue grouped by currency (SUM of
+     * total_amount for CONFIRMED/FULFILLED orders only — the statuses a
+     * folio charge has actually been posted for; never summed across
+     * currencies), for $hotelId, requested within [$from, $to] — the
+     * services report's data source.
+     *
+     * @return array{by_status: array<string, int>, revenue: list<array{currency: string, amount: string}>}
+     */
+    public function statsForHotel(int $hotelId, string $from, string $to): array;
+
+    /**
      * `find()` under a `SELECT ... FOR UPDATE` row lock. Call only from
      * within an active DB::transaction().
      */

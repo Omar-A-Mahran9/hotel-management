@@ -526,6 +526,11 @@ class ReservationServiceTest extends TestCase
                 // throw, or create() would fail for an unrelated reason.
                 return 1;
             }
+
+            public function countByHotel(int $hotelId): int
+            {
+                throw new LogicException('not used by this test');
+            }
         };
 
         $service = new ReservationService(

@@ -47,4 +47,11 @@ interface RoomRepositoryInterface
      * status.
      */
     public function countByRoomType(int $roomTypeId): int;
+
+    /**
+     * Total physical Rooms belonging to $hotelId, regardless of room type
+     * or operational status — the capacity figure the occupancy report
+     * compares booked room-nights against.
+     */
+    public function countByHotel(int $hotelId): int;
 }

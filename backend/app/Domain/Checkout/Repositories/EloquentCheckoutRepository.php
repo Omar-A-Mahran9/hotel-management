@@ -4,9 +4,20 @@ namespace App\Domain\Checkout\Repositories;
 
 use App\Domain\Checkout\Models\Checkout;
 use App\Domain\Checkout\Repositories\Contracts\CheckoutRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class EloquentCheckoutRepository implements CheckoutRepositoryInterface
 {
+    public function paginateForHotel(int $hotelId, array $filters, int $perPage): LengthAwarePaginator
+    {
+        return Checkout::query()
+            ->where('hotel_id', $hotelId)
+            ->when(($filters['status'] ?? null) !== null, fn ($q) => $q->where('status', $filters['status']))
+            ->latest()
+            ->paginate($perPage)
+            ->withQueryString();
+    }
+
     public function find(int $id): ?Checkout
     {
         return Checkout::query()->find($id);

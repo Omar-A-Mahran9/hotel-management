@@ -47,4 +47,27 @@ class EloquentReviewRepository implements ReviewRepositoryInterface
             ->latest()
             ->paginate($perPage);
     }
+
+    public function statsForHotel(int $hotelId, string $from, string $to): array
+    {
+        $byStatus = Review::query()
+            ->where('hotel_id', $hotelId)
+            ->whereBetween('created_at', ["{$from} 00:00:00", "{$to} 23:59:59"])
+            ->groupBy('status')
+            ->selectRaw('status, COUNT(*) as aggregate')
+            ->pluck('aggregate', 'status')
+            ->all();
+
+        $rating = Review::query()
+            ->where('hotel_id', $hotelId)
+            ->whereBetween('created_at', ["{$from} 00:00:00", "{$to} 23:59:59"])
+            ->selectRaw('COALESCE(SUM(rating), 0) as rating_sum, COUNT(rating) as rated_count')
+            ->first();
+
+        return [
+            'by_status' => $byStatus,
+            'rating_sum' => (int) ($rating->rating_sum ?? 0),
+            'rated_count' => (int) ($rating->rated_count ?? 0),
+        ];
+    }
 }

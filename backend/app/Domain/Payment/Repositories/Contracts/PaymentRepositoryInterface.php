@@ -3,9 +3,38 @@
 namespace App\Domain\Payment\Repositories\Contracts;
 
 use App\Domain\Payment\Models\Payment;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 interface PaymentRepositoryInterface
 {
+    /**
+     * Every Payment belonging to a hotel (the staff payments ledger),
+     * newest first. `status` is an optional exact-match filter over
+     * Payment::STATUSES.
+     *
+     * @param  array{status?: string|null}  $filters
+     */
+    public function paginateForHotel(int $hotelId, array $filters, int $perPage): LengthAwarePaginator;
+
+    /**
+     * Payment counts by status for $hotelId, created within [$from, $to]
+     * — the payments report's data source.
+     *
+     * @return array<string, int>
+     */
+    public function countsByStatusForHotel(int $hotelId, string $from, string $to): array;
+
+    /**
+     * Captured-or-settled money in for $hotelId within [$from, $to],
+     * grouped by currency (a deployment may not be single-currency, and
+     * amounts are never summed across currencies) — the revenue report's
+     * data source. Rows shaped `{currency: string, total: string}`.
+     *
+     * @return Collection<int, object{currency: string, total: string}>
+     */
+    public function sumCapturedForHotelByCurrency(int $hotelId, string $from, string $to): Collection;
+
     /**
      * Plain lookup by id — no authorization decision is made here, that is
      * the Policy's responsibility (added in a later sub-phase).

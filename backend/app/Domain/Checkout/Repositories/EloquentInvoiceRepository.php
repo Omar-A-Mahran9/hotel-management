@@ -5,9 +5,20 @@ namespace App\Domain\Checkout\Repositories;
 use App\Domain\Checkout\Models\Invoice;
 use App\Domain\Checkout\Models\InvoiceItem;
 use App\Domain\Checkout\Repositories\Contracts\InvoiceRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class EloquentInvoiceRepository implements InvoiceRepositoryInterface
 {
+    public function paginateForHotel(int $hotelId, array $filters, int $perPage): LengthAwarePaginator
+    {
+        return Invoice::query()
+            ->where('hotel_id', $hotelId)
+            ->when(($filters['status'] ?? null) !== null, fn ($q) => $q->where('status', $filters['status']))
+            ->latest()
+            ->paginate($perPage)
+            ->withQueryString();
+    }
+
     public function find(int $id): ?Invoice
     {
         return Invoice::query()->with('items')->find($id);

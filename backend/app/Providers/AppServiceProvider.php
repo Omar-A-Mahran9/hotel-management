@@ -105,6 +105,10 @@ use App\Domain\Reservation\Models\Guest;
 use App\Domain\Reservation\Models\Reservation;
 use App\Domain\Reservation\Policies\GuestPolicy;
 use App\Domain\Reservation\Policies\ReservationPolicy;
+use App\Domain\Audit\Models\AuditLog;
+use App\Domain\Audit\Policies\AuditLogPolicy;
+use App\Domain\Audit\Repositories\Contracts\AuditLogRepositoryInterface;
+use App\Domain\Audit\Repositories\EloquentAuditLogRepository;
 use App\Domain\Reservation\Repositories\Contracts\GuestRepositoryInterface;
 use App\Domain\Reservation\Repositories\Contracts\ReservationExtensionRepositoryInterface;
 use App\Domain\Reservation\Repositories\Contracts\ReservationRepositoryInterface;
@@ -176,6 +180,7 @@ class AppServiceProvider extends ServiceProvider
         LoyaltyRuleRepositoryInterface::class => EloquentLoyaltyRuleRepository::class,
         NotificationRepositoryInterface::class => EloquentNotificationRepository::class,
         ReviewRepositoryInterface::class => EloquentReviewRepository::class,
+        AuditLogRepositoryInterface::class => EloquentAuditLogRepository::class,
     ];
 
     /**
@@ -205,6 +210,7 @@ class AppServiceProvider extends ServiceProvider
         LoyaltyRule::class => LoyaltyRulePolicy::class,
         Notification::class => NotificationPolicy::class,
         Review::class => ReviewPolicy::class,
+        AuditLog::class => AuditLogPolicy::class,
         Guest::class => GuestPolicy::class,
     ];
 
@@ -288,6 +294,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Gate::define('permissions.view', fn (User $user) => $user->hasPermission('permissions.view'));
+        Gate::define('reports.view', fn (User $user) => $user->hasPermission('reports.view'));
 
         $this->registerGuestAuthRateLimiters();
         $this->registerPaymentRateLimiters();

@@ -6,8 +6,10 @@ use App\Domain\Payment\Models\Payment;
 use App\Domain\Payment\Repositories\Contracts\PaymentRepositoryInterface;
 use App\Domain\Payment\Repositories\Contracts\PaymentTransactionRepositoryInterface;
 use App\Domain\Reservation\Models\Reservation;
+use App\Domain\Reservation\Repositories\Contracts\ReservationRepositoryInterface;
 use App\Domain\StayServices\Models\FolioCharge;
 use App\Domain\StayServices\Repositories\Contracts\FolioChargeRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 /**
@@ -35,6 +37,7 @@ class FolioService
         private readonly FolioChargeRepositoryInterface $charges,
         private readonly PaymentRepositoryInterface $payments,
         private readonly PaymentTransactionRepositoryInterface $paymentTransactions,
+        private readonly ReservationRepositoryInterface $reservations,
     ) {}
 
     public function folioFor(Reservation $reservation): Folio
@@ -61,6 +64,63 @@ class FolioService
             outstandingTotal: $outstanding,
             currency: $this->resolveCurrency($charges, $payment),
         );
+    }
+
+    /**
+     * The standalone folio ledger for a hotel — every reservation with a
+     * live folio, newest check-in first, optionally narrowed to a guest/
+     * reservation-id search and/or "outstanding balance only".
+     *
+     * Returns a paginator of Reservation, NOT of Folio: computing the
+     * exact authoritative Folio (this class's own folioFor()) for a whole
+     * hotel's history would mean one query set per reservation, which does
+     * not scale. Instead, "outstanding only" is decided by two single
+     * grouped-SUM queries (charges vs. collected payments, per
+     * reservation) — cheap, indexed, and reusing the exact same status
+     * constants folioFor() itself reads (FolioCharge::OWED_STATUSES /
+     * PaymentTransaction::COLLECTED_TYPES via the repositories below), so
+     * it can never diverge from what folioFor() would compute. The
+     * caller is expected to call folioFor() on each row of the returned
+     * (bounded, paginated) page to render the authoritative totals.
+     *
+     * @param  array{search?: string|null, outstanding_only?: bool}  $filters
+     * @return LengthAwarePaginator<Reservation>
+     */
+    public function listForHotel(int $hotelId, array $filters, int $perPage): LengthAwarePaginator
+    {
+        $listFilters = ['search' => $filters['search'] ?? null];
+
+        if (! empty($filters['outstanding_only'])) {
+            $listFilters['reservation_ids'] = $this->outstandingReservationIdsForHotel($hotelId);
+        }
+
+        return $this->reservations->paginateForFolioLedger($hotelId, $listFilters, $perPage);
+    }
+
+    /**
+     * Reservation ids of $hotelId whose charges_total (OWED_STATUSES)
+     * exceeds their collected payments_total (COLLECTED_TYPES, succeeded)
+     * — the exact folioFor() formula, evaluated for every reservation via
+     * two grouped SUMs instead of N folioFor() calls.
+     *
+     * @return list<int>
+     */
+    private function outstandingReservationIdsForHotel(int $hotelId): array
+    {
+        $chargesByReservation = $this->charges->sumsGroupedByReservationForHotel($hotelId, FolioCharge::OWED_STATUSES);
+        $paymentsByReservation = $this->paymentTransactions->collectedSumsGroupedByReservationForHotel($hotelId);
+
+        $ids = [];
+
+        foreach ($chargesByReservation as $reservationId => $chargesTotal) {
+            $paid = $paymentsByReservation[$reservationId] ?? '0.00';
+
+            if (bccomp($chargesTotal, $paid, 2) > 0) {
+                $ids[] = (int) $reservationId;
+            }
+        }
+
+        return $ids;
     }
 
     /**
